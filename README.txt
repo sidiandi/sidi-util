@@ -16,7 +16,8 @@ Sidi.Util
   The library itself
 
 Sidi.Util.Test
+  NUnit tests for Sidi.Util classes
 
-src/Lucene.Net
-  NUnit tests for the library classes.
+fixcsproj
+  Sample program for Sidi.CommandLine. Fixes build paths of csproj files.
 
