@@ -8,8 +8,8 @@ my $libDir = File::Spec->catdir($0, "..", "..", "lib");
 my $cacheDir = File::Spec->catdir($ENV{TEMP}, 'get-req-cache');
 mkpath $libDir;
 
-downloadAndExtract("http://dfn.dl.sourceforge.net/sourceforge/sqlite-dotnet2/SQLite-1.0.58.0-binaries.zip", $libDir, 'SQLite-1.0.58.0');
-downloadAndExtract("http://ovh.dl.sourceforge.net/sourceforge/sqlite-dotnet2/SQLite-1.0.58.0-source.zip", $libDir, 'SQLite-1.0.58.0');
+downloadAndExtract("http://dfn.dl.sourceforge.net/sourceforge/sqlite-dotnet2/SQLite-1.0.60.0-binaries.zip", $libDir, 'SQLite');
+downloadAndExtract("http://ovh.dl.sourceforge.net/sourceforge/sqlite-dotnet2/SQLite-1.0.60.0-source.zip", $libDir, 'SQLite');
 downloadAndExtract("http://www.componentace.com/data/distr/zlib.NET_104.zip", $libDir, 'zlib.NET_104');
 downloadAndExtract("http://kent.dl.sourceforge.net/sourceforge/sharpdevelop/SharpZipLib_0855_Bin.zip", $libDir, 'SharpZipLib_0855');
 downloadAndExtract("http://archive.apache.org/dist/incubator/log4net/1.2.10/incubating-log4net-1.2.10.zip", $libDir, '.');
