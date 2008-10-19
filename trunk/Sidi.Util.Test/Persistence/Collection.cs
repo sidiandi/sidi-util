@@ -111,7 +111,10 @@ namespace Sidi.Persistence.Test
         [SetUp]
         public void Init()
         {
-            File.Delete(path);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
             addressBook = new Sidi.Persistence.Collection<Address>(path, table);
             Write();
         }
