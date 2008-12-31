@@ -79,7 +79,7 @@ namespace Sidi.Util
             }
         }
 
-        IArchive ProvideArchive(string path)
+        public static IArchive ProvideArchive(string path)
         {
             string ext = new FileInfo(path).Extension.ToLower();
             if (ext == ".zip")

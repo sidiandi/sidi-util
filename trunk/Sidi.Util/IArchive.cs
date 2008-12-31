@@ -18,7 +18,7 @@ using System.Text;
 
 namespace Sidi.Util
 {
-    interface IArchive
+    public interface IArchive
     {
         void Extract(string destinationDirectory, string memberName);
         void ExtractAll(string destinationDirectory);
