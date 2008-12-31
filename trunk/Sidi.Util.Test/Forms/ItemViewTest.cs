@@ -94,6 +94,23 @@ namespace Sidi.Forms.Test
             //Assert.AreEqual(ValueItShouldBe, TestObjectsValue, "Error message to display if not");            
         }
 
+        bool itemActivated = false;
+
+        [Test()]
+        public void ItemsActivated()
+        {
+            itemActivated = false;
+            itemView.ItemsActivated += new EventHandler(itemView_ItemsActivated);
+            Form f = Sidi.Forms.Util.AsForm(itemView);
+            Application.Run(f);
+            Assert.IsTrue(itemActivated);
+        }
+
+        void itemView_ItemsActivated(object sender, EventArgs e)
+        {
+            itemActivated = true;
+        }
+
         [Test()]
         public void ItemViewOneItem()
         {
