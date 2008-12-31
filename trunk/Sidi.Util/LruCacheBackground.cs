@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using System.Threading;
 
 namespace Sidi.Collections
@@ -29,6 +28,11 @@ namespace Sidi.Collections
         }
 
         public delegate void EntryUpdatedHandler(object sender, EntryUpdatedEventArgs arg);
+        
+        /// <summary>
+        /// Fires when an entry in the cache was updated.
+        /// </summary>
+        /// Warning: this event will be fired by a background thread.
         public event EntryUpdatedHandler EntryUpdated;
 
         enum State
@@ -185,18 +189,14 @@ namespace Sidi.Collections
 
         protected virtual void OnEntryUpdated(Key key)
         {
+            EntryUpdatedEventArgs a = new EntryUpdatedEventArgs();
+            a.key = key;
+
             foreach (LruCacheBackground<Key, Value> instance in m_shared.m_instances)
             {
                 if (instance.EntryUpdated != null)
                 {
-                    EntryUpdatedEventArgs a = new EntryUpdatedEventArgs();
-                    a.key = key;
-
-                    if (Application.OpenForms.Count > 0)
-                    {
-                        Control c = Application.OpenForms[0];
-                        c.BeginInvoke(instance.EntryUpdated, new object[] { this, a });
-                    }
+                    instance.EntryUpdated(this, a);
                 }
             }
         }
