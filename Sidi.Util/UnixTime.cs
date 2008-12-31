@@ -38,8 +38,9 @@ namespace Sidi.Util
         // [CLSCompliant(false)]
         public static uint UnixTimeFromDateTime(DateTime time)
         {
-            uint diff = (uint)(time.Ticks - origin.Ticks);
-            return (uint)((diff / TimeSpan.TicksPerSecond));
+            long diff = time.Ticks - origin.Ticks;
+            long seconds = diff / TimeSpan.TicksPerSecond;
+            return (uint)seconds;
         }
     }
 }
