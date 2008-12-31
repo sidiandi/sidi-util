@@ -435,6 +435,9 @@ namespace Sidi.Forms
                     case Keys.Space:
                         KbSelectItem();
                         break;
+                    case Keys.Enter:
+                        OnItemsActivated();
+                        break;
                     default:
                         return;
                 }
@@ -445,6 +448,15 @@ namespace Sidi.Forms
 
         public event EventHandler FocusedItemChanged;
         public event EventHandler SelectionChanged;
+        public event EventHandler ItemsActivated;
+
+        protected virtual void OnItemsActivated()
+        {
+            if (ItemsActivated != null)
+            {
+                ItemsActivated(this, EventArgs.Empty);
+            }
+        }
 
         static public ItemView<Item> Create(IList<Item> list)
         {
@@ -790,8 +802,14 @@ namespace Sidi.Forms
             base.OnMouseDown(e);
             if (e.Button == MouseButtons.Left)
             {
-            MouseGotoItem(ItemIndexAt(e.Location));
+                MouseGotoItem(ItemIndexAt(e.Location));
             }
+        }
+
+        protected override void OnMouseDoubleClick(MouseEventArgs e)
+        {
+            base.OnMouseDoubleClick(e);
+            OnItemsActivated();
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
