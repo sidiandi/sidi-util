@@ -20,9 +20,61 @@ using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.IO;
+using System.Linq;
 
 namespace Sidi.Persistence
 {
+    public static class MemberInfoEx
+    {
+        public static void SetValue(this MemberInfo member, object target, object value)
+        {
+            if (member is FieldInfo)
+            {
+                ((FieldInfo)member).SetValue(target, value);
+            }
+            else if (member is PropertyInfo)
+            {
+                ((PropertyInfo)member).SetValue(target, value, new object[]{});
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+        public static Type FieldType(this MemberInfo member)
+        {
+            if (member is FieldInfo)
+            {
+                return ((FieldInfo)member).FieldType;
+            }
+            else if (member is PropertyInfo)
+            {
+                return ((PropertyInfo)member).PropertyType;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+        public static object GetValue(this MemberInfo member, object item)
+        {
+            if (member is FieldInfo)
+            {
+                return ((FieldInfo)member).GetValue(item);
+            }
+            else if (member is PropertyInfo)
+            {
+                return ((PropertyInfo)member).GetValue(item, new object[] { });
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+    }
+    
     public class Collection<T> : ICollection<T> where T : new()
     {
         string path;
@@ -35,9 +87,9 @@ namespace Sidi.Persistence
         SQLiteCommand deleteByRowId;
         SQLiteCommand containsQuery;
 
-        FieldInfo rowIdField;
+        MemberInfo rowIdMember;
         string rowIdColumn;
-        FieldInfo[] fields;
+        MemberInfo[] members;
 
         Sidi.Collections.LruCache<long, T> cache;
 
@@ -57,31 +109,31 @@ namespace Sidi.Persistence
             connection = null;
         }
 
-        bool IsPrimaryKeyField(FieldInfo f)
+        bool IsPrimaryKeyField(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(PrimaryKey), true);
             return a.Length > 0;
         }
 
-        bool IsRowId(FieldInfo f)
+        bool IsRowId(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(RowId), true);
             return a.Length > 0;
         }
 
-        bool IsDataField(FieldInfo f)
+        bool IsDataField(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(Data), true);
             return a.Length > 0;
         }
 
-        bool IsIndexed(FieldInfo f)
+        bool IsIndexed(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(Indexed), true);
             return a.Length > 0;
         }
 
-        bool IsUnique(FieldInfo f)
+        bool IsUnique(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(Unique), true);
             return a.Length > 0;
@@ -145,14 +197,14 @@ namespace Sidi.Persistence
         {
             connection = a_connection;
 
-            rowIdField = Array.Find(typeof(T).GetFields(), new Predicate<FieldInfo>(IsRowId));
-            if (rowIdField == null)
+            rowIdMember = typeof(T).GetMembers().FirstOrDefault(x => IsRowId(x));
+            if (rowIdMember == null)
             {
                 throw new InvalidDataException("Need [RowId] attribute.");
             }
             rowIdColumn = "oid";
 
-            fields = Array.FindAll(typeof(T).GetFields(), new Predicate<FieldInfo>(IsDataField));
+            members = typeof(T).GetMembers().Where(x => IsDataField(x)).ToArray();
 
             table = a_table;
 
@@ -173,10 +225,8 @@ namespace Sidi.Persistence
             insert = connection.CreateCommand();
             insert.CommandText = String.Format("insert or replace into {0} values({1})",
                 table,
-                String.Join(", ", Array.ConvertAll(Fields, new Converter<FieldInfo, String>(delegate(FieldInfo x)
-                {
-                    return String.Format("@{0}", x.Name);
-                }))));
+                String.Join(", ", Members.Select(x => String.Format("@{0}", x.Name)).ToArray())
+                );
             AddFieldParams(insert);
 
             select = connection.CreateCommand();
@@ -186,10 +236,8 @@ namespace Sidi.Persistence
             containsQuery = connection.CreateCommand();
             containsQuery.CommandText = String.Format("select {0} from {1} where {2}",
                 rowIdColumn, table,
-                String.Join(" AND ", Array.ConvertAll(Fields, new Converter<FieldInfo, String>(delegate(FieldInfo x)
-                {
-                    return String.Format("{0} = @{0}", x.Name);
-                }))));
+                String.Join(" AND ", Members.Select(x => String.Format("{0} = @{0}", x.Name)).ToArray())
+                );
             AddFieldParams(containsQuery);
 
             getDataByRowId = connection.CreateCommand();
@@ -231,7 +279,7 @@ namespace Sidi.Persistence
 
         void CreateIndex()
         {
-            foreach (FieldInfo i in Fields)
+            foreach (MemberInfo i in Members)
             {
                 if (IsIndexed(i))
                 {
@@ -275,7 +323,7 @@ namespace Sidi.Persistence
 
         bool CheckTableSchema()
         {
-            foreach (FieldInfo i in Fields)
+            foreach (MemberInfo i in Members)
             {
                 SQLiteCommand c = connection.CreateCommand();
                 c.CommandText = String.Format("select {0} from {1} limit 1", i.Name, table);
@@ -293,7 +341,7 @@ namespace Sidi.Persistence
 
         void AddFieldParams(SQLiteCommand cmd)
         {
-            foreach (FieldInfo i in Fields)
+            foreach (MemberInfo i in Members)
             {
                 cmd.Parameters.Add(new SQLiteParameter(i.Name));
             }
@@ -308,19 +356,16 @@ namespace Sidi.Persistence
         {
             get
             {
-                string[] names = Array.ConvertAll(Fields, new Converter<FieldInfo, String>(delegate(FieldInfo x)
-                {
-                    return String.Format("{0} = @{0}", x.Name);
-                }));
+                string[] names = Members.Select(x=>String.Format("{0} = @{0}", x.Name)).ToArray();
                 return String.Join(", ", names);
             }
         }
 
-        FieldInfo[] Fields
+        MemberInfo[] Members
         {
             get
             {
-                return fields;
+                return members;
             }
         }
 
@@ -328,10 +373,7 @@ namespace Sidi.Persistence
         {
             get
             {
-                string[] names = Array.ConvertAll(Fields, new Converter<FieldInfo, String>(delegate(FieldInfo x)
-                {
-                    return x.Name;
-                }));
+                string[] names = Members.Select(x => x.Name).ToArray();
                 return String.Join(", ", names);
             }
         }
@@ -340,14 +382,10 @@ namespace Sidi.Persistence
         {
             get
             {
-                string[] names = Array.ConvertAll(Fields, new Converter<FieldInfo, String>(delegate(FieldInfo x)
-                {
-                    return x.Name;
-                }));
+                string[] names = Members.Select(x=>x.Name).ToArray();
                 return rowIdColumn + ", " + String.Join(", ", names);
             }
         }
-
 
         public DbTransaction BeginTransaction()
         {
@@ -477,10 +515,10 @@ namespace Sidi.Persistence
 
         void SetFieldParams(SQLiteCommand cmd, T item)
         {
-            foreach (FieldInfo i in Fields)
+            foreach (MemberInfo i in Members)
             {
                 object v = i.GetValue(item);
-                if (i.FieldType.Equals(typeof(String)))
+                if (FieldType(i).Equals(typeof(String)))
                 {
                     if (v == null)
                     {
@@ -491,13 +529,29 @@ namespace Sidi.Persistence
             }
         }
 
+        Type FieldType(MemberInfo member)
+        {
+            if (member is FieldInfo)
+            {
+                return ((FieldInfo)member).FieldType;
+            }
+            else if (member is PropertyInfo)
+            {
+                return ((PropertyInfo)member).PropertyType;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
         T FromReader(SQLiteDataReader reader)
         {
             T item = new T();
             int index = 0;
-            SetValue(rowIdField, item, reader, index);
+            SetValue(rowIdMember, item, reader, index);
             ++index;
-            foreach (FieldInfo i in Fields)
+            foreach (MemberInfo i in Members)
             {
                 SetValue(i, item, reader, index);
 
@@ -506,7 +560,7 @@ namespace Sidi.Persistence
             return item;
         }
 
-        void SetValue(FieldInfo i, T item, SQLiteDataReader reader, int index)
+        void SetValue(MemberInfo i, T item, SQLiteDataReader reader, int index)
         {
             try
             {
@@ -514,31 +568,31 @@ namespace Sidi.Persistence
                 {
                     i.SetValue(item, null);
                 }
-                else if (i.FieldType == typeof(DateTime))
+                else if (i.FieldType() == typeof(DateTime))
                 {
                     i.SetValue(item, reader.GetDateTime(index));
                 }
-                else if (i.FieldType == typeof(bool))
+                else if (i.FieldType() == typeof(bool))
                 {
                     i.SetValue(item, reader.GetBoolean(index));
                 }
-                else if (i.FieldType == typeof(decimal))
+                else if (i.FieldType() == typeof(decimal))
                 {
                     i.SetValue(item, reader.GetDecimal(index));
                 }
-                else if (i.FieldType == typeof(short))
+                else if (i.FieldType() == typeof(short))
                 {
                     i.SetValue(item, reader.GetInt16(index));
                 }
-                else if (i.FieldType == typeof(int))
+                else if (i.FieldType() == typeof(int))
                 {
                     i.SetValue(item, reader.GetInt32(index));
                 }
-                else if (i.FieldType == typeof(long))
+                else if (i.FieldType() == typeof(long))
                 {
                     i.SetValue(item, reader.GetInt64(index));
                 }
-                else if (i.FieldType == typeof(Guid))
+                else if (i.FieldType() == typeof(Guid))
                 {
                     i.SetValue(item, reader.GetGuid(index));
                 }
@@ -607,7 +661,7 @@ namespace Sidi.Persistence
 
         long GetRowId(T item)
         {
-            return (long) rowIdField.GetValue(item);
+            return (long) rowIdMember.GetValue(item);
         }
 
         void SetRowIdParam(SQLiteCommand cmd, long key)
