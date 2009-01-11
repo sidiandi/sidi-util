@@ -78,6 +78,8 @@ namespace Sidi.Collections
 
         class Shared
         {
+            private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
             public LruCache<Key, CacheEntry> m_cache;
             public Value m_defaultValueWhileLoading = default(Value);
             public bool m_workerStarted = false;
@@ -108,8 +110,9 @@ namespace Sidi.Collections
                                     {
                                         v = instance.m_provideValue(k);
                                     }
-                                    catch (Exception)
+                                    catch (Exception exception)
                                     {
+                                        log.Error(String.Format("Providing value for key {0} failed.", k), exception);
                                     }
 
                                     Monitor.Enter(this);
