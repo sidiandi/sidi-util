@@ -207,7 +207,7 @@ namespace Sidi.Net.Pop3
                  for (int i = 1; i <= Mails.Count; ++i)
                  {
                      Out.WriteLine(UidListing(i));
-                     log.Info(UidListing(i));
+                     log.Debug(UidListing(i));
                  }
                  TerminateMultiline();
              }
@@ -275,7 +275,7 @@ namespace Sidi.Net.Pop3
             get { return _state; }
             set
             {
-                if (log.IsInfoEnabled) log.InfoFormat("State change: {0} -> {1}", _state, value);
+                if (log.IsDebugEnabled) log.DebugFormat("State change: {0} -> {1}", _state, value);
                 _state = value;
             }
         }
@@ -308,11 +308,11 @@ namespace Sidi.Net.Pop3
 
                 if (line.StartsWith("PASS"))
                 {
-                    log.Info("PASS <omitted>");
+                    log.Debug("PASS <omitted>");
                 }
                 else
                 {
-                    log.Info(line);
+                    log.Debug(line);
                 }
 
                 string[] args = System.Text.RegularExpressions.Regex.Split(line, "\\s+");
@@ -338,7 +338,7 @@ namespace Sidi.Net.Pop3
         {
             string line = String.Format("{0} {1}", ok ? positive : negative, response.OneLine(1024));
             Out.WriteLine(line);
-            log.Info(line);
+            log.Debug(line);
             if (!ok)
             {
             }
@@ -348,7 +348,7 @@ namespace Sidi.Net.Pop3
         {
             Respond(ok, response);
             Out.WriteLine(data);
-            log.Info(data);
+            log.Debug(data);
             TerminateMultiline();
         }
 

@@ -392,9 +392,26 @@ namespace Sidi.Persistence
             return connection.BeginTransaction();
         }
 
+        /// <summary>
+        /// Selects a subset of items from the collection
+        /// </summary>
+        /// <param name="query">Part of an SQL statement after the "where" keyword.</param>
+        /// <returns></returns>
         public IList<T> Select(string query)
         {
             return DoSelect(query);
+        }
+
+        /// <summary>
+        /// Selects a subset of items from the collection.
+        /// </summary>
+        /// <param name="query">complete SQL select statement returning row ids</param>
+        /// <returns>List of found items</returns>
+        public IList<T> Query(string query)
+        {
+            SQLiteCommand command = connection.CreateCommand();
+            command.CommandText = query;
+            return DoSelect(command);
         }
 
         public T Find(string query)
