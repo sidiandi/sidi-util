@@ -70,5 +70,14 @@ namespace Sidi.Util
         {
             return "\"" + s + "\"";
         }
+
+        public static string CatDir(this string dir0, params string[] dirs)
+        {
+            foreach (string i in dirs)
+            {
+                dir0 = System.IO.Path.Combine(dir0, i);
+            }
+            return dir0;
+        }
     }
 }
