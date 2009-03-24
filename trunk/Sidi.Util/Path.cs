@@ -99,6 +99,16 @@ namespace Sidi.IO
             return String.Join(new String(System.IO.Path.DirectorySeparatorChar, 1), rel.ToArray());
         }
 
+        public static string CatDir(params string[] dirs)
+        {
+            string r = String.Empty;
+            foreach (string i in dirs)
+            {
+                r = System.IO.Path.Combine(r, i);
+            }
+            return r;
+        }
+
         public static string CatDir(IEnumerable<string> dirs)
         {
             string r = String.Empty;
@@ -108,5 +118,6 @@ namespace Sidi.IO
             }
             return r;
         }
+
     }
 }
