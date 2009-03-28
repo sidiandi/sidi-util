@@ -102,7 +102,7 @@ namespace Sidi.Persistence.Test
             public byte[] aByteArray = System.Text.ASCIIEncoding.ASCII.GetBytes("Hello, World!");
         }
 
-        string path = Sidi.IO.Path.BinFile(@"test-data\Sidi.Persistence.Test.sqlite");
+        string path = Sidi.IO.FileUtil.BinFile(@"test-data\Sidi.Persistence.Test.sqlite");
         string table = "a";
         int count = 10;
 

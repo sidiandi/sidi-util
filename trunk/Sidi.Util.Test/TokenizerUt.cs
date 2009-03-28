@@ -25,7 +25,7 @@ using System.Linq;
 using Sidi.CommandLine;
 using System.IO;
 
-namespace Sidi.Util.Tests
+namespace Sidi.Util.Test
 {
     [TestFixture]
     public class TokenizerUt

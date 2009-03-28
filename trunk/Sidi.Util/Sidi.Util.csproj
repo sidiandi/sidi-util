@@ -134,7 +134,7 @@
     <Compile Include="LruCacheBackground.cs" />
     <Compile Include="LruCacheBackgroundAutoInvalidate.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="Path.cs" />
+    <Compile Include="FileUtil.cs" />
     <Compile Include="Persistence\Attributes.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\Dictionary.cs" />

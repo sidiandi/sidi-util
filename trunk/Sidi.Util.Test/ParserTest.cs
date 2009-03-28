@@ -24,7 +24,7 @@ using NUnit.Framework;
 //TODO - Add imports your going to test here
 using Sidi.CommandLine;
 
-namespace Sidi.Util.Tests
+namespace Sidi.Util.Test
 {
     [TestFixture]
     public class ParserTest
