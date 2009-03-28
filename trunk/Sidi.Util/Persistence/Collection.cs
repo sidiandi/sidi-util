@@ -730,12 +730,12 @@ namespace Sidi.Persistence
             c.ExecuteNonQuery();
         }
 
-        class ResultProxy<T> : IList<T> where T : new()
+        class ResultProxy<TItem> : IList<TItem> where TItem : new()
         {
             IList<long> primaryKeys;
-            Collection<T> source;
+            Collection<TItem> source;
 
-            public ResultProxy(Collection<T> a_source, IList<long> a_primaryKeys)
+            public ResultProxy(Collection<TItem> a_source, IList<long> a_primaryKeys)
             {
                 source = a_source;
                 primaryKeys = a_primaryKeys;
@@ -743,12 +743,12 @@ namespace Sidi.Persistence
 
             #region IList<T> Members
 
-            public int IndexOf(T item)
+            public int IndexOf(TItem item)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public void Insert(int index, T item)
+            public void Insert(int index, TItem item)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
@@ -758,7 +758,7 @@ namespace Sidi.Persistence
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public T this[int index]
+            public TItem this[int index]
             {
                 get
                 {
@@ -774,7 +774,7 @@ namespace Sidi.Persistence
 
             #region ICollection<T> Members
 
-            public void Add(T item)
+            public void Add(TItem item)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
@@ -784,14 +784,14 @@ namespace Sidi.Persistence
                 primaryKeys.Clear();
             }
 
-            public bool Contains(T item)
+            public bool Contains(TItem item)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public void CopyTo(T[] array, int arrayIndex)
+            public void CopyTo(TItem[] array, int arrayIndex)
             {
-                foreach (T i in this)
+                foreach (TItem i in this)
                 {
                     array[arrayIndex++] = i;
                 }
@@ -807,7 +807,7 @@ namespace Sidi.Persistence
                 get { return true; }
             }
 
-            public bool Remove(T item)
+            public bool Remove(TItem item)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
@@ -816,7 +816,7 @@ namespace Sidi.Persistence
 
             #region IEnumerable<T> Members
 
-            public IEnumerator<T> GetEnumerator()
+            public IEnumerator<TItem> GetEnumerator()
             {
                 foreach (long i in primaryKeys)
                 {
