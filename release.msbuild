@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <MSBuildCommunityTasksPath Condition="'$(MSBuildCommunityTasksPath)' == ''">D:\work\msbuildtasks\Source\MSBuild.Community.Tasks\bin\Debug</MSBuildCommunityTasksPath>
+        <MSBuildCommunityTasksLib>$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.dll</MSBuildCommunityTasksLib>
+    </PropertyGroup>
+    <Import Project="D:\work\msbuildtasks\Source\MSBuild.Community.Tasks\bin\Debug\MSBuild.Community.Tasks.Targets"/>
+
+    <ItemGroup>
+        <ZipFiles Include="D:\work\build\Sidi.Util\bin\Release\**\*.*" Exclude="" />
+    </ItemGroup>
+    
+    <PropertyGroup>
+        <ProjectName>Sidi.Util</ProjectName>
+        <PackageDir>..\build\$(ProjectName)\package</PackageDir>
+    </PropertyGroup>
+  
+    <Target Name="Build" >
+        <SvnCommit 
+            Targets="." 
+            Message="Auto commit from MSBuild." >
+        </SvnCommit>
+        <SvnVersion 
+            LocalPath=".">
+            <Output TaskParameter="Revision" PropertyName="Revision" />
+        </SvnVersion>
+        <MSBuild
+            Projects="$(ProjectName).sln" Properties="Configuration=Release" />
+        <Zip
+            Files="@(ZipFiles)" 
+            ZipFileName="$(PackageDir)\$(ProjectName)-$(Revision).zip">
+        </Zip>
+        <GoogleCode.Upload
+            ProjectName="sidi-util"
+            LocalFile="$(PackageDir)\$(ProjectName)-$(Revision).zip"
+            RemoteFile="$(ProjectName)-$(Revision).zip"
+            Summary="Revision $(Revision)"
+            />
+    </Target>
+</Project>

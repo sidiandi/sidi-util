@@ -56,7 +56,7 @@
     <Compile Include="IntSetTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="ParserTest.cs" />
-    <Compile Include="PathTest.cs" />
+    <Compile Include="FileUtilTest.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

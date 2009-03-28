@@ -18,16 +18,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using NUnit.Framework;
+using Sidi.IO;
+using System.IO;
 #endregion
 
 //Test Specific Imports
 //TODO - Add imports your going to test here
 
-namespace Sidi.Util.Tests
+namespace Sidi.Util.Test
 {
 
     [TestFixture]
-    public class PathUt
+    public class FileUtilTest
     {
         #region "Custom Trace Listener"
         MyListener listener = new MyListener();
@@ -75,10 +77,35 @@ namespace Sidi.Util.Tests
         [Test()]
         public void TestGetRelativePath()
         {
-            Assert.AreEqual(@"b\c", Sidi.IO.Path.GetRelativePath(@"a", @"a\b\c"));
-            Assert.AreEqual(@"..\..", Sidi.IO.Path.GetRelativePath(@"a\b\c", @"a"));
-            Assert.AreEqual(@"a", Sidi.IO.Path.GetRelativePath(@".", @".\a"));
-            Assert.AreEqual(@"..", Sidi.IO.Path.GetRelativePath(@".\a", @"."));
+            Assert.AreEqual(FileUtil.GetRelativePath(@"a\b\c", @"a"), @"b\c");
+            Assert.AreEqual(FileUtil.GetRelativePath(@"a", @"a\b\c"), @"..\..");
+            Assert.AreEqual(FileUtil.GetRelativePath(@".\a", @"."), @"a");
+            Assert.AreEqual(FileUtil.GetRelativePath(@".", @".\a"), @"..");
+
+            Assert.AreEqual(@"a\b\c".GetRelativePath(@"a"), @"b\c");
+            Assert.AreEqual(@"a".GetRelativePath(@"a\b\c"), @"..\..");
+            Assert.AreEqual(@".\a".GetRelativePath(@"."), @"a");
+            Assert.AreEqual(@".".GetRelativePath(@".\a"), @"..");
+        }
+
+        [Test]
+        public void Sibling()
+        {
+            Assert.AreEqual(@"a\b".Sibling("c"), @"a\c");
+        }
+
+        [Test]
+        public void GetFileSystemInfo()
+        {
+            string p = FileUtil.BinFile("test");
+            FileSystemInfo fi = p.GetFileSystemInfo();
+            Assert.AreEqual(fi.FullName, p);
+        }
+
+        [Test]
+        public void CatDir()
+        {
+            Assert.AreEqual(FileUtil.CatDir("a", "b", "c"), @"a\b\c");
         }
     }
 
