@@ -20,9 +20,9 @@ using System.Reflection;
 
 namespace Sidi.IO
 {
-    public static class Path
+    public static class FileUtil
     {
-        public static string Sibling(string path, string append)
+        public static string Sibling(this string path, string siblingName)
         {
             DirectoryInfo parent = System.IO.Directory.GetParent(path);
             if (!parent.Exists)
@@ -31,29 +31,33 @@ namespace Sidi.IO
             }
             return System.IO.Path.Combine(
                 parent.FullName,
-                append);
+                siblingName);
         }
 
+        public static string Sibling(this Assembly assembly, string siblingName)
+        {
+            return Sibling(assembly.Location, siblingName);
+        }
+
+        /// <summary>
+        /// Returns a file in the same directory as the assembly.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string BinFile(string path)
         {
             return Assembly.GetExecutingAssembly().Sibling(path);
         }
 
-        public static string Sibling(this Assembly assembly, string path)
-        {
-            return Sibling(assembly.Location, path);
-        }
-
-        public static string UserSetting(Type type, string name)
+        public static string UserSetting(this Type type, string name)
         {
             string root = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
             string assemblyName = type.Assembly.GetName().Name;
-            string path = System.IO.Path.Combine(root, assemblyName);
-            path = System.IO.Path.Combine(path, name);
+            string path = CatDir(root, assemblyName, name);
             return path;
         }
 
-        public static System.IO.FileSystemInfo GetFileSystemInfo(string path)
+        public static System.IO.FileSystemInfo GetFileSystemInfo(this string path)
         {
             FileInfo f = new FileInfo(path);
             if ((f.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
@@ -66,13 +70,13 @@ namespace Sidi.IO
             }
         }
 
-        public static string GetRelativePath(string from, string to)
+        public static string GetRelativePath(this string path, string basePath)
         {
-            from = System.IO.Path.GetFullPath(from);
-            to = System.IO.Path.GetFullPath(to);
+            basePath = System.IO.Path.GetFullPath(basePath);
+            path = System.IO.Path.GetFullPath(path);
 
-            string[] fromDirs = from.Split(System.IO.Path.DirectorySeparatorChar);
-            string[] toDirs = to.Split(System.IO.Path.DirectorySeparatorChar);
+            string[] fromDirs = basePath.Split(System.IO.Path.DirectorySeparatorChar);
+            string[] toDirs = path.Split(System.IO.Path.DirectorySeparatorChar);
 
             int i = 0;
             for (; i < fromDirs.Length && i < toDirs.Length; ++i)
@@ -118,6 +122,5 @@ namespace Sidi.IO
             }
             return r;
         }
-
     }
 }
