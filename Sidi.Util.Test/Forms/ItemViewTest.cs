@@ -27,7 +27,7 @@ using System.Windows.Forms;
 namespace Sidi.Forms.Test
 {
 
-    [TestFixture]
+    [TestFixture, Ignore]
     public class ItemViewTest
     {
         #region "Custom Trace Listener"

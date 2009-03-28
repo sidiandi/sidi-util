@@ -24,7 +24,7 @@ using NUnit.Framework;
 //TODO - Add imports your going to test here
 using Sidi.Util;
 
-namespace Sidi.Util.Tests
+namespace Sidi.Util.Test
 {
 
     [TestFixture]

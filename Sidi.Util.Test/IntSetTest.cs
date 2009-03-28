@@ -25,7 +25,7 @@ using NUnit.Framework;
 using Sidi.Collections;
 using Sidi.Util;
 
-namespace Sidi.Util.Tests
+namespace Sidi.Util.Test
 {
 
     [TestFixture]

@@ -382,7 +382,7 @@ namespace Sidi.CommandLine
             }
             else if (type == typeof(FileSystemInfo))
             {
-                return Sidi.IO.Path.GetFileSystemInfo(stringRepresentation);
+                return Sidi.IO.FileUtil.GetFileSystemInfo(stringRepresentation);
             }
             else if (type == typeof(DateTime))
             {

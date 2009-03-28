@@ -23,7 +23,7 @@ namespace Sidi.IO
     {
         public void Recurse(string path, FileHandler handler)
         {
-            Recurse(Sidi.IO.Path.GetFileSystemInfo(path), handler);
+            Recurse(Sidi.IO.FileUtil.GetFileSystemInfo(path), handler);
         }
 
         int m_maxLevel = Int32.MaxValue;
