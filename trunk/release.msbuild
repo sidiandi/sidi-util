@@ -5,6 +5,7 @@
  
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
+        <BuildDir>$(MSBuildProjectDirectory)\..\build\$(ProjectName)\bin\Release</BuildDir>
         <PackageDir>$(MSBuildProjectDirectory)\..\build\$(ProjectName)\package</PackageDir>
         
         <Major>1</Major>
@@ -13,7 +14,7 @@
     </PropertyGroup>
   
     <ItemGroup>
-        <ZipFiles Include="D:\work\build\Sidi.Util\bin\Release\**\*.*" Exclude="" />
+        <ZipFiles Include="$(BuildDir)\**\*.*" />
     </ItemGroup>
     
     <Target Name="Commit" >
@@ -49,7 +50,8 @@
 
     <Target Name="Package" DependsOnTargets="Build">
         <Zip
-            Files="@(ZipFiles)" 
+            Files="@(ZipFiles)"
+            WorkingDirectory="$(BuildDir)"
             ZipFileName="$(PackageDir)\$(ProjectName)-$(Revision).zip">
         </Zip>
     </Target>
