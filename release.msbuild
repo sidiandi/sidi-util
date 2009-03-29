@@ -5,8 +5,11 @@
  
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
-        <BuildDir>$(MSBuildProjectDirectory)\..\build\$(ProjectName)\bin\Release</BuildDir>
-        <PackageDir>$(MSBuildProjectDirectory)\..\build\$(ProjectName)\package</PackageDir>
+        <RootDir>$(MSBuildProjectDirectory)</RootDir>
+        <BuildDir>$(RootDir)\..\build\$(ProjectName)</BuildDir>
+        <OutputDir>$(BuildDir)\bin\Release</OutputDir>
+        <PackageDir>$(BuildDir)\Package</PackageDir>
+        <DocDir>$(BuildDir)\Documentation</DocDir>
         
         <Major>1</Major>
         <Minor>0</Minor>
@@ -58,6 +61,14 @@
             ZipFileName="$(PackageFileName)" />
     </Target>
 
+    <Target Name="Doc" DependsOnTargets="Build">
+        <NDoc Documenter="MSDN"
+            ProjectFilePath="Sidi.Util.ndoc"
+            WorkingDirectory="$(DocRoot)"
+            ToolPath="$(ndocPath)"
+            />
+    </Target>
+            
     <Target Name="Upload" DependsOnTargets="Package">
         <GoogleCode.Upload
             ProjectName="sidi-util"
