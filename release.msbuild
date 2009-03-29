@@ -3,15 +3,19 @@
 
     <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
  
+    <PropertyGroup>
+        <ProjectName>Sidi.Util</ProjectName>
+        <PackageDir>..\build\$(ProjectName)\package</PackageDir>
+        
+        <Major>1</Major>
+        <Minor>0</Minor>
+        <Build>0</Build>
+    </PropertyGroup>
+  
     <ItemGroup>
         <ZipFiles Include="D:\work\build\Sidi.Util\bin\Release\**\*.*" Exclude="" />
     </ItemGroup>
     
-    <PropertyGroup>
-        <ProjectName>Sidi.Util</ProjectName>
-        <PackageDir>..\build\$(ProjectName)\package</PackageDir>
-    </PropertyGroup>
-  
     <Target Name="UpdateVersion" >
         <SvnCommit 
             Targets="." 
