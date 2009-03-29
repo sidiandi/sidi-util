@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Upload" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
  
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
+        <Major>1</Major>
+        <Minor>0</Minor>
+        <Build>0</Build>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <RootDir>$(MSBuildProjectDirectory)</RootDir>
         <BuildDir>$(RootDir)\..\build\$(ProjectName)</BuildDir>
         <OutputDir>$(BuildDir)\bin\Release</OutputDir>
         <PackageDir>$(BuildDir)\Package</PackageDir>
-        <DocDir>$(RootDir)\Documentation</DocDir>
-        
-        <Major>1</Major>
-        <Minor>0</Minor>
-        <Build>0</Build>
-
+        <DocDir>$(RootDir)\doc</DocDir>
         <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
-
     </PropertyGroup>
   
     <ItemGroup>
@@ -49,7 +49,7 @@
             AssemblyFileVersion="$(Version)" />
     </Target>
 
-  <Target Name="Build" DependsOnTargets="Commit;UpdateVersion">
+  <Target Name="Build" DependsOnTargets="UpdateVersion">
         <MSBuild
             Projects="$(ProjectName).sln" Properties="Configuration=Release" />
     </Target>
@@ -62,13 +62,16 @@
     </Target>
 
     <Target Name="Doc" DependsOnTargets="Build">
-        <NDoc Documenter="MSDN"
+        <NDoc
+            Documenter="MSDN-CHM"
             ProjectFilePath="Sidi.Util.ndoc"
             WorkingDirectory="$(DocDir)"
+            ToolPath="D:\work\msbuildtasks\Documentation\ndoc"
             />
+        <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
             
-    <Target Name="Upload" DependsOnTargets="Package">
+    <Target Name="Upload" DependsOnTargets="Commit;Package">
         <GoogleCode.Upload
             ProjectName="sidi-util"
             LocalFile="$(PackageFileName)"
@@ -76,4 +79,6 @@
             Summary="Build for Version $(Version)"
             />
     </Target>
+    
+    <Target Name="Release" DependsOnTargets="Upload" />
 </Project>
