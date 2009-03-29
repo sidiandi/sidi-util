@@ -16,11 +16,14 @@
         <ZipFiles Include="D:\work\build\Sidi.Util\bin\Release\**\*.*" Exclude="" />
     </ItemGroup>
     
-    <Target Name="UpdateVersion" >
+    <Target Name="Commit" >
         <SvnCommit 
             Targets="." 
             Message="Auto commit from MSBuild." >
         </SvnCommit>
+    </Target>
+
+    <Target Name="UpdateVersion" >
         <SvnVersion 
             LocalPath=".">
             <Output TaskParameter="Revision" PropertyName="Revision" />
@@ -28,7 +31,7 @@
         <Message Text="Version $(Major).$(Minor).$(Build).$(Revision)" />
     </Target>
 
-  <Target Name="Build" DependsOnTargets="UpdateVersion">
+  <Target Name="Build" DependsOnTargets="Commit;UpdateVersion">
         <MSBuild
             Projects="$(ProjectName).sln" Properties="Configuration=Release" />
     </Target>
