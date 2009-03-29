@@ -59,8 +59,8 @@
     <Target Name="Upload" DependsOnTargets="Package">
         <GoogleCode.Upload
             ProjectName="sidi-util"
-            LocalFile="$(PackageDir)\$(ProjectName)-$(Revision).zip"
-            RemoteFile="$(ProjectName)-$(Revision).zip"
+            LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
+            RemoteFile="$(ProjectName)-$(Version).zip"
             Summary="Revision $(Revision)"
             />
     </Target>
