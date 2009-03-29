@@ -5,7 +5,7 @@
  
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
-        <PackageDir>..\build\$(ProjectName)\package</PackageDir>
+        <PackageDir>$(MSBuildProjectDirectory)\..\build\$(ProjectName)\package</PackageDir>
         
         <Major>1</Major>
         <Minor>0</Minor>
@@ -18,7 +18,7 @@
     
     <Target Name="Commit" >
         <SvnCommit 
-            Targets="." 
+            Targets="$(MSBuildProjectDirectory)"
             Message="Auto commit from MSBuild." >
         </SvnCommit>
     </Target>
