@@ -8,9 +8,7 @@
         <Major>1</Major>
         <Minor>0</Minor>
         <Build>0</Build>
-    </PropertyGroup>
 
-    <PropertyGroup>
         <RootDir>$(MSBuildProjectDirectory)</RootDir>
         <BuildDir>$(RootDir)\..\build\$(ProjectName)</BuildDir>
         <OutputDir>$(BuildDir)\bin\Release</OutputDir>
@@ -41,8 +39,7 @@
                 TaskParameter="Value"
                 PropertyName="Version" />
         </CreateProperty>
-        <Message Text="Version is $(Version)">
-        </Message>
+        <Message Text="Version is $(Version)" />
         <AssemblyInfo CodeLanguage="CS"
             OutputFile="VersionInfo.cs" 
             AssemblyVersion="$(Version)" 
@@ -52,13 +49,6 @@
   <Target Name="Build" DependsOnTargets="UpdateVersion">
         <MSBuild
             Projects="$(ProjectName).sln" Properties="Configuration=Release" />
-    </Target>
-
-    <Target Name="Package" DependsOnTargets="Build">
-        <Zip
-            Files="@(ZipFiles)"
-            WorkingDirectory="$(BuildDir)"
-            ZipFileName="$(PackageFileName)" />
     </Target>
 
     <Target Name="Doc" DependsOnTargets="Build">
@@ -71,10 +61,17 @@
         <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
             
+    <Target Name="Package" DependsOnTargets="Build;Doc">
+        <Zip
+            Files="@(ZipFiles)"
+            WorkingDirectory="$(OutputDir)"
+            ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
+    </Target>
+
     <Target Name="Upload" DependsOnTargets="Commit;Package">
         <GoogleCode.Upload
             ProjectName="sidi-util"
-            LocalFile="$(PackageFileName)"
+            LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
             RemoteFile="$(ProjectName)-$(Version).zip"
             Summary="Build for Version $(Version)"
             />
