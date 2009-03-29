@@ -11,6 +11,9 @@
         <Major>1</Major>
         <Minor>0</Minor>
         <Build>0</Build>
+
+        <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
+
     </PropertyGroup>
   
     <ItemGroup>
@@ -52,9 +55,7 @@
         <Zip
             Files="@(ZipFiles)"
             WorkingDirectory="$(BuildDir)"
-            ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip">
-            <Output TaskParameter="ZipFileName" PropertyName="PackageFileName" />
-        </Zip>
+            ZipFileName="$(PackageFileName)" />
     </Target>
 
     <Target Name="Upload" DependsOnTargets="Package">
