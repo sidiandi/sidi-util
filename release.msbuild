@@ -28,7 +28,18 @@
             LocalPath=".">
             <Output TaskParameter="Revision" PropertyName="Revision" />
         </SvnVersion>
-        <Message Text="Version $(Major).$(Minor).$(Build).$(Revision)" />
+        <CreateProperty
+            Value="$(Major).$(Minor).$(Build).$(Revision)">
+            <Output
+                TaskParameter="Value"
+                PropertyName="Version" />
+        </CreateProperty>
+        <Message Text="Version is $(Version)">
+        </Message>
+        <AssemblyInfo CodeLanguage="CS"
+            OutputFile="VersionInfo.cs" 
+            AssemblyVersion="$(Version)" 
+            AssemblyFileVersion="$(Version)" />
     </Target>
 
   <Target Name="Build" DependsOnTargets="Commit;UpdateVersion">
