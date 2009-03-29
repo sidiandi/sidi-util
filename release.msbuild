@@ -52,16 +52,17 @@
         <Zip
             Files="@(ZipFiles)"
             WorkingDirectory="$(BuildDir)"
-            ZipFileName="$(PackageDir)\$(ProjectName)-$(Revision).zip">
+            ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip">
+            <Output TaskParameter="ZipFileName" PropertyName="PackageFileName" />
         </Zip>
     </Target>
 
     <Target Name="Upload" DependsOnTargets="Package">
         <GoogleCode.Upload
             ProjectName="sidi-util"
-            LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
+            LocalFile="$(PackageFileName)"
             RemoteFile="$(ProjectName)-$(Version).zip"
-            Summary="Revision $(Revision)"
+            Summary="Build for Version $(Version)"
             />
     </Target>
 </Project>
