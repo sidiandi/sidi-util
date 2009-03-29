@@ -9,7 +9,7 @@
         <BuildDir>$(RootDir)\..\build\$(ProjectName)</BuildDir>
         <OutputDir>$(BuildDir)\bin\Release</OutputDir>
         <PackageDir>$(BuildDir)\Package</PackageDir>
-        <DocDir>$(BuildDir)\Documentation</DocDir>
+        <DocDir>$(RootDir)\Documentation</DocDir>
         
         <Major>1</Major>
         <Minor>0</Minor>
@@ -64,8 +64,7 @@
     <Target Name="Doc" DependsOnTargets="Build">
         <NDoc Documenter="MSDN"
             ProjectFilePath="Sidi.Util.ndoc"
-            WorkingDirectory="$(DocRoot)"
-            ToolPath="$(ndocPath)"
+            WorkingDirectory="$(DocDir)"
             />
     </Target>
             
