@@ -21,6 +21,7 @@
             LocalPath=".">
             <Output TaskParameter="Revision" PropertyName="Revision" />
         </SvnVersion>
+        <Message Text="Version $(Major).$(Minor).$(Build).$(Revision)" />
     </Target>
 
   <Target Name="Build" DependsOnTargets="UpdateVersion">
