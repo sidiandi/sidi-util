@@ -19,6 +19,8 @@
   
     <ItemGroup>
         <ZipFiles Include="$(BuildDir)\**\*.*" />
+        <Assemblies Include="$(OutputDir)\Sidi.Util.dll" />
+        <DocFiles Include="$(OutputDir)\Sidi.Util.chm" />
     </ItemGroup>
     
     <Target Name="Commit" >
@@ -51,7 +53,10 @@
             Projects="$(ProjectName).sln" Properties="Configuration=Release" />
     </Target>
 
-    <Target Name="Doc" DependsOnTargets="Build">
+    <Target Name="Doc" DependsOnTargets="Build"
+        Inputs="@(Assemblies)"
+        Outputs="@(DocFiles)"
+        >
         <NDoc
             Documenter="MSDN-CHM"
             ProjectFilePath="Sidi.Util.ndoc"
