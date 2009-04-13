@@ -41,26 +41,22 @@ namespace Sidi.CommandLine
             m_description = description;
         }
 
-        public static string Get(Type t)
+        public static string Get(ICustomAttributeProvider cap)
         {
-            return Get(t.GetCustomAttributes(typeof(Usage), true));
-        }
-
-        public static string Get(MemberInfo t)
-        {
-            return Get(t.GetCustomAttributes(typeof(Usage), true));
-        }
-
-        public static string Get(object[] attributes)
-        {
-            if (attributes.Length > 0)
+            Usage usage = (Usage)cap.GetCustomAttributes(typeof(Usage), true).FirstOrDefault();
+            if (usage != null)
             {
-                return ((Usage)attributes[0]).Description;
+                return usage.Description;
             }
-            else
+
+            System.ComponentModel.DescriptionAttribute description = (System.ComponentModel.DescriptionAttribute)
+                cap.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), true).FirstOrDefault();
+            if (description != null)
             {
-                return null;
+                return description.Description;
             }
+
+            return null;
         }
     }
 
@@ -140,6 +136,12 @@ namespace Sidi.CommandLine
         }
     }
 
+    /// <summary>
+    /// Command line parser
+    /// </summary>
+    /// Helps to transform your class into a command line application with attributes.
+    /// You only have to decorate your class with [Usage("...")] attributes, and Parser will 
+    /// do the rest for you.
     public class Parser
     {
         object m_application;
