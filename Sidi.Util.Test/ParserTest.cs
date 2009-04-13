@@ -23,6 +23,8 @@ using NUnit.Framework;
 //Test Specific Imports
 //TODO - Add imports your going to test here
 using Sidi.CommandLine;
+using System.ComponentModel;
+using System.IO;
 
 namespace Sidi.Util.Test
 {
@@ -125,7 +127,7 @@ namespace Sidi.Util.Test
             Assert.AreEqual("Hello, Andreas", app.Result);
 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Andreas", "SayHello", "--Name", "Ernie", "SayHello" });
-            Assert.AreEqual("Hello, Claudia", app.Result);
+            Assert.AreEqual("Hello, Ernie", app.Result);
         }
 
         [Test()]
@@ -166,6 +168,28 @@ namespace Sidi.Util.Test
             // --t is not unique, since it could mean --Time or --Times
             parser.Parse(new string[] { "--t", "2008-05-11 11:12:00" });
         }
-    }
 
+        [System.ComponentModel.Description("Test app that uses the Description attribute")]
+        class TestAppWithDescription
+        {
+            [System.ComponentModel.Description("some action")]
+            public void SomeAction()
+            {
+            }
+
+            [System.ComponentModel.Description("some option - marker_for_test_aoifq7ft48q")]
+            public string SomeOption { get; set; }
+        }
+
+        [Test]
+        public void TestDescription()
+        {
+            Parser parser = new Parser(new TestAppWithDescription());
+            parser.Parse(new string[] { "--SomeOption", "hello", "SomeAction" });
+
+            StringWriter w = new StringWriter();
+            parser.PrintSampleScript(w);
+            Assert.IsTrue(w.ToString().Contains("marker_for_test_aoifq7ft48q"));
+        }
+    }
 }
