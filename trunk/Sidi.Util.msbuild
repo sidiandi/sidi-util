@@ -73,7 +73,7 @@
             ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
     </Target>
 
-    <Target Name="Install" DependsOnTargets="Build;Doc">
+    <Target Name="Install" DependsOnTargets="Package">
         <RoboCopy 
                 SourceFolder="$(BuildDir)\bin" 
                 DestinationFolder="D:\work\lib\$(ProjectName)\bin" 
@@ -90,5 +90,5 @@
             />
     </Target>
     
-    <Target Name="Release" DependsOnTargets="Install;Upload" />
+    <Target Name="Release" DependsOnTargets="Upload;Install" />
 </Project>
