@@ -18,7 +18,7 @@
     </PropertyGroup>
   
     <ItemGroup>
-        <ZipFiles Include="$(BuildDir)\**\*.*" />
+        <ZipFiles Include="$(OutputDir)\**\*.*" />
         <Assemblies Include="$(OutputDir)\$(ProjectName).dll" />
         <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
     </ItemGroup>
@@ -75,8 +75,8 @@
 
     <Target Name="Install" DependsOnTargets="Build;Doc">
         <RoboCopy 
-                SourceFolder="$(BuildDir)" 
-                DestinationFolder="D:\work\lib\$(ProjectName)" 
+                SourceFolder="$(BuildDir)\bin" 
+                DestinationFolder="D:\work\lib\$(ProjectName)\bin" 
                 Mirror="true"
             />  
     </Target>
