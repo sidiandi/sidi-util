@@ -19,8 +19,8 @@
   
     <ItemGroup>
         <ZipFiles Include="$(BuildDir)\**\*.*" />
-        <Assemblies Include="$(OutputDir)\Sidi.Util.dll" />
-        <DocFiles Include="$(OutputDir)\Sidi.Util.chm" />
+        <Assemblies Include="$(OutputDir)\$(ProjectName).dll" />
+        <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
     </ItemGroup>
     
     <Target Name="Commit" >
@@ -59,7 +59,7 @@
         >
         <NDoc
             Documenter="MSDN-CHM"
-            ProjectFilePath="Sidi.Util.ndoc"
+            ProjectFilePath="$(ProjectName).ndoc"
             WorkingDirectory="$(DocDir)"
             ToolPath="D:\work\msbuildtasks\Documentation\ndoc"
             />
@@ -73,6 +73,14 @@
             ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
     </Target>
 
+    <Target Name="Install" DependsOnTargets="Build;Doc">
+        <RoboCopy 
+                SourceFolder="$(BuildDir)" 
+                DestinationFolder="D:\work\lib\$(ProjectName)" 
+                Mirror="true"
+            />  
+    </Target>
+
     <Target Name="Upload" DependsOnTargets="Commit;Package">
         <GoogleCode.Upload
             ProjectName="sidi-util"
@@ -82,5 +90,5 @@
             />
     </Target>
     
-    <Target Name="Release" DependsOnTargets="Upload" />
+    <Target Name="Release" DependsOnTargets="Install;Upload" />
 </Project>
