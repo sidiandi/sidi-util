@@ -10,6 +10,7 @@ using Sidi.IO;
 using System.Threading;
 using System.Net.Cache;
 using Microsoft.Build.Framework;
+using System.Windows.Forms;
 
 namespace Sidi.Util
 {
@@ -40,7 +41,7 @@ namespace Sidi.Util
             XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
             using (Stream f = File.OpenWrite(outFile))
             {
-                s.Deserialize(f);
+                s.Serialize(f, this);
             }
         }
     }
@@ -80,18 +81,6 @@ namespace Sidi.Util
         UpdateInfo updateInfo;
         Assembly assembly;
 
-        public class RequiresUpdateEventArgs
-        {
-            public string Message { get; set; }
-            public string InstalledVersion { get; set; }
-            public string AvailableVersion { get; set; }
-            public string DownloadUrl { set; get; }
-        }
-        
-        public delegate void RequiresUpdateEvent(object sender, RequiresUpdateEventArgs e);
-        
-        public event RequiresUpdateEvent RequiresUpdate;
-
         public Assembly Assembly
         {
             get { return assembly; }
@@ -102,11 +91,19 @@ namespace Sidi.Util
         {
             get
             {
-                return assembly.GetName().Version < AvailableVersion;
+                return InstalledVersion < AvailableVersion;
             }
         }
 
-        Version AvailableVersion
+        public Version InstalledVersion
+        {
+            get
+            {
+                return assembly.GetName().Version;
+            }
+        }
+
+        public Version AvailableVersion
         {
             get
             {
@@ -114,12 +111,22 @@ namespace Sidi.Util
             }
         }
 
-        public VersionInfo VersionInfo
+        VersionInfo VersionInfo
         {
             get
             {
                 return updateInfo.VersionInfo.First(x => x.Name.Equals(assembly.GetName().Name));
             }
+        }
+
+        public string DownloadUrl
+        {
+            get { return VersionInfo.DownloadUrl; }
+        }
+
+        public string Message
+        {
+            get { return VersionInfo.Message; }
         }
 
         public UpdateInfo UpdateInfo
@@ -132,36 +139,127 @@ namespace Sidi.Util
                 OnUpdateInfoChanged();
             }
         }
+
+        public UpdateCheck(Uri updateInfoUri)
+            : this(Assembly.GetCallingAssembly(), updateInfoUri)
+        {
+        }
+
         
         public UpdateCheck(Assembly assembly, Uri updateInfoUri)
         {
+            if (assembly == null)
+            {
+                throw new ArgumentNullException("assembly");
+            }
+            if (updateInfoUri == null)
+            {
+                throw new ArgumentNullException("updateInfoUri");
+            }
             this.updateInfoUri = updateInfoUri;
             this.assembly = assembly;
         }
 
-        public void CheckUpdateAvailable()
+        public void Check()
         {
-            ReadUpdateInfo(updateInfoUri);
+            try
+            {
+                ReadUpdateInfo(false);
+            }
+            catch (Exception e)
+            {
+                log.Error("Error during update check", e);
+            }
         }
 
-        public void ReadUpdateInfo(Uri updateInfoUri)
+        Action updateRequiredHandler;
+
+        public void CheckAsync()
+        {
+            CheckAsync(delegate()
+            {
+                FormCollection of = Application.OpenForms;
+                if (of.Count > 0)
+                {
+                    of[0].Invoke(new Action(delegate()
+                    {
+                        UpdateForm u = new UpdateForm(this);
+                        u.ShowDialog();
+                    }));
+                }
+                else
+                {
+                    UpdateForm u = new UpdateForm(this);
+                    u.ShowDialog();
+                }
+            });
+        }
+        
+        public void CheckAsync(Action updateRequiredHandler)
+        {
+            this.updateRequiredHandler = updateRequiredHandler;
+            completed = false;
+            ReadUpdateInfo(true);
+        }
+
+        bool completed = true;
+
+        public void WaitCompleted()
+        {
+            while (!completed)
+            {
+                Thread.Sleep(100);
+            }
+        }
+
+        Uri uri;
+
+        public void ReadUpdateInfo(bool async)
         {
             WebClient web = new WebClient();
             web.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
-            web.DownloadDataCompleted += new DownloadDataCompletedEventHandler(web_DownloadDataCompleted);
             UriBuilder uriBuilder = new UriBuilder(updateInfoUri);
             if (!updateInfoUri.IsFile)
             {
                 AssemblyName an = assembly.GetName();
                 uriBuilder.Query = "name=" + an.Name + "&" + "version=" + an.Version.ToString();
             }
-            log.InfoFormat("Downloading update info from {0}", uriBuilder.Uri);
-            web.DownloadDataAsync(uriBuilder.Uri);
+            uri = uriBuilder.Uri;
+            log.InfoFormat("Downloading update info from {0}", uri);
+            if (async)
+            {
+                web.DownloadDataCompleted += new DownloadDataCompletedEventHandler(web_DownloadDataCompleted);
+                web.DownloadDataAsync(uri);
+            }
+            else
+            {
+                Parse(web.DownloadData(uri));
+            }
         }
 
         void web_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
         {
-            MemoryStream m = new MemoryStream(e.Result);
+            if (e.Error != null)
+            {
+                log.Error(String.Format("Error while downloading {0}", uri), e.Error);
+            }
+            else
+            {
+                try
+                {
+                    Parse(e.Result);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Error while processing update info", ex);
+                }
+            }
+            completed = true;
+        }
+
+        void Parse(byte[] data)
+        {
+            MemoryStream m = new MemoryStream(data);
             XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
             UpdateInfo = (UpdateInfo)s.Deserialize(m);
         }
@@ -173,15 +271,7 @@ namespace Sidi.Util
 
             if (IsUpdateRequired)
             {
-                if (RequiresUpdate != null)
-                {
-                    RequiresUpdateEventArgs e = new RequiresUpdateEventArgs();
-                    e.AvailableVersion = AvailableVersion.ToString();
-                    e.InstalledVersion = Assembly.GetName().Version.ToString();
-                    e.Message = VersionInfo.Message;
-                    e.DownloadUrl = VersionInfo.DownloadUrl;
-                    RequiresUpdate(this, e);
-                }
+                updateRequiredHandler();
             }
         }
     }
