@@ -154,6 +154,12 @@
     <Compile Include="Tokenizer.cs" />
     <Compile Include="UnixTime.cs" />
     <Compile Include="UpdateCheck.cs" />
+    <Compile Include="UpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateForm.Designer.cs">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Zip.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +184,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Forms\Sidi.Forms.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UpdateForm.resx">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

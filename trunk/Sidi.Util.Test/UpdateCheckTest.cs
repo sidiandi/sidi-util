@@ -7,9 +7,12 @@ using System.Reflection;
 using Sidi.IO;
 using System.Threading;
 using NUnit.Framework;
+using Sidi.Util;
+using System.Diagnostics;
 
 namespace Sidi.Util.Test
 {
+
     [TestFixture]
     public class UpdateCheckTest
     {
@@ -41,23 +44,69 @@ namespace Sidi.Util.Test
         {
             UriBuilder u = new UriBuilder();
             Uri uri = new Uri(FileUtil.BinFile(@"Test\UpdateInfo.xml"));
-            // Uri uri = new Uri("http://andreas-grimme.gmxhome.de/trackutil/UpdateInfo.xml");
             UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), uri);
-            c.RequiresUpdate += new UpdateCheck.RequiresUpdateEvent(c_RequiresUpdate);
-            c.CheckUpdateAvailable();
-
-
-            while (c.UpdateInfo == null)
-            {
-                Thread.Sleep(1000);
-            }
-
+            c.Check();
             Assert.IsTrue(c.IsUpdateRequired);
         }
 
-        void c_RequiresUpdate(object sender, UpdateCheck.RequiresUpdateEventArgs e)
+        [Test]
+        public void CheckAsync()
         {
-            log.Info(e.AvailableVersion);
+            UriBuilder u = new UriBuilder();
+            Uri uri = new Uri(FileUtil.BinFile(@"Test\UpdateInfo.xml"));
+            UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), uri);
+            c.CheckAsync(delegate()
+            {
+                log.Info(c.AvailableVersion);
+                log.Info(c.InstalledVersion);
+                log.Info(c.DownloadUrl);
+            });
+
+            c.WaitCompleted();
+            Assert.IsTrue(c.IsUpdateRequired);
+        }
+
+        [Test]
+        public void Writer()
+        {
+            string outFile = FileUtil.BinFile(@"Test\generated.xml");
+            {
+                CreateUpdateInfo cui = new CreateUpdateInfo();
+                cui.OutputFile = outFile;
+                cui.AssemblyFile = Assembly.GetExecutingAssembly().Location;
+                cui.Execute();
+            }
+
+            UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri(outFile));
+            c.Check();
+            Assert.IsTrue(!c.IsUpdateRequired);
+        }
+
+        [Test]
+        public void Test404()
+        {
+            UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri("http://andreas-grimme.gmxhome.de/ThisFileDoesNotExist"));
+            c.Check();
+        }
+
+        [Test]
+        public void TestSimple()
+        {
+            UpdateCheck c = new UpdateCheck(new Uri(FileUtil.BinFile(@"Test\UpdateInfo.xml")));
+            c.CheckAsync();
+            c.WaitCompleted();
+        }
+
+        [Test]
+        public void TestOpen()
+        {
+            Process p = new Process();
+            p.StartInfo.FileName = "http://www.spiegel.de";
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
         }
     }
 }
+
+
+
