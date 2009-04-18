@@ -70,6 +70,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net-1.2.10\bin\net\2.0\release\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build.Framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Data" />
@@ -152,6 +153,7 @@
     <Compile Include="TileGeometry.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="UnixTime.cs" />
+    <Compile Include="UpdateCheck.cs" />
     <Compile Include="Zip.cs" />
   </ItemGroup>
   <ItemGroup>
