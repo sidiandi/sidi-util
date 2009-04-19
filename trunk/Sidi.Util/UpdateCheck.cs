@@ -57,6 +57,8 @@ namespace Sidi.Util
             Assembly a = Assembly.ReflectionOnlyLoadFrom(AssemblyFile);
             VersionInfo v = new VersionInfo();
             v.AssemblyName = a.GetName();
+            v.DownloadUrl = DownloadUrl;
+            v.Message = Message;
             UpdateInfo i = new UpdateInfo();
             i.VersionInfo.Add(v);
             i.Write(OutputFile);
@@ -64,6 +66,8 @@ namespace Sidi.Util
         }
 
         public string AssemblyFile { set; get; }
+        public string DownloadUrl { set; get; }
+        public string Message { set; get; }
 
         public string OutputFile { set; get; }
 
