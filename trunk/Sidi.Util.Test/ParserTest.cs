@@ -191,5 +191,22 @@ namespace Sidi.Util.Test
             parser.PrintSampleScript(w);
             Assert.IsTrue(w.ToString().Contains("marker_for_test_aoifq7ft48q"));
         }
+
+        [Usage("")]
+        public class TestAppWithStringList
+        {
+            [Usage("process all following arguments")]
+            public void Action(List<string> args)
+            {
+                args.Clear();
+            }
+        }
+        
+        [Test]
+        public void ArgList()
+        {
+            Parser parser = new Parser(new TestAppWithStringList());
+            parser.Parse(new string[] { "Action", "arg1", "arg2", "arg3" });
+        }
     }
 }

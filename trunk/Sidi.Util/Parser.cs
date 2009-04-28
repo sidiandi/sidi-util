@@ -412,12 +412,21 @@ namespace Sidi.CommandLine
             {
                 return false;
             }
+
             NextArg();
             ParameterInfo[] parameters = action.GetParameters();
             object[] parameterValues = new object[parameters.Length];
-            for (int i = 0; i < parameters.Length; ++i)
+
+            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(List<string>))
             {
-                parameterValues[i] = ParseValue(NextArg(), parameters[i].ParameterType);
+                parameterValues[0] = args;
+            }
+            else
+            {
+                for (int i = 0; i < parameters.Length; ++i)
+                {
+                    parameterValues[i] = ParseValue(NextArg(), parameters[i].ParameterType);
+                }
             }
             action.Invoke(m_application, parameterValues);
             return true;
