@@ -200,6 +200,25 @@ namespace Sidi.Util.Test
             {
                 args.Clear();
             }
+
+            public void Add(int x, int y)
+            {
+            }
+
+            [Usage("adds")]
+            public void Add(double x, double y)
+            {
+            }
+
+            [Usage("adds")]
+            public void SubtractInt(int x, int y)
+            {
+            }
+
+            [Usage("adds")]
+            public void SubtractDouble(int x, int y)
+            {
+            }
         }
         
         [Test]
@@ -207,6 +226,25 @@ namespace Sidi.Util.Test
         {
             Parser parser = new Parser(new TestAppWithStringList());
             parser.Parse(new string[] { "Action", "arg1", "arg2", "arg3" });
+        }
+
+        [Test]
+        public void Ambiguous()
+        {
+            Parser parser = new Parser(new TestAppWithStringList());
+            parser.Parse(new string[] { "Add", "1.0", "1.0" });
+        }
+
+        [Test]
+        public void Ambiguous2()
+        {
+            Parser.Run(new TestAppWithStringList(), new string[] { "Subtract", "1", "1" });
+        }
+
+        [Test]
+        public void NotEnoughParameters()
+        {
+            Parser.Run(new TestAppWithStringList(), new string[] { "Add", "1" });
         }
     }
 }
