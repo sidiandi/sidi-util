@@ -179,10 +179,10 @@ namespace Sidi.CommandLine
             {
                 parser.Parse(args);
             }
-            catch (CommandLineException e)
+            catch (CommandLineException exception)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(String.Format("Type {0} to get help.", parser.AppType.Assembly.GetName().Name));
+                Console.WriteLine(exception.Message);
+                Console.WriteLine("Type \"{0}\" to get usage information.", parser.ApplicationName);
             }
         }
 
@@ -190,45 +190,45 @@ namespace Sidi.CommandLine
 
         public void Parse(string[] a_args)
         {
-            args = new List<string>(a_args);
-
-            if (args.Count == 0)
-            {
-                ShowUsage();
-                // ShowGui();
-                return;
-            }
-
-            while (args.Count > 0)
-            {
-                if (Application is CommandLineHandler)
-                {
-                    CommandLineHandler h = (CommandLineHandler)Application;
-                    h.BeforeParse(args);
-                }
+                args = new List<string>(a_args);
 
                 if (args.Count == 0)
                 {
-                    break;
+                    ShowUsage();
+                    // ShowGui();
+                    return;
                 }
 
-                if (HandleOption())
+                while (args.Count > 0)
                 {
-                    continue;
-                }
+                    if (Application is CommandLineHandler)
+                    {
+                        CommandLineHandler h = (CommandLineHandler)Application;
+                        h.BeforeParse(args);
+                    }
 
-                if (HandleAction())
-                {
-                    continue;
-                }
+                    if (args.Count == 0)
+                    {
+                        break;
+                    }
 
-                if (HandleUnknown())
-                {
-                    continue;
-                }
+                    if (HandleOption())
+                    {
+                        continue;
+                    }
 
-                throw new CommandLineException("Argument " + args[0] + " is unknown.");
-            }
+                    if (HandleAction())
+                    {
+                        continue;
+                    }
+
+                    if (HandleUnknown())
+                    {
+                        continue;
+                    }
+
+                    throw new CommandLineException("Argument " + args[0] + " is unknown.");
+                }
         }
 
         bool HandleUnknown()
@@ -306,8 +306,9 @@ namespace Sidi.CommandLine
         MemberInfo FuzzyMatch(IEnumerable<MemberInfo> members, string name)
         {
             name = name.ToLower();
+            IEnumerable<MemberInfo> accessibleMembers = members.Where(x => Usage.Get(x) != null);
 
-            foreach (MemberInfo i in members)
+            foreach (MemberInfo i in accessibleMembers)
             {
                 if (i.Name.ToLower() == name)
                 {
@@ -315,27 +316,28 @@ namespace Sidi.CommandLine
                 }
             }
 
-            List<MemberInfo> hits = new List<MemberInfo>();
+            IEnumerable<MemberInfo> hits = accessibleMembers.Where(i => i.Name.ToLower().StartsWith(name));
 
-            foreach (MemberInfo i in members)
+            if (hits.Any())
             {
-                if (i.Name.ToLower().StartsWith(name) && Usage.Get(i) != null)
+                if (hits.Count() > 1)
                 {
-                    hits.Add(i);
+                    throw new CommandLineException(
+                        String.Format(
+                            "Argument {0} is ambiguous. Possible arguments are: {1}", 
+                            name,
+                            hits.Select(x => x.Name).Aggregate((x,y) => x + ", " + y)
+                            )
+                    );
                 }
-            }
-
-            if (hits.Count == 1)
-            {
-                return hits[0];
-            }
-            else if (hits.Count == 0)
-            {
-                return null;
+                else
+                {
+                    return hits.First();
+                }
             }
             else
             {
-                throw new CommandLineException("Parameter " + name + " is ambiguous.");
+                return null;
             }
         }
 
@@ -399,8 +401,6 @@ namespace Sidi.CommandLine
 
         MethodInfo GetAction(string actionName)
         {
-            MethodInfo a = AppType.GetMethod(actionName);
-            if (a != null) return a;
             return (MethodInfo)FuzzyMatch(AppType.GetMethods(), actionName);
         }
 
@@ -423,9 +423,18 @@ namespace Sidi.CommandLine
             }
             else
             {
+                if (args.Count < parameters.Length)
+                {
+                    throw new CommandLineException(String.Format("Not enough parameters for action \"{0}\". {1} parameters are required, but only {2} are supplied.",
+                        action.Name,
+                        parameters.Length,
+                        args.Count));
+                }
+
                 for (int i = 0; i < parameters.Length; ++i)
                 {
-                    parameterValues[i] = ParseValue(NextArg(), parameters[i].ParameterType);
+                    string a = NextArg();
+                    parameterValues[i] = ParseValue(a, parameters[i].ParameterType);
                 }
             }
             action.Invoke(m_application, parameterValues);
@@ -470,15 +479,27 @@ namespace Sidi.CommandLine
             }
         }
 
+        string ApplicationName
+        {
+            get
+            {
+                Assembly a = Assembly.GetEntryAssembly();
+                if (a != null)
+                {
+                    return a.GetName().Name;
+                }
+                return m_application.GetType().Name;
+            }
+        }
+
         public string VersionInfo
         {
             get
             {
                 StringWriter w = new StringWriter();
-                string applicationName = m_application.GetType().Name;
                 w.WriteLine(
                     String.Format("{0} - {1}",
-                    applicationName,
+                    ApplicationName,
                     Usage.Get(m_application.GetType()))
                     );
 
@@ -502,11 +523,10 @@ namespace Sidi.CommandLine
 
         public void ShowUsage()
         {
-            string applicationName = m_application.GetType().Name;
             Console.WriteLine(
                 String.Format("{0} - {1}",
-                applicationName,
-                Usage.Get(m_application.GetType()))
+                    ApplicationName,
+                    Usage.Get(m_application.GetType()))
                 );
 
             Assembly assembly = AppType.Assembly;
@@ -524,7 +544,7 @@ namespace Sidi.CommandLine
             }
 
             Console.WriteLine(String.Join(", ", infos.ToArray()));
-            Console.WriteLine(String.Format("Usage: {0} --option1 value --option2 value action [parameters]", applicationName));
+            Console.WriteLine(String.Format("Usage: {0} --option1 value --option2 value action [parameters]", ApplicationName));
             Console.WriteLine();
             Console.WriteLine("Actions");
             Console.WriteLine();
