@@ -521,29 +521,38 @@ namespace Sidi.CommandLine
             }
         }
 
-        public void ShowUsage()
+        public string Info
         {
-            Console.WriteLine(
+            get
+            {
+                StringWriter i = new StringWriter();
+                i.WriteLine(
                 String.Format("{0} - {1}",
                     ApplicationName,
                     Usage.Get(m_application.GetType()))
                 );
 
-            Assembly assembly = AppType.Assembly;
+                Assembly assembly = AppType.Assembly;
 
-            List<string> infos = new List<string>();
+                List<string> infos = new List<string>();
 
+                infos.Add(String.Format("Version {0}", assembly.GetName().Version));
 
-            infos.Add(String.Format("Version {0}", assembly.GetName().Version));
+                object[] a = assembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
+                a = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+                if (a.Length > 0)
+                {
+                    infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
+                }
 
-            object[] a = assembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
-            a = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            if (a.Length > 0)
-            {
-                infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
+                i.Write(String.Join(", ", infos.ToArray()));
+                return i.ToString();
             }
+        }
 
-            Console.WriteLine(String.Join(", ", infos.ToArray()));
+        public void ShowUsage()
+        {
+            Console.WriteLine(Info);
             Console.WriteLine(String.Format("Usage: {0} --option1 value --option2 value action [parameters]", ApplicationName));
             Console.WriteLine();
             Console.WriteLine("Actions");

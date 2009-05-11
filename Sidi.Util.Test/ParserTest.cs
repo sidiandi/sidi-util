@@ -112,6 +112,16 @@ namespace Sidi.Util.Test
             public string Result;
         }
 
+        [Test]
+        public void Info()
+        {
+            TestApp app = new TestApp();
+            Parser p = new Parser(app);
+            string i = p.Info;
+            Console.WriteLine(i);
+            Assert.IsTrue(i.Contains(app.GetType().Name));
+        }
+
         [Test()]
         public void TestAssertion()
         {
