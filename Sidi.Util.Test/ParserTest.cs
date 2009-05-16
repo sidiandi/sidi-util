@@ -51,6 +51,13 @@ namespace Sidi.Util.Test
         {
         }
 
+        public enum Fruit
+        {
+            Apple,
+            Orange,
+            Pear,
+        };
+
         [Usage("App usage")]
         class TestApp
         {
@@ -84,7 +91,11 @@ namespace Sidi.Util.Test
                 get { return m_Time; }
                 set { m_Time = value; }
             }
+
             public DateTime m_Time;
+
+            [Usage("Demonstrates enums")]
+            public Fruit Fruit { set; get; }
 
             public string Result;
         }
@@ -95,10 +106,23 @@ namespace Sidi.Util.Test
         }
 
         [Test]
+        public void Enum()
+        {
+            TestApp t = new TestApp();
+            Parser.Run(t, new string[] { "--Fruit", "Apple" });
+            Assert.AreEqual(t.Fruit, Fruit.Apple);
+
+            Parser.Run(t, new string[] { "--Fruit", "Orange" });
+            Assert.AreEqual(t.Fruit, Fruit.Orange);
+
+            var usage = StringEx.ToString(new Parser(t).WriteUsage);
+            Assert.IsTrue(usage.Contains(Fruit.Apple.ToString()));
+        }
+
+        [Test]
         public void ShowUsage()
         {
             Parser p = new Parser(new TestApp());
-            p.ShowUsage();
             var usage = StringEx.ToString(x => p.WriteUsage(x));
             Assert.IsTrue(usage.Contains("Options"));
             Assert.IsTrue(usage.Contains("Actions"));

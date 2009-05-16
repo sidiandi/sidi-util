@@ -93,11 +93,16 @@ namespace Sidi.Util
         /// </summary>
         /// <param name="generator">Function that writes something to a TextWriter</param>
         /// <returns>Output string</returns>
-        public static string ToString(Action<TextWriter> generator)
+        public static string ToString(this Action<TextWriter> generator)
         {
             TextWriter w = new StringWriter();
             generator(w);
             return w.ToString();
+        }
+
+        public static string F(this string formatString, params object[] args)
+        {
+            return String.Format(formatString, args);
         }
     }
 }
