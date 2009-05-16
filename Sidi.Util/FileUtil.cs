@@ -26,6 +26,12 @@ namespace Sidi.IO
 {
     public static class FileUtil
     {
+        /// <summary>
+        /// Constructs the path for a sibling of a file, i.e. of a file in the same directory.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="siblingName"></param>
+        /// <returns></returns>
         public static string Sibling(this string path, string siblingName)
         {
             DirectoryInfo parent = System.IO.Directory.GetParent(path);
@@ -37,6 +43,29 @@ namespace Sidi.IO
                 parent.FullName,
                 siblingName);
         }
+
+        /// <summary>
+        /// Searches fileName in directory first, then in all parent directories
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string SearchUp(string directory, string fileName)
+        {
+            if (directory == null)
+            {
+                return null;
+            }
+
+            string p = FileUtil.CatDir(directory, fileName);
+            if (File.Exists(p))
+            {
+                return p;
+            }
+
+            return FileUtil.SearchUp(Path.GetDirectoryName(directory), fileName);
+        }
+
 
         public static string Sibling(this Assembly assembly, string siblingName)
         {
