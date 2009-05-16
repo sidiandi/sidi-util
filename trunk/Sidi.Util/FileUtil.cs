@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using Sidi.Util;
 
 namespace Sidi.IO
 {
@@ -103,7 +104,7 @@ namespace Sidi.IO
                 rel.Add(toDirs[i]);
             }
 
-            return String.Join(new String(System.IO.Path.DirectorySeparatorChar, 1), rel.ToArray());
+            return rel.Join(new String(System.IO.Path.DirectorySeparatorChar, 1));
         }
 
         public static string CatDir(params string[] dirs)

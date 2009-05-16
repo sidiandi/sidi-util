@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
 using System.Globalization;
+using Sidi.Util;
 
 namespace Sidi.CommandLine
 {
@@ -73,10 +74,9 @@ namespace Sidi.CommandLine
             get
             {
                 MethodInfo i = MethodInfo;
-                string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
-                {
-                    return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name);
-                })));
+                string parameters = i.GetParameters()
+                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name))
+                    .Join(" ");
                 return String.Format("{0} {1}", i.Name, parameters);
             }
         }
@@ -120,6 +120,41 @@ namespace Sidi.CommandLine
                         );
                 }
                 throw new InvalidDataException(i.GetType().ToString());
+            }
+        }
+
+        public object GetValue(object application)
+        {
+            MemberInfo i = MemberInfo;
+            if (i.MemberType == MemberTypes.Field)
+            {
+                FieldInfo fieldInfo = (FieldInfo)i;
+                return fieldInfo.GetValue(application);
+            }
+            else if (i.MemberType == MemberTypes.Property)
+            {
+                PropertyInfo propertyInfo = (PropertyInfo)i;
+                return propertyInfo.GetValue(application, new object[] { });
+            }
+            throw new InvalidDataException(i.MemberType.ToString());
+        }
+
+        public Type Type
+        {
+            get
+            {
+                MemberInfo i = MemberInfo;
+                if (i.MemberType == MemberTypes.Field)
+                {
+                    FieldInfo fieldInfo = (FieldInfo)i;
+                    return fieldInfo.FieldType;
+                }
+                else if (i.MemberType == MemberTypes.Property)
+                {
+                    PropertyInfo propertyInfo = (PropertyInfo)i;
+                    return propertyInfo.PropertyType;
+                }
+                throw new InvalidDataException(i.MemberType.ToString());
             }
         }
 
@@ -519,7 +554,7 @@ namespace Sidi.CommandLine
                     infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
                 }
 
-                w.WriteLine(String.Join(", ", infos.ToArray()));
+                w.WriteLine(infos.Join(", "));
                 return w.ToString();
             }
         }
@@ -548,69 +583,60 @@ namespace Sidi.CommandLine
                     infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
                 }
 
-                i.Write(String.Join(", ", infos.ToArray()));
+                i.Write(infos.Join(", "));
                 return i.ToString();
             }
         }
 
+        /// <summary>
+        /// Writes usage information to the console.
+        /// </summary>
         public void ShowUsage()
         {
-            Console.WriteLine(Info);
-            Console.WriteLine(String.Format("Usage: {0} --option1 value --option2 value action [parameters]", ApplicationName));
-            Console.WriteLine();
-            Console.WriteLine("Actions");
-            Console.WriteLine();
+            WriteUsage(Console.Out);
+        }
 
-            foreach (MethodInfo i in m_application.GetType().GetMethods())
+        /// <summary>
+        /// Writes usage information to a TextWriter
+        /// </summary>
+        /// <param name="w">Receives the usage message.</param>
+        public void WriteUsage(TextWriter w)
+        {
+            w.WriteLine(Info);
+            w.WriteLine(String.Format("Usage: {0} --option1 value --option2 value action [parameters]", ApplicationName));
+
+            if (Actions.Any())
             {
-                string u = Usage.Get(i);
-                string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
+                w.WriteLine();
+                w.WriteLine("Actions");
+
+                foreach (Action a in Actions)
                 {
-                    return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name);
-                })));
-                if (u != null)
-                {
-                    Console.WriteLine(String.Format("  {0} {2}\r\n    {1}\r\n", i.Name, u, parameters));
+                    string u = a.Usage;
+                    string parameters = a.MethodInfo.GetParameters().Select(pi =>
+                    {
+                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name);
+                    }).Join(" ");
+                    w.WriteLine();
+                    w.WriteLine(String.Format("  {0} {2}\r\n    {1}", a.Name, u, parameters));
                 }
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Options");
-            Console.WriteLine();
-
-            foreach (MemberInfo i in m_application.GetType().GetMembers())
+            if (Options.Any())
             {
-                if (i.MemberType == MemberTypes.Field)
+                w.WriteLine();
+                w.WriteLine("Options");
+
+                foreach (Option i in Options)
                 {
-                    FieldInfo fieldInfo = (FieldInfo)i;
-                    object defaultValue = fieldInfo.GetValue(m_application);
-                    string u = Usage.Get(i);
-                    if (u != null)
-                    {
-                        Console.WriteLine(String.Format(
-                            cultureInfo,
-                            "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
-                            i.Name,
-                            fieldInfo.FieldType.Name,
-                            u,
-                            defaultValue));
-                    }
-                }
-                else if (i.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo propertyInfo = (PropertyInfo)i;
-                    object defaultValue = propertyInfo.GetValue(m_application, new object[] { });
-                    string u = Usage.Get(i);
-                    if (u != null)
-                    {
-                        Console.WriteLine(String.Format(
-                            cultureInfo,
-                            "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
-                            i.Name,
-                            propertyInfo.PropertyType.Name,
-                            u,
-                            defaultValue));
-                    }
+                    w.WriteLine();
+                    w.WriteLine(String.Format(
+                        cultureInfo,
+                        "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}",
+                        i.Name,
+                        i.Type.Name,
+                        i.Usage,
+                        i.GetValue(m_application)));
                 }
             }
         }
@@ -638,7 +664,7 @@ namespace Sidi.CommandLine
                 infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
             }
 
-            w.WriteLine(String.Join(", ", infos.ToArray()));
+            w.WriteLine(infos.Join(", "));
             w.WriteLine();
             w.WriteLine("Actions");
             w.WriteLine();
@@ -646,10 +672,10 @@ namespace Sidi.CommandLine
             foreach (MethodInfo i in m_application.GetType().GetMethods())
             {
                 string u = Usage.Get(i);
-                string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
-                {
-                    return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name);
-                })));
+                string parameters = i.GetParameters()
+                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name))
+                    .Join(" ");
+
                 if (u != null)
                 {
                     w.WriteLine(String.Format("  {0} {2}\r\n    {1}\r\n", i.Name, u, parameters));

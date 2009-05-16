@@ -82,5 +82,22 @@ namespace Sidi.Util
             }
             return dir0;
         }
+
+        public static string Join<T>(this IEnumerable<T> enumerable, string separator)
+        {
+            return String.Join(separator, enumerable.Select(x => x.ToString()).ToArray());
+        }
+
+        /// <summary>
+        /// Converts a action that writes to a TextWriter to a string
+        /// </summary>
+        /// <param name="generator">Function that writes something to a TextWriter</param>
+        /// <returns>Output string</returns>
+        public static string ToString(Action<TextWriter> generator)
+        {
+            TextWriter w = new StringWriter();
+            generator(w);
+            return w.ToString();
+        }
     }
 }
