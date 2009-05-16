@@ -1,14 +1,13 @@
-Sidi.Util README file
+sidi-util README file
 
 
 INTRODUCTION
 
-Sidi.Util is a collection of many general purpose .NET utility classes.
+sidi-util is a collection of many general purpose .NET utility classes.
 
-Sidi.Util is compiled against Microsoft .NET Framework 3.5
+sidi-util is compiled against Microsoft .NET Framework 3.5
 
-The Sidi.Util web site is at:
-  ***todo***
+sidi-util web site: http://code.google.com/p/sidi-util/
 
 FILES
 
@@ -17,7 +16,3 @@ Sidi.Util
 
 Sidi.Util.Test
   NUnit tests for Sidi.Util classes
-
-fixcsproj
-  Sample program for Sidi.CommandLine. Fixes build paths of csproj files.
-
