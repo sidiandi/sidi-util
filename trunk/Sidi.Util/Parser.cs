@@ -27,6 +27,23 @@ using Sidi.Util;
 
 namespace Sidi.CommandLine
 {
+    public static class TypeEx
+    {
+        public static string GetInfo(this Type type)
+        {
+            if (type.IsEnum)
+            {
+                return "enum {0} ({1})".F(
+                    type.Name,
+                    Enum.GetValues(type).Cast<object>().Join(", "));
+            }
+            else
+            {
+                return type.Name;
+            }
+        }
+    }
+    
     public interface CommandLineHandler
     {
         void BeforeParse(IList<string> args);
@@ -75,7 +92,7 @@ namespace Sidi.CommandLine
             {
                 MethodInfo i = MethodInfo;
                 string parameters = i.GetParameters()
-                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name))
+                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo()))
                     .Join(" ");
                 return String.Format("{0} {1}", i.Name, parameters);
             }
@@ -106,7 +123,7 @@ namespace Sidi.CommandLine
                         Parser.CultureInfo,
                         "--{0} [{1}]",
                         i.Name,
-                        fieldInfo.FieldType.Name
+                        fieldInfo.FieldType.GetInfo()
                         );
                 }
                 else if (i.MemberType == MemberTypes.Property)
@@ -116,7 +133,7 @@ namespace Sidi.CommandLine
                         Parser.CultureInfo,
                         "--{0} [{1}]",
                         i.Name,
-                        propertyInfo.PropertyType.Name
+                        propertyInfo.PropertyType.GetInfo()
                         );
                 }
                 throw new InvalidDataException(i.GetType().ToString());
@@ -180,6 +197,9 @@ namespace Sidi.CommandLine
     /// Helps to transform your class into a command line application with attributes.
     /// You only have to decorate your class with [Usage("...")] attributes, and Parser will 
     /// do the rest for you.
+    /// 
+    /// Supported argument types are: bool,int, double, string, DirectoryInfo,
+    /// FileSystemInfo, DateTime, TimeSpan and enums.
     public class Parser
     {
         object m_application;
@@ -434,6 +454,10 @@ namespace Sidi.CommandLine
             {
                 return DateTime.Parse(stringRepresentation, cultureInfo).TimeOfDay;
             }
+            else if (type.IsEnum)
+            {
+                return Enum.Parse(type, stringRepresentation);
+            }
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
@@ -488,7 +512,7 @@ namespace Sidi.CommandLine
                     string u = Usage.Get(i);
                     string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
                     {
-                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name);
+                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
                     })));
                     if (u != null)
                     {
@@ -615,7 +639,7 @@ namespace Sidi.CommandLine
                     string u = a.Usage;
                     string parameters = a.MethodInfo.GetParameters().Select(pi =>
                     {
-                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name);
+                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
                     }).Join(" ");
                     w.WriteLine();
                     w.WriteLine(String.Format("  {0} {2}\r\n    {1}", a.Name, u, parameters));
@@ -634,7 +658,7 @@ namespace Sidi.CommandLine
                         cultureInfo,
                         "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}",
                         i.Name,
-                        i.Type.Name,
+                        i.Type.GetInfo(),
                         i.Usage,
                         i.GetValue(m_application)));
                 }
@@ -673,7 +697,7 @@ namespace Sidi.CommandLine
             {
                 string u = Usage.Get(i);
                 string parameters = i.GetParameters()
-                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.Name))
+                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo()))
                     .Join(" ");
 
                 if (u != null)
@@ -699,7 +723,7 @@ namespace Sidi.CommandLine
                             cultureInfo,
                             "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
                             i.Name,
-                            fieldInfo.FieldType.Name,
+                            fieldInfo.FieldType.GetInfo(),
                             u,
                             defaultValue));
                     }
@@ -715,7 +739,7 @@ namespace Sidi.CommandLine
                             cultureInfo,
                             "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
                             i.Name,
-                            propertyInfo.PropertyType.Name,
+                            propertyInfo.PropertyType.GetInfo(),
                             u,
                             defaultValue));
                     }
