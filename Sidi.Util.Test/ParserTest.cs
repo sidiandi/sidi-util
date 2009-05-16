@@ -34,47 +34,21 @@ namespace Sidi.Util.Test
     [TestFixture]
     public class ParserTest
     {
-        #region "Custom Trace Listener"
-        MyListener listener = new MyListener();
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        internal class MyListener : TraceListener
+        public ParserTest()
         {
-            public override void Write(string message)
-            {
-                Console.Write(message);
-            }
-
-
-            public override void WriteLine(string message)
-            {
-                Console.WriteLine(message);
-            }
+            log4net.Config.BasicConfigurator.Configure();
         }
-        #endregion
-
 
         [SetUp()]
         public void SetUp()
         {
-            //Setup our custom trace listener
-            if (!Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Add(listener);
-            }
-
-            //TODO - Setup your test objects here
         }
 
         [TearDown()]
         public void TearDown()
         {
-            //Remove our custom trace listener
-            if (Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Remove(listener);
-            }
-
-            //TODO - Tidy up your test objects here
         }
 
         [Usage("App usage")]
@@ -113,6 +87,30 @@ namespace Sidi.Util.Test
             public DateTime m_Time;
 
             public string Result;
+        }
+
+        [Usage("Minimal app")]
+        public class MinimalTestApp
+        {
+        }
+
+        [Test]
+        public void ShowUsage()
+        {
+            Parser p = new Parser(new TestApp());
+            p.ShowUsage();
+            var usage = StringEx.ToString(x => p.WriteUsage(x));
+            Assert.IsTrue(usage.Contains("Options"));
+            Assert.IsTrue(usage.Contains("Actions"));
+        }
+
+        [Test]
+        public void ShowUsage2()
+        {
+            Parser p = new Parser(new MinimalTestApp());
+            var usage = StringEx.ToString(x => p.WriteUsage(x));
+            Assert.IsFalse(usage.Contains("Options"));
+            Assert.IsFalse(usage.Contains("Actions"));
         }
 
         [Test]
