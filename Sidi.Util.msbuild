@@ -6,7 +6,7 @@
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
         <Major>1</Major>
-        <Minor>0</Minor>
+        <Minor>1</Minor>
         <Build>0</Build>
 
         <RootDir>$(MSBuildProjectDirectory)</RootDir>
