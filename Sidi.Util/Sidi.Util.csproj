@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArchiveHandler.cs" />
+    <Compile Include="AsyncCalculation.cs" />
     <Compile Include="ByteArrayEx.cs" />
     <Compile Include="DumpExtensions.cs" />
     <Compile Include="Find.cs" />

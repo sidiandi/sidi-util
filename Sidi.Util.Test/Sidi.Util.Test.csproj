@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncCalculationTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />
     <Compile Include="GraMath.cs" />
     <Compile Include="IntSetTest.cs" />
