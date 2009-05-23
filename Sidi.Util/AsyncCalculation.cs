@@ -71,7 +71,7 @@ namespace Sidi.Util
                         }
                     }
                 }
-                catch (ThreadAbortException e)
+                catch (ThreadAbortException)
                 {
                     log.InfoFormat("Worker with input {0} aborted.", i);
                     Thread.ResetAbort();
