@@ -2,6 +2,7 @@
 <Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+    <Import Project="$(MSBuildExtensionsPath)\Sidi.Util\Sidi.Build.Targets"/>
  
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
@@ -53,6 +54,24 @@
             AssemblyFileVersion="$(Version)" />
     </Target>
 
+    <Target Name="GetVersion" >
+        <SvnVersion 
+            LocalPath=".">
+            <Output TaskParameter="Revision" PropertyName="Revision" />
+        </SvnVersion>
+        <CreateProperty
+            Value="$(Major).$(Minor).$(Build).$(Revision)">
+            <Output
+                TaskParameter="Value"
+                PropertyName="Version" />
+        </CreateProperty>
+        <Message Text="Version is $(Version)" />
+        <AssemblyInfo CodeLanguage="CS"
+            OutputFile="VersionInfo.cs" 
+            AssemblyVersion="$(Version)" 
+            AssemblyFileVersion="$(Version)" />
+    </Target>
+
   <Target Name="Build" DependsOnTargets="UpdateVersion">
         <MSBuild
             Projects="$(ProjectName).sln" Properties="Configuration=Release" />
@@ -79,10 +98,10 @@
     </Target>
 
     <Target Name="SourceIndex" DependsOnTargets="Build">
-        <SymbolServer.SourceIndex
+        <Sidi.Build.SourceIndex
             Directory = "$(MSBuildProjectDirectory)"
             Url = "http://sidi-util.googlecode.com/svn/tags/$(Version)/"
-            SymbolFiles = "@(SymbolFiles)"
+            Modules = "@(SymbolFiles)"
             />
     </Target>
 

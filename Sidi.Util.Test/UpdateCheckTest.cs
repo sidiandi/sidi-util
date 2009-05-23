@@ -84,22 +84,6 @@ namespace Sidi.Util.Test
         }
 
         [Test]
-        public void Writer()
-        {
-            string outFile = FileUtil.BinFile(@"Test\generated.xml");
-            {
-                CreateUpdateInfo cui = new CreateUpdateInfo();
-                cui.OutputFile = outFile;
-                cui.AssemblyFile = Assembly.GetExecutingAssembly().Location;
-                cui.Execute();
-            }
-
-            UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri(outFile));
-            c.Check();
-            Assert.IsTrue(!c.IsUpdateRequired);
-        }
-
-        [Test]
         public void Test404()
         {
             UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri("http://andreas-grimme.gmxhome.de/ThisFileDoesNotExist"));
