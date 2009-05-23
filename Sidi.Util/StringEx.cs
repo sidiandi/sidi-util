@@ -104,5 +104,18 @@ namespace Sidi.Util
         {
             return String.Format(formatString, args);
         }
+
+        public static IEnumerable<string> ReadLines(this TextReader reader)
+        {
+            for (; ; )
+            {
+                string line = reader.ReadLine();
+                if (line == null)
+                {
+                    break;
+                }
+                yield return line;
+            }
+        }
     }
 }
