@@ -52,7 +52,14 @@
             AssemblyFileVersion="$(Version)" />
     </Target>
 
-  <Target Name="Build" DependsOnTargets="UpdateVersion">
+    <Target Name="TagVersion" >
+        <SvnCopy 
+            SourcePath="https://sidi-util.googlecode.com/svn/trunk"
+            DestinationPath="https://sidi-util.googlecode.com/svn/tags/$(Version)" 
+            Message="Automatic build of $(ProjectName)" />
+    </Target>
+
+  <Target Name="Build" DependsOnTargets="UpdateVersion;TagVersion">
         <MSBuild
             Projects="$(ProjectName).sln" Properties="Configuration=Release" />
     </Target>
