@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("1.1.0.88")]
-[assembly: AssemblyFileVersion("1.1.0.88")]
+[assembly: AssemblyVersion("1.1.0.90")]
+[assembly: AssemblyFileVersion("1.1.0.90")]
 
 
