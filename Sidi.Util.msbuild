@@ -20,6 +20,7 @@
     <ItemGroup>
         <ZipFiles Include="$(OutputDir)\**\*.*" />
         <Assemblies Include="$(OutputDir)\$(ProjectName).dll" />
+        <SymbolFiles Include="$(OutputDir)\$(ProjectName).pdb" />
         <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
     </ItemGroup>
     
@@ -74,11 +75,19 @@
         <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
             
-    <Target Name="Package" DependsOnTargets="Build;Doc">
+    <Target Name="Package" DependsOnTargets="Build;Doc;SourceIndex">
         <Zip
             Files="@(ZipFiles)"
             WorkingDirectory="$(OutputDir)"
             ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
+    </Target>
+
+    <Target Name="SourceIndex" DependsOnTargets="Build">
+        <SourceIndex
+            Directory = "$(MSBuildProjectDirectory)"
+            Url = "http://sidi-util.googlecode.com/svn/tags/$(Version)/"
+            SymbolFiles = "@(SymbolFiles)"
+            />
     </Target>
 
     <Target Name="Install" DependsOnTargets="Package">
