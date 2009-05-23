@@ -1,7 +1,0 @@
-Sidi.Util TODO
---------
-* upload to Google Code
-* write codeproject article
-
-Done
-----
