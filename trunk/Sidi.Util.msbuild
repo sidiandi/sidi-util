@@ -29,10 +29,6 @@
             Targets="$(MSBuildProjectDirectory)"
             Message="Auto commit from MSBuild." >
         </SvnCommit>
-        <SvnCopy 
-            SourcePath="https://sidi-util.googlecode.com/svn/trunk"
-            DestinationPath="https://sidi-util.googlecode.com/svn/tags/$(Version)" 
-            Message="Automatic build of $(ProjectName)" />
     </Target>
 
     <Target Name="UpdateVersion" >
