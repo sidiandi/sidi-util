@@ -155,5 +155,18 @@ namespace Sidi.IO
             }
             return r;
         }
+
+        /// <summary>
+        /// Replaces the file extension of a path. 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="newExtension">New extension (without dot)</param>
+        /// <returns></returns>
+        public static string ReplaceExtension(this string path, string newExtension)
+        {
+            string d = Path.GetDirectoryName(path);
+            string n = Path.GetFileNameWithoutExtension(path);
+            return FileUtil.CatDir(d, n + "." + newExtension);
+        }
     }
 }

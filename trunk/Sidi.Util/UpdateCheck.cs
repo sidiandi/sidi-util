@@ -26,7 +26,6 @@ using System.IO;
 using Sidi.IO;
 using System.Threading;
 using System.Net.Cache;
-using Microsoft.Build.Framework;
 using System.Windows.Forms;
 
 namespace Sidi.Util
@@ -61,36 +60,6 @@ namespace Sidi.Util
                 s.Serialize(f, this);
             }
         }
-    }
-
-    public class CreateUpdateInfo : ITask
-    {
-        #region ITask Members
-
-        public IBuildEngine BuildEngine { set; get; }
-
-        public bool Execute()
-        {
-            Assembly a = Assembly.ReflectionOnlyLoadFrom(AssemblyFile);
-            VersionInfo v = new VersionInfo();
-            v.AssemblyName = a.GetName();
-            v.DownloadUrl = DownloadUrl;
-            v.Message = Message;
-            UpdateInfo i = new UpdateInfo();
-            i.VersionInfo.Add(v);
-            i.Write(OutputFile);
-            return true;
-        }
-
-        public string AssemblyFile { set; get; }
-        public string DownloadUrl { set; get; }
-        public string Message { set; get; }
-
-        public string OutputFile { set; get; }
-
-        public ITaskHost HostObject { set; get; }
-
-        #endregion
     }
 
     public class UpdateCheck
