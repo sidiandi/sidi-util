@@ -87,7 +87,7 @@
             WorkingDirectory="$(DocDir)"
             ToolPath="D:\work\msbuildtasks\Documentation\ndoc"
             />
-        <!-- <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" /> -->
+        <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
             
     <Target Name="Package" DependsOnTargets="Build;Doc;SourceIndex">
