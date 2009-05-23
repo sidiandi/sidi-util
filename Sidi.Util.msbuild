@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+    <!--
     <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+    -->
+    <Import Project="D:\work\msbuildtasks\Build\MSBuild.Community.Tasks.Targets"/>
  
     <PropertyGroup>
         <ProjectName>Sidi.Util</ProjectName>
@@ -31,7 +34,7 @@
         </SvnCommit>
     </Target>
 
-    <Target Name="UpdateVersion" >
+    <Target Name="UpdateVersion" DependsOnTargets="Commit">
         <SvnVersion 
             LocalPath=".">
             <Output TaskParameter="Revision" PropertyName="Revision" />
@@ -79,7 +82,7 @@
     </Target>
 
     <Target Name="SourceIndex" DependsOnTargets="Build">
-        <SourceIndex
+        <SymbolServer.SourceIndex
             Directory = "$(MSBuildProjectDirectory)"
             Url = "http://sidi-util.googlecode.com/svn/tags/$(Version)/"
             SymbolFiles = "@(SymbolFiles)"
