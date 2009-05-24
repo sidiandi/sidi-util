@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SidiBuildAssembly>D:\work\build\Sidi.Util\bin\Debug\Sidi.Build.dll</SidiBuildAssembly>
+  </PropertyGroup>
+  <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.CreateUpdateInfo" />
+  <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.GoogleCode.Upload" />
+  <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.SourceIndex" />
+</Project>
