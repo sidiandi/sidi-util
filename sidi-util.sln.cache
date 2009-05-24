@@ -51,9 +51,9 @@
   <PropertyGroup>
     <SolutionDir>D:\work\Sidi.Util\</SolutionDir>
     <SolutionExt>.sln</SolutionExt>
-    <SolutionFileName>Sidi.Util.sln</SolutionFileName>
-    <SolutionName>Sidi.Util</SolutionName>
-    <SolutionPath>D:\work\Sidi.Util\Sidi.Util.sln</SolutionPath>
+    <SolutionFileName>sidi-util.sln</SolutionFileName>
+    <SolutionName>sidi-util</SolutionName>
+    <SolutionPath>D:\work\Sidi.Util\sidi-util.sln</SolutionPath>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '2.0'">v2.0</TargetFrameworkVersion>
@@ -176,7 +176,7 @@
     <MSBuild Condition="@(BuildLevel1) != ''" Projects="@(BuildLevel1)" Properties="Configuration=%(Configuration); Platform=%(Platform); BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" Targets="Clean" ToolsVersion="$(ProjectToolsVersion)" BuildInParallel="true" UnloadProjectsOnCompletion="$(UnloadProjectsOnCompletion)" UseResultsCache="$(UseResultsCache)" />
     <Message Text="Das Projekt &quot;%(SkipLevel1.Identity)&quot; ist in der Projektmappenkonfiguration &quot;$(Configuration)|$(Platform)&quot; nicht zum Erstellen ausgewählt." Condition="@(SkipLevel1) != ''" />
     <Warning Text="Die Projektkonfiguration für das Projekt &quot;%(MissingConfigLevel1.Identity)&quot; wurde nicht in der Projektmappendatei für die Projektmappenkonfiguration &quot;$(Configuration)|$(Platform)&quot; angegeben." Code="MSB4121" HelpKeyword="MSBuild.SolutionProjectConfigurationMissing" Condition="@(MissingConfigLevel1) != ''" />
-    <Delete Files="Sidi.Util.sln.cache" />
+    <Delete Files="sidi-util.sln.cache" />
   </Target>
   <Target Name="Rebuild" Condition="'$(CurrentSolutionConfigurationContents)' != ''" Outputs="@(CollectedBuildOutput)">
     <MSBuild Condition="@(BuildLevel0) != ''" Projects="@(BuildLevel0)" Properties="Configuration=%(Configuration); Platform=%(Platform); BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" Targets="Rebuild" ToolsVersion="$(ProjectToolsVersion)" BuildInParallel="true" UnloadProjectsOnCompletion="$(UnloadProjectsOnCompletion)" UseResultsCache="$(UseResultsCache)">

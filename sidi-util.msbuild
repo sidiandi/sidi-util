@@ -21,8 +21,6 @@
   
     <ItemGroup>
         <ZipFiles Include="$(OutputDir)\**\*.*" />
-        <Assemblies Include="$(OutputDir)\$(ProjectName).dll" />
-        <SymbolFiles Include="$(OutputDir)\$(ProjectName).pdb" />
         <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
     </ItemGroup>
     
@@ -64,7 +62,9 @@
 
   <Target Name="Build" DependsOnTargets="UpdateVersion">
         <MSBuild
-            Projects="$(ProjectName).sln" Properties="Configuration=Release" />
+            Projects="$(ProjectName).sln" Properties="Configuration=Release">
+            <Output ItemName="Assemblies" TaskParameter="TargetOutputs"/>
+        </MSBuild>
     </Target>
 
     <Target Name="Doc" DependsOnTargets="Build"
