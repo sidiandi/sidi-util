@@ -7,10 +7,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util.Test", "Sidi.Util
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07C0FD19-D688-4FDC-92A6-AD445879EE02}"
 	ProjectSection(SolutionItems) = preProject
-		LICENSE.txt = LICENSE.txt
+		COPYING = COPYING
+		COPYING.LESSER = COPYING.LESSER
+		get-prerequisites.pl = get-prerequisites.pl
+		header.txt = header.txt
 		NOTICE.txt = NOTICE.txt
 		README.txt = README.txt
+		Sidi.Util.msbuild = Sidi.Util.msbuild
 		TODO.txt = TODO.txt
+		VersionInfo.cs = VersionInfo.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Build", "Sidi.Build\Sidi.Build.csproj", "{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}"
