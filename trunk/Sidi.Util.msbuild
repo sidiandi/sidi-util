@@ -2,10 +2,10 @@
 <Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
-    <Import Project="$(MSBuildExtensionsPath)\Sidi.Util\Sidi.Build.Targets"/>
+    <Import Project="$(MSBuildExtensionsPath)\sidi-util\Sidi.Build.Targets"/>
  
     <PropertyGroup>
-        <ProjectName>Sidi.Util</ProjectName>
+        <ProjectName>sidi-util</ProjectName>
         <Major>1</Major>
         <Minor>1</Minor>
         <Build>0</Build>
@@ -16,6 +16,7 @@
         <PackageDir>$(BuildDir)\Package</PackageDir>
         <DocDir>$(RootDir)\doc</DocDir>
         <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
+        <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
     </PropertyGroup>
   
     <ItemGroup>
@@ -32,21 +33,10 @@
         </SvnCommit>
     </Target>
 
-    <Target Name="UpdateVersion" DependsOnTargets="Commit">
-        <SvnVersion 
-            LocalPath=".">
-            <Output TaskParameter="Revision" PropertyName="Revision" />
-        </SvnVersion>
-        <CreateProperty
-            Value="$(Major).$(Minor).$(Build).$(Revision)">
-            <Output
-                TaskParameter="Value"
-                PropertyName="Version" />
-        </CreateProperty>
-        <Message Text="Version is $(Version)" />
+    <Target Name="UpdateVersion" DependsOnTargets="Commit;GetVersion">
         <SvnCopy 
-            SourcePath="https://sidi-util.googlecode.com/svn/trunk"
-            DestinationPath="https://sidi-util.googlecode.com/svn/tags/$(Version)" 
+            SourcePath="$(SvnRoot)/trunk"
+            DestinationPath="$(SvnRoot)/tags/$(Version)" 
             Message="Automatic build of $(ProjectName)" />
         <AssemblyInfo CodeLanguage="CS"
             OutputFile="VersionInfo.cs" 
@@ -100,7 +90,7 @@
     <Target Name="SourceIndex" DependsOnTargets="Build">
         <Sidi.Build.SourceIndex
             Directory = "$(MSBuildProjectDirectory)"
-            Url = "http://sidi-util.googlecode.com/svn/tags/$(Version)/"
+            Url = "$(SvnRoot)/tags/$(Version)/"
             Modules = "@(SymbolFiles)"
             />
     </Target>
@@ -115,7 +105,7 @@
 
     <Target Name="Upload" DependsOnTargets="Commit;Package">
         <GoogleCode.Upload
-            ProjectName="sidi-util"
+            ProjectName="$(ProjectName)"
             LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
             RemoteFile="$(ProjectName)-$(Version).zip"
             Summary="Build for Version $(Version)"
