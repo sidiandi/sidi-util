@@ -20,11 +20,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Sidi.Util
 {
     public static class StringEx
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static string OneLine(this string text, int maxLen)
         {
             StringReader r = new StringReader(text);
@@ -116,6 +119,58 @@ namespace Sidi.Util
                 }
                 yield return line;
             }
+        }
+
+        public static string Wrap(this string text, int columns)
+        {
+            StringWriter w = new StringWriter();
+            StringReader r = new StringReader(text);
+            bool first = true;
+            foreach (string i in r.ReadLines())
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    w.WriteLine();
+                }
+
+                int s = 0;
+                while ((i.Length - s) > columns)
+                {
+                    int s1 = i.LastIndexOf(" ", s + columns, columns);
+                    if (s1 < 0)
+                    {
+                        s1 = s + columns;
+                    }
+                    w.WriteLine(i.Substring(s, s1 - s));
+                    s = s1 + 1;
+                }
+                w.Write(i.Substring(s));
+            }
+            return w.ToString();
+        }
+
+        public static string Indent(this string text, string prefix)
+        {
+            StringWriter w = new StringWriter();
+            StringReader r = new StringReader(text);
+            bool first = true;
+            foreach (string i in r.ReadLines())
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    w.WriteLine();
+                }
+                w.Write(prefix + i);
+            }
+            return w.ToString();
         }
     }
 }

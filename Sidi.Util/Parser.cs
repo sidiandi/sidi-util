@@ -202,6 +202,8 @@ namespace Sidi.CommandLine
     /// FileSystemInfo, DateTime, TimeSpan and enums.
     public class Parser
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         object m_application;
         static string[] optionPrefix = new string[] { "--", "-", "/" };
         static CultureInfo cultureInfo;
@@ -241,6 +243,15 @@ namespace Sidi.CommandLine
             {
                 Console.WriteLine(exception.Message);
                 Console.WriteLine("Type \"{0}\" to get usage information.", parser.ApplicationName);
+            }
+            catch (TargetInvocationException exception)
+            {
+                log.Info(exception.InnerException);
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("An error has occured. Details are logged above.");
+                Console.WriteLine("Reason: " + exception.InnerException.Message);
+                Console.WriteLine();
             }
         }
 
@@ -620,6 +631,9 @@ namespace Sidi.CommandLine
             WriteUsage(Console.Out);
         }
 
+        static string indent = "  ";
+        static int maxColumns = 60;
+
         /// <summary>
         /// Writes usage information to a TextWriter
         /// </summary>
@@ -642,7 +656,12 @@ namespace Sidi.CommandLine
                         return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
                     }).Join(" ");
                     w.WriteLine();
-                    w.WriteLine(String.Format("  {0} {2}\r\n    {1}", a.Name, u, parameters));
+                    w.WriteLine(String.Format(
+                        "{3}{0} {2}\r\n{1}", 
+                        a.Name,
+                        u.Wrap(maxColumns).Indent(indent + indent), 
+                        parameters, 
+                        indent));
                 }
             }
 
@@ -656,11 +675,12 @@ namespace Sidi.CommandLine
                     w.WriteLine();
                     w.WriteLine(String.Format(
                         cultureInfo,
-                        "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}",
+                        "{4}--{0}\r\n{4}{4}Type: {1}, default: {3}\r\n{2}",
                         i.Name,
                         i.Type.GetInfo(),
-                        i.Usage,
-                        i.GetValue(m_application)));
+                        i.Usage.Wrap(maxColumns).Indent(indent + indent),
+                        i.GetValue(m_application)),
+                        indent);
                 }
             }
         }
