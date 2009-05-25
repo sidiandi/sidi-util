@@ -281,5 +281,26 @@ namespace Sidi.Util.Test
         {
             Parser.Run(new TestAppWithStringList(), new string[] { "Add", "1" });
         }
+
+        [Usage("Multiline test")]
+        public class TestMultiLineUsage
+        {
+            [Usage("multiline\r\nline 1\r\nline2\r\nline3")]
+            public void A()
+            {
+            }
+
+            [Usage("very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. very long line that should be wrapped. ")]
+            public void B()
+            {
+            }
+        }
+
+        [Test]
+        public void ShowMultiLineUsage()
+        {
+            string u = StringEx.ToString(new Parser(new TestMultiLineUsage()).WriteUsage);
+            Console.WriteLine(u);
+        }
     }
 }
