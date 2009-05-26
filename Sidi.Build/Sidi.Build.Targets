@@ -3,6 +3,7 @@
   <PropertyGroup>
     <SidiBuildAssembly>D:\work\build\Sidi.Util\bin\Debug\Sidi.Build.dll</SidiBuildAssembly>
   </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
   <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.CreateUpdateInfo" />
   <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.GoogleCode.Upload" />
   <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.SourceIndex" />
