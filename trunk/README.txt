@@ -21,3 +21,4 @@ PREREQUISITES
 
 http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx#ERB
 http://www.kynosarges.de/NDoc.html (Install at %ProgramFiles%\NDoc 2.0)
+http://msbuildtasks.tigris.org/MSBuild.Community.Tasks.Nightly.msi
