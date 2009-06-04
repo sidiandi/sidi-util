@@ -16,3 +16,8 @@ Sidi.Util
 
 Sidi.Util.Test
   NUnit tests for Sidi.Util classes
+
+PREREQUISITES
+
+http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx#ERB
+http://www.kynosarges.de/NDoc.html (Install at %ProgramFiles%\NDoc 2.0)
