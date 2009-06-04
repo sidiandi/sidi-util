@@ -61,7 +61,7 @@
 
   <Target Name="Build" DependsOnTargets="UpdateVersion">
         <MSBuild
-            Projects="$(ProjectName).sln" Properties="Configuration=Release">
+            Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=Any CPU">
             <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
         </MSBuild>
     </Target>
