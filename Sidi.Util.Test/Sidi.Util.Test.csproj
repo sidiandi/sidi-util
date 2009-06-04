@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCalculationTest.cs" />
+    <Compile Include="DumpExtensionsTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />
     <Compile Include="GraMath.cs" />
     <Compile Include="IntSetTest.cs" />
