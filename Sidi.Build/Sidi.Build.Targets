@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <SidiBuildAssembly>D:\work\build\Sidi.Util\bin\Debug\Sidi.Build.dll</SidiBuildAssembly>
+    <SidiBuildAssembly>$(MSBuildExtensionsPath)\sidi-util\Sidi.Build.dll</SidiBuildAssembly>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
   <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.CreateUpdateInfo" />
@@ -74,12 +74,13 @@
             Documenter="MSDN-CHM"
             ProjectFilePath="$(ProjectName).ndoc"
             WorkingDirectory="$(DocDir)"
-            ToolPath="D:\work\msbuildtasks\Documentation\ndoc"
+            ToolPath="c:\Program Files\NDoc 2.0"
             />
         <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
             
     <Target Name="Package" DependsOnTargets="Build;Doc;SourceIndex">
+        <MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
         <Zip
             Files="@(ZipFiles)"
             WorkingDirectory="$(OutputDir)"
