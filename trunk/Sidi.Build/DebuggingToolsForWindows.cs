@@ -40,7 +40,7 @@ namespace Sidi.Build
             {
                 string d = FileUtil.CatDir(
                     Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    "Debugging Tools for Windows");
+                    "Debugging Tools for Windows (x86)");
 
                 if (!System.IO.Directory.Exists(d))
                 {
