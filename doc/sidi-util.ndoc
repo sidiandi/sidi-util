@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <project SchemaVersion="2.0">
     <assemblies>
-        <assembly location="..\..\Build\Sidi.Util\bin\Release\Sidi.Util.dll" documentation="..\..\Build\Sidi.Util\bin\Release\Sidi.Util.xml" />
+        <assembly location="..\..\Build\sidi-util\bin\Release\Sidi.Util.dll" documentation="..\..\Build\Sidi.Util\bin\Release\Sidi.Util.xml" />
     </assemblies>
     <referencePaths>
         <referencePath path="..\Libraries\**" />
@@ -13,8 +13,8 @@
             <property name="RootPageFileName" value=".\Overview.html" />
             <property name="SdkLinksOnWeb" value="True" />
             <property name="OutputDirectory" value="..\..\Build\Sidi.Util\bin\Release" />
-            <property name="HtmlHelpName" value="Sidi.Util" />
-            <property name="Title" value="Sidi.Util" />
+            <property name="HtmlHelpName" value="sidi-util" />
+            <property name="Title" value="sidi-util" />
             <property name="AssemblyVersionInfo" value="AssemblyVersion" />
             <property name="CopyrightText" value="http://code.google.com/p/sidi-util/" />
             <property name="CopyrightHref" value="http://code.google.com/p/sidi-util/" />
