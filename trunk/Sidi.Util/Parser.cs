@@ -679,8 +679,8 @@ namespace Sidi.CommandLine
                         i.Name,
                         i.Type.GetInfo(),
                         i.Usage.Wrap(maxColumns).Indent(indent + indent),
-                        i.GetValue(m_application)),
-                        indent);
+                        i.GetValue(m_application),
+                        indent));
                 }
             }
         }

@@ -66,6 +66,8 @@ namespace Sidi.Util
             list.PrintTable(o, i => i.Key, i => i.Value());
         }
 
+        static int MaxColumnWidth = 20;
+            
         public static void PrintTable<T>(this IEnumerable<T> e, TextWriter o, params Func<T, string>[] columns)
         {
             var rows = new List<string[]>();
@@ -79,7 +81,7 @@ namespace Sidi.Util
             {
                 foreach (var r in rows)
                 {
-                    w[i] = Math.Max(w[i], r[i].Length);
+                    w[i] = Math.Min(MaxColumnWidth, Math.Max(w[i], r[i].Length));
                 }
             }
 
