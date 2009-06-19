@@ -44,6 +44,10 @@ namespace Sidi.Util
             {
                 return info.GetValue(x).ToString();
             }
+            catch (TargetInvocationException e)
+            {
+                return "Exception: {0}".F(e.InnerException.Message);
+            }
             catch (Exception e)
             {
                 return "Exception: {0}".F(e.Message);
