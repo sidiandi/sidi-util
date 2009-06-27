@@ -372,20 +372,54 @@ namespace Sidi.CommandLine
             ShowUsage();
         }
 
+        public bool IsExactMatch(string userInput, string memberName)
+        {
+            return StringComparer.InvariantCultureIgnoreCase.Compare(userInput, memberName) == 0;
+        }
+
+        public bool IsMatch(string userInput, string memberName)
+        {
+            var m = memberName.GetEnumerator();
+            foreach (var u in userInput)
+            {
+                if (!m.MoveNext())
+                {
+                    return false;
+                }
+
+                if (Char.ToLower(u) == Char.ToLower(m.Current))
+                {
+                    continue;
+                }
+
+                while (Char.IsLower(m.Current))
+                {
+                    if (!m.MoveNext())
+                    {
+                        return false;
+                    }
+                }
+
+                if (Char.ToLower(u) != Char.ToLower(m.Current))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         MemberInfo FuzzyMatch(IEnumerable<MemberInfo> members, string name)
         {
             name = name.ToLower();
             IEnumerable<MemberInfo> accessibleMembers = members.Where(x => Usage.Get(x) != null);
 
-            foreach (MemberInfo i in accessibleMembers)
+            var exact = accessibleMembers.FirstOrDefault(x => IsExactMatch(name, x.Name));
+            if (exact != null)
             {
-                if (i.Name.ToLower() == name)
-                {
-                    return i;
-                }
+                return exact;
             }
 
-            IEnumerable<MemberInfo> hits = accessibleMembers.Where(i => i.Name.ToLower().StartsWith(name));
+            IEnumerable<MemberInfo> hits = accessibleMembers.Where(i => IsMatch(name, i.Name));
 
             if (hits.Any())
             {
