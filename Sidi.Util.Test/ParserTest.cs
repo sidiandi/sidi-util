@@ -302,5 +302,18 @@ namespace Sidi.Util.Test
             string u = StringEx.ToString(new Parser(new TestMultiLineUsage()).WriteUsage);
             Console.WriteLine(u);
         }
+
+        [Test]
+        public void IsMatch()
+        {
+            Parser p = new Parser(new TestMultiLineUsage());
+            Assert.IsTrue(p.IsMatch("rfl", "RunFromLocal"));
+            Assert.IsFalse(p.IsMatch("rfl", "RunFromlocal"));
+            Assert.IsTrue(p.IsMatch("runfr", "RunFromLocal"));
+            Assert.IsTrue(p.IsMatch("runfromlocal", "RunFromLocal"));
+            Assert.IsTrue(p.IsMatch("rufro", "RunFromLocal"));
+            Assert.IsTrue(p.IsMatch("rfrlocal", "RunFromLocal"));
+            Assert.IsFalse(p.IsMatch("rfrlocale", "RunFromLocal"));
+        }
     }
 }
