@@ -179,9 +179,15 @@ namespace Sidi.Util.Test
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Andreas", "SayHello" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
+            app = new TestApp();
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Andreas", "sh" });
+            Assert.AreEqual("Hello, Andreas", app.Result);
+
+            app = new TestApp(); 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Andreas", "say" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
+            app = new TestApp(); 
             Sidi.CommandLine.Parser.Run(app, new string[] { "-na", "Andreas", "say" });
             Assert.AreEqual("Hello, Andreas", app.Result);
         }
