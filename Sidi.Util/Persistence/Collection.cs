@@ -24,6 +24,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.IO;
 using System.Linq;
+using Sidi.Util;
 
 namespace Sidi.Persistence
 {
@@ -80,6 +81,8 @@ namespace Sidi.Persistence
     
     public class Collection<T> : ICollection<T> where T : new()
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         string path;
         string table;
         SQLiteConnection connection;
@@ -336,7 +339,18 @@ namespace Sidi.Persistence
                 }
                 catch (SQLiteException)
                 {
-                    return false;
+                    log.WarnFormat("{0} not found in table {1}. Trying to alter table.", i.Name, table);
+                    c.CommandText = "alter table {0} add column {1}".F(
+                        table, i.Name);
+                    try
+                    {
+                        c.ExecuteNonQuery();
+                    }
+                    catch (SQLiteException)
+                    {
+                        return false;
+                    }
+                    log.InfoFormat("Column {0} added to table {1}", i.Name, table);
                 }
             }
             return true;

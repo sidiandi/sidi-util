@@ -24,12 +24,18 @@ using System.Data.Common;
 using NUnit.Framework;
 using Sidi.Persistence;
 using System.Threading;
+using Sidi.IO;
 
 namespace Sidi.Persistence.Test
 {
     [TestFixture]
     public class PersistentCollectionTest
     {
+        public PersistentCollectionTest()
+        {
+            log4net.Config.BasicConfigurator.Configure();
+        }
+
         class OtherData
         {
             [RowId]
@@ -126,6 +132,19 @@ namespace Sidi.Persistence.Test
         public void Deinit()
         {
             addressBook.Close();
+        }
+
+        [Test]
+        public void AlterTable()
+        {
+            string tableName = "alter_table_test";
+            var a = new Sidi.Persistence.Collection<AddressSubset>(path, tableName);
+
+            a.Add(new AddressSubset());
+
+            var b = new Sidi.Persistence.Collection<Address>(path, tableName);
+
+            b.Add(new Address());
         }
         
         [Test]
