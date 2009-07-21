@@ -145,6 +145,7 @@
     <Compile Include="RandomEx.cs" />
     <Compile Include="Rar.cs" />
     <Compile Include="Pop3\Session.cs" />
+    <Compile Include="RegistrySerializer.cs" />
     <Compile Include="Stats.cs" />
     <Compile Include="StringEx.cs" />
     <Compile Include="TcpClientEx.cs" />
