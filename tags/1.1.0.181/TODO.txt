@@ -1,0 +1,8 @@
+Sidi.Util TODO
+--------
+* use log4net in fixcsproj
+* write codeproject article about Sidi.CommandLine
+
+Done
+----
+* upload to Google Code
