@@ -38,18 +38,22 @@ namespace Sidi.Build
         {
             get
             {
-                string d = FileUtil.CatDir(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    "Debugging Tools for Windows (x86)");
-
-                if (!System.IO.Directory.Exists(d))
+                string[] searchPath = new string[]
                 {
-                    throw new DirectoryNotFoundException(String.Format("The Debugging Tools for Windows must be installed at {0}. See {1}",
-                        d,
-                        DownloadUrl));
+                    FileUtil.CatDir(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
+                    FileUtil.CatDir(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
+                };
+
+                foreach (string d in searchPath)
+                {
+                    if (System.IO.Directory.Exists(d))
+                    {
+                        return d;
+                    }
                 }
 
-                return d;
+                throw new DirectoryNotFoundException(String.Format("The Debugging Tools for Windows must be installed at {0}. See {1}",
+                    searchPath[0], DownloadUrl));
             }
         }
     }
