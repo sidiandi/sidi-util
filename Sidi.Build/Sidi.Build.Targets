@@ -15,7 +15,8 @@
         <PackageDir>$(BuildDir)\Package</PackageDir>
         <DocDir>$(RootDir)\doc</DocDir>
         <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
-        <SvnRoot>http://$(ProjectName).googlecode.com/svn</SvnRoot>
+        <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
+        <AnonymousSvnRoot>http://$(ProjectName).googlecode.com/svn</AnonymousSvnRoot>
     </PropertyGroup>
   
     <ItemGroup>
@@ -90,7 +91,7 @@
     <Target Name="SourceIndex" DependsOnTargets="Build">
         <Sidi.Build.SourceIndex
             Directory = "$(MSBuildProjectDirectory)"
-            Url = "$(SvnRoot)/tags/$(Version)/"
+            Url = "$(AnonymousSvnRoot)/tags/$(Version)/"
             Modules = "@(Targets)"
             />
     </Target>
