@@ -74,7 +74,7 @@
             Documenter="MSDN-CHM"
             ProjectFilePath="$(ProjectName).ndoc"
             WorkingDirectory="$(DocDir)"
-            ToolPath="c:\Program Files\NDoc 2.0"
+            ToolPath="$(ProgramFiles)\NDoc 2.0"
             />
         <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
