@@ -67,7 +67,8 @@
         </MSBuild>
     </Target>
 
-    <Target Name="Doc" DependsOnTargets="Build"
+  <!-- Download NDoc from http://www.kynosarges.de/NDoc.html -->
+  <Target Name="Doc" DependsOnTargets="Build"
         Inputs="@(Targets)"
         Outputs="@(DocFiles)"
         >
@@ -75,7 +76,7 @@
             Documenter="MSDN-CHM"
             ProjectFilePath="$(ProjectName).ndoc"
             WorkingDirectory="$(DocDir)"
-            ToolPath="$(ProgramFiles)\NDoc 2.0"
+            ToolPath="$(ProgramFiles)\NDoc2"
             />
         <DeleteTree Directories="$(OutputDir)\ndoc_msdn_temp" />
     </Target>
