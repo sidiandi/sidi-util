@@ -15,7 +15,7 @@
         <PackageDir>$(BuildDir)\Package</PackageDir>
         <DocDir>$(RootDir)\doc</DocDir>
         <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
-        <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
+        <SvnRoot>http://$(ProjectName).googlecode.com/svn</SvnRoot>
     </PropertyGroup>
   
     <ItemGroup>
