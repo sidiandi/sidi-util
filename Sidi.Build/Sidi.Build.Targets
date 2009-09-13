@@ -11,7 +11,7 @@
     <PropertyGroup>
         <RootDir>$(MSBuildProjectDirectory)</RootDir>
         <BuildDir>$(RootDir)\..\build\$(ProjectName)</BuildDir>
-        <OutputDir>$(BuildDir)\bin\Release</OutputDir>
+        <OutputDir>$(BuildDir)\Release\bin</OutputDir>
         <PackageDir>$(BuildDir)\Package</PackageDir>
         <DocDir>$(RootDir)\doc</DocDir>
         <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
