@@ -517,6 +517,14 @@ namespace Sidi.Persistence
             }
         }
 
+        /// <summary>
+        /// Flushes the internal cache
+        /// </summary>
+        public void Flush()
+        {
+            cache.Clear();
+        }
+
         T Get(long key)
         {
             SetRowIdParam(getDataByRowId, key);

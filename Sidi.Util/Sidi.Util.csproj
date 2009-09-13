@@ -7,7 +7,7 @@
     <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sidi.Util</RootNamespace>
+    <RootNamespace>Sidi</RootNamespace>
     <AssemblyName>Sidi.Util</AssemblyName>
     <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
     <FileUpgradeFlags>
@@ -88,7 +88,8 @@
     <Compile Include="ByteArrayEx.cs" />
     <Compile Include="Comparer.cs" />
     <Compile Include="DumpExtensions.cs" />
-    <Compile Include="Find.cs" />
+    <Compile Include="IO\Copy.cs" />
+    <Compile Include="IO\Find.cs" />
     <Compile Include="Forms\BossController.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -130,11 +131,12 @@
     <Compile Include="IArchive.cs" />
     <Compile Include="Interval.cs" />
     <Compile Include="IntSet.cs" />
+    <Compile Include="IO\PathEx.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="LruCacheBackground.cs" />
     <Compile Include="LruCacheBackgroundAutoInvalidate.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="FileUtil.cs" />
+    <Compile Include="IO\FileUtil.cs" />
     <Compile Include="Persistence\Attributes.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\Dictionary.cs" />
