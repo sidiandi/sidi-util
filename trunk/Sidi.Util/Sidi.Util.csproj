@@ -34,11 +34,11 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Sidi.Util.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)\</IntermediateOutputPath>
-    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)\</IntermediatePath>
-    <DocumentationFile>$(SolutionDir)..\build\$(SolutionName)\doc\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\bin\</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediateOutputPath>
+    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediatePath>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
