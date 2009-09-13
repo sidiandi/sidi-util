@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <project SchemaVersion="2.0">
     <assemblies>
-        <assembly location="..\..\Build\sidi-util\bin\Release\Sidi.Util.dll" documentation="..\..\Build\sidi-util\bin\Release\Sidi.Util.xml" />
+        <assembly location="..\..\build\sidi-util\Release\bin\Sidi.Util.dll" documentation="..\..\build\sidi-util\Release\bin\Sidi.Util.xml" />
     </assemblies>
     <referencePaths>
         <referencePath path="..\Libraries\**" />
