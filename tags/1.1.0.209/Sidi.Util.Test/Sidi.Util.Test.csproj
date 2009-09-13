@@ -1,0 +1,102 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sidi</RootNamespace>
+    <AssemblyName>Sidi.Util.Test</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
+    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)</IntermediatePath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
+    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)</IntermediatePath>
+    <DocumentationFile>..\..\build\Sidi.Util\bin\Release\Sidi.Util.Tests.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\log4net-1.2.10\bin\net\2.0\debug\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NUnit-2.4.8-net-2.0\bin\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsyncCalculationTest.cs" />
+    <Compile Include="DumpExtensionsTest.cs" />
+    <Compile Include="Forms\ItemViewTest.cs" />
+    <Compile Include="GraMath.cs" />
+    <Compile Include="IntSetTest.cs" />
+    <Compile Include="IO\PathExTest.cs" />
+    <Compile Include="LruBackgroundCache.cs" />
+    <Compile Include="CommandLine\ParserTest.cs" />
+    <Compile Include="IO\FileUtilTest.cs" />
+    <Compile Include="Persistence\Collection.cs" />
+    <Compile Include="Persistence\DictionaryTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\VersionInfo.cs" />
+    <Compile Include="RegistrySerializerTest.cs" />
+    <Compile Include="StringExTest.cs" />
+    <Compile Include="TestBase.cs" />
+    <Compile Include="TokenizerUt.cs" />
+    <Compile Include="UpdateCheckTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sidi.Util\Sidi.Util.csproj">
+      <Project>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</Project>
+      <Name>Sidi.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Test\UpdateInfo.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
