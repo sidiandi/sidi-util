@@ -1,0 +1,3 @@
+sidi-util TODO
+--------
+write codeproject article about Sidi.CommandLine
