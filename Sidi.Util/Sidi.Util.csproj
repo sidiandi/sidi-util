@@ -47,7 +47,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
+    <OutputPath>..\..\lib\sidi-util\</OutputPath>
     <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)</IntermediatePath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

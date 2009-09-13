@@ -7,6 +7,7 @@ using Sidi.Util;
 using System.Reflection;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Sidi.IO
 {
@@ -114,70 +115,6 @@ namespace Sidi.IO
             File.WriteAllText(path, text);
         }
 
-        /// <summary>
-        /// Compares two files bytewise
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static bool FilesAreEqual(string a, string b)
-        {
-            if (File.Exists(a))
-            {
-                if (File.Exists(b))
-                {
-                    FileInfo ia = new FileInfo(a);
-                    FileInfo ib = new FileInfo(b);
-                    if (ia.Length != ib.Length)
-                    {
-                        return false;
-                    }
-
-                    Stream fa = null;
-                    Stream fb = null;
-                    try
-                    {
-                        fa = File.OpenRead(a);
-                        fb = File.OpenRead(b);
-                        int da;
-                        int db;
-                        do
-                        {
-                            da = fa.ReadByte();
-                            db = fb.ReadByte();
-                            if (da != db)
-                            {
-                                return false;
-                            }
-                        }
-                        while (da != -1);
-
-                        return true;
-                    }
-                    finally
-                    {
-                        if (fa != null) fa.Close();
-                        if (fb != null) fb.Close();
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (File.Exists(b))
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        }
-
         public static string GetRelativePath(string path, string basePath)
         {
             path = Path.GetFullPath(path);
@@ -283,6 +220,10 @@ namespace Sidi.IO
             return String.Join(pathlistSeparator, paths.ToArray());
         }
 
+        public static void ShellOpen(this string path)
+        {
+            Process.Start(path);
+        }
 
     }
 }
