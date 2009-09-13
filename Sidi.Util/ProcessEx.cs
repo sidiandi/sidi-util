@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using Sidi.IO;
+using System.Linq;
 
 namespace Sidi.Util
 {
@@ -47,5 +49,68 @@ namespace Sidi.Util
             process.Start();
             return process.StandardOutput;
         }
+
+        public static string DetailedInfo(this Process p)
+        {
+            return String.Format("{0} {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
+        }
+
+        public static bool IsAlreadyRunning(this Process p)
+        {
+            SearchPath sp = SearchPath.Parse(p.StartInfo.EnvironmentVariables["PATH"]);
+            sp.Paths.Insert(0, p.StartInfo.WorkingDirectory);
+            string pFilename = Path.GetFullPath(sp.Find(p.StartInfo.FileName)).ToLower();
+
+            return Process.GetProcesses().Any(x =>
+                {
+                    try
+                    {
+                        string filename = Path.GetFullPath(x.MainModule.FileName).ToLower();
+                        return filename.Equals(pFilename);
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                });
+        }
+
+        public static string ExitCodeInfo(this Process p)
+        {
+            return String.Format("exited with exit code {0} : {1}", p.ExitCode, p.DetailedInfo());
+        }
+
+        public static void CheckResult(this Process p)
+        {
+            p.CheckResult(0);
+        }
+
+        public static void CheckResult(this Process p, int expectedExitCode)
+        {
+            if (p.ExitCode != expectedExitCode)
+            {
+                throw new ProcessFailedException(p);
+            }
+        }
+
     }
+
+    public class ProcessFailedException : Exception
+    {
+        Process process;
+
+        public ProcessFailedException(Process p)
+        {
+            process = p;
+        }
+
+        public override string Message
+        {
+            get
+            {
+                return process.ExitCodeInfo();
+            }
+        }
+    }
+
 }
