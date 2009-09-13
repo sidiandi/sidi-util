@@ -7,8 +7,8 @@
     <ProjectGuid>{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sidi.Test</RootNamespace>
-    <AssemblyName>Sidi.Util.Tests</AssemblyName>
+    <RootNamespace>Sidi</RootNamespace>
+    <AssemblyName>Sidi.Util.Test</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -72,6 +72,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\VersionInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
+    <Compile Include="StringExTest.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="TokenizerUt.cs" />
     <Compile Include="UpdateCheckTest.cs" />

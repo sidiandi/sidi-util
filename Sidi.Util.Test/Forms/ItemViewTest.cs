@@ -15,13 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-#region "Mandatory NUnit Imports"
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using NUnit.Framework;
-#endregion
 
 //Test Specific Imports
 using Sidi.Forms;
@@ -29,38 +27,14 @@ using System.Windows.Forms;
 
 namespace Sidi.Forms
 {
-    [TestFixture, Ignore]
-    public class ItemViewTest
+    [TestFixture, Explicit("interactive")]
+    public class ItemViewTest : TestBase
     {
-        #region "Custom Trace Listener"
-        MyListener listener = new MyListener();
-
-        internal class MyListener : TraceListener
-        {
-            public override void Write(string message)
-            {
-                Console.Write(message);
-            }
-
-
-            public override void WriteLine(string message)
-            {
-                Console.WriteLine(message);
-            }
-        }
-        #endregion
-
         ItemView<string> itemView;
 
         [SetUp()]
         public void SetUp()
         {
-            //Setup our custom trace listener
-            if (!Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Add(listener);
-            }
-
             itemView = new ItemView<string>();
             List<string> data = new List<string>();
             for (int i = 0; i < 1000; ++i)
@@ -71,19 +45,7 @@ namespace Sidi.Forms
             itemView.ItemLayout = new ItemLayoutRows(32);
         }
 
-        [TearDown()]
-        public void TearDown()
-        {
-            //Remove our custom trace listener
-            if (Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Remove(listener);
-            }
-
-            //TODO - Tidy up your test objects here
-        }
-
-        [Test()]
+        [Test, Explicit("interactive")]
         public void ItemView()
         {
             Form f = Sidi.Forms.Util.AsForm(itemView);
@@ -98,7 +60,7 @@ namespace Sidi.Forms
 
         bool itemActivated = false;
 
-        [Test()]
+        [Test, Explicit("interactive")]
         public void ItemsActivated()
         {
             itemActivated = false;
@@ -113,7 +75,7 @@ namespace Sidi.Forms
             itemActivated = true;
         }
 
-        [Test()]
+        [Test, Explicit("interactive")]
         public void ItemViewOneItem()
         {
             itemView.List.Clear();

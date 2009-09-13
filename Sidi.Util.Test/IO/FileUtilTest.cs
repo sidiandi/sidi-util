@@ -32,7 +32,7 @@ namespace Sidi.Util
 {
 
     [TestFixture]
-    public class FileUtilTest
+    public class FileUtilTest : TestBase
     {
         #region "Custom Trace Listener"
         MyListener listener = new MyListener();

@@ -25,14 +25,9 @@ using System.Threading;
 namespace Sidi.Util
 {
     [TestFixture]
-    public class AsyncCalculationTest
+    public class AsyncCalculationTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        public AsyncCalculationTest()
-        {
-            log4net.Config.BasicConfigurator.Configure();
-        }
 
         IList<string> TestQuery(string search)
         {

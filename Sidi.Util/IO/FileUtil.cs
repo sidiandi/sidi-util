@@ -69,7 +69,7 @@ namespace Sidi.IO
 
         public static string Sibling(this Assembly assembly, string siblingName)
         {
-            return Sibling(assembly.Location, siblingName);
+            return Sibling(new Uri(assembly.CodeBase).LocalPath, siblingName);
         }
 
         /// <summary>

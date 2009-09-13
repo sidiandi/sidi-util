@@ -28,16 +28,8 @@ using NUnit.Framework;
 
 namespace Sidi.Util
 {
-    public class Test
-    {
-        public Test()
-        {
-            log4net.Config.BasicConfigurator.Configure();
-        }
-    }
-    
     [TestFixture]
-    public class DumpExtensionsTest : Test
+    public class DumpExtensionsTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

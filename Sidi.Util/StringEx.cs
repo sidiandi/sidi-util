@@ -21,6 +21,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using Sidi.IO;
 
 namespace Sidi.Util
 {
@@ -124,6 +126,16 @@ namespace Sidi.Util
             return String.Join(separator, enumerable.Select(x => x.ToString()).ToArray());
         }
 
+        public static string Join<T>(this IEnumerable<T> e)
+        {
+            StringWriter w = new StringWriter();
+            foreach (var i in e)
+            {
+                w.WriteLine(i);
+            }
+            return w.ToString();
+        }
+
         /// <summary>
         /// Converts a action that writes to a TextWriter to a string
         /// </summary>
@@ -136,6 +148,12 @@ namespace Sidi.Util
             return w.ToString();
         }
 
+        /// <summary>
+        /// A shorter way to write String.Format
+        /// </summary>
+        /// <param name="formatString"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string F(this string formatString, params object[] args)
         {
             return String.Format(formatString, args);
@@ -215,5 +233,58 @@ namespace Sidi.Util
         {
             return Regex.Replace(text, @"\u2022", "_");
         }
+        public static string EditInteractive(this string text)
+        {
+            string tf = null;
+            try
+            {
+                tf = Path.GetTempFileName();
+                File.WriteAllText(tf, text);
+
+                Process p = new Process();
+
+                p.StartInfo.FileName = FileUtil.CatDir(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    "Notepad++", "notepad++.exe");
+                p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
+
+                if (!File.Exists(p.StartInfo.FileName))
+                {
+                    p.StartInfo.FileName = "notepad.exe";
+                    p.StartInfo.Arguments = tf.Quote();
+                }
+
+                p.Start();
+                log.Info(p.DetailedInfo());
+                p.WaitForExit();
+                return File.ReadAllText(tf);
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(tf);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        public static IEnumerable<string> Lines(this string text)
+        {
+            StringReader r = new StringReader(text);
+            return r.ReadLines();
+        }
+
+        public static string GetSection(this string text, string sectionName)
+        {
+            var e = text.Lines();
+            string sectionHead = "[" + sectionName + "]";
+            e = e.SkipWhile(x => !x.StartsWith(sectionHead)).Skip(1);
+            e = e.TakeWhile(x => !x.StartsWith("["));
+            return e.JoinLines();
+        }
+
     }
 }

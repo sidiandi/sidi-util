@@ -104,7 +104,14 @@ namespace Sidi.Util
         {
             get
             {
-                return updateInfo.VersionInfo.First(x => x.Name.Equals(assembly.GetName().Name));
+                try
+                {
+                    return updateInfo.VersionInfo.First(x => x.Name.Equals(assembly.GetName().Name));
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception("No VersionInfo for {0}".F(assembly), ex);
+                }
             }
         }
 
@@ -260,7 +267,10 @@ namespace Sidi.Util
 
             if (IsUpdateRequired)
             {
-                updateRequiredHandler();
+                if (updateRequiredHandler != null)
+                {
+                    updateRequiredHandler();
+                }
             }
         }
     }

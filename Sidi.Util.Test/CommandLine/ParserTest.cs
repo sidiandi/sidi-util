@@ -33,14 +33,9 @@ using Sidi.Util;
 namespace Sidi.CommandLine
 {
     [TestFixture]
-    public class ParserTest
+    public class ParserTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        public ParserTest()
-        {
-            log4net.Config.BasicConfigurator.Configure();
-        }
 
         [SetUp()]
         public void SetUp()
