@@ -12,9 +12,10 @@
     <AssemblyName>Sidi.Build</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)\</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\bin\</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediateOutputPath>
+    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediatePath>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

@@ -15,10 +15,10 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\bin\$(Configuration)</OutputPath>
-    <DocumentationFile>$(SolutionDir)..\build\$(SolutionName)\doc\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)\</IntermediateOutputPath>
-    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\obj\$(Configuration)\$(AssemblyName)</IntermediatePath>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\bin\</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediateOutputPath>
+    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediatePath>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
