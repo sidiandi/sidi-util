@@ -24,6 +24,7 @@ using System.IO;
 using System.Reflection;
 using System.Globalization;
 using Sidi.Util;
+using System.ComponentModel;
 
 namespace Sidi.CommandLine
 {
@@ -86,6 +87,16 @@ namespace Sidi.CommandLine
         public MethodInfo MethodInfo;
         public string Name { get { return MethodInfo.Name; } }
         public string Usage { get { return Sidi.CommandLine.Usage.Get(MethodInfo); } }
+        public IEnumerable<string> Categories
+        {
+            get
+            {
+                var c = MethodInfo.GetCustomAttributes(typeof(CategoryAttribute), true)
+                    .Select(x => ((CategoryAttribute)x).Category);
+                return c.Any() ? c : new string[]{String.Empty};
+            }
+        }
+
         public string Syntax
         {
             get
@@ -111,6 +122,17 @@ namespace Sidi.CommandLine
         public MemberInfo MemberInfo;
         public string Name { get { return MemberInfo.Name; } }
         public string Usage { get { return Sidi.CommandLine.Usage.Get(MemberInfo); } }
+        
+        public IEnumerable<string> Categories
+        {
+            get
+            {
+                var c = MemberInfo.GetCustomAttributes(typeof(CategoryAttribute), true)
+                    .Select(x => ((CategoryAttribute)x).Category);
+                return c.Any() ? c : new string[] { String.Empty };
+            }
+        }
+
         public string Syntax
         {
             get
@@ -121,7 +143,7 @@ namespace Sidi.CommandLine
                     FieldInfo fieldInfo = (FieldInfo)i;
                     return String.Format(
                         Parser.CultureInfo,
-                        "--{0} [{1}]",
+                        "{0} [{1}]",
                         i.Name,
                         fieldInfo.FieldType.GetInfo()
                         );
@@ -131,7 +153,7 @@ namespace Sidi.CommandLine
                     PropertyInfo propertyInfo = (PropertyInfo)i;
                     return String.Format(
                         Parser.CultureInfo,
-                        "--{0} [{1}]",
+                        "{0} [{1}]",
                         i.Name,
                         propertyInfo.PropertyType.GetInfo()
                         );
@@ -200,6 +222,8 @@ namespace Sidi.CommandLine
     /// 
     /// Supported argument types are: bool,int, double, string, DirectoryInfo,
     /// FileSystemInfo, DateTime, TimeSpan and enums.
+    /// You can use System.ComponentModel.CategoryAttribute to sort your actions and
+    /// options into categories to make the usage message more readable.
     public class Parser
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -317,7 +341,7 @@ namespace Sidi.CommandLine
 
         bool HandleOption()
         {
-            string option = null;
+            string option = args[0];
             foreach (string op in optionPrefix)
             {
                 if (args[0].StartsWith(op))
@@ -675,46 +699,61 @@ namespace Sidi.CommandLine
         public void WriteUsage(TextWriter w)
         {
             w.WriteLine(Info);
-            w.WriteLine(String.Format("Usage: {0} --option1 value --option2 value action [parameters]", ApplicationName));
+            w.WriteLine(String.Format("Usage: {0} option1 value option2 value action [parameters]", ApplicationName));
 
-            if (Actions.Any())
+            var categories = 
+                Actions.SelectMany(x => x.Categories)
+                .Concat(Options.SelectMany(x => x.Categories))
+                .Distinct().ToList();
+            categories.Sort();
+
+            foreach (var category in categories)
             {
-                w.WriteLine();
-                w.WriteLine("Actions");
+                var categoryText = category + " ";
 
-                foreach (Action a in Actions)
+                var actions = Actions.Where(x => x.Categories.Contains(category));
+                
+                if (actions.Any())
                 {
-                    string u = a.Usage;
-                    string parameters = a.MethodInfo.GetParameters().Select(pi =>
+                    w.WriteLine();
+                    w.WriteLine("{0}Actions", categoryText);
+
+                    foreach (Action a in actions)
                     {
-                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                    }).Join(" ");
-                    w.WriteLine();
-                    w.WriteLine(String.Format(
-                        "{3}{0} {2}\r\n{1}", 
-                        a.Name,
-                        u.Wrap(maxColumns).Indent(indent + indent), 
-                        parameters, 
-                        indent));
+                        string u = a.Usage;
+                        string parameters = a.MethodInfo.GetParameters().Select(pi =>
+                        {
+                            return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
+                        }).Join(" ");
+                        w.WriteLine();
+                        w.WriteLine(String.Format(
+                            "{3}{0} {2}\r\n{1}",
+                            a.Name,
+                            u.Wrap(maxColumns).Indent(indent + indent),
+                            parameters,
+                            indent));
+                    }
                 }
-            }
 
-            if (Options.Any())
-            {
-                w.WriteLine();
-                w.WriteLine("Options");
+                var options = Options.Where(x => x.Categories.Contains(category));
 
-                foreach (Option i in Options)
+                if (options.Any())
                 {
                     w.WriteLine();
-                    w.WriteLine(String.Format(
-                        cultureInfo,
-                        "{4}--{0}\r\n{4}{4}Type: {1}, default: {3}\r\n{2}",
-                        i.Name,
-                        i.Type.GetInfo(),
-                        i.Usage.Wrap(maxColumns).Indent(indent + indent),
-                        i.GetValue(m_application),
-                        indent));
+                    w.WriteLine("{0}Options", categoryText);
+
+                    foreach (Option i in options)
+                    {
+                        w.WriteLine();
+                        w.WriteLine(String.Format(
+                            cultureInfo,
+                            "{4}{0} [{1}]\r\n{4}{4}default: {3}\r\n{2}",
+                            i.Name,
+                            i.Type.GetInfo(),
+                            i.Usage.Wrap(maxColumns).Indent(indent + indent),
+                            i.GetValue(m_application),
+                            indent));
+                    }
                 }
             }
         }
@@ -775,7 +814,7 @@ namespace Sidi.CommandLine
                     {
                         w.WriteLine(String.Format(
                             cultureInfo,
-                            "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
+                            "  {0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
                             i.Name,
                             fieldInfo.FieldType.GetInfo(),
                             u,
@@ -791,7 +830,7 @@ namespace Sidi.CommandLine
                     {
                         w.WriteLine(String.Format(
                             cultureInfo,
-                            "  --{0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
+                            "  {0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
                             i.Name,
                             propertyInfo.PropertyType.GetInfo(),
                             u,
@@ -800,6 +839,5 @@ namespace Sidi.CommandLine
                 }
             }
         }
-
     }
 }
