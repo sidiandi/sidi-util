@@ -31,14 +31,9 @@ namespace Sidi.Util
 {
 
     [TestFixture]
-    public class UpdateCheckTest
+    public class UpdateCheckTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        public UpdateCheckTest()
-        {
-            log4net.Config.BasicConfigurator.Configure();
-        }
 
         [Test]
         public void Serialize()
@@ -61,6 +56,7 @@ namespace Sidi.Util
         {
             UriBuilder u = new UriBuilder();
             Uri uri = new Uri(FileUtil.BinFile(@"Test\UpdateInfo.xml"));
+            log.Info(uri);
             UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), uri);
             c.Check();
             Assert.IsTrue(c.IsUpdateRequired);
@@ -90,7 +86,7 @@ namespace Sidi.Util
             c.Check();
         }
 
-        [Test]
+        [Test, Explicit("interactive")]
         public void TestSimple()
         {
             UpdateCheck c = new UpdateCheck(new Uri(FileUtil.BinFile(@"Test\UpdateInfo.xml")));
@@ -98,7 +94,7 @@ namespace Sidi.Util
             c.WaitCompleted();
         }
 
-        [Test]
+        [Test, Explicit("interactive")]
         public void TestOpen()
         {
             Process p = new Process();

@@ -34,7 +34,7 @@ namespace Sidi.Persistence
 {
 
     [TestFixture]
-    public class DictionaryTest
+    public class DictionaryTest : TestBase
     {
         #region "Custom Trace Listener"
         MyListener listener = new MyListener();
