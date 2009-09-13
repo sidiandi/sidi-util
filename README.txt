@@ -14,7 +14,7 @@ FILES
 Sidi.Util
   The library itself
 
-Sidi.Util.Test
+Sidi.Util
   NUnit tests for Sidi.Util classes
 
 PREREQUISITES

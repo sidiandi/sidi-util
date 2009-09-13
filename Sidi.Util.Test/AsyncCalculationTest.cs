@@ -22,7 +22,7 @@ using System.Text;
 using NUnit.Framework;
 using System.Threading;
 
-namespace Sidi.Util.Test
+namespace Sidi.Util
 {
     [TestFixture]
     public class AsyncCalculationTest

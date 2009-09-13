@@ -28,8 +28,9 @@ using NUnit.Framework;
 using Sidi.CommandLine;
 using System.ComponentModel;
 using System.IO;
+using Sidi.Util;
 
-namespace Sidi.Util.Test
+namespace Sidi.CommandLine
 {
     [TestFixture]
     public class ParserTest

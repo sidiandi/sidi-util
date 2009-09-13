@@ -65,8 +65,8 @@
     <Compile Include="IntSetTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
-    <Compile Include="ParserTest.cs" />
-    <Compile Include="FileUtilTest.cs" />
+    <Compile Include="CommandLine\ParserTest.cs" />
+    <Compile Include="IO\FileUtilTest.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,6 +86,9 @@
     <Content Include="Test\UpdateInfo.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Util\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -26,7 +26,7 @@ using Sidi.Persistence;
 using System.Threading;
 using Sidi.IO;
 
-namespace Sidi.Persistence.Test
+namespace Sidi.Persistence
 {
     [TestFixture]
     public class PersistentCollectionTest

@@ -30,87 +30,91 @@ using System.IO;
 using System.Data.Common;
 using System.Linq;
 
-[TestFixture]
-public class DictionaryTest
+namespace Sidi.Persistence
 {
-    #region "Custom Trace Listener"
-    MyListener listener = new MyListener();
 
-    internal class MyListener : TraceListener
+    [TestFixture]
+    public class DictionaryTest
     {
-        public override void Write(string message)
+        #region "Custom Trace Listener"
+        MyListener listener = new MyListener();
+
+        internal class MyListener : TraceListener
         {
-            Console.Write(message);
-        }
-
-
-        public override void WriteLine(string message)
-        {
-            Console.WriteLine(message);
-        }
-    }
-    #endregion
-
-    Sidi.Persistence.Dictionary<string, string> dictionary;
-
-    [SetUp()]
-    public void SetUp()
-    {
-        //Setup our custom trace listener
-        if (!Trace.Listeners.Contains(listener))
-        {
-            Trace.Listeners.Add(listener);
-        }
-
-        //TODO - Setup your test objects here
-        string path = @"d:\temp\dictionary_test.sqlite";
-        if (File.Exists(path))
-        {
-            File.Delete(path);
-        }
-        dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options");
-    }
-
-    [TearDown()]
-    public void TearDown()
-    {
-        //Remove our custom trace listener
-        if (Trace.Listeners.Contains(listener))
-        {
-            Trace.Listeners.Remove(listener);
-        }
-
-        //TODO - Tidy up your test objects here
-        dictionary.Close();
-    }
-
-    [Test()]
-    public void ReadWrite()
-    {
-        string verboseValue = "on";
-        string userValue = "sidi";
-        dictionary["verbose"] = verboseValue;
-        dictionary["user"] = userValue;
-
-        Assert.AreEqual(verboseValue, dictionary["verbose"]);
-        Assert.AreEqual(userValue, dictionary["user"]);
-    }
-
-    [Test()]
-    public void MassReadWrite()
-    {
-        Stopwatch w = new Stopwatch();
-        w.Start();
-        using (DbTransaction t = dictionary.BeginTransaction())
-        {
-            for (long i = 0; i < 100000; ++i)
+            public override void Write(string message)
             {
-                string key = String.Join(".", BitConverter.GetBytes(i).Select(x => "Parameter " + x.ToString()).ToArray());
-                string value = String.Format("Value{0}", i);
-                dictionary[key] = value;
+                Console.Write(message);
             }
-            t.Commit();
+
+
+            public override void WriteLine(string message)
+            {
+                Console.WriteLine(message);
+            }
         }
-        Console.WriteLine(w.Elapsed);
+        #endregion
+
+        Sidi.Persistence.Dictionary<string, string> dictionary;
+
+        [SetUp()]
+        public void SetUp()
+        {
+            //Setup our custom trace listener
+            if (!Trace.Listeners.Contains(listener))
+            {
+                Trace.Listeners.Add(listener);
+            }
+
+            //TODO - Setup your test objects here
+            string path = @"d:\temp\dictionary_test.sqlite";
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options");
+        }
+
+        [TearDown()]
+        public void TearDown()
+        {
+            //Remove our custom trace listener
+            if (Trace.Listeners.Contains(listener))
+            {
+                Trace.Listeners.Remove(listener);
+            }
+
+            //TODO - Tidy up your test objects here
+            dictionary.Close();
+        }
+
+        [Test()]
+        public void ReadWrite()
+        {
+            string verboseValue = "on";
+            string userValue = "sidi";
+            dictionary["verbose"] = verboseValue;
+            dictionary["user"] = userValue;
+
+            Assert.AreEqual(verboseValue, dictionary["verbose"]);
+            Assert.AreEqual(userValue, dictionary["user"]);
+        }
+
+        [Test()]
+        public void MassReadWrite()
+        {
+            Stopwatch w = new Stopwatch();
+            w.Start();
+            using (DbTransaction t = dictionary.BeginTransaction())
+            {
+                for (long i = 0; i < 100000; ++i)
+                {
+                    string key = String.Join(".", BitConverter.GetBytes(i).Select(x => "Parameter " + x.ToString()).ToArray());
+                    string value = String.Format("Value{0}", i);
+                    dictionary[key] = value;
+                }
+                t.Commit();
+            }
+            Console.WriteLine(w.Elapsed);
+        }
     }
 }

@@ -27,9 +27,8 @@ using NUnit.Framework;
 using Sidi.Forms;
 using System.Windows.Forms;
 
-namespace Sidi.Forms.Test
+namespace Sidi.Forms
 {
-
     [TestFixture, Ignore]
     public class ItemViewTest
     {
