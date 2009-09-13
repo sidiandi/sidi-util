@@ -172,5 +172,15 @@ namespace Sidi.Util
             }
             return w.ToString();
         }
+
+        /// <summary>
+        /// Replace the annoying "beep" unicode character
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Printable(this string text)
+        {
+            return Regex.Replace(text, @"\u2022", "_");
+        }
     }
 }
