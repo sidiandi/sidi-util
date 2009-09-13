@@ -28,6 +28,39 @@ namespace Sidi.Util
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public static string ShortenMd5(this string text, int maxLength)
+        {
+            int md5StringLength = 16 * 2 + 1;
+
+            if (!(maxLength > md5StringLength))
+            {
+                throw new ArgumentOutOfRangeException(String.Format("maxLength must be > {0}", md5StringLength));
+            }
+
+            var x = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            if (text.Length <= maxLength)
+            {
+                return text;
+            }
+
+            string toEncode = text.Substring(maxLength - md5StringLength);
+            return
+                text.Substring(0, maxLength) + "." +
+                x.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode)).HexString();
+        }
+
+        public static string Unquote(this string text)
+        {
+            if (text.StartsWith("\"") && text.EndsWith("\""))
+            {
+                return text.Substring(1, text.Length - 2);
+            }
+            else
+            {
+                return text;
+            }
+        }
+
         public static string OneLine(this string text, int maxLen)
         {
             StringReader r = new StringReader(text);
