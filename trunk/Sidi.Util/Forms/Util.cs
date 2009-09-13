@@ -23,14 +23,14 @@ using System.Drawing;
 
 namespace Sidi.Forms
 {
-    public class Util
+    public static class Util
     {
         static public Form AsForm(Control c)
         {
             return AsForm(c, c.ToString());
         }
         
-        static public Form AsForm(Control c, string caption)
+        static public Form AsForm(this Control c, string caption)
         {
             Form f = new Form();
             c.Dock = DockStyle.Fill;
@@ -41,7 +41,7 @@ namespace Sidi.Forms
             return f;
         }
 
-        static public void Run(Control c)
+        static public void Run(this Control c)
         {
             Form f = AsForm(c, string.Empty);
             Application.Run(f);
