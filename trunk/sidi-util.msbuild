@@ -9,4 +9,12 @@
     </PropertyGroup>
     
     <Import Project="$(MSBuildExtensionsPath)\sidi-util\Sidi.Build.Targets"/>
+
+  <Target Name="Install" DependsOnTargets="Build">
+    <RoboCopy
+            SourceFolder="$(OutputDir)"
+            DestinationFolder="$(ProgramFiles)\MSBuild\$(ProjectName)"
+            Mirror="true"
+            />
+  </Target>
 </Project>
