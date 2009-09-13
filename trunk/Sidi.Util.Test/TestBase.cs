@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Sidi.IO;
 
-namespace Sidi.Test
+namespace Sidi
 {
     public class TestBase
     {

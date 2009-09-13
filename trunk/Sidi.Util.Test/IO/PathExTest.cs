@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Sidi.IO;
 using System.IO;
 
-namespace Sidi.Test.IO
+namespace Sidi.IO
 {
     [TestFixture]
     public class PathExTest : TestBase

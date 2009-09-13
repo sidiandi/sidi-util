@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace Sidi.Util.Test
+namespace Sidi.Util
 {
     [TestFixture]
     public class RegistrySerializerTest

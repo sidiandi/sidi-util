@@ -22,11 +22,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Sidi.Util.Test")]
+[assembly: AssemblyTitle("Sidi.Util")]
 [assembly: AssemblyDescription("Nunit tests for Sidi.Util")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Sidi.Util.Test")]
+[assembly: AssemblyProduct("Sidi.Util")]
 [assembly: AssemblyCopyright("(c) 2008 andreas.grimme@gmx.net")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
