@@ -26,7 +26,7 @@ using NUnit.Framework;
 //Test Specific Imports
 //TODO - Add imports your going to test here
 using Sidi.CommandLine;
-using System.ComponentModel;
+using cm = System.ComponentModel;
 using System.IO;
 using Sidi.Util;
 
@@ -91,6 +91,7 @@ namespace Sidi.CommandLine
             public DateTime m_Time;
 
             [Usage("Demonstrates enums")]
+            [cm.Category("Advanced")]
             public Fruit Fruit { set; get; }
 
             public string Result;
@@ -105,11 +106,14 @@ namespace Sidi.CommandLine
         public void Enum()
         {
             TestApp t = new TestApp();
-            Parser.Run(t, new string[] { "--Fruit", "Apple" });
+            Parser.Run(t, new string[] { "Fruit", "Apple" });
             Assert.AreEqual(t.Fruit, Fruit.Apple);
 
-            Parser.Run(t, new string[] { "--Fruit", "Orange" });
+            Parser.Run(t, new string[] { "Fruit", "Orange" });
             Assert.AreEqual(t.Fruit, Fruit.Orange);
+
+            Parser.Run(t, new string[] { "--Fruit", "Pear" });
+            Assert.AreEqual(t.Fruit, Fruit.Pear);
 
             var usage = StringEx.ToString(new Parser(t).WriteUsage);
             Assert.IsTrue(usage.Contains(Fruit.Apple.ToString()));
@@ -120,6 +124,7 @@ namespace Sidi.CommandLine
         {
             Parser p = new Parser(new TestApp());
             var usage = StringEx.ToString(x => p.WriteUsage(x));
+            log.Info(usage);
             Assert.IsTrue(usage.Contains("Options"));
             Assert.IsTrue(usage.Contains("Actions"));
         }
