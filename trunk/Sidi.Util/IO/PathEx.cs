@@ -117,6 +117,17 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// Returns true if path is inside of directory or its sub-directories
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="directory"></param>
+        /// <returns></returns>
+        public static bool IsChild(this string path, string directory)
+        {
+            return path.ToLower().StartsWith(directory.ToLower());
+        }
+
         public static void EnsureParentDirectoryExists(this string path)
         {
             string destinationDir = Directory.GetParent(path).FullName;
