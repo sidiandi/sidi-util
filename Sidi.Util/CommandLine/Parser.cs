@@ -548,7 +548,7 @@ namespace Sidi.CommandLine
             ParameterInfo[] parameters = action.GetParameters();
             object[] parameterValues = new object[parameters.Length];
 
-            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(List<string>))
+            if (parameters[0].ParameterType == typeof(List<string>))
             {
                 parameterValues[0] = args;
             }
