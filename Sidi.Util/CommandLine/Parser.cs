@@ -369,14 +369,14 @@ namespace Sidi.CommandLine
                 FieldInfo fi = (FieldInfo)member;
                 object v = ParseValue(NextArg(), fi.FieldType);
                 fi.SetValue(m_application, v);
-                log.InfoFormat("{0} = {1}", fi.Name, fi.GetValue(m_application));
+                log.InfoFormat("Option {0} = {1}", fi.Name, fi.GetValue(m_application));
             }
             else if (member is PropertyInfo)
             {
                 PropertyInfo pi = (PropertyInfo)member;
                 object v = ParseValue(NextArg(), pi.PropertyType);
                 pi.SetValue(m_application, v, new object[] { });
-                log.InfoFormat("{0} = {1}", pi.Name, pi.GetValue(m_application, new object[]{}));
+                log.InfoFormat("Option {0} = {1}", pi.Name, pi.GetValue(m_application, new object[] { }));
             }
             return true;
         }
@@ -572,7 +572,7 @@ namespace Sidi.CommandLine
                     parameterValues[i] = ParseValue(a, parameters[i].ParameterType);
                 }
             }
-            log.InfoFormat("{0}({1})", action.Name, parameterValues.Join(", "));
+            log.InfoFormat("Action {0}({1})", action.Name, parameterValues.Join(", "));
             action.Invoke(m_application, parameterValues);
             return true;
         }
