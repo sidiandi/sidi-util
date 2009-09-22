@@ -253,5 +253,23 @@ namespace Sidi.IO
             Process.Start(path);
         }
 
+        /// <summary>
+        /// Copies to another stream
+        /// </summary>
+        /// <param name="source">Source stream</param>
+        /// <param name="dest">Destination stream</param>
+        public static void CopyTo(this Stream source, Stream dest)
+        {
+            byte[] buffer = new byte[4096];
+            for (; ; )
+            {
+                int r = source.Read(buffer, 0, buffer.Length);
+                if (r == 0)
+                {
+                    break;
+                }
+                dest.Write(buffer, 0, r);
+            }
+        }
     }
 }
