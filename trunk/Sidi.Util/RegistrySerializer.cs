@@ -58,21 +58,24 @@ namespace Sidi.Util
             foreach (var f in x.GetType().GetFields())
             {
                 object value = f.GetValue(x);
-                if (value is bool)
+                if (value != null)
                 {
-                    value = (bool)value ? 1 : 0;
+                    if (value is bool)
+                    {
+                        value = (bool)value ? 1 : 0;
+                    }
+                    else if (value is int)
+                    {
+                    }
+                    else if (value is string)
+                    {
+                    }
+                    else
+                    {
+                        throw new Exception(String.Format("{0} type is not supported", f.FieldType.ToString()));
+                    }
+                    Registry.SetValue(key, f.Name, value);
                 }
-                else if (value is int)
-                {
-                }
-                else if (value is string)
-                {
-                }
-                else
-                {
-                    throw new Exception(String.Format("{0} type is not supported", f.FieldType.ToString()));
-                }
-                Registry.SetValue(key, f.Name, value);
             }
         }
     }
