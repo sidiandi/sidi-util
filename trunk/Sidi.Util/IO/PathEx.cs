@@ -130,10 +130,14 @@ namespace Sidi.IO
 
         public static void EnsureParentDirectoryExists(this string path)
         {
-            string destinationDir = Directory.GetParent(path).FullName;
-            if (!Directory.Exists(destinationDir))
+            Directory.GetParent(path).FullName.EnsureDirectoryExists();
+        }
+
+        public static void EnsureDirectoryExists(this string path)
+        {
+            if (!Directory.Exists(path))
             {
-                Directory.CreateDirectory(destinationDir);
+                Directory.CreateDirectory(path);
             }
         }
 
