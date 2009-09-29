@@ -77,7 +77,7 @@ namespace Sidi.Util
             var rows = new List<string[]>();
             foreach (var i in e)
             {
-                rows.Add(columns.Select(x => x(i)).ToArray());
+                rows.Add(columns.Select(x => x(i)).Select(x => x == null ? String.Empty : x).ToArray());
             }
 
             int[] w = new int[columns.Length];
