@@ -20,14 +20,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Win32;
+using System.Reflection;
 
 namespace Sidi.Util
 {
     public class RegistrySerializer
     {
+        static IEnumerable<FieldInfo> Fields(object x)
+        {
+            return x.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+        }
+        
         public static void Read(string key, object x)
         {
-            foreach (var f in x.GetType().GetFields())
+            foreach (var f in Fields(x))
             {
                 var value = Registry.GetValue(key, f.Name, null);
                 if (value == null)
@@ -55,7 +61,7 @@ namespace Sidi.Util
 
         public static void Write(string key, object x)
         {
-            foreach (var f in x.GetType().GetFields())
+            foreach (var f in Fields(x))
             {
                 object value = f.GetValue(x);
                 if (value != null)

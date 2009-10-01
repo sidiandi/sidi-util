@@ -28,6 +28,7 @@ namespace Sidi.Util
     {
         public class Example
         {
+            public const string Key = @"HKEY_CURRENT_USER\Software\sidi-util\Test\Example";
             public string AStringVariable;
             public bool ABoolVariable;
             public int AIntVariable;
@@ -39,6 +40,8 @@ namespace Sidi.Util
         /// </summary>
         public class Debugger
         {
+            public const string Key = @"HKEY_CURRENT_USER\Software\sidi-util\Test\Example2";
+
             public bool ShowNonPublicMembers;
             public bool WarnIfNoUserCodeOnLaunch;
             public bool FrameworkSourceStepping;
@@ -60,11 +63,10 @@ namespace Sidi.Util
             x.ABoolVariable = true;
             x.AIntVariable = 123;
 
-            string key = @"HKEY_CURRENT_USER\Software\sidi-util\Test\Example";
-            RegistrySerializer.Write(key, x);
+            RegistrySerializer.Write(Debugger.Key, x);
 
             var y = new Example();
-            RegistrySerializer.Read(key, y);
+            RegistrySerializer.Read(Debugger.Key, y);
             Assert.AreEqual(x.AStringVariable, y.AStringVariable);
             Assert.AreEqual(x.AIntVariable, y.AIntVariable);
             Assert.AreEqual(x.ABoolVariable, y.ABoolVariable);
@@ -73,10 +75,9 @@ namespace Sidi.Util
         [Test]
         public void ReadWrite2()
         {
-            string key = @"HKEY_CURRENT_USER\Software\sidi-util\Test\Example2";
             Debugger d = new Debugger();
             d.SymbolCacheDir = @"D:\symbols";
-            RegistrySerializer.Write(key, d);
+            RegistrySerializer.Write(Debugger.Key, d);
         }
     }
 }
