@@ -82,6 +82,23 @@ namespace Sidi.IO
             return Assembly.GetExecutingAssembly().Sibling(path);
         }
 
+        /// <summary>
+        /// Deletes also write-protected files
+        /// </summary>
+        /// <param name="path"></param>
+        public static void ForceDelete(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                path.SetReadOnly(false);
+                File.Delete(path);
+            }
+        }
+
         public static string UserSetting(this Type type, string name)
         {
             string root = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
