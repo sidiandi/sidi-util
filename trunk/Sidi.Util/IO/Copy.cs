@@ -165,6 +165,35 @@ namespace Sidi.IO
             }
         }
 
+        public void IncrementalCopy(string source, string dest, string existingCopy)
+        {
+            foreach (var i in FileUtil.Recurse(source))
+            {
+                string s = source.CatDir(i);
+                string d = dest.CatDir(i);
+                string e = existingCopy.CatDir(i);
+
+                if (Directory.Exists(s))
+                {
+                    Directory.CreateDirectory(d);
+                }
+                else
+                {
+                    if (CopyCondition(s))
+                    {
+                        if (FileUtil.FilesAreEqualByTime(s, e))
+                        {
+                            FileUtil.CreateHardLink(d, e);
+                        }
+                        else
+                        {
+                            File.Copy(s, d);
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Delete all files in directory dir. Does not recurse into sub directories.
         /// </summary>

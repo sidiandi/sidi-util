@@ -136,6 +136,7 @@
     <Compile Include="IntSet.cs" />
     <Compile Include="IO\PathEx.cs" />
     <Compile Include="IO\SearchPath.cs" />
+    <Compile Include="ListEx.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="LruCacheBackground.cs" />
     <Compile Include="LruCacheBackgroundAutoInvalidate.cs" />
