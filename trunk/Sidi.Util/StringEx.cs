@@ -114,14 +114,7 @@ namespace Sidi.Util
 
         public static string CatDir(this string dir0, params string[] dirs)
         {
-            foreach (string i in dirs)
-            {
-                if (!String.IsNullOrEmpty(i))
-                {
-                    dir0 = System.IO.Path.Combine(dir0, i);
-                }
-            }
-            return dir0;
+            return FileUtil.CatDir(new string[] { dir0 }.Concat(dirs).ToArray());
         }
 
         public static string Join<T>(this IEnumerable<T> enumerable, string separator)
