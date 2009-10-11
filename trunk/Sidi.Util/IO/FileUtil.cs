@@ -254,6 +254,27 @@ namespace Sidi.IO
             }
         }
 
+        public static bool FilesAreEqualByTime(string a, string b)
+        {
+            if (File.Exists(a))
+            {
+                if (File.Exists(b))
+                {
+                    var fa = new FileInfo(a);
+                    var fb = new FileInfo(b);
+                    return fa.LastWriteTimeUtc == fb.LastWriteTimeUtc;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return !File.Exists(b);
+            }
+        }
+
         public static void CreateHardLink(
                 string fileName,
                 string existingFileName)
