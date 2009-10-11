@@ -36,7 +36,13 @@ namespace Sidi.Util
 
         public void Extract(string destinationDirectory, string memberName)
         {
-            zip.ExtractZip(zipFileName, destinationDirectory, FastZip.Overwrite.Always, null, String.Empty, String.Empty, true);
+            zip.ExtractZip(
+                zipFileName, 
+                destinationDirectory, 
+                FastZip.Overwrite.Always, 
+                null, 
+                String.Empty, 
+                String.Empty);
         }
 
         public void ExtractAll(string destinationDirectory)
