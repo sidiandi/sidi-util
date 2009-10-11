@@ -183,10 +183,12 @@ namespace Sidi.IO
                     {
                         if (FileUtil.FilesAreEqualByTime(s, e))
                         {
+                            log.InfoFormat("Link {0} -> {1}", d, e);
                             FileUtil.CreateHardLink(d, e);
                         }
                         else
                         {
+                            log.InfoFormat("Copy {0} -> {1}", s, d);
                             File.Copy(s, d);
                         }
                     }
