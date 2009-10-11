@@ -21,6 +21,7 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using Sidi.Util;
+using System.Runtime.InteropServices;
 
 namespace Sidi.IO
 {
@@ -252,5 +253,24 @@ namespace Sidi.IO
                 }
             }
         }
+
+        public static void CreateHardLink(
+                string fileName,
+                string existingFileName)
+        {
+            bool result = CreateHardLink(fileName, existingFileName, IntPtr.Zero);
+            if (!result)
+            {
+                throw new System.IO.IOException(String.Format("Cannot create hard link: {0} -> {1}", fileName, existingFileName));
+            }
+        }
+
+        [DllImport("Kernel32.dll")]
+        private static extern
+            bool CreateHardLink(
+                string FileName,
+                string ExistingFileName,
+                IntPtr lpSecurityAttributes
+            );
     }
 }
