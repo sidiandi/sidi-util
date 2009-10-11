@@ -293,5 +293,34 @@ namespace Sidi.IO
                 string ExistingFileName,
                 IntPtr lpSecurityAttributes
             );
+
+        public static IEnumerable<string> Recurse(string path)
+        {
+            return Recurse(path, null);
+        }
+
+        public static IEnumerable<string> Recurse(string root, string relPath)
+        {
+            List<string> r = new List<string>();
+            r.Add(relPath);
+
+            string i;
+            while (r.Pop(out i))
+            {
+                string p = root.CatDir(i);
+                if (File.Exists(p))
+                {
+                    yield return i;
+                }
+                if (Directory.Exists(p))
+                {
+                    yield return i;
+                    foreach (var c in new DirectoryInfo(p).GetFileSystemInfos())
+                    {
+                        r.Add(i.CatDir(c.Name));
+                    }
+                }
+            }
+        }
     }
 }
