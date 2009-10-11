@@ -116,7 +116,10 @@ namespace Sidi.Util
         {
             foreach (string i in dirs)
             {
-                dir0 = System.IO.Path.Combine(dir0, i);
+                if (!String.IsNullOrEmpty(i))
+                {
+                    dir0 = System.IO.Path.Combine(dir0, i);
+                }
             }
             return dir0;
         }
