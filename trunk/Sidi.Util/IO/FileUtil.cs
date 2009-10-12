@@ -36,13 +36,7 @@ namespace Sidi.IO
         public static string Sibling(this string path, string siblingName)
         {
             DirectoryInfo parent = System.IO.Directory.GetParent(path);
-            if (!parent.Exists)
-            {
-                parent.Create();
-            }
-            return System.IO.Path.Combine(
-                parent.FullName,
-                siblingName);
+            return parent.FullName.CatDir(siblingName);
         }
 
         /// <summary>
