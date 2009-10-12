@@ -270,12 +270,9 @@ namespace Sidi.CommandLine
             }
             catch (TargetInvocationException exception)
             {
-                log.Info(exception.InnerException);
+                log.Error(exception.InnerException);
                 Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine("An error has occured. Details are logged above.");
-                Console.WriteLine("Reason: " + exception.InnerException.Message);
-                Console.WriteLine();
+                Console.WriteLine("Error: " + exception.InnerException.Message);
             }
         }
 
