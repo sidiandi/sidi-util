@@ -42,7 +42,7 @@ namespace Sidi.Util
                 FastZip.Overwrite.Always, 
                 null, 
                 String.Empty, 
-                String.Empty);
+                String.Empty, true);
         }
 
         public void ExtractAll(string destinationDirectory)
