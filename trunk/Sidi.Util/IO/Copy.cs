@@ -83,6 +83,8 @@ namespace Sidi.IO
                 si.Length != di.Length);
         }
 
+        public string RenameLockedDestinationFilesExtension = "renamed-to-overwrite";
+
         public bool FastCopyNoCreateDir(string source, string dest)
         {
             FileInfo si = new FileInfo(source);
@@ -99,7 +101,34 @@ namespace Sidi.IO
                         destFileInfo.Attributes = (FileAttributes)(destFileInfo.Attributes - FileAttributes.ReadOnly);
                     }
                 }
-                File.Copy(source, dest, true);
+
+                try
+                {
+                    File.Copy(source, dest, true);
+                }
+                catch (Exception ex)
+                {
+                    if (RenameLockedDestinationFiles)
+                    {
+                        string oldFile = String.Empty;
+                        for (int unique = 0; unique < 100; ++unique)
+                        {
+                            oldFile = String.Format("{0}.{1}.{2}", dest, unique, RenameLockedDestinationFilesExtension);
+                            if (!File.Exists(oldFile))
+                            {
+                                break;
+                            }
+                        }
+                        log.InfoFormat("Move {0} -> {1}", dest, oldFile);
+                        File.Move(dest, oldFile);
+                    }
+                    else
+                    {
+                        log.Error("Cannot copy {0} -> {1}".F(source, dest), ex);
+                        throw;
+                    }
+                }
+
                 if (MakeWritable)
                 {
                     new FileInfo(dest).IsReadOnly = false;
@@ -122,6 +151,7 @@ namespace Sidi.IO
         }
 
         public bool MakeWritable { get; set; }
+        public bool RenameLockedDestinationFiles { get; set; }
 
         public void CopyRecursive(string source, string dest)
         {

@@ -60,6 +60,7 @@
     <Compile Include="Forms\ItemViewTest.cs" />
     <Compile Include="GraMath.cs" />
     <Compile Include="IntSetTest.cs" />
+    <Compile Include="IO\CopyTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
