@@ -121,6 +121,7 @@ namespace Sidi.IO
                         }
                         log.InfoFormat("Move {0} -> {1}", dest, oldFile);
                         File.Move(dest, oldFile);
+                        File.Copy(source, dest, true);
                     }
                     else
                     {
