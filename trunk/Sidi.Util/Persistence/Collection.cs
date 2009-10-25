@@ -229,7 +229,7 @@ namespace Sidi.Persistence
             }
 
             insert = connection.CreateCommand();
-            insert.CommandText = String.Format("insert or replace into {0} values({1})",
+            insert.CommandText = String.Format("insert or replace into {0} ({1}) values({2})",
                 table,
                 Members.Select(x => x.Name).Join(", "),
                 Members.Select(x => "@" + x.Name).Join(", ")
