@@ -44,13 +44,13 @@ namespace Sidi.CommandLine
             }
         }
     }
-    
+
     public interface CommandLineHandler
     {
         void BeforeParse(IList<string> args);
         void UnknownArgument(IList<string> args);
     }
-    
+
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
     public class Usage : System.Attribute
     {
@@ -93,7 +93,7 @@ namespace Sidi.CommandLine
             {
                 var c = MethodInfo.GetCustomAttributes(typeof(CategoryAttribute), true)
                     .Select(x => ((CategoryAttribute)x).Category);
-                return c.Any() ? c : new string[]{String.Empty};
+                return c.Any() ? c : new string[] { String.Empty };
             }
         }
 
@@ -108,7 +108,7 @@ namespace Sidi.CommandLine
                 return String.Format("{0} {1}", i.Name, parameters);
             }
         }
-        
+
         public void PrintScriptFileSample(TextWriter w)
         {
             w.Write("# "); w.WriteLine(Usage);
@@ -122,7 +122,8 @@ namespace Sidi.CommandLine
         public MemberInfo MemberInfo;
         public string Name { get { return MemberInfo.Name; } }
         public string Usage { get { return Sidi.CommandLine.Usage.Get(MemberInfo); } }
-        
+        public object Application { get; set; }
+
         public IEnumerable<string> Categories
         {
             get
@@ -228,15 +229,15 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        object m_application;
+        List<object> m_applications;
         static string[] optionPrefix = new string[] { "--", "-", "/" };
         static CultureInfo cultureInfo;
 
         public static CultureInfo CultureInfo { get { return cultureInfo; } }
 
-        public Object Application
+        public List<object> Applications
         {
-            get { return m_application; }
+            get { return m_applications; }
         }
 
         static Parser()
@@ -248,12 +249,17 @@ namespace Sidi.CommandLine
         }
 
         public Parser(object application)
+            : this()
+        {
+            Applications.Add(application);
+        }
+
+        public Parser()
         {
             cultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
-            m_application = application;
         }
 
         public static void Run(object application, string[] args)
@@ -280,62 +286,65 @@ namespace Sidi.CommandLine
 
         public void Parse(string[] a_args)
         {
-                args = new List<string>(a_args);
+            args = new List<string>(a_args);
+
+            if (args.Count == 0)
+            {
+                ShowUsage();
+                // ShowGui();
+                return;
+            }
+
+            log.InfoFormat("Arguments: {0}", args.Join(" "));
+
+            while (args.Count > 0)
+            {
+                foreach (var i in Applications)
+                {
+                    if (i is CommandLineHandler)
+                    {
+                        CommandLineHandler h = (CommandLineHandler)i;
+                        h.BeforeParse(args);
+                    }
+                }
 
                 if (args.Count == 0)
                 {
-                    ShowUsage();
-                    // ShowGui();
-                    return;
+                    break;
                 }
 
-                log.InfoFormat("Arguments: {0}", args.Join(" "));
-            
-                while (args.Count > 0)
+                if (HandleOption())
                 {
-                    if (Application is CommandLineHandler)
-                    {
-                        CommandLineHandler h = (CommandLineHandler)Application;
-                        h.BeforeParse(args);
-                    }
-
-                    if (args.Count == 0)
-                    {
-                        break;
-                    }
-
-                    if (HandleOption())
-                    {
-                        continue;
-                    }
-
-                    if (HandleAction())
-                    {
-                        continue;
-                    }
-
-                    if (HandleUnknown())
-                    {
-                        continue;
-                    }
-
-                    throw new CommandLineException("Argument " + args[0] + " is unknown.");
+                    continue;
                 }
+
+                if (HandleAction())
+                {
+                    continue;
+                }
+
+                if (HandleUnknown())
+                {
+                    continue;
+                }
+
+                throw new CommandLineException("Argument " + args[0] + " is unknown.");
+            }
         }
 
         bool HandleUnknown()
         {
-            if (Application is CommandLineHandler)
+            foreach (var i in Applications)
             {
-                CommandLineHandler h = (CommandLineHandler)Application;
-                int c = args.Count;
-                h.UnknownArgument(args);
-                return args.Count != c;
+                if (i is CommandLineHandler)
+                {
+                    CommandLineHandler h = (CommandLineHandler)i;
+                    int c = args.Count;
+                    h.UnknownArgument(args);
+                    return args.Count != c;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         bool HandleOption()
@@ -355,7 +364,8 @@ namespace Sidi.CommandLine
                 return false;
             }
 
-            MemberInfo member = GetOption(option);
+            object m_application;
+            MemberInfo member = GetOption(option, out m_application);
             if (member == null)
             {
                 return false;
@@ -452,9 +462,9 @@ namespace Sidi.CommandLine
                 {
                     throw new CommandLineException(
                         String.Format(
-                            "Argument {0} is ambiguous. Possible arguments are: {1}", 
+                            "Argument {0} is ambiguous. Possible arguments are: {1}",
                             name,
-                            hits.Select(x => x.Name).Aggregate((x,y) => x + ", " + y)
+                            hits.Select(x => x.Name).Aggregate((x, y) => x + ", " + y)
                             )
                     );
                 }
@@ -469,25 +479,31 @@ namespace Sidi.CommandLine
             }
         }
 
-        MemberInfo GetOption(string name)
+        MemberInfo GetOption(string name, out object application)
         {
-            MemberInfo m = AppType.GetProperty(name);
-            if (m != null) return m;
-            m = AppType.GetField(name);
-            if (m != null) return m;
+            foreach (var i in Applications)
+            {
+                application = i;
+                var AppType = i.GetType();
+                MemberInfo m = AppType.GetProperty(name);
+                if (m != null) return m;
+                m = AppType.GetField(name);
+                if (m != null) return m;
+            }
 
-            m = FuzzyMatch(AppType.GetProperties(), name);
-            if (m != null) return m;
+            foreach (var i in Applications)
+            {
+                application = i;
+                var AppType = i.GetType();
+                var m = FuzzyMatch(AppType.GetProperties(), name);
+                if (m != null) return m;
 
-            m = FuzzyMatch(AppType.GetFields(), name);
-            if (m != null) return m;
+                m = FuzzyMatch(AppType.GetFields(), name);
+                if (m != null) return m;
+            }
 
+            application = null;
             return null;
-        }
-
-        Type AppType
-        {
-            get { return m_application.GetType(); }
         }
 
         public static object ParseValue(string stringRepresentation, Type type)
@@ -531,15 +547,26 @@ namespace Sidi.CommandLine
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
-        MethodInfo GetAction(string actionName)
+        MethodInfo GetAction(string actionName, out object application)
         {
-            return (MethodInfo)FuzzyMatch(AppType.GetMethods(), actionName);
+            foreach (var i in Applications)
+            {
+                var m = (MethodInfo)FuzzyMatch(i.GetType().GetMethods(), actionName);
+                if (m != null)
+                {
+                    application = i;
+                    return m;
+                }
+            }
+            application = null;
+            return null;
         }
 
         bool HandleAction()
         {
             string actionName = args[0];
-            MethodInfo action = GetAction(actionName);
+            object m_application;
+            MethodInfo action = GetAction(actionName, out m_application);
             if (action == null)
             {
                 return false;
@@ -578,18 +605,21 @@ namespace Sidi.CommandLine
         {
             get
             {
-                foreach (MethodInfo i in m_application.GetType().GetMethods())
+                foreach (var m_application in Applications)
                 {
-                    string u = Usage.Get(i);
-                    string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
+                    foreach (MethodInfo i in m_application.GetType().GetMethods())
                     {
-                        return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                    })));
-                    if (u != null)
-                    {
-                        Action a = new Action();
-                        a.MethodInfo = i;
-                        yield return a;
+                        string u = Usage.Get(i);
+                        string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
+                        {
+                            return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
+                        })));
+                        if (u != null)
+                        {
+                            Action a = new Action();
+                            a.MethodInfo = i;
+                            yield return a;
+                        }
                     }
                 }
             }
@@ -599,14 +629,17 @@ namespace Sidi.CommandLine
         {
             get
             {
-                foreach (MemberInfo i in Application.GetType().GetMembers())
+                foreach (var Application in Applications)
                 {
-                    string u = Usage.Get(i);
-                    if ((i is FieldInfo || i is PropertyInfo) && u != null)
+                    foreach (MemberInfo i in Application.GetType().GetMembers())
                     {
-                        Option o = new Option();
-                        o.MemberInfo = i;
-                        yield return o;
+                        string u = Usage.Get(i);
+                        if ((i is FieldInfo || i is PropertyInfo) && u != null)
+                        {
+                            Option o = new Option();
+                            o.MemberInfo = i;
+                            yield return o;
+                        }
                     }
                 }
             }
@@ -621,7 +654,7 @@ namespace Sidi.CommandLine
                 {
                     return a.GetName().Name;
                 }
-                return m_application.GetType().Name;
+                return Applications.First().GetType().Name;
             }
         }
 
@@ -633,10 +666,10 @@ namespace Sidi.CommandLine
                 w.WriteLine(
                     String.Format("{0} - {1}",
                     ApplicationName,
-                    Usage.Get(m_application.GetType()))
+                    Usage.Get(Applications.First().GetType()))
                     );
 
-                Assembly assembly = AppType.Assembly;
+                Assembly assembly = Applications.First().GetType().Assembly;
 
                 List<string> infos = new List<string>();
 
@@ -658,14 +691,17 @@ namespace Sidi.CommandLine
         {
             get
             {
+                var app = Applications.First();
+                var appType = app.GetType();
+
                 StringWriter i = new StringWriter();
                 i.WriteLine(
                 String.Format("{0} - {1}",
                     ApplicationName,
-                    Usage.Get(m_application.GetType()))
+                    Usage.Get(app.GetType()))
                 );
 
-                Assembly assembly = AppType.Assembly;
+                Assembly assembly = appType.Assembly;
 
                 List<string> infos = new List<string>();
 
@@ -703,7 +739,7 @@ namespace Sidi.CommandLine
             w.WriteLine(Info);
             w.WriteLine(String.Format("Usage: {0} option1 value option2 value action [parameters]", ApplicationName));
 
-            var categories = 
+            var categories =
                 Actions.SelectMany(x => x.Categories)
                 .Concat(Options.SelectMany(x => x.Categories))
                 .Distinct().ToList();
@@ -714,7 +750,7 @@ namespace Sidi.CommandLine
                 var categoryText = category + " ";
 
                 var actions = Actions.Where(x => x.Categories.Contains(category));
-                
+
                 if (actions.Any())
                 {
                     w.WriteLine();
@@ -753,7 +789,7 @@ namespace Sidi.CommandLine
                             i.Name,
                             i.Type.GetInfo(),
                             i.Usage.Wrap(maxColumns).Indent(indent + indent),
-                            i.GetValue(m_application),
+                            i.GetValue(i.Application),
                             indent));
                     }
                 }
@@ -762,14 +798,14 @@ namespace Sidi.CommandLine
 
         public void PrintSampleScript(TextWriter w)
         {
-            string applicationName = m_application.GetType().Name;
+            string applicationName = Applications.First().GetType().Name;
             Console.WriteLine(
                 String.Format("{0} - {1}",
                 applicationName,
-                Usage.Get(m_application.GetType()))
+                Usage.Get(Applications.First().GetType()))
                 );
 
-            Assembly assembly = AppType.Assembly;
+            Assembly assembly = Applications.First().GetType().Assembly;
 
             List<string> infos = new List<string>();
 
@@ -785,58 +821,62 @@ namespace Sidi.CommandLine
 
             w.WriteLine(infos.Join(", "));
             w.WriteLine();
-            w.WriteLine("Actions");
-            w.WriteLine();
 
-            foreach (MethodInfo i in m_application.GetType().GetMethods())
+            foreach (var m_application in Applications)
             {
-                string u = Usage.Get(i);
-                string parameters = i.GetParameters()
-                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo()))
-                    .Join(" ");
+                w.WriteLine("Actions");
+                w.WriteLine();
 
-                if (u != null)
+                foreach (MethodInfo i in m_application.GetType().GetMethods())
                 {
-                    w.WriteLine(String.Format("  {0} {2}\r\n    {1}\r\n", i.Name, u, parameters));
-                }
-            }
-
-            w.WriteLine();
-            w.WriteLine("Options");
-            w.WriteLine();
-
-            foreach (MemberInfo i in m_application.GetType().GetMembers())
-            {
-                if (i.MemberType == MemberTypes.Field)
-                {
-                    FieldInfo fieldInfo = (FieldInfo)i;
-                    object defaultValue = fieldInfo.GetValue(m_application);
                     string u = Usage.Get(i);
+                    string parameters = i.GetParameters()
+                        .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo()))
+                        .Join(" ");
+
                     if (u != null)
                     {
-                        w.WriteLine(String.Format(
-                            cultureInfo,
-                            "  {0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
-                            i.Name,
-                            fieldInfo.FieldType.GetInfo(),
-                            u,
-                            defaultValue));
+                        w.WriteLine(String.Format("  {0} {2}\r\n    {1}\r\n", i.Name, u, parameters));
                     }
                 }
-                else if (i.MemberType == MemberTypes.Property)
+
+                w.WriteLine();
+                w.WriteLine("Options");
+                w.WriteLine();
+
+                foreach (MemberInfo i in m_application.GetType().GetMembers())
                 {
-                    PropertyInfo propertyInfo = (PropertyInfo)i;
-                    object defaultValue = propertyInfo.GetValue(m_application, new object[] { });
-                    string u = Usage.Get(i);
-                    if (u != null)
+                    if (i.MemberType == MemberTypes.Field)
                     {
-                        w.WriteLine(String.Format(
-                            cultureInfo,
-                            "  {0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
-                            i.Name,
-                            propertyInfo.PropertyType.GetInfo(),
-                            u,
-                            defaultValue));
+                        FieldInfo fieldInfo = (FieldInfo)i;
+                        object defaultValue = fieldInfo.GetValue(m_application);
+                        string u = Usage.Get(i);
+                        if (u != null)
+                        {
+                            w.WriteLine(String.Format(
+                                cultureInfo,
+                                "  {0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
+                                i.Name,
+                                fieldInfo.FieldType.GetInfo(),
+                                u,
+                                defaultValue));
+                        }
+                    }
+                    else if (i.MemberType == MemberTypes.Property)
+                    {
+                        PropertyInfo propertyInfo = (PropertyInfo)i;
+                        object defaultValue = propertyInfo.GetValue(m_application, new object[] { });
+                        string u = Usage.Get(i);
+                        if (u != null)
+                        {
+                            w.WriteLine(String.Format(
+                                cultureInfo,
+                                "  {0}\r\n    Type: {1}, default: {3}\r\n    {2}\r\n",
+                                i.Name,
+                                propertyInfo.PropertyType.GetInfo(),
+                                u,
+                                defaultValue));
+                        }
                     }
                 }
             }
