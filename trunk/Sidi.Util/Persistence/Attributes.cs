@@ -32,6 +32,11 @@ namespace Sidi.Persistence
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class AutoIncrement : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class Data : Attribute
     {
     }
