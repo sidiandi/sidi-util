@@ -139,6 +139,12 @@ namespace Sidi.Persistence
             return a.Length > 0;
         }
 
+        bool IsAutoIncrement(MemberInfo f)
+        {
+            object[] a = f.GetCustomAttributes(typeof(AutoIncrement), true);
+            return a.Length > 0;
+        }
+
         bool IsUnique(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(Unique), true);
@@ -567,6 +573,10 @@ namespace Sidi.Persistence
                     {
                         v = String.Empty;
                     }
+                }
+                if (IsAutoIncrement(i) && v is long && (long)v == 0)
+                {
+                    v = null;
                 }
                 cmd.Parameters[i.Name].Value = v;
             }
