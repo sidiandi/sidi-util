@@ -231,7 +231,8 @@ namespace Sidi.Persistence
             insert = connection.CreateCommand();
             insert.CommandText = String.Format("insert or replace into {0} values({1})",
                 table,
-                String.Join(", ", Members.Select(x => String.Format("@{0}", x.Name)).ToArray())
+                Members.Select(x => x.Name)).Join(", "),
+                Members.Select(x => String.Format("@{0}", x.Name)).Join(", ")
                 );
             AddFieldParams(insert);
 
