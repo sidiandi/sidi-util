@@ -153,7 +153,7 @@ namespace Sidi.CommandLine
             var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
 
-            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(List<string>))
+            if (parameters.Length > 0 && parameters[0].ParameterType == typeof(List<string>))
             {
                 parameterValues = new object[] { args };
             }
