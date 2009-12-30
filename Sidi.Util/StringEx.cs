@@ -185,6 +185,7 @@ namespace Sidi.Util
                 }
 
                 int s = 0;
+                var prefix = Regex.Match(i, @"^\s*").Value;
                 while ((i.Length - s) > columns)
                 {
                     int s1 = i.LastIndexOf(" ", s + columns, columns);
@@ -192,10 +193,24 @@ namespace Sidi.Util
                     {
                         s1 = s + columns;
                     }
-                    w.WriteLine(i.Substring(s, s1 - s));
+                    if (s == 0)
+                    {
+                        w.WriteLine(i.Substring(s, s1 - s));
+                    }
+                    else
+                    {
+                        w.WriteLine(prefix + i.Substring(s, s1 - s));
+                    }
                     s = s1 + 1;
                 }
-                w.Write(i.Substring(s));
+                if (s == 0)
+                {
+                    w.Write(i.Substring(s));
+                }
+                else
+                {
+                    w.Write(prefix + i.Substring(s));
+                }
             }
             return w.ToString();
         }
