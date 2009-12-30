@@ -22,6 +22,7 @@ using System.IO;
 using System.Reflection;
 using Sidi.Util;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace Sidi.IO
 {
@@ -150,8 +151,8 @@ namespace Sidi.IO
 
         public static string CatDir(params string[] dirs)
         {
-            string r = String.Empty;
-            foreach (string i in dirs)
+            string r = dirs[0];
+            foreach (string i in dirs.Skip(1))
             {
                 if (!String.IsNullOrEmpty(i))
                 {
