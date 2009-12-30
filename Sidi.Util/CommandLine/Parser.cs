@@ -150,10 +150,10 @@ namespace Sidi.CommandLine
 
         public void Handle(List<string> args)
         {
-            ParameterInfo[] parameters = MethodInfo.GetParameters();
+            var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
 
-            if (parameters[0].ParameterType == typeof(List<string>))
+            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(List<string>))
             {
                 parameterValues = new object[] { args };
             }

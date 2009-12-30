@@ -254,8 +254,9 @@ namespace Sidi.CommandLine
             }
 
             [Usage("adds")]
-            public void Add(double x, double y)
+            public double Add(double x, double y)
             {
+                return x + y;
             }
 
             [Usage("adds")]
@@ -263,9 +264,10 @@ namespace Sidi.CommandLine
             {
             }
 
-            [Usage("adds")]
-            public void SubtractDouble(int x, int y)
+            [Usage("subtracts")]
+            public double Subtract(double x, double y)
             {
+                return x - y;
             }
         }
 
@@ -283,6 +285,14 @@ namespace Sidi.CommandLine
             var a = new TestAppWithStringList();
             var p = new Parser(a);
             p.Parse(new string[] { "AddList" });
+        }
+
+        [Test]
+        public void MultiCommand()
+        {
+            var a = new TestAppWithStringList();
+            var p = new Parser(a);
+            p.Parse(new string[] { "Add", "1", "1", "Subtract", "3", "1" });
         }
 
         [Test]
