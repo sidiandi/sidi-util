@@ -29,6 +29,7 @@ using Sidi.CommandLine;
 using cm = System.ComponentModel;
 using System.IO;
 using Sidi.Util;
+using System.Linq;
 
 namespace Sidi.CommandLine
 {
@@ -245,6 +246,13 @@ namespace Sidi.CommandLine
             {
             }
 
+            [Usage("adds a list of numbers")]
+            public void AddList(List<string> list)
+            {
+                log.Info(list.Select(x => Double.Parse(x)).Aggregate(0.0, (x, y) => x + y));
+                list.Clear();
+            }
+
             [Usage("adds")]
             public void Add(double x, double y)
             {
@@ -259,6 +267,22 @@ namespace Sidi.CommandLine
             public void SubtractDouble(int x, int y)
             {
             }
+        }
+
+        [Test]
+        public void List()
+        {
+            var a = new TestAppWithStringList();
+            var p = new Parser(a);
+            p.Parse(new string[]{ "AddList", "1", "2", "3"});
+        }
+
+        [Test]
+        public void List2()
+        {
+            var a = new TestAppWithStringList();
+            var p = new Parser(a);
+            p.Parse(new string[] { "AddList" });
         }
 
         [Test]

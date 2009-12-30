@@ -153,7 +153,7 @@ namespace Sidi.CommandLine
             ParameterInfo[] parameters = MethodInfo.GetParameters();
             object[] parameterValues;
 
-            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(List<string>))
+            if (parameters[0].ParameterType == typeof(List<string>))
             {
                 parameterValues = new object[] { args };
             }
@@ -173,8 +173,8 @@ namespace Sidi.CommandLine
                 {
                     parameterValues[i] = Parser.ParseValue(args[i], parameters[i].ParameterType);
                 }
+                args.RemoveRange(0, parameters.Length);
             }
-            args.RemoveRange(0, parameters.Length);
 
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
             MethodInfo.Invoke(Application, parameterValues);
