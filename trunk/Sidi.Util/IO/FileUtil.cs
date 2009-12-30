@@ -312,7 +312,14 @@ namespace Sidi.IO
                     yield return i;
                     foreach (var c in new DirectoryInfo(p).GetFileSystemInfos())
                     {
-                        r.Add(i.CatDir(c.Name));
+                        if (i == null)
+                        {
+                            r.Add(c.Name);
+                        }
+                        else
+                        {
+                            r.Add(i.CatDir(c.Name));
+                        }
                     }
                 }
             }
