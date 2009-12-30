@@ -130,15 +130,6 @@ namespace Sidi.CommandLine
         }
 
         [Test]
-        public void ShowUsage2()
-        {
-            Parser p = new Parser(new MinimalTestApp());
-            var usage = StringEx.ToString(x => p.WriteUsage(x));
-            Assert.IsFalse(usage.Contains("Options"));
-            Assert.IsFalse(usage.Contains("Actions"));
-        }
-
-        [Test]
         public void Info()
         {
             TestApp app = new TestApp();
@@ -146,6 +137,13 @@ namespace Sidi.CommandLine
             string i = p.Info;
             Console.WriteLine(i);
             Assert.IsTrue(i.Contains(app.GetType().Name));
+        }
+
+        [Test]
+        public void Help()
+        {
+            TestApp app = new TestApp();
+            Parser.Run(app, new string[] { "help", "SayHello" });
         }
 
         [Test()]
@@ -262,7 +260,22 @@ namespace Sidi.CommandLine
             {
             }
         }
-        
+
+        [Test]
+        public void WrongParameterCountMessage()
+        {
+            var p = new Parser(new TestAppWithStringList());
+            try
+            {
+                p.Parse(new string[] { "Add", "1" });
+            }
+            catch (CommandLineException e)
+            {
+                log.Info(e.Message);
+                Assert.IsTrue(e.Message.Contains(p.GetAction("Add").Usage));
+            }
+        }
+
         [Test]
         public void ArgList()
         {

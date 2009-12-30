@@ -82,11 +82,27 @@ namespace Sidi.CommandLine
         }
     }
 
-    public class Action
+    public interface IParserItem
     {
-        public MethodInfo MethodInfo;
+        string UsageText { get; }
+        string Name { get; }
+    }
+    
+    public class Action : IParserItem
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public Action(object application, MethodInfo method)
+        {
+            Application = application;
+            MethodInfo = method;
+        }
+
+        public MethodInfo MethodInfo { private set; get; }
+        public object Application { private set; get; }
         public string Name { get { return MethodInfo.Name; } }
         public string Usage { get { return Sidi.CommandLine.Usage.Get(MethodInfo); } }
+        
         public IEnumerable<string> Categories
         {
             get
@@ -109,20 +125,77 @@ namespace Sidi.CommandLine
             }
         }
 
+        public string UsageText
+        {
+            get
+            {
+                string parameters = MethodInfo.GetParameters().Select(pi =>
+                {
+                    return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
+                }).Join(" ");
+
+                return String.Format("{0} {1}\r\n{2}",
+                    Name,
+                    parameters,
+                    Usage.Indent("  "));
+            }
+        }
+
         public void PrintScriptFileSample(TextWriter w)
         {
             w.Write("# "); w.WriteLine(Usage);
             w.Write("# "); w.WriteLine(Syntax);
             w.WriteLine();
         }
+
+        public void Handle(List<string> args)
+        {
+            ParameterInfo[] parameters = MethodInfo.GetParameters();
+            object[] parameterValues;
+
+            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(List<string>))
+            {
+                parameterValues = new object[] { args };
+            }
+            else
+            {
+                if (args.Count < parameters.Length)
+                {
+                    throw new CommandLineException(String.Format("Not enough parameters for action \"{0}\". {1} parameters are required, but only {2} are supplied.\r\n\r\n{3}\r\n",
+                        Name,
+                        parameters.Length,
+                        args.Count,
+                        UsageText));
+                }
+
+                parameterValues = new object[parameters.Length];
+                for (int i = 0; i < parameters.Length; ++i)
+                {
+                    parameterValues[i] = Parser.ParseValue(args[i], parameters[i].ParameterType);
+                }
+            }
+            args.RemoveRange(0, parameters.Length);
+
+            log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
+            MethodInfo.Invoke(Application, parameterValues);
+        }
     }
 
-    public class Option
+    public class Option : IParserItem
     {
-        public MemberInfo MemberInfo;
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public Option(object application, MemberInfo memberInfo)
+        {
+            Application = application;
+            MemberInfo = memberInfo;
+        }
+        
+        public object Application { get; private set; }
+        public MemberInfo MemberInfo { get; private set; }
+
         public string Name { get { return MemberInfo.Name; } }
         public string Usage { get { return Sidi.CommandLine.Usage.Get(MemberInfo); } }
-        public object Application { get; set; }
 
         public IEnumerable<string> Categories
         {
@@ -163,18 +236,18 @@ namespace Sidi.CommandLine
             }
         }
 
-        public object GetValue(object application)
+        public object GetValue()
         {
             MemberInfo i = MemberInfo;
             if (i.MemberType == MemberTypes.Field)
             {
                 FieldInfo fieldInfo = (FieldInfo)i;
-                return fieldInfo.GetValue(application);
+                return fieldInfo.GetValue(Application);
             }
             else if (i.MemberType == MemberTypes.Property)
             {
                 PropertyInfo propertyInfo = (PropertyInfo)i;
-                return propertyInfo.GetValue(application, new object[] { });
+                return propertyInfo.GetValue(Application, new object[] { });
             }
             throw new InvalidDataException(i.MemberType.ToString());
         }
@@ -203,6 +276,47 @@ namespace Sidi.CommandLine
             w.Write("# "); w.WriteLine(Usage);
             w.Write("# "); w.WriteLine(Syntax);
             w.WriteLine();
+        }
+
+        public void Handle(IList<string> args)
+        {
+            if (MemberInfo is FieldInfo)
+            {
+                FieldInfo fi = (FieldInfo) MemberInfo;
+                object v = Parser.ParseValue(args[0], fi.FieldType);
+                fi.SetValue(Application, v);
+                args.RemoveAt(0);
+                log.InfoFormat("Option {0} = {1}", fi.Name, fi.GetValue(Application));
+            }
+            else if (MemberInfo is PropertyInfo)
+            {
+                PropertyInfo pi = (PropertyInfo)MemberInfo;
+                object v = Parser.ParseValue(args[0], pi.PropertyType);
+                pi.SetValue(Application, v, new object[] { });
+                args.RemoveAt(0);
+                log.InfoFormat("Option {0} = {1}", pi.Name, pi.GetValue(Application, new object[] { }));
+            }
+            else
+            {
+                throw new CommandLineException("option is of invalid type: {0}".F(MemberInfo));
+            }
+        
+        }
+
+        public string UsageText
+        {
+            get
+            {
+                string indent = "  ";
+                return String.Format(
+                    Parser.CultureInfo,
+                    "{0} [{1}]\r\n{2}\r\n{3}",
+                    Name,
+                    Type.GetInfo(),
+                    "default: {0}".F(GetValue()).Indent(indent),
+                    Usage.Indent(indent)
+                    );
+            }
         }
     }
 
@@ -240,12 +354,43 @@ namespace Sidi.CommandLine
             get { return m_applications; }
         }
 
+        public object MainApplication
+        {
+            get
+            {
+                return Applications.Last();
+            }
+        }
+
         static Parser()
         {
             cultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
+        }
+
+        public class ShowHelp
+        {
+            Parser parser;
+
+            public ShowHelp(Parser parser)
+            {
+                this.parser = parser;
+            }
+
+            [Usage("Shows help for all options and actions that match searchString")]
+            public void Help(string searchString)
+            {
+                foreach (var i in parser.Items)
+                {
+                    if (Regex.IsMatch(i.UsageText, searchString))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(i.UsageText);
+                    }
+                }
+            }
         }
 
         public Parser(object application)
@@ -260,6 +405,8 @@ namespace Sidi.CommandLine
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
+
+            Applications.Add(new ShowHelp(this));
         }
 
         public static void Run(object application, string[] args)
@@ -349,42 +496,28 @@ namespace Sidi.CommandLine
 
         bool HandleOption()
         {
-            string option = args[0];
+            string optionName = args[0];
             foreach (string op in optionPrefix)
             {
                 if (args[0].StartsWith(op))
                 {
-                    option = args[0].Substring(op.Length);
+                    optionName = args[0].Substring(op.Length);
                     break;
                 }
             }
 
-            if (option == null)
+            if (optionName == null)
             {
                 return false;
             }
 
-            object m_application;
-            MemberInfo member = GetOption(option, out m_application);
-            if (member == null)
+            var option = GetOption(optionName);
+            if (option == null)
             {
                 return false;
             }
             NextArg();
-            if (member is FieldInfo)
-            {
-                FieldInfo fi = (FieldInfo)member;
-                object v = ParseValue(NextArg(), fi.FieldType);
-                fi.SetValue(m_application, v);
-                log.InfoFormat("Option {0} = {1}", fi.Name, fi.GetValue(m_application));
-            }
-            else if (member is PropertyInfo)
-            {
-                PropertyInfo pi = (PropertyInfo)member;
-                object v = ParseValue(NextArg(), pi.PropertyType);
-                pi.SetValue(m_application, v, new object[] { });
-                log.InfoFormat("Option {0} = {1}", pi.Name, pi.GetValue(m_application, new object[] { }));
-            }
+            option.Handle(args);
             return true;
         }
 
@@ -479,30 +612,27 @@ namespace Sidi.CommandLine
             }
         }
 
-        MemberInfo GetOption(string name, out object application)
+        Option GetOption(string name)
         {
             foreach (var i in Applications)
             {
-                application = i;
                 var AppType = i.GetType();
                 MemberInfo m = AppType.GetProperty(name);
-                if (m != null) return m;
+                if (m != null) return new Option(i, m);
                 m = AppType.GetField(name);
-                if (m != null) return m;
+                if (m != null) return new Option(i, m);
             }
 
             foreach (var i in Applications)
             {
-                application = i;
                 var AppType = i.GetType();
                 var m = FuzzyMatch(AppType.GetProperties(), name);
-                if (m != null) return m;
+                if (m != null) return new Option(i, m);
 
                 m = FuzzyMatch(AppType.GetFields(), name);
-                if (m != null) return m;
+                if (m != null) return new Option(i, m);
             }
 
-            application = null;
             return null;
         }
 
@@ -547,67 +677,48 @@ namespace Sidi.CommandLine
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
-        MethodInfo GetAction(string actionName, out object application)
+        public Action GetAction(string actionName)
         {
             foreach (var i in Applications)
             {
                 var m = (MethodInfo)FuzzyMatch(i.GetType().GetMethods(), actionName);
                 if (m != null)
                 {
-                    application = i;
-                    return m;
+                    return new Action(i, m);
                 }
             }
-            application = null;
             return null;
         }
 
         bool HandleAction()
         {
             string actionName = args[0];
-            object m_application;
-            MethodInfo action = GetAction(actionName, out m_application);
+            var action = GetAction(actionName);
             if (action == null)
             {
                 return false;
             }
 
             NextArg();
-            ParameterInfo[] parameters = action.GetParameters();
-            object[] parameterValues = new object[parameters.Length];
-
-            if (parameters.Length > 0 && parameters[0].ParameterType == typeof(List<string>))
-            {
-                parameterValues[0] = args;
-            }
-            else
-            {
-                if (args.Count < parameters.Length)
-                {
-                    throw new CommandLineException(String.Format("Not enough parameters for action \"{0}\". {1} parameters are required, but only {2} are supplied.",
-                        action.Name,
-                        parameters.Length,
-                        args.Count));
-                }
-
-                for (int i = 0; i < parameters.Length; ++i)
-                {
-                    string a = NextArg();
-                    parameterValues[i] = ParseValue(a, parameters[i].ParameterType);
-                }
-            }
-            log.InfoFormat("Action {0}({1})", action.Name, parameterValues.Join(", "));
-            action.Invoke(m_application, parameterValues);
+            action.Handle(args);
             return true;
+        }
+
+        public IEnumerable<IParserItem> Items
+        {
+            get
+            {
+                return Actions.Cast<IParserItem>().Concat(Options.Cast<IParserItem>()).OrderBy(x => x.Name);
+            }
         }
 
         public IEnumerable<Action> Actions
         {
             get
             {
-                foreach (var m_application in Applications)
+                foreach (var application in Applications)
                 {
-                    foreach (MethodInfo i in m_application.GetType().GetMethods())
+                    foreach (MethodInfo i in application.GetType().GetMethods())
                     {
                         string u = Usage.Get(i);
                         string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
@@ -616,9 +727,7 @@ namespace Sidi.CommandLine
                         })));
                         if (u != null)
                         {
-                            Action a = new Action();
-                            a.MethodInfo = i;
-                            yield return a;
+                            yield return new Action(application, i);
                         }
                     }
                 }
@@ -629,16 +738,14 @@ namespace Sidi.CommandLine
         {
             get
             {
-                foreach (var Application in Applications)
+                foreach (var application in Applications)
                 {
-                    foreach (MemberInfo i in Application.GetType().GetMembers())
+                    foreach (MemberInfo i in application.GetType().GetMembers())
                     {
                         string u = Usage.Get(i);
                         if ((i is FieldInfo || i is PropertyInfo) && u != null)
                         {
-                            Option o = new Option();
-                            o.MemberInfo = i;
-                            yield return o;
+                            yield return new Option(application, i);
                         }
                     }
                 }
@@ -654,7 +761,7 @@ namespace Sidi.CommandLine
                 {
                     return a.GetName().Name;
                 }
-                return Applications.First().GetType().Name;
+                return MainApplication.GetType().Name;
             }
         }
 
@@ -666,10 +773,10 @@ namespace Sidi.CommandLine
                 w.WriteLine(
                     String.Format("{0} - {1}",
                     ApplicationName,
-                    Usage.Get(Applications.First().GetType()))
+                    Usage.Get(MainApplication.GetType()))
                     );
 
-                Assembly assembly = Applications.First().GetType().Assembly;
+                Assembly assembly = MainApplication.GetType().Assembly;
 
                 List<string> infos = new List<string>();
 
@@ -691,7 +798,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                var app = Applications.First();
+                var app = Applications.Last();
                 var appType = app.GetType();
 
                 StringWriter i = new StringWriter();
@@ -758,18 +865,8 @@ namespace Sidi.CommandLine
 
                     foreach (Action a in actions)
                     {
-                        string u = a.Usage;
-                        string parameters = a.MethodInfo.GetParameters().Select(pi =>
-                        {
-                            return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                        }).Join(" ");
                         w.WriteLine();
-                        w.WriteLine(String.Format(
-                            "{3}{0} {2}\r\n{1}",
-                            a.Name,
-                            u.Wrap(maxColumns).Indent(indent + indent),
-                            parameters,
-                            indent));
+                        w.WriteLine(a.UsageText.Indent(indent).Wrap(maxColumns));
                     }
                 }
 
@@ -783,14 +880,7 @@ namespace Sidi.CommandLine
                     foreach (Option i in options)
                     {
                         w.WriteLine();
-                        w.WriteLine(String.Format(
-                            cultureInfo,
-                            "{4}{0} [{1}]\r\n{4}{4}default: {3}\r\n{2}",
-                            i.Name,
-                            i.Type.GetInfo(),
-                            i.Usage.Wrap(maxColumns).Indent(indent + indent),
-                            i.GetValue(i.Application),
-                            indent));
+                        w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));
                     }
                 }
             }
@@ -798,14 +888,14 @@ namespace Sidi.CommandLine
 
         public void PrintSampleScript(TextWriter w)
         {
-            string applicationName = Applications.First().GetType().Name;
+            string applicationName = Applications.Last().GetType().Name;
             Console.WriteLine(
                 String.Format("{0} - {1}",
                 applicationName,
-                Usage.Get(Applications.First().GetType()))
+                Usage.Get(MainApplication.GetType()))
                 );
 
-            Assembly assembly = Applications.First().GetType().Assembly;
+            Assembly assembly = MainApplication.GetType().Assembly;
 
             List<string> infos = new List<string>();
 
