@@ -109,6 +109,7 @@ namespace Sidi.Util
         public void CatDir()
         {
             Assert.AreEqual(FileUtil.CatDir("a", "b", "c"), @"a\b\c");
+            Assert.AreEqual(@"\\tsclient\X\a\b\c", FileUtil.CatDir(@"\\tsclient\X", "a", "b", "c"));
         }
     }
 
