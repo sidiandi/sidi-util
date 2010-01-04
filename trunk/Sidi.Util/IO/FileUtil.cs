@@ -151,10 +151,14 @@ namespace Sidi.IO
 
         public static string CatDir(params string[] dirs)
         {
-            string r = dirs[0];
-            foreach (string i in dirs.Skip(1))
+            string r = null;
+            foreach (string i in dirs)
             {
-                if (!String.IsNullOrEmpty(i))
+                if (String.IsNullOrEmpty(r))
+                {
+                    r = i;
+                }
+                else if (!String.IsNullOrEmpty(i))
                 {
                     r = System.IO.Path.Combine(r, i);
                 }
