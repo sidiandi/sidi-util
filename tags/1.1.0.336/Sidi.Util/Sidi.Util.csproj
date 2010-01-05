@@ -1,0 +1,209 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sidi</RootNamespace>
+    <AssemblyName>Sidi.Util</AssemblyName>
+    <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <StartupObject>
+    </StartupObject>
+    <PublishUrl>http://localhost/Sidi.Util/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Sidi.Util.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\bin\</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediateOutputPath>
+    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediatePath>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.5.452, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SharpZipLib\net-20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\log4net-1.2.10\bin\net\2.0\release\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.65.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SQLite\bin\System.Data.SQLite.DLL</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArchiveHandler.cs" />
+    <Compile Include="AsyncCalculation.cs" />
+    <Compile Include="ByteArrayEx.cs" />
+    <Compile Include="CommandLine\ShowHelp.cs" />
+    <Compile Include="CommandLine\ShowUserInterface.cs" />
+    <Compile Include="Comparer.cs" />
+    <Compile Include="DumpExtensions.cs" />
+    <Compile Include="IO\Copy.cs" />
+    <Compile Include="IO\Find.cs" />
+    <Compile Include="Forms\BossController.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\DirectoryDialog.cs" />
+    <Compile Include="Forms\FullScreenManager.cs" />
+    <Compile Include="Forms\ImageView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\ItemFormatColumn.cs" />
+    <Compile Include="Forms\ItemLayout.cs" />
+    <Compile Include="Forms\ItemView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\MouseDelta.cs" />
+    <Compile Include="Forms\MouseWheelSupport.cs" />
+    <Compile Include="Forms\PointExtensions.cs" />
+    <Compile Include="Forms\Support.cs" />
+    <Compile Include="Forms\TextPrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TextPrompt.designer.cs">
+      <DependentUpon>TextPrompt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Util.cs" />
+    <Compile Include="Forms\VerbMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\ViewIList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Viewport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GraMath.cs" />
+    <Compile Include="History.cs" />
+    <Compile Include="IArchive.cs" />
+    <Compile Include="Interval.cs" />
+    <Compile Include="IntSet.cs" />
+    <Compile Include="IO\PathEx.cs" />
+    <Compile Include="IO\SearchPath.cs" />
+    <Compile Include="ListEx.cs" />
+    <Compile Include="LruCache.cs" />
+    <Compile Include="LruCacheBackground.cs" />
+    <Compile Include="LruCacheBackgroundAutoInvalidate.cs" />
+    <Compile Include="CommandLine\Parser.cs" />
+    <Compile Include="IO\FileUtil.cs" />
+    <Compile Include="Persistence\Attributes.cs" />
+    <Compile Include="Persistence\Collection.cs" />
+    <Compile Include="Persistence\Dictionary.cs" />
+    <Compile Include="Pop3\Server.cs" />
+    <Compile Include="..\VersionInfo.cs" />
+    <Compile Include="ProcessEx.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomEx.cs" />
+    <Compile Include="Rar.cs" />
+    <Compile Include="Pop3\Session.cs" />
+    <Compile Include="RegistrySerializer.cs" />
+    <Compile Include="Stats.cs" />
+    <Compile Include="StringEx.cs" />
+    <Compile Include="TcpClientEx.cs" />
+    <Compile Include="TileGeometry.cs" />
+    <Compile Include="Tokenizer.cs" />
+    <Compile Include="UnixTime.cs" />
+    <Compile Include="UpdateCheck.cs" />
+    <Compile Include="UpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateForm.Designer.cs">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Zip.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sidi.Util.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Forms\Sidi.Forms.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UpdateForm.resx">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
