@@ -62,7 +62,10 @@ namespace Sidi.CommandLine
             public void SayHello()
             {
                 Result = "Hello, " + Name;
-                Console.WriteLine(Result);
+                for (int i = 0; i < Times; ++i)
+                {
+                    Console.WriteLine(Result);
+                }
             }
 
             [Usage("Determines to whom to say hello.")]
@@ -101,6 +104,12 @@ namespace Sidi.CommandLine
         [Usage("Minimal app")]
         public class MinimalTestApp
         {
+        }
+
+        [Test, Explicit("interactive")]
+        public void UserInterface()
+        {
+            Parser.Run(new TestApp(), new string[]{"ui"});
         }
 
         [Test]

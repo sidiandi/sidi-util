@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Globalization;
 using Sidi.Util;
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace Sidi.CommandLine
 {
@@ -84,8 +85,11 @@ namespace Sidi.CommandLine
 
     public interface IParserItem
     {
+        string Usage { get; }
         string UsageText { get; }
         string Name { get; }
+        object Application { get; }
+        IEnumerable<string> Categories { get; }
     }
     
     public class Action : IParserItem
@@ -370,29 +374,6 @@ namespace Sidi.CommandLine
             cultureInfo.DateTimeFormat = dtfi;
         }
 
-        public class ShowHelp
-        {
-            Parser parser;
-
-            public ShowHelp(Parser parser)
-            {
-                this.parser = parser;
-            }
-
-            [Usage("Shows help for all options and actions that match searchString")]
-            public void Help(string searchString)
-            {
-                foreach (var i in parser.Items)
-                {
-                    if (Regex.IsMatch(i.UsageText, searchString))
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(i.UsageText);
-                    }
-                }
-            }
-        }
-
         public Parser(object application)
             : this()
         {
@@ -407,6 +388,7 @@ namespace Sidi.CommandLine
             cultureInfo.DateTimeFormat = dtfi;
 
             Applications.Add(new ShowHelp(this));
+            Applications.Add(new ShowUserInterface(this));
         }
 
         public static void Run(object application, string[] args)
@@ -752,7 +734,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        string ApplicationName
+        public string ApplicationName
         {
             get
             {
@@ -837,6 +819,19 @@ namespace Sidi.CommandLine
         static string indent = "  ";
         static int maxColumns = 60;
 
+        public IEnumerable<string> Categories
+        {
+            get
+            {
+                var categories =
+                    Actions.SelectMany(x => x.Categories)
+                    .Concat(Options.SelectMany(x => x.Categories))
+                    .Distinct().ToList();
+                categories.Sort();
+                return categories;
+            }
+        }
+
         /// <summary>
         /// Writes usage information to a TextWriter
         /// </summary>
@@ -846,11 +841,7 @@ namespace Sidi.CommandLine
             w.WriteLine(Info);
             w.WriteLine(String.Format("Usage: {0} option1 value option2 value action [parameters]", ApplicationName));
 
-            var categories =
-                Actions.SelectMany(x => x.Categories)
-                .Concat(Options.SelectMany(x => x.Categories))
-                .Distinct().ToList();
-            categories.Sort();
+            var categories = Categories;
 
             foreach (var category in categories)
             {
