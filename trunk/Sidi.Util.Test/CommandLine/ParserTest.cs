@@ -109,7 +109,13 @@ namespace Sidi.CommandLine
         [Test, Explicit("interactive")]
         public void UserInterface()
         {
-            Parser.Run(new TestApp(), new string[]{"ui"});
+            Parser p = new Parser();
+            p.Applications.Add(new TestApp());
+            p.Applications.Add(new TestMultiLineUsage());
+            p.Applications.Add(new MinimalTestApp());
+            p.Applications.Add(new TestAppWithDescription());
+            p.Applications.Add(new TestAppWithStringList());
+            p.Parse(new string[]{"ui"});
         }
 
         [Test]
@@ -349,7 +355,7 @@ namespace Sidi.CommandLine
         public class TestMultiLineUsage
         {
             [Usage("multiline\r\nline 1\r\nline2\r\nline3")]
-            public void A()
+            public void A(int a, int b, int c)
             {
             }
 
