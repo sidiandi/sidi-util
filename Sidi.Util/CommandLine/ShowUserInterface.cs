@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using Sidi.Util;
 using Sidi.Forms;
+using System.Reflection;
 
 namespace Sidi.CommandLine
 {
@@ -21,13 +22,13 @@ namespace Sidi.CommandLine
         }
 
         int y = 8;
-        int margin = 8;
+        int margin = 4;
 
         void Stack(Control parent, Control child, ref int y)
         {
             child.Top = y;
             child.Left = margin;
-            child.Width = parent.ClientRectangle.Width - child.Left - margin;
+            child.Width = parent.Width - child.Left - margin;
             child.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             parent.Controls.Add(child);
             y = child.Bottom + margin;
@@ -53,49 +54,39 @@ namespace Sidi.CommandLine
             foreach (var category in parser.Categories)
             {
                 var page = new TabPage(String.IsNullOrEmpty(category) ? "General" : category);
-                page.Width = 640;
-                page.Height = 480;
 
                 var c = new ScrollableControl();
                 c.Dock = DockStyle.Fill;
 
-                int gy = margin;
+                int y = 0;
 
                 foreach (var item in parser.Items.Where(x => x.Categories.Contains(category)))
                 {
+                    y += 3 * margin;
                     if (item.Application is ShowHelp || item.Application is ShowUserInterface)
                     {
                         continue;
                     }
 
-                    int y = 2*margin;
-                    var groupBox = new GroupBox();
-                    groupBox.Text = item.Name;
-                    Stack(c, groupBox, ref gy);
-                    groupBox.Width = c.Width - groupBox.Left - margin;
-
-                    var label = new Label();
-                    label.Text = item.Usage;
-                    label.AutoSize = true;
-                    Stack(groupBox, label, ref y);
-
                     if (item is Action)
                     {
-                        Action action = (Action) item;
+                        Action action = (Action)item;
 
                         var at = new ActionTag();
                         at.Action = action;
-                        
+
                         foreach (var p in action.MethodInfo.GetParameters())
                         {
                             var paramLabel = new Label();
                             paramLabel.Text = "{0} [{1}]".F(p.Name, p.ParameterType.GetInfo());
                             paramLabel.AutoSize = true;
                             int y1 = y;
-                            Stack(groupBox, paramLabel, ref y1);
+                            Stack(c, paramLabel, ref y1);
 
                             var paramInput = new TextBox();
-                            Stack(groupBox, paramInput, ref y);
+                            paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
+                            paramInput.Tag = p;
+                            Stack(c, paramInput, ref y);
                             paramInput.Left = paramLabel.Right + margin;
                             at.ParameterTextBoxes.Add(paramInput);
                         }
@@ -103,34 +94,46 @@ namespace Sidi.CommandLine
                         var button = new Button();
                         button.Text = item.Name;
                         button.Top = y;
-                        button.Tag = at; 
+                        button.Tag = at;
                         button.Click += new EventHandler(button_Click);
-                        Stack(groupBox, button, ref y);
+                        {
+                            int y2 = y;
+                            Stack(c, button, ref y);
+                            y = y2;
+                        }
                         button.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                         button.AutoSize = true;
+
+                        var label = new Label();
+                        label.Text = item.Usage;
+                        label.AutoSize = true;
+                        Stack(c, label, ref y);
+                        label.Left = button.Right + margin;
                     }
 
                     if (item is Option)
                     {
+                        var label = new Label();
+                        label.Text = item.Usage;
+                        label.AutoSize = true;
+                        Stack(c, label, ref y);
+
                         var option = item as Option;
                         
                         var paramLabel = new Label();
                         paramLabel.Text = option.Syntax;
                         paramLabel.AutoSize = true;
                         int y1 = y;
-                        Stack(groupBox, paramLabel, ref y1);
+                        Stack(c, paramLabel, ref y1);
 
                         var paramInput = new TextBox();
-                        Stack(groupBox, paramInput, ref y);
+                        Stack(c, paramInput, ref y);
                         paramInput.Left = paramLabel.Right + margin;
 
                         paramInput.Text = Support.SafeToString(option.GetValue());
                         paramInput.Tag = option;
                         paramInput.TextChanged += new EventHandler(paramInput_Leave);
                     }
-
-                    groupBox.Height = y + margin;
-                    gy = groupBox.Bottom + margin;
                 }
 
                 c.AutoScroll = true; 
@@ -144,22 +147,56 @@ namespace Sidi.CommandLine
             main.ShowDialog();
         }
 
+        void paramInput_TextChanged(object sender, EventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            var p = (ParameterInfo)textBox.Tag;
+            try
+            {
+                Parser.ParseValue(textBox.Text, p.ParameterType);
+                ClearError(textBox);
+            }
+            catch (Exception ex)
+            {
+                SetError(textBox, ex.Message);
+            }
+        }
+
         void button_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
             var at = (ActionTag)button.Tag;
             try
             {
-                var p = at.ParameterTextBoxes.Select(x => x.Text.Quote()).ToList();
+                var p = at.ParameterTextBoxes.Select(x => x.Text).ToList();
                 at.Action.Handle(p);
-                tooltip.SetToolTip(button, null);
-                button.BackColor = Color.FromKnownColor(KnownColor.ButtonFace);
+                ClearError(button);
             }
             catch (Exception ex)
             {
-                tooltip.SetToolTip(button, ex.InnerException.Message);
-                button.BackColor = errorColor;
+                var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+                SetError(button, msg);
             }
+        }
+
+        void SetError(Control c, string message)
+        {
+            c.BackColor = errorColor;
+            tooltip.SetToolTip(c, message);
+        }
+
+        void ClearError(Control c)
+        {
+            if (c is TextBox)
+            {
+                c.BackColor = Color.FromKnownColor(KnownColor.Window); 
+            }
+
+            if (c is Button)
+            {
+                c.BackColor = Color.FromKnownColor(KnownColor.ButtonFace);
+            }
+            tooltip.SetToolTip(c, null);
         }
 
         ToolTip tooltip = new ToolTip();
@@ -172,12 +209,11 @@ namespace Sidi.CommandLine
             try
             {
                 option.Handle(new string[] { textBox.Text }.ToList());
-                textBox.BackColor = Color.FromKnownColor(KnownColor.Window);
+                ClearError(textBox);
             }
             catch (Exception ex)
             {
-                tooltip.SetToolTip(textBox, ex.Message);
-                textBox.BackColor = errorColor;
+                SetError(textBox, ex.Message);
             }
         }
     }

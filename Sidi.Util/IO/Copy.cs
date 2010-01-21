@@ -75,12 +75,7 @@ namespace Sidi.IO
                 return true;
             }
 
-            FileInfo si = new FileInfo(source);
-            FileInfo di = new FileInfo(dest);
-            return !(
-                !di.Exists ||
-                si.LastWriteTime != di.LastWriteTime ||
-                si.Length != di.Length);
+            return FileUtil.FilesAreEqualByTime(source, dest);
         }
 
         public string RenameLockedDestinationFilesExtension = "renamed-to-overwrite";

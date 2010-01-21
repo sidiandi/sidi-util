@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\Common.Targets" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -12,9 +13,6 @@
     <AssemblyName>Sidi.Build</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <OutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\bin\</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediateOutputPath>
-    <IntermediatePath>$(SolutionDir)..\build\$(SolutionName)\$(Configuration)\obj\$(AssemblyName)\</IntermediatePath>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

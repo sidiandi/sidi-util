@@ -261,7 +261,9 @@ namespace Sidi.IO
                 {
                     var fa = new FileInfo(a);
                     var fb = new FileInfo(b);
-                    return fa.LastWriteTimeUtc == fb.LastWriteTimeUtc;
+                    return 
+                        fa.Length == fb.Length &&
+                        Math.Abs((fa.LastWriteTimeUtc - fb.LastWriteTimeUtc).TotalSeconds) < 2.0;
                 }
                 else
                 {
