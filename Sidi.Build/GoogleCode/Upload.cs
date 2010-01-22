@@ -104,12 +104,12 @@ namespace Sidi.Build.GoogleCode
         string GetRegString(string valueName)
         {
             string keyName = Registry.CurrentUser.Name + "\\Software\\" + GetType().FullName + "\\" + ProjectName;
-            // Log.LogMessage("Looking for {0} in {1}", valueName, keyName);
+            Log.LogMessage("Looking for {0} in {1}", valueName, keyName);
             string value = (string)Registry.GetValue(keyName, valueName, null);
             if (value == null)
             {
                 string defaultKeyName = Registry.CurrentUser.Name + "\\Software\\" + GetType().FullName;
-                // Log.LogMessage("Looking for {0} in {1}", valueName, defaultKeyName);
+                Log.LogMessage("Looking for {0} in {1}", valueName, defaultKeyName);
                 value = (string)Registry.GetValue(defaultKeyName, valueName, null);
             }
             return value;
