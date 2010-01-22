@@ -13,11 +13,13 @@
   <Target Name="Doc" />
   
   <Target Name="Install" DependsOnTargets="Build">
-    <RoboCopy
+    <!--
+	<RoboCopy
       SourceFolder="$(OutputDir)"
       DestinationFolder="$(MSBuildExtensionsPath)\$(ProjectName)"
       Mirror="true"
       />
+	-->
     <RoboCopy
       SourceFolder="$(OutputDir)"
       DestinationFolder="$(RootDir)\..\lib\$(ProjectName)"
