@@ -114,6 +114,6 @@
             />
     </Target>
     
-    <Target Name="Release" DependsOnTargets="Upload;Install" />
+    <Target Name="Release" DependsOnTargets="Upload" />
 
 </Project>
