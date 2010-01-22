@@ -76,7 +76,7 @@ namespace Sidi.Build.GoogleCode
         public string UserName { set; get; }
 
         /// <summary>
-        /// Password for the Google Code profile
+        /// Password for the Google Code profile. Note that this is NOT your global Google Account password.
         /// </summary>
         /// The Pasword can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\Password
         public string Password { set; get; }
@@ -104,12 +104,12 @@ namespace Sidi.Build.GoogleCode
         string GetRegString(string valueName)
         {
             string keyName = Registry.CurrentUser.Name + "\\Software\\" + GetType().FullName + "\\" + ProjectName;
-            Log.LogMessage("Looking for {0} in {1}", valueName, keyName);
+            log.InfoFormat("Looking for {0} in {1}", valueName, keyName);
             string value = (string)Registry.GetValue(keyName, valueName, null);
             if (value == null)
             {
                 string defaultKeyName = Registry.CurrentUser.Name + "\\Software\\" + GetType().FullName;
-                Log.LogMessage("Looking for {0} in {1}", valueName, defaultKeyName);
+                log.InfoFormat("Looking for {0} in {1}", valueName, defaultKeyName);
                 value = (string)Registry.GetValue(defaultKeyName, valueName, null);
             }
             return value;
