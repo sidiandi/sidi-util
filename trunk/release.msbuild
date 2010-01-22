@@ -10,6 +10,8 @@
     
     <Import Project="$(MSBuildExtensionsPath)\sidi-util\Sidi.Build.Targets"/>
 
+  <Target Name="Doc" />
+  
   <Target Name="Install" DependsOnTargets="Build">
     <RoboCopy
       SourceFolder="$(OutputDir)"
