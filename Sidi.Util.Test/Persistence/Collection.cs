@@ -162,7 +162,7 @@ namespace Sidi.Persistence
             for (int i = 0; i < count; ++i)
             {
                 Address a = new Address();
-                a.Name = "Andreas";
+                a.Name = "Bert";
                 a.Street = "Some Street";
                 a.City = "Nowhere";
                 a.Zip = i;
