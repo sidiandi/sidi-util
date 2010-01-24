@@ -100,7 +100,7 @@ namespace Sidi.Util
         [Test]
         public void GetFileSystemInfo()
         {
-            string p = FileUtil.BinFile("test");
+            string p = TestFile(".");
             FileSystemInfo fi = p.GetFileSystemInfo();
             Assert.AreEqual(fi.FullName, p);
         }
