@@ -30,5 +30,10 @@ namespace Sidi.Util
     [TestFixture]
     public class CopyTest : TestBase
     {
+        [Test]
+        public void Copy()
+        {
+            // todo
+        }
     }
 }
