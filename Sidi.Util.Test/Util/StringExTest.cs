@@ -23,22 +23,13 @@ using NUnit.Framework;
 using System.IO;
 using Sidi.Util;
 
-namespace Sidi.Test.Util
+namespace Sidi.Util
 {
     [TestFixture]
     public class StringExTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
-        [Test]
-        public void Printable()
-        {
-            foreach (var i in Directory.GetFiles(@"I:\1_MR\1_HQMR\Teams\ExamFramework\arfa\cache\N4_VD11A_LATEST_20090905\Debug\examdb\MriProduct\examdb\Root\Test_Region\Test_Exam\Test_I18n"))
-            {
-                log.Info(i);
-            }
-        }
-
         [Test]
         public void GetSection()
         {
