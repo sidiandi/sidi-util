@@ -28,7 +28,7 @@ using Sidi.IO;
 
 namespace Sidi.Persistence
 {
-    [TestFixture, Ignore("does not yet work")]
+    [TestFixture]
     public class CollectionTest
     {
         class OtherData
@@ -106,7 +106,7 @@ namespace Sidi.Persistence
             public byte[] aByteArray = System.Text.ASCIIEncoding.ASCII.GetBytes("Hello, World!");
         }
 
-        string path = Sidi.IO.FileUtil.BinFile(@"test-data\Sidi.Persistence.Test.sqlite");
+        string testFile = Sidi.IO.FileUtil.BinFile(@"test-data\Sidi.Persistence.Test.sqlite");
         string table = "a";
         int count = 10;
 
@@ -115,39 +115,33 @@ namespace Sidi.Persistence
         [SetUp]
         public void Init()
         {
-            if (File.Exists(path))
+            if (File.Exists(testFile))
             {
-                File.Delete(path);
+                File.Delete(testFile);
             }
-            addressBook = new Sidi.Persistence.Collection<Address>(path, table);
+            addressBook = new Sidi.Persistence.Collection<Address>(testFile, table);
             Write();
         }
 
         [TearDown]
         public void Deinit()
         {
-            addressBook.Close();
+            addressBook.Dispose();
         }
 
         [Test]
         public void AlterTable()
         {
             string tableName = "alter_table_test";
-            var a = new Sidi.Persistence.Collection<AddressSubset>(path, tableName);
+            var a = new Sidi.Persistence.Collection<AddressSubset>(addressBook.Connection, tableName);
 
             a.Add(new AddressSubset());
 
-            var b = new Sidi.Persistence.Collection<Address>(path, tableName);
+            var b = new Sidi.Persistence.Collection<Address>(addressBook.Connection, tableName);
 
             b.Add(new Address());
         }
         
-        [Test]
-        public void Create()
-        {
-            Sidi.Persistence.Collection<Address> addressBook = new Sidi.Persistence.Collection<Address>(path, table);
-        }
-
         [Test]
         public void Count()
         {
@@ -239,13 +233,15 @@ namespace Sidi.Persistence
         [Test]
         public void AutoTableName()
         {
-            Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(path);
+            using (Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(addressBook.Connection))
+            {
+            }
         }
 
         [Test]
         public void Schema()
         {
-            Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(path);
+            Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(addressBook.Connection);
             DbCommand c = otherData.Connection.CreateCommand();
             c.CommandText = "select * from sqlite_master;";
             DbDataReader reader = c.ExecuteReader();
@@ -263,7 +259,7 @@ namespace Sidi.Persistence
         [Test]
         public void Subset()
         {
-            Sidi.Persistence.Collection<AddressSubset> subset = new Sidi.Persistence.Collection<AddressSubset>(path, table);
+            Sidi.Persistence.Collection<AddressSubset> subset = new Sidi.Persistence.Collection<AddressSubset>(addressBook.Connection, table);
             foreach (AddressSubset i in subset)
             {
                 Console.WriteLine(i);
@@ -273,7 +269,7 @@ namespace Sidi.Persistence
         [Test]
         public void DataTypes()
         {
-            Sidi.Persistence.Collection<AllDataTypes> c = new Sidi.Persistence.Collection<AllDataTypes>(path);
+            Sidi.Persistence.Collection<AllDataTypes> c = new Sidi.Persistence.Collection<AllDataTypes>(addressBook.Connection);
             c.Clear();
             using (DbTransaction t = c.BeginTransaction())
             {

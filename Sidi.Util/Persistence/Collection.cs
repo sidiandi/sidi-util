@@ -79,12 +79,13 @@ namespace Sidi.Persistence
         }
     }
     
-    public class Collection<T> : ICollection<T> where T : new()
+    public class Collection<T> : ICollection<T>, IDisposable where T : new()
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         string path;
         string table;
+        SQLiteConnection ownConnection;
         SQLiteConnection connection;
         SQLiteCommand insert;
         SQLiteCommand select;
@@ -111,7 +112,11 @@ namespace Sidi.Persistence
 
         public void Close()
         {
-            connection.Close();
+            if (ownConnection != null)
+            {
+                ownConnection.Close();
+                ownConnection = null;
+            }
             connection = null;
         }
 
@@ -152,8 +157,8 @@ namespace Sidi.Persistence
         }
 
         public Collection(string a_path)
+        : this(a_path, typeof(T).Name)
         {
-            Init(a_path, typeof(T).Name);
         }
 
         public Collection(string a_path, string a_table)
@@ -201,6 +206,7 @@ namespace Sidi.Persistence
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
             }
             SQLiteConnection connection = new SQLiteConnection(b.ToString());
+            ownConnection = connection;
             connection.Open();
             Init(connection, a_table);
         }
@@ -875,5 +881,9 @@ namespace Sidi.Persistence
             #endregion
         }
 
+        public void Dispose()
+        {
+            Close();
+        }
     }
 }
