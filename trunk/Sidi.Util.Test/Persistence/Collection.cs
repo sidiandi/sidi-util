@@ -29,8 +29,13 @@ using Sidi.IO;
 namespace Sidi.Persistence
 {
     [TestFixture]
-    public class CollectionTest
+    public class CollectionTest : TestBase
     {
+        public CollectionTest()
+        {
+            testFile = TestFile("Sidi.Persistence.Test.sqlite");
+        }
+        
         class OtherData
         {
             [RowId]
@@ -106,7 +111,7 @@ namespace Sidi.Persistence
             public byte[] aByteArray = System.Text.ASCIIEncoding.ASCII.GetBytes("Hello, World!");
         }
 
-        string testFile = Sidi.IO.FileUtil.BinFile(@"test-data\Sidi.Persistence.Test.sqlite");
+        string testFile;
         string table = "a";
         int count = 10;
 
