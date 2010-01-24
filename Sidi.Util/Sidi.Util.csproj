@@ -84,13 +84,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArchiveHandler.cs" />
-    <Compile Include="AsyncCalculation.cs" />
-    <Compile Include="ByteArrayEx.cs" />
+    <Compile Include="Util\ArchiveHandler.cs" />
+    <Compile Include="Util\AsyncCalculation.cs" />
+    <Compile Include="Util\ByteArrayEx.cs" />
     <Compile Include="CommandLine\ShowHelp.cs" />
     <Compile Include="CommandLine\ShowUserInterface.cs" />
-    <Compile Include="Comparer.cs" />
-    <Compile Include="DumpExtensions.cs" />
+    <Compile Include="Util\Comparer.cs" />
+    <Compile Include="Util\DumpExtensions.cs" />
     <Compile Include="IO\Copy.cs" />
     <Compile Include="IO\Find.cs" />
     <Compile Include="Forms\BossController.cs">
@@ -129,7 +129,7 @@
     <Compile Include="Forms\Viewport.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GraMath.cs" />
+    <Compile Include="Util\GraMath.cs" />
     <Compile Include="History.cs" />
     <Compile Include="IArchive.cs" />
     <Compile Include="Interval.cs" />
@@ -137,9 +137,9 @@
     <Compile Include="IO\PathEx.cs" />
     <Compile Include="IO\SearchPath.cs" />
     <Compile Include="ListEx.cs" />
-    <Compile Include="LruCache.cs" />
-    <Compile Include="LruCacheBackground.cs" />
-    <Compile Include="LruCacheBackgroundAutoInvalidate.cs" />
+    <Compile Include="Collections\LruCache.cs" />
+    <Compile Include="Collections\LruCacheBackground.cs" />
+    <Compile Include="Collections\LruCacheBackgroundAutoInvalidate.cs" />
     <Compile Include="CommandLine\Parser.cs" />
     <Compile Include="IO\FileUtil.cs" />
     <Compile Include="Persistence\Attributes.cs" />
