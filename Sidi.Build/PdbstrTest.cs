@@ -36,7 +36,7 @@ namespace Sidi.Build.Test
 
         public PdbstrTest()
         {
-            pdbFile = TestFile("Sidi.Util.pdb");
+            pdbFile = FileUtil.BinFile("Sidi.Util.pdb");
         }
 
         [SetUp]
@@ -49,7 +49,7 @@ namespace Sidi.Build.Test
         [Test]
         public void Write()
         {
-            string pdbFileCopy = pdbFile + ".modified.pdb";
+            string pdbFileCopy = TestFile(Path.GetFileNameWithoutExtension(pdbFile) + ".modified.pdb");
             File.Copy(pdbFile, pdbFileCopy, true);
 
             string content = "Hello, Test";

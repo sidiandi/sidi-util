@@ -44,7 +44,7 @@ namespace Sidi.Build.Test
             instance = new Srctool();
         }
 
-        string pdbFile = @"D:\work\lib\Sidi.Util\bin\Debug\Sidi.Util.pdb";
+        string pdbFile = FileUtil.BinFile("Sidi.Util.pdb");
 
         [Test]
         public void Test()
