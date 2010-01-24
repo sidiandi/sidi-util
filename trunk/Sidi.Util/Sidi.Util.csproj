@@ -130,13 +130,13 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Util\GraMath.cs" />
-    <Compile Include="History.cs" />
-    <Compile Include="IArchive.cs" />
-    <Compile Include="Interval.cs" />
-    <Compile Include="IntSet.cs" />
+    <Compile Include="Collections\History.cs" />
+    <Compile Include="Util\IArchive.cs" />
+    <Compile Include="Util\Interval.cs" />
+    <Compile Include="Collections\IntSet.cs" />
     <Compile Include="IO\PathEx.cs" />
     <Compile Include="IO\SearchPath.cs" />
-    <Compile Include="ListEx.cs" />
+    <Compile Include="Util\ListEx.cs" />
     <Compile Include="Collections\LruCache.cs" />
     <Compile Include="Collections\LruCacheBackground.cs" />
     <Compile Include="Collections\LruCacheBackgroundAutoInvalidate.cs" />
@@ -147,26 +147,26 @@
     <Compile Include="Persistence\Dictionary.cs" />
     <Compile Include="Pop3\Server.cs" />
     <Compile Include="..\VersionInfo.cs" />
-    <Compile Include="ProcessEx.cs" />
+    <Compile Include="Util\ProcessEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomEx.cs" />
-    <Compile Include="Rar.cs" />
+    <Compile Include="Util\RandomEx.cs" />
+    <Compile Include="Util\Rar.cs" />
     <Compile Include="Pop3\Session.cs" />
-    <Compile Include="RegistrySerializer.cs" />
-    <Compile Include="Stats.cs" />
-    <Compile Include="StringEx.cs" />
-    <Compile Include="TcpClientEx.cs" />
-    <Compile Include="TileGeometry.cs" />
-    <Compile Include="Tokenizer.cs" />
-    <Compile Include="UnixTime.cs" />
-    <Compile Include="UpdateCheck.cs" />
-    <Compile Include="UpdateForm.cs">
+    <Compile Include="Util\RegistrySerializer.cs" />
+    <Compile Include="Util\Stats.cs" />
+    <Compile Include="Util\StringEx.cs" />
+    <Compile Include="Net\TcpClientEx.cs" />
+    <Compile Include="Util\TileGeometry.cs" />
+    <Compile Include="Util\Tokenizer.cs" />
+    <Compile Include="Util\UnixTime.cs" />
+    <Compile Include="Util\UpdateCheck.cs" />
+    <Compile Include="Util\UpdateForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UpdateForm.Designer.cs">
+    <Compile Include="Util\UpdateForm.Designer.cs">
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Zip.cs" />
+    <Compile Include="Util\Zip.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -192,7 +192,7 @@
     <Content Include="Forms\Sidi.Forms.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UpdateForm.resx">
+    <EmbeddedResource Include="Util\UpdateForm.resx">
       <DependentUpon>UpdateForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
