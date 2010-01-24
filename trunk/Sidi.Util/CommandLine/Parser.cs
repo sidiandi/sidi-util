@@ -29,6 +29,9 @@ using System.Windows.Forms;
 
 namespace Sidi.CommandLine
 {
+    /// <summary>
+    /// Extension methods for Type
+    /// </summary>
     public static class TypeEx
     {
         public static string GetInfo(this Type type)

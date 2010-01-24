@@ -29,6 +29,7 @@ using Sidi.Persistence;
 using System.IO;
 using System.Data.Common;
 using System.Linq;
+using Sidi.IO;
 
 namespace Sidi.Persistence
 {
@@ -36,37 +37,12 @@ namespace Sidi.Persistence
     [TestFixture]
     public class DictionaryTest : TestBase
     {
-        #region "Custom Trace Listener"
-        MyListener listener = new MyListener();
-
-        internal class MyListener : TraceListener
-        {
-            public override void Write(string message)
-            {
-                Console.Write(message);
-            }
-
-
-            public override void WriteLine(string message)
-            {
-                Console.WriteLine(message);
-            }
-        }
-        #endregion
-
         Sidi.Persistence.Dictionary<string, string> dictionary;
 
         [SetUp()]
         public void SetUp()
         {
-            //Setup our custom trace listener
-            if (!Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Add(listener);
-            }
-
-            //TODO - Setup your test objects here
-            string path = @"d:\temp\dictionary_test.sqlite";
+            string path = FileUtil.BinFile(@"unit-test\dictionary_test.sqlite");
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -77,14 +53,7 @@ namespace Sidi.Persistence
         [TearDown()]
         public void TearDown()
         {
-            //Remove our custom trace listener
-            if (Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Remove(listener);
-            }
-
-            //TODO - Tidy up your test objects here
-            dictionary.Close();
+            dictionary.Dispose();
         }
 
         [Test()]

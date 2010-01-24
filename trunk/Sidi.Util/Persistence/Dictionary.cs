@@ -22,7 +22,7 @@ using System.Data.Common;
 
 namespace Sidi.Persistence
 {
-    public class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>
+    public class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
     {
         class Record
         {
@@ -50,17 +50,17 @@ namespace Sidi.Persistence
 
         public Dictionary(string a_path, string a_table)
         {
-            Init(a_path, a_table);
+            collection = new Collection<Record>(a_path, a_table);
+        }
+
+        public Dictionary(DbConnection connection, string a_table)
+        {
+            collection = new Collection<Record>(connection, a_table);
         }
 
         public void Close()
         {
             collection.Close();
-        }
-
-        public void Init(string a_path, string a_table)
-        {
-            collection = new Collection<Record>(a_path, a_table);
         }
 
         public DbTransaction BeginTransaction()
@@ -191,5 +191,10 @@ namespace Sidi.Persistence
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            Close();
+        }
     }
 }
