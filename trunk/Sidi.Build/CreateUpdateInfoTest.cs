@@ -27,7 +27,7 @@ using Sidi.Util;
 namespace Sidi.Build.Test
 {
     [TestFixture]
-    public class CreateUpdateInfoTest
+    public class CreateUpdateInfoTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -42,7 +42,7 @@ namespace Sidi.Build.Test
         [Test]
         public void Writer()
         {
-            string outFile = FileUtil.BinFile(@"Test\generated.xml");
+            string outFile = TestFile("generated.xml");
             {
                 CreateUpdateInfo cui = new CreateUpdateInfo();
                 cui.OutputFile = outFile;

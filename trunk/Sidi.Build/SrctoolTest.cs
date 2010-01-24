@@ -27,7 +27,7 @@ using Sidi.Build;
 namespace Sidi.Build.Test
 {
     [TestFixture]
-    public class SrctoolTestTest
+    public class SrctoolTestTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -63,7 +63,7 @@ namespace Sidi.Build.Test
                 throw new FileNotFoundException(pdbFile);
             }
 
-            string pdbFileIndexed = FileUtil.CatDir(@"D:\test\ConsoleApplication3\lib\Sidi.Util\bin\Debug", Path.GetFileName(pdbFile));
+            string pdbFileIndexed = TestFile(Path.GetFileName(pdbFile));
 
             File.Copy(pdbFile, pdbFileIndexed, true);
 

@@ -189,9 +189,6 @@
     <None Include="Sidi.Util.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Forms\Sidi.Forms.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Util\UpdateForm.resx">
       <DependentUpon>UpdateForm.cs</DependentUpon>
       <SubType>Designer</SubType>
