@@ -170,13 +170,13 @@ namespace Sidi.CommandLine
             Sidi.CommandLine.Parser.Run(app, new string[] { "SayHello" });
             Assert.AreEqual("Hello, John Doe", app.Result);
 
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Andreas", "SayHello" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Bert", "SayHello" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--Times", "10", "--Name", "Andreas", "SayHello" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--Times", "10", "--Name", "Bert", "SayHello" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Andreas", "SayHello", "--Name", "Ernie", "SayHello" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Bert", "SayHello", "--Name", "Ernie", "SayHello" });
             Assert.AreEqual("Hello, Ernie", app.Result);
         }
 
@@ -191,19 +191,19 @@ namespace Sidi.CommandLine
         public void FuzzySearch()
         {
             TestApp app = new TestApp();
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Andreas", "SayHello" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "SayHello" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
             app = new TestApp();
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Andreas", "sh" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "sh" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
             app = new TestApp(); 
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Andreas", "say" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "say" });
             Assert.AreEqual("Hello, Andreas", app.Result);
 
             app = new TestApp(); 
-            Sidi.CommandLine.Parser.Run(app, new string[] { "-na", "Andreas", "say" });
+            Sidi.CommandLine.Parser.Run(app, new string[] { "-na", "Bert", "say" });
             Assert.AreEqual("Hello, Andreas", app.Result);
         }
 
