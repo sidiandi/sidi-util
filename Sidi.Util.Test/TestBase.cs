@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sidi.IO;
+using Sidi.Util;
 
 namespace Sidi
 {
@@ -36,7 +37,7 @@ namespace Sidi
 
         protected string TestFile(string relPath)
         {
-            return FileUtil.BinFile(relPath);
+            return FileUtil.BinFile("unit-test".CatDir(relPath));
         }
     }
 }

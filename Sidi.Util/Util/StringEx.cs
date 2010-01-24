@@ -297,5 +297,29 @@ namespace Sidi.Util
             return e.JoinLines();
         }
 
+        /// <summary>
+        /// Converts to a string, even if ToString() raises an exception or x is null.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static string SafeToString(this object x)
+        {
+            try
+            {
+                if (x == null)
+                {
+                    return String.Empty;
+                }
+                else
+                {
+                    return x.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Warn(ex);
+                return String.Empty;
+            }
+        }
     }
 }

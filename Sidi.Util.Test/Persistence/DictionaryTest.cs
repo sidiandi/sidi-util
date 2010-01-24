@@ -42,7 +42,7 @@ namespace Sidi.Persistence
         [SetUp()]
         public void SetUp()
         {
-            string path = FileUtil.BinFile(@"unit-test\dictionary_test.sqlite");
+            string path = TestFile("dictionary_test.sqlite");
             if (File.Exists(path))
             {
                 File.Delete(path);

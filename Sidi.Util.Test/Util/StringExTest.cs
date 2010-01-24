@@ -50,5 +50,15 @@ namespace Sidi.Util
         {
             log.Info("Hello, world".EditInteractive());
         }
+
+        [Test]
+        public void SafeToString()
+        {
+            object o = null;
+            Assert.AreEqual(String.Empty, o.SafeToString());
+
+            o = "Hello";
+            Assert.AreEqual("Hello", o.SafeToString());
+        }
     }
 }

@@ -27,15 +27,16 @@ using Sidi.Util;
 namespace Sidi.Build.Test
 {
     [TestFixture]
-    public class PdbstrTest
+    public class PdbstrTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         Pdbstr instance = null;
+        string pdbFile;
 
         public PdbstrTest()
         {
-            log4net.Config.BasicConfigurator.Configure();
+            pdbFile = TestFile("Sidi.Util.pdb");
         }
 
         [SetUp]
@@ -44,7 +45,6 @@ namespace Sidi.Build.Test
             instance = new Pdbstr();
         }
 
-        string pdbFile = FileUtil.BinFile(@"Test\Sidi.Util.pdb");
 
         [Test]
         public void Write()

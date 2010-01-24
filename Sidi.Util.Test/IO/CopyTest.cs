@@ -25,12 +25,8 @@ using Sidi.IO;
 using System.IO;
 #endregion
 
-//Test Specific Imports
-//TODO - Add imports your going to test here
-
 namespace Sidi.Util
 {
-
     [TestFixture]
     public class CopyTest : TestBase
     {
