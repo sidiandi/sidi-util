@@ -167,17 +167,19 @@ namespace Sidi.CommandLine
         {
             TestApp app = new TestApp();
 
+            string helloBert = "Hello, Bert";
+            
             Sidi.CommandLine.Parser.Run(app, new string[] { "SayHello" });
             Assert.AreEqual("Hello, John Doe", app.Result);
 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Bert", "SayHello" });
-            Assert.AreEqual("Hello, Andreas", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--Times", "10", "--Name", "Bert", "SayHello" });
-            Assert.AreEqual("Hello, Andreas", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Bert", "SayHello", "--Name", "Ernie", "SayHello" });
-            Assert.AreEqual("Hello, Ernie", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
         }
 
         [Test()]
