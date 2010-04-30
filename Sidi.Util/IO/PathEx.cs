@@ -141,6 +141,28 @@ namespace Sidi.IO
             }
         }
 
+        public static void EnsureFileSystemEntryNotExists(this String path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    log.InfoFormat("Deleted {0}", path);
+                }
+                else if (Directory.Exists(path))
+                {
+                    Directory.Delete(path, true);
+                    log.InfoFormat("Deleted {0}", path);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Problem while deleting {0}".F(path), ex);
+                throw;
+            }
+        }
+
         public static void WriteAllText(string path, string text)
         {
             path.EnsureParentDirectoryExists();
