@@ -327,5 +327,49 @@ namespace Sidi.Persistence
             Address a = addressBook.Find("City = @City", "City", city);
             Assert.AreEqual(a.City, city);
         }
+
+        public class WithPrimaryKey
+        {
+            [Data, RowId]
+            public long Id;
+
+            [Data]
+            public string Name;
+        }
+
+        [Test]
+        public void PrimaryKeyData()
+        {
+            var path = TestFile(@"test-data\primarykey.sqlite");
+            path.EnsureFileSystemEntryNotExists();
+            var c = new Collection<WithPrimaryKey>(path);
+
+            var d = new WithPrimaryKey();
+            d.Id = 123;
+            d.Name = "sidi";
+            c.Add(d);
+
+            d.Id = 456;
+            d.Name = "util";
+            c.Add(d);
+
+            d.Id = 456;
+            d.Name = "util2";
+            c.Add(d);
+
+            var schema = GetSchema(c.Connection);
+            log.Info(schema);
+            Assert.That(schema.Contains("Id INTEGER PRIMARY KEY"));
+
+            Assert.AreEqual(2, c.Count);
+            c.Remove(d);
+            Assert.AreEqual(1, c.Count);
+
+            foreach (var i in c)
+            {
+                log.InfoFormat("{0} {1}", i.Id, i.Name);
+            }
+
+        }
     }
 }
