@@ -120,12 +120,6 @@ namespace Sidi.Persistence
             connection = null;
         }
 
-        bool IsPrimaryKeyField(MemberInfo f)
-        {
-            object[] a = f.GetCustomAttributes(typeof(PrimaryKey), true);
-            return a.Length > 0;
-        }
-
         bool IsRowId(MemberInfo f)
         {
             object[] a = f.GetCustomAttributes(typeof(RowId), true);
@@ -403,8 +397,20 @@ namespace Sidi.Persistence
         {
             get
             {
-                string[] names = Members.Select(x => x.Name).ToArray();
+                string[] names = Members.Select(x => GetFieldDefinition(x)).ToArray();
                 return String.Join(", ", names);
+            }
+        }
+
+        string GetFieldDefinition(MemberInfo m)
+        {
+            if (IsRowId(m))
+            {
+                return m.Name + " INTEGER PRIMARY KEY";
+            }
+            else
+            {
+                return m.Name;
             }
         }
 

@@ -27,11 +27,6 @@ namespace Sidi.Persistence
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class PrimaryKey : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class AutoIncrement : Attribute
     {
     }
