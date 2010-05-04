@@ -187,6 +187,23 @@ namespace Sidi.Persistence
             return command;
         }
 
+        public DbCommand CreateCommand(string sql, params object[] parameters)
+        {
+            SQLiteCommand command = connection.CreateCommand();
+            for (int i = 0; i < parameters.Length; ++i)
+            {
+                var p = command.CreateParameter();
+                p.Value = parameters[i];
+                command.Parameters.Add(p);
+                p.ParameterName = "@param" + i.ToString();
+                sql = sql.Replace("{" + i.ToString() + "}", p.ParameterName);
+            }
+
+            sql = sql.Replace("@table", table);
+            command.CommandText = sql;
+            return command;
+        }
+
         void Init(string a_path, string a_table)
         {
             path = a_path;
@@ -447,7 +464,7 @@ namespace Sidi.Persistence
         {
             SQLiteCommand command = connection.CreateCommand();
             command.CommandText = query;
-            return DoSelect(command);
+            return Select(command);
         }
 
         public T Find(string query)
@@ -496,22 +513,14 @@ namespace Sidi.Persistence
             return Find(select);
         }
 
-        ResultProxy<T> DoSelect(string query)
+        IList<T> DoSelect(string query)
         {
-            List<long> ids = new List<long>();
-
             select = connection.CreateCommand();
             select.CommandText = String.Format("select {0} from {1} where {2}", "oid", table, query);
-            SQLiteDataReader reader = select.ExecuteReader();
-            while (reader.Read())
-            {
-                ids.Add((long)reader[0]);
-            }
-            reader.Close();
-            return new ResultProxy<T>(this, ids);
+            return Select(select);
         }
 
-        ResultProxy<T> DoSelect(DbCommand select)
+        public IList<T> Select(DbCommand select)
         {
             List<long> ids = new List<long>();
             SQLiteDataReader reader = ((SQLiteCommand)select).ExecuteReader();
@@ -689,7 +698,7 @@ namespace Sidi.Persistence
         public bool Contains(T item)
         {
             SetFieldParams(containsQuery, item);
-            IList<T> result = DoSelect(containsQuery);
+            IList<T> result = Select(containsQuery);
             return result.Count > 0;
         }
 

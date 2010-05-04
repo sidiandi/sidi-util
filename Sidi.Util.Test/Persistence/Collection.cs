@@ -31,6 +31,8 @@ namespace Sidi.Persistence
     [TestFixture]
     public class CollectionTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public CollectionTest()
         {
             testFile = TestFile("Sidi.Persistence.Test.sqlite");
@@ -357,10 +359,6 @@ namespace Sidi.Persistence
             d.Name = "util2";
             c.Add(d);
 
-            var schema = GetSchema(c.Connection);
-            log.Info(schema);
-            Assert.That(schema.Contains("Id INTEGER PRIMARY KEY"));
-
             Assert.AreEqual(2, c.Count);
             c.Remove(d);
             Assert.AreEqual(1, c.Count);
@@ -370,6 +368,15 @@ namespace Sidi.Persistence
                 log.InfoFormat("{0} {1}", i.Id, i.Name);
             }
 
+            var name = "sidi";
+            var cmd = c.CreateCommand("select oid from @table where Name = {0}", name);
+            Assert.AreEqual(name, c.Select(cmd)[0].Name);
+        }
+
+        [Test]
+        public void Query()
+        {
+            
         }
     }
 }
