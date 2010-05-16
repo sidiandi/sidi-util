@@ -229,7 +229,7 @@ namespace Sidi.Persistence
         [Test]
         public void Update()
         {
-            Address a = addressBook.Find("Name = 'Andreas'");
+            Address a = addressBook.Find("Name = 'Bert'");
             a.Name = a.Name + " (updated)";
             addressBook.Update(a);
 
