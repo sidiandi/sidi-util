@@ -167,8 +167,6 @@ namespace Sidi.CommandLine
         {
             TestApp app = new TestApp();
 
-            string helloBert = "Hello, Bert";
-            
             Sidi.CommandLine.Parser.Run(app, new string[] { "SayHello" });
             Assert.AreEqual("Hello, John Doe", app.Result);
 
@@ -179,8 +177,10 @@ namespace Sidi.CommandLine
             Assert.AreEqual(helloBert, app.Result);
 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--Name", "Bert", "SayHello", "--Name", "Ernie", "SayHello" });
-            Assert.AreEqual(helloBert, app.Result);
+            Assert.AreEqual("Hello, Ernie", app.Result);
         }
+
+        string helloBert = "Hello, Bert";
 
         [Test()]
         public void TestGui()
@@ -194,19 +194,19 @@ namespace Sidi.CommandLine
         {
             TestApp app = new TestApp();
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "SayHello" });
-            Assert.AreEqual("Hello, Andreas", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
 
             app = new TestApp();
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "sh" });
-            Assert.AreEqual("Hello, Andreas", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
 
             app = new TestApp(); 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "say" });
-            Assert.AreEqual("Hello, Andreas", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
 
             app = new TestApp(); 
             Sidi.CommandLine.Parser.Run(app, new string[] { "-na", "Bert", "say" });
-            Assert.AreEqual("Hello, Andreas", app.Result);
+            Assert.AreEqual(helloBert, app.Result);
         }
 
         [Test]

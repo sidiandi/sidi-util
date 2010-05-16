@@ -2,12 +2,12 @@
 <Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
-        <ProjectName>sidi-util</ProjectName>
-        <Major>1</Major>
-        <Minor>1</Minor>
+        <ProjectName>TrackUtil</ProjectName>
+        <Major>0</Major>
+        <Minor>6</Minor>
         <Build>0</Build>
     </PropertyGroup>
     
-    <Import Project="$(MSBuildExtensionsPath)\sidi-util\Sidi.Build.Targets"/>
+    <Import Project="$(MSBuildExtensionsPath)\sidi-util\google.code.Targets"/>
 
 </Project>

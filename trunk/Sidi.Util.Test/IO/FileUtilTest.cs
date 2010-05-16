@@ -102,7 +102,7 @@ namespace Sidi.Util
         {
             string p = TestFile(".");
             FileSystemInfo fi = p.GetFileSystemInfo();
-            Assert.AreEqual(fi.FullName, p);
+            Assert.AreEqual(Path.GetDirectoryName(p), fi.FullName);
         }
 
         [Test]
