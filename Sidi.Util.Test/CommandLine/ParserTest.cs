@@ -218,7 +218,7 @@ namespace Sidi.CommandLine
             Assert.IsTrue(app.Time == new DateTime(2008, 5, 11, 11, 12, 0));
         }
 
-        [Test, ExpectedException(ExceptionType = typeof(CommandLineException))]
+        [Test, ExpectedException(ExpectedException = typeof(CommandLineException))]
         public void NotUnique()
         {
             TestApp app = new TestApp();
