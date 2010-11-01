@@ -127,6 +127,11 @@ namespace Sidi.CommandLine
                         Stack(c, paramLabel, ref y1);
 
                         var paramInput = new TextBox();
+                        inputs.Add(paramInput);
+                        if (option.IsPassword)
+                        {
+                            paramInput.PasswordChar = '*';
+                        }
                         Stack(c, paramInput, ref y);
                         paramInput.Left = paramLabel.Right + margin;
 
@@ -145,6 +150,20 @@ namespace Sidi.CommandLine
             main.Controls.Add(t);
 
             main.ShowDialog();
+        }
+
+        List<TextBox> inputs = new List<TextBox>();
+
+        void Refresh()
+        {
+            foreach (var i in inputs)
+            {
+                if (i.Tag is Option)
+                {
+                    var option = ((Option)i.Tag);
+                    i.Text = Support.SafeToString(option.GetValue());
+                }
+            }
         }
 
         void paramInput_TextChanged(object sender, EventArgs e)
@@ -177,6 +196,7 @@ namespace Sidi.CommandLine
                 var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 SetError(button, msg);
             }
+            Refresh();
         }
 
         void SetError(Control c, string message)

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sidi.Util.Test</name>
+    </assembly>
+    <members>
+        <member name="T:Sidi.Util.RegistrySerializerTest.Debugger">
+            <summary>
+            Registry settings for Visual Studio 2008 debugger
+            store at @"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\9.0\Debugger"
+            </summary>
+        </member>
+    </members>
+</doc>

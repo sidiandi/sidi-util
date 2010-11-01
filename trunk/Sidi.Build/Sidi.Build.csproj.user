@@ -1,0 +1,8 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\Common.Targets" />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>$(LibDir)\NUnit\bin\net-2.0\nunit.exe</StartProgram>
+    <StartArguments>$(TargetPath)</StartArguments>
+  </PropertyGroup>
+</Project>

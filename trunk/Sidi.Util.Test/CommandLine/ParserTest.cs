@@ -386,5 +386,60 @@ namespace Sidi.CommandLine
             Assert.IsTrue(p.IsMatch("rfrlocal", "RunFromLocal"));
             Assert.IsFalse(p.IsMatch("rfrlocale", "RunFromLocal"));
         }
+
+        public class PreferencesTestApplication
+        {
+            [Usage("Your name")]
+            [Persistent]
+            public string Name { set; get; }
+
+            [Usage("secret password")]
+            [Password]
+            [Persistent]
+            public string Password { set; get; }
+        }
+
+        [Test]
+        public void Preferences()
+        {
+            var a = new PreferencesTestApplication();
+
+            var p = new Parser(a);
+
+            log.Info(p.PreferencesKey);
+
+            a.Name = "Donald";
+            a.Password = "Secret";
+
+            p.StorePreferences();
+
+            var b = new PreferencesTestApplication();
+
+            var pb = new Parser(b);
+
+            var k = pb.GetPreferencesKey(pb.Options.First());
+            log.Info(k);
+
+            pb.LoadPreferences();
+            Assert.AreEqual(a.Name, b.Name);
+            Assert.AreEqual(a.Password, b.Password);
+        }
+
+        [Test, Explicit("interactive")]
+        public void PasswordUi()
+        {
+            Parser.Run(new PreferencesTestApplication(), new string[] { "ui" });
+        }
+
+        [Test]
+        public void HidePassword()
+        {
+            var a = new PreferencesTestApplication();
+            var p = "24985624856";
+            a.Password = p;
+            var w = new StringWriter();
+            new Parser(a).WriteUsage(w);
+            Assert.IsFalse(w.ToString().Contains(a.Password), w.ToString());
+        }
     }
 }

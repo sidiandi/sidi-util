@@ -26,6 +26,7 @@ using System.Globalization;
 using Sidi.Util;
 using System.ComponentModel;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace Sidi.CommandLine
 {
@@ -84,6 +85,22 @@ namespace Sidi.CommandLine
 
             return null;
         }
+    }
+
+    /// <summary>
+    /// Properties marked with this attribute will be stored in the registry
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class PersistentAttribute : System.Attribute
+    {
+    }
+
+    /// <summary>
+    /// Properties marked with this attribute will not be displayed to the user
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class PasswordAttribute : System.Attribute
+    {
     }
 
     public interface IParserItem
@@ -293,7 +310,10 @@ namespace Sidi.CommandLine
                 object v = Parser.ParseValue(args[0], fi.FieldType);
                 fi.SetValue(Application, v);
                 args.RemoveAt(0);
-                log.InfoFormat("Option {0} = {1}", fi.Name, fi.GetValue(Application));
+                if (!IsPassword)
+                {
+                    log.InfoFormat("Option {0} = {1}", fi.Name, fi.GetValue(Application));
+                }
             }
             else if (MemberInfo is PropertyInfo)
             {
@@ -301,7 +321,10 @@ namespace Sidi.CommandLine
                 object v = Parser.ParseValue(args[0], pi.PropertyType);
                 pi.SetValue(Application, v, new object[] { });
                 args.RemoveAt(0);
-                log.InfoFormat("Option {0} = {1}", pi.Name, pi.GetValue(Application, new object[] { }));
+                if (!IsPassword)
+                {
+                    log.InfoFormat("Option {0} = {1}", pi.Name, pi.GetValue(Application, new object[] { }));
+                }
             }
             else
             {
@@ -320,9 +343,25 @@ namespace Sidi.CommandLine
                     "{0} [{1}]\r\n{2}\r\n{3}",
                     Name,
                     Type.GetInfo(),
-                    "default: {0}".F(GetValue()).Indent(indent),
+                    "default: {0}".F(IsPassword ? "-- hidden --" : GetValue()).Indent(indent),
                     Usage.Indent(indent)
                     );
+            }
+        }
+
+        public bool IsPersistent
+        {
+            get
+            {
+                return MemberInfo.GetCustomAttributes(typeof(PersistentAttribute), true).Any();
+            }
+        }
+
+        public bool IsPassword
+        {
+            get
+            {
+                return MemberInfo.GetCustomAttributes(typeof(PasswordAttribute), true).Any();
             }
         }
     }
@@ -399,7 +438,9 @@ namespace Sidi.CommandLine
             Parser parser = new Parser(application);
             try
             {
+                parser.LoadPreferences();
                 parser.Parse(args);
+                parser.StorePreferences();
             }
             catch (CommandLineException exception)
             {
@@ -463,6 +504,80 @@ namespace Sidi.CommandLine
                 throw new CommandLineException("Argument " + args[0] + " is unknown.");
             }
         }
+
+        public void LoadPreferences()
+        {
+            foreach (var o in Options.Where(x => x.IsPersistent))
+            {
+                try
+                {
+                    var value = Registry.GetValue(GetPreferencesKey(o), o.Name, null);
+                    if (value != null)
+                    {
+                        var valueString = value.ToString();
+                        if (o.IsPassword)
+                        {
+                            valueString = valueString.Decrypt(preferencesPassword);
+                        }
+                        o.Handle(new string[] { valueString }.ToList());
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        /// <summary>
+        /// It is not safe to use an internal password
+        /// to store secrets in the registry, but better than nothing, however.
+        /// </summary>
+        static string preferencesPassword = "^69@KE3i3%VKAxAd";
+
+        public void StorePreferences()
+        {
+            foreach (var o in Options.Where(x => x.IsPersistent))
+            {
+                var v = o.GetValue().ToString();
+                if (o.IsPassword)
+                {
+                    v = v.Encrypt(preferencesPassword);
+                }
+                if (v != null)
+                {
+                    Registry.SetValue(GetPreferencesKey(o), o.Name, v.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// The registry key for an option is HKEY_CURRENT_USER\Software\[Company]\[Product]\[Full application class name]
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public string GetPreferencesKey(Option o)
+        {
+            var at = o.Application.GetType();
+            var k = PreferencesKey;
+            if (k == null)
+            {
+                k = Registry.CurrentUser.ToString().CatDir(
+                    "Software");
+            }
+            return 
+                    k.CatDir(
+                    ((AssemblyCompanyAttribute)at.Assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false).First()).Company,
+                    ((AssemblyProductAttribute)at.Assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false).First()).Product,
+                    at.FullName);
+        }
+
+        string preferencesKey = null;
+        /// <summary>
+        /// Registry key for LoadPreferences and StorePreferences. 
+        /// Should be set to HKEY_CURRENT_USER\Software\[your company]\[your product]
+        /// Default is HKEY_CURRENT_USER\Software\Sidi.CommandLine.Parser
+        /// </summary>
+        public string PreferencesKey { get; set; }
 
         bool HandleUnknown()
         {

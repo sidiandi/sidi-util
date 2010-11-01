@@ -25,7 +25,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Sidi.Util")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Andreas Grimme")]
+[assembly: AssemblyCompany("sidi")]
 [assembly: AssemblyProduct("sidi-util")]
 [assembly: AssemblyCopyright("Copyright © Andreas Grimme 2009")]
 [assembly: AssemblyTrademark("")]
