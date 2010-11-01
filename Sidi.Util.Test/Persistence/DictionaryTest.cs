@@ -75,7 +75,7 @@ namespace Sidi.Persistence
             w.Start();
             using (DbTransaction t = dictionary.BeginTransaction())
             {
-                for (long i = 0; i < 100000; ++i)
+                for (long i = 0; i < 1000; ++i)
                 {
                     string key = String.Join(".", BitConverter.GetBytes(i).Select(x => "Parameter " + x.ToString()).ToArray());
                     string value = String.Format("Value{0}", i);

@@ -3,5 +3,6 @@
   <PropertyGroup>
     <OutputPath>$(SolutionDir)..\..\build\$(SolutionName)_$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
+	<LibDir>$(SolutionDir)lib\</LibDir>
+	</PropertyGroup>
 </Project>

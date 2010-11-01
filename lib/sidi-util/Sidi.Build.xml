@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sidi.Build</name>
+    </assembly>
+    <members>
+        <member name="T:Sidi.Build.Pdbstr">
+            <summary>
+            Wrapper for the pdbstr.exe tool.
+            </summary>
+        </member>
+        <member name="T:Sidi.Build.GoogleCode.Upload">
+            <summary>
+            Upload a file to a project hosted at http://code.google.com 
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.Execute">
+            <summary>
+            Upload the file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.CreateAuthorizationToken(System.String,System.String)">
+            <summary>
+            Creates the authorization token.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.WriteLine(System.IO.Stream,System.String)">
+            <summary>
+            Writes the string to the specified stream and concatenates a newline.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.WriteFile(System.IO.Stream,System.String)">
+            <summary>
+            Writes the specified file to the specified stream.
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.UserName">
+            <summary>
+            User name for the Google Code profile
+            </summary>
+            The UserName can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\UserName
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.Password">
+            <summary>
+            Password for the Google Code profile. Note that this is NOT your global Google Account password.
+            </summary>
+            The Pasword can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\Password
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.ProjectName">
+            <summary>
+            Name of the Google Code project
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.LocalFile">
+            <summary>
+            Local path of the file to be uploaded
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.RemoteFile">
+            <summary>
+            Name of the file on the server
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.Summary">
+            <summary>
+            Summary for the upload
+            </summary>
+        </member>
+    </members>
+</doc>
