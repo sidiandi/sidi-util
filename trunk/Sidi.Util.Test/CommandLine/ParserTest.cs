@@ -441,5 +441,49 @@ namespace Sidi.CommandLine
             new Parser(a).WriteUsage(w);
             Assert.IsFalse(w.ToString().Contains(a.Password), w.ToString());
         }
+
+        [Usage("Ambiguous option/action")]
+        public class AmbiguousOption
+        {
+            public string arg;
+
+            [Usage("run action")]
+            public void Run(string arg)
+            {
+                this.arg = arg;
+            }
+
+            [Usage("run mode option")]
+            public int RunMode { get; set; }
+        }
+
+        [Test]
+        public void AmbiguousOptionAction()
+        {
+            var a = new AmbiguousOption();
+            var arg = "hello";
+
+            var p = new Parser(a);
+
+            p.Parse(new string[] { "run", arg });
+            Assert.AreEqual(arg, a.arg);
+        }
+
+        [Test, ExpectedException(typeof(CommandLineException))]
+        public void Ambiguous3()
+        {
+            var a = new AmbiguousOption();
+            var p = new Parser(a);
+            p.Parse(new string[] { "ru" });
+        }
+
+        [Test]
+        public void WithOptionPrefix()
+        {
+            var a = new AmbiguousOption();
+            var p = new Parser(a);
+            p.Parse(new string[] { "--ru", "1"});
+        }
+
     }
 }
