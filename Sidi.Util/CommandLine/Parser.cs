@@ -537,14 +537,18 @@ namespace Sidi.CommandLine
         {
             foreach (var o in Options.Where(x => x.IsPersistent))
             {
-                var v = o.GetValue().ToString();
-                if (o.IsPassword)
+                var value = o.GetValue();
+                if (value != null)
                 {
-                    v = v.Encrypt(preferencesPassword);
-                }
-                if (v != null)
-                {
-                    Registry.SetValue(GetPreferencesKey(o), o.Name, v.ToString());
+                    var v = value.ToString();
+                    if (o.IsPassword)
+                    {
+                        v = v.Encrypt(preferencesPassword);
+                    }
+                    if (v != null)
+                    {
+                        Registry.SetValue(GetPreferencesKey(o), o.Name, v.ToString());
+                    }
                 }
             }
         }
@@ -556,25 +560,39 @@ namespace Sidi.CommandLine
         /// <returns></returns>
         public string GetPreferencesKey(Option o)
         {
-            var at = o.Application.GetType();
+            return GetPreferencesKey(o.Application.GetType());
+        }
+
+        public string GetPreferencesKey(Type at)
+        {
             var k = PreferencesKey;
             if (k == null)
             {
-                k = Registry.CurrentUser.ToString().CatDir(
-                    "Software");
+                k = Registry.CurrentUser.ToString().CatDir("Software");
+                var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(at).Company;
+                var product = GetAssemblyAttribute<AssemblyProductAttribute>(at).Product;
+                k = k.CatDir(company, product, at.FullName);
             }
-            return 
-                    k.CatDir(
-                    ((AssemblyCompanyAttribute)at.Assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false).First()).Company,
-                    ((AssemblyProductAttribute)at.Assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false).First()).Product,
-                    at.FullName);
+            k = k.CatDir(at.FullName);
+            return k;
         }
 
-        string preferencesKey = null;
+        T GetAssemblyAttribute<T>(Type t)
+        {
+            var a = t.Assembly;
+            try
+            {
+                return ((T)a.GetCustomAttributes(typeof(T), false).First());
+            }
+            catch (Exception)
+            {
+                throw new Exception(String.Format("{0} is not defined for assembly {1}", typeof(T).ToString(), a));
+            }
+        }
+
         /// <summary>
         /// Registry key for LoadPreferences and StorePreferences. 
-        /// Should be set to HKEY_CURRENT_USER\Software\[your company]\[your product]
-        /// Default is HKEY_CURRENT_USER\Software\Sidi.CommandLine.Parser
+        /// Default is HKEY_CURRENT_USER\Software\[your company]\[your product]
         /// </summary>
         public string PreferencesKey { get; set; }
 

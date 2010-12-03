@@ -1,37 +1,154 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!--This file represents the results of running a test suite-->
-<test-results name="C:\build\sidi-util_Debug\Sidi.Util.Test.dll" total="21" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2010-10-27" time="11:30:04">
+<test-results name="C:\build\sidi-util_Debug\Sidi.Util.Test.dll" total="69" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2010-11-02" time="08:16:14">
   <environment nunit-version="2.5.8.10295" clr-version="2.0.50727.3615" os-version="Microsoft Windows NT 5.1.2600 Service Pack 3" platform="Win32NT" cwd="C:\build\sidi-util_Debug" machine-name="AG" user="Andreas" user-domain="AG" />
   <culture-info current-culture="de-DE" current-uiculture="de-DE" />
-  <test-suite type="Assembly" name="C:\build\sidi-util_Debug\Sidi.Util.Test.dll" executed="True" result="Success" success="True" time="0.050" asserts="0">
+  <test-suite type="Assembly" name="C:\build\sidi-util_Debug\Sidi.Util.Test.dll" executed="True" result="Success" success="True" time="31.726" asserts="0">
     <results>
-      <test-suite type="Namespace" name="Sidi" executed="True" result="Success" success="True" time="0.050" asserts="0">
+      <test-suite type="Namespace" name="Sidi" executed="True" result="Success" success="True" time="31.716" asserts="0">
         <results>
-          <test-suite type="Namespace" name="CommandLine" executed="True" result="Success" success="True" time="0.050" asserts="0">
+          <test-suite type="Namespace" name="CommandLine" executed="True" result="Success" success="True" time="0.711" asserts="0">
             <results>
-              <test-suite type="TestFixture" name="ParserTest" executed="True" result="Success" success="True" time="0.050" asserts="0">
+              <test-suite type="TestFixture" name="ParserTest" executed="True" result="Success" success="True" time="0.711" asserts="0">
                 <results>
-                  <test-case name="Sidi.CommandLine.ParserTest.Ambiguous" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Sidi.CommandLine.ParserTest.Ambiguous" executed="True" result="Success" success="True" time="0.170" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.Ambiguous2" executed="True" result="Success" success="True" time="0.000" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.ArgList" executed="True" result="Success" success="True" time="0.000" asserts="0" />
-                  <test-case name="Sidi.CommandLine.ParserTest.DateTimeArg" executed="True" result="Success" success="True" time="0.000" asserts="1" />
-                  <test-case name="Sidi.CommandLine.ParserTest.Enum" executed="True" result="Success" success="True" time="0.010" asserts="4" />
-                  <test-case name="Sidi.CommandLine.ParserTest.FuzzySearch" executed="True" result="Success" success="True" time="0.010" asserts="4" />
-                  <test-case name="Sidi.CommandLine.ParserTest.Help" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Sidi.CommandLine.ParserTest.DateTimeArg" executed="True" result="Success" success="True" time="0.010" asserts="1" />
+                  <test-case name="Sidi.CommandLine.ParserTest.Enum" executed="True" result="Success" success="True" time="0.250" asserts="4" />
+                  <test-case name="Sidi.CommandLine.ParserTest.FuzzySearch" executed="True" result="Success" success="True" time="0.020" asserts="4" />
+                  <test-case name="Sidi.CommandLine.ParserTest.Help" executed="True" result="Success" success="True" time="0.030" asserts="0" />
+                  <test-case name="Sidi.CommandLine.ParserTest.HidePassword" executed="True" result="Success" success="True" time="0.000" asserts="1" />
                   <test-case name="Sidi.CommandLine.ParserTest.Info" executed="True" result="Success" success="True" time="0.000" asserts="1" />
                   <test-case name="Sidi.CommandLine.ParserTest.IsMatch" executed="True" result="Success" success="True" time="0.000" asserts="7" />
-                  <test-case name="Sidi.CommandLine.ParserTest.List" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Sidi.CommandLine.ParserTest.List" executed="True" result="Success" success="True" time="0.010" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.List2" executed="True" result="Success" success="True" time="0.000" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.MultiCommand" executed="True" result="Success" success="True" time="0.000" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.NotEnoughParameters" executed="True" result="Success" success="True" time="0.000" asserts="0" />
-                  <test-case name="Sidi.CommandLine.ParserTest.NotUnique" executed="True" result="Success" success="True" time="0.000" asserts="0" />
-                  <test-case name="Sidi.CommandLine.ParserTest.Preferences" executed="True" result="Success" success="True" time="0.010" asserts="2" />
-                  <test-case name="Sidi.CommandLine.ParserTest.ShowMultiLineUsage" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Sidi.CommandLine.ParserTest.NotUnique" executed="True" result="Success" success="True" time="0.010" asserts="0" />
+                  <test-case name="Sidi.CommandLine.ParserTest.Preferences" executed="True" result="Success" success="True" time="0.000" asserts="2" />
+                  <test-case name="Sidi.CommandLine.ParserTest.ShowMultiLineUsage" executed="True" result="Success" success="True" time="0.010" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.ShowUsage" executed="True" result="Success" success="True" time="0.000" asserts="2" />
                   <test-case name="Sidi.CommandLine.ParserTest.TestAssertion" executed="True" result="Success" success="True" time="0.010" asserts="4" />
                   <test-case name="Sidi.CommandLine.ParserTest.TestDescription" executed="True" result="Success" success="True" time="0.000" asserts="1" />
                   <test-case name="Sidi.CommandLine.ParserTest.TestGui" executed="True" result="Success" success="True" time="0.010" asserts="0" />
                   <test-case name="Sidi.CommandLine.ParserTest.WrongParameterCountMessage" executed="True" result="Success" success="True" time="0.000" asserts="1" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="Namespace" name="Forms" executed="True" result="Inconclusive" success="False" time="0.000" asserts="0" />
+          <test-suite type="Namespace" name="IO" executed="True" result="Success" success="True" time="0.080" asserts="0">
+            <results>
+              <test-suite type="TestFixture" name="PathExTest" executed="True" result="Success" success="True" time="0.080" asserts="0">
+                <results>
+                  <test-case name="Sidi.IO.PathExTest.Find" executed="True" result="Success" success="True" time="0.020" asserts="9" />
+                  <test-case name="Sidi.IO.PathExTest.GetRelativePath" executed="True" result="Success" success="True" time="0.000" asserts="2" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="Namespace" name="Persistence" executed="True" result="Success" success="True" time="5.368" asserts="0">
+            <results>
+              <test-suite type="TestFixture" name="CollectionTest" executed="True" result="Success" success="True" time="5.027" asserts="0">
+                <results>
+                  <test-case name="Sidi.Persistence.CollectionTest.AlterTable" executed="True" result="Success" success="True" time="0.741" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.AutoTableName" executed="True" result="Success" success="True" time="0.721" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Clear" executed="True" result="Success" success="True" time="0.421" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.CopyTo" executed="True" result="Success" success="True" time="0.150" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Count" executed="True" result="Success" success="True" time="0.260" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.DataTypes" executed="True" result="Success" success="True" time="0.531" asserts="80" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Execute" executed="True" result="Success" success="True" time="0.531" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Find" executed="True" result="Success" success="True" time="0.280" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.PrimaryKeyData" executed="True" result="Success" success="True" time="0.130" asserts="3" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Query" executed="True" result="Success" success="True" time="0.060" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Read" executed="True" result="Success" success="True" time="0.090" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.ReadAll" executed="True" result="Success" success="True" time="0.100" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Schema" executed="True" result="Success" success="True" time="0.110" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Select" executed="True" result="Success" success="True" time="0.100" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Subset" executed="True" result="Success" success="True" time="0.110" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Update" executed="True" result="Success" success="True" time="0.180" asserts="1" />
+                  <test-case name="Sidi.Persistence.CollectionTest.UserSetting" executed="True" result="Success" success="True" time="0.230" asserts="0" />
+                  <test-case name="Sidi.Persistence.CollectionTest.Write" executed="True" result="Success" success="True" time="0.270" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="DictionaryTest" executed="True" result="Success" success="True" time="0.340" asserts="0">
+                <results>
+                  <test-case name="Sidi.Persistence.DictionaryTest.MassReadWrite" executed="True" result="Success" success="True" time="0.280" asserts="0" />
+                  <test-case name="Sidi.Persistence.DictionaryTest.ReadWrite" executed="True" result="Success" success="True" time="0.060" asserts="2" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="Namespace" name="Util" executed="True" result="Success" success="True" time="25.547" asserts="0">
+            <results>
+              <test-suite type="TestFixture" name="AsyncCalculationTest" executed="True" result="Success" success="True" time="2.303" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.AsyncCalculationTest.Test" executed="True" result="Success" success="True" time="1.011" asserts="2" />
+                  <test-case name="Sidi.Util.AsyncCalculationTest.Test2" executed="True" result="Success" success="True" time="1.272" asserts="3" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="CopyTest" executed="True" result="Success" success="True" time="0.010" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.CopyTest.Copy" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="DumpExtensionsTest" executed="True" result="Success" success="True" time="0.060" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.DumpExtensionsTest.DumpProperties" executed="True" result="Success" success="True" time="0.060" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="FileUtilTest" executed="True" result="Success" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.FileUtilTest.CatDir" executed="True" result="Success" success="True" time="0.000" asserts="2" />
+                  <test-case name="Sidi.Util.FileUtilTest.GetFileSystemInfo" executed="True" result="Success" success="True" time="0.000" asserts="1" />
+                  <test-case name="Sidi.Util.FileUtilTest.Sibling" executed="True" result="Success" success="True" time="0.000" asserts="1" />
+                  <test-case name="Sidi.Util.FileUtilTest.TestGetRelativePath" executed="True" result="Success" success="True" time="0.000" asserts="8" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="GraMathTest" executed="True" result="Success" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.GraMathTest.WrapAround" executed="True" result="Success" success="True" time="0.000" asserts="7" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="IntSetTest" executed="True" result="Success" success="True" time="0.010" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.IntSetTest.Contains" executed="True" result="Success" success="True" time="0.000" asserts="2" />
+                  <test-case name="Sidi.Util.IntSetTest.Contains2" executed="True" result="Success" success="True" time="0.010" asserts="3" />
+                  <test-case name="Sidi.Util.IntSetTest.Contains3" executed="True" result="Success" success="True" time="0.000" asserts="3" />
+                  <test-case name="Sidi.Util.IntSetTest.Intersect" executed="True" result="Success" success="True" time="0.000" asserts="4" />
+                  <test-case name="Sidi.Util.IntSetTest.IsEmpty" executed="True" result="Success" success="True" time="0.000" asserts="1" />
+                  <test-case name="Sidi.Util.IntSetTest.IsEmpty2" executed="True" result="Success" success="True" time="0.000" asserts="1" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="LruBackgroundCache" executed="True" result="Success" success="True" time="1.152" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.LruBackgroundCache.Simple1" executed="True" result="Success" success="True" time="1.152" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="RegistrySerializerTest" executed="True" result="Success" success="True" time="0.010" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.RegistrySerializerTest.ReadWrite" executed="True" result="Success" success="True" time="0.000" asserts="3" />
+                  <test-case name="Sidi.Util.RegistrySerializerTest.ReadWrite2" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="StringExTest" executed="True" result="Success" success="True" time="0.020" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.StringExTest.GetSection" executed="True" result="Success" success="True" time="0.020" asserts="2" />
+                  <test-case name="Sidi.Util.StringExTest.SafeToString" executed="True" result="Success" success="True" time="0.000" asserts="2" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="TokenizerUt" executed="True" result="Success" success="True" time="0.010" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.TokenizerUt.TokenizerTest" executed="True" result="Success" success="True" time="0.010" asserts="4" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="UpdateCheckTest" executed="True" result="Success" success="True" time="21.972" asserts="0">
+                <results>
+                  <test-case name="Sidi.Util.UpdateCheckTest.Check" executed="True" result="Success" success="True" time="0.631" asserts="1" />
+                  <test-case name="Sidi.Util.UpdateCheckTest.CheckAsync" executed="True" result="Success" success="True" time="0.110" asserts="1" />
+                  <test-case name="Sidi.Util.UpdateCheckTest.Serialize" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Sidi.Util.UpdateCheckTest.Test404" executed="True" result="Success" success="True" time="21.231" asserts="0" />
                 </results>
               </test-suite>
             </results>

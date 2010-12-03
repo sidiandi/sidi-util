@@ -45,7 +45,6 @@
             <summary>
             Password for the Google Code profile. Note that this is NOT your global Google Account password.
             </summary>
-            The Pasword can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\Password
         </member>
         <member name="P:Sidi.Build.GoogleCode.Upload.ProjectName">
             <summary>

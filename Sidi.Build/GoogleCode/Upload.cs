@@ -54,6 +54,7 @@ using Microsoft.Win32;
 using System.Reflection;
 using System.Net;
 using System.Collections.Generic;
+using Sidi.CommandLine;
 
 // $Id: SvnClient.cs 461 2009-02-19 03:30:28Z pwelter34 $
 
@@ -64,6 +65,11 @@ namespace Sidi.Build.GoogleCode
     /// </summary>
     public class Upload : ITask
     {
+        public Upload()
+        {
+            new Parser(this).LoadPreferences();
+        }
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly byte[] NewLineAsciiBytes = Encoding.ASCII.GetBytes("\r\n");
@@ -73,12 +79,13 @@ namespace Sidi.Build.GoogleCode
         /// User name for the Google Code profile
         /// </summary>
         /// The UserName can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\UserName
+        [Persistent, Usage("User name for google code uploads.")]
         public string UserName { set; get; }
 
         /// <summary>
         /// Password for the Google Code profile. Note that this is NOT your global Google Account password.
         /// </summary>
-        /// The Pasword can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\Password
+        [Persistent, Password, Usage("Password for the Google Code profile. Note that this is NOT your global Google Account password.")]
         public string Password { set; get; }
 
         /// <summary>
@@ -101,20 +108,6 @@ namespace Sidi.Build.GoogleCode
         /// </summary>
         public string Summary { set; get; }
 
-        string GetRegString(string valueName)
-        {
-            string keyName = Registry.CurrentUser.Name + "\\Software\\" + GetType().FullName + "\\" + ProjectName;
-            log.InfoFormat("Looking for {0} in {1}", valueName, keyName);
-            string value = (string)Registry.GetValue(keyName, valueName, null);
-            if (value == null)
-            {
-                string defaultKeyName = Registry.CurrentUser.Name + "\\Software\\" + GetType().FullName;
-                log.InfoFormat("Looking for {0} in {1}", valueName, defaultKeyName);
-                value = (string)Registry.GetValue(defaultKeyName, valueName, null);
-            }
-            return value;
-        }
-        
         /// <summary>
         /// Upload the file
         /// </summary>
@@ -122,20 +115,10 @@ namespace Sidi.Build.GoogleCode
         public bool Execute()
         {
             if (UserName == null)
-            {
-                UserName = GetRegString("UserName");
-            }
+                throw new InvalidOperationException("Specify UserName or use Sidi.Build.Settings.exe to set a default user name.");
 
             if (Password == null)
-            {
-                Password = GetRegString("Password");
-            }
-            
-            if (UserName == null)
-                throw new InvalidOperationException("UserName cannot be null");
-
-            if (Password == null)
-                throw new InvalidOperationException("Password cannot be null");
+                throw new InvalidOperationException("Specify Password or use Sidi.Build.Settings to set a default password.");
 
             if (ProjectName == null)
                 throw new InvalidOperationException("ProjectName cannot be null");

@@ -13,7 +13,10 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("1.1.0.393")]
-[assembly: AssemblyFileVersion("1.1.0.393")]
+[assembly: AssemblyCopyright("Copyright (c) Andreas Grimme 2010")]
+[assembly: AssemblyCompany("sidi")]
+[assembly: AssemblyProduct("sidi-util")]
+[assembly: AssemblyVersion("1.1.0.395")]
+[assembly: AssemblyFileVersion("1.1.0.395")]
 
 

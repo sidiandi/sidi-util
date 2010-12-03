@@ -26,6 +26,9 @@ using Sidi.IO;
 
 namespace Sidi.Build.Test
 {
+    /// <summary>
+    /// Test for SourceIndex
+    /// </summary>
     [TestFixture]
     public class SourceIndexTest : TestBase
     {
@@ -33,17 +36,26 @@ namespace Sidi.Build.Test
 
         SourceIndex instance = null;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public SourceIndexTest()
         {
             log4net.Config.BasicConfigurator.Configure();
         }
 
+        /// <summary>
+        /// Test setup. Creates a fresh SourceIndex instance.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
             instance = new SourceIndex();
         }
 
+        /// <summary>
+        /// Add information to a PDB under which URLs the source files can be found.
+        /// </summary>
         [Test, Explicit("requires source path")]
         public void Test()
         {
