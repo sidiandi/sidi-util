@@ -27,10 +27,17 @@ using Microsoft.Build.Utilities;
 
 namespace Sidi.Build
 {
+    /// <summary>
+    /// Modifies the symbol files (*.pdb) of specified modules so that the debugger can download 
+    /// the source files from a URL
+    /// </summary>
     public class SourceIndex : Task
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        /// <summary>
+        /// Name of the stream in the PDB file containing the source information
+        /// </summary>
         public static string SrcsrvStream
         {
             get
@@ -39,15 +46,32 @@ namespace Sidi.Build
             }
         }
         
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public SourceIndex()
         {
         }
 
+        /// <summary>
+        /// Local source directory
+        /// </summary>
         public string Directory { set; get; }
+        
+        /// <summary>
+        /// URL that contains the same source files as the local source directory
+        /// </summary>
         public string Url { set; get; }
 
+        /// <summary>
+        /// Modules to be source-indexed
+        /// </summary>
         public ITaskItem[] Modules { set; get; }
 
+        /// <summary>
+        /// Executes the task
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {
             if (Directory == null)
@@ -73,6 +97,10 @@ namespace Sidi.Build
             return true;
         }
 
+        /// <summary>
+        /// Modifies pdbFile so that it references the source files not over a local directory but an URL
+        /// </summary>
+        /// <param name="pdbFile"></param>
         public void AddSourceIndex(string pdbFile)
         {
             if (!File.Exists(pdbFile))

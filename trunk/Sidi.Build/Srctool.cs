@@ -26,10 +26,17 @@ using System.IO;
 
 namespace Sidi.Build
 {
+    /// <summary>
+    /// Extract source information from a PDB file. Wrapper for srctool.exe. 
+    /// "Debugging Tools for Windows (x86)" must be installed.
+    /// </summary>
     public class Srctool
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public Srctool()
         {
         }
@@ -45,6 +52,11 @@ namespace Sidi.Build
             }
         }
 
+        /// <summary>
+        /// Dumps the original source file names
+        /// </summary>
+        /// <param name="pdbFile">PDB file name</param>
+        /// <returns>Sequence of source file names</returns>
         public IEnumerable<string> DumpRaw(string pdbFile)
         {
             if (!File.Exists(pdbFile))

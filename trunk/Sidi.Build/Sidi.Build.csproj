@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="CreateUpdateInfo.cs" />
     <Compile Include="CreateUpdateInfoTest.cs" />
     <Compile Include="DebuggingToolsForWindows.cs" />
@@ -80,6 +83,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="google.code.Targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Sidi.Build.Targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

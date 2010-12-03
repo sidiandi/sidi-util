@@ -461,8 +461,7 @@
         <member name="P:Sidi.CommandLine.Parser.PreferencesKey">
             <summary>
             Registry key for LoadPreferences and StorePreferences. 
-            Should be set to HKEY_CURRENT_USER\Software\[your company]\[your product]
-            Default is HKEY_CURRENT_USER\Software\Sidi.CommandLine.Parser
+            Default is HKEY_CURRENT_USER\Software\[your company]\[your product]
             </summary>
         </member>
         <member name="M:Sidi.IO.Copy.CopyToDir(System.String,System.String)">

@@ -27,7 +27,7 @@ using System.IO;
 namespace Sidi.Build
 {
     /// <summary>
-    /// Wrapper for the pdbstr.exe tool.
+    /// Reads and writes streams in PDB files. Wrapper for the pdbstr.exe tool.
     /// </summary>
     public class Pdbstr
     {
@@ -53,10 +53,19 @@ namespace Sidi.Build
                 }
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public Pdbstr()
         {
         }
 
+        /// <summary>
+        /// Write a stream to a PDB file
+        /// </summary>
+        /// <param name="pdbFile">PDB file name</param>
+        /// <param name="streamName">Name of the stream</param>
+        /// <param name="content">Content of the stream</param>
         public void Write(string pdbFile, string streamName, string content)
         {
             var temp = Path.GetTempFileName();
@@ -81,6 +90,12 @@ namespace Sidi.Build
             }
         }
 
+        /// <summary>
+        /// Reads a stream from a PDB file
+        /// </summary>
+        /// <param name="pdbFile">PDB file name</param>
+        /// <param name="streamName">Stream name</param>
+        /// <returns>Content of the stream</returns>
         public string Read(string pdbFile, string streamName)
         {
             Process p = new Process();

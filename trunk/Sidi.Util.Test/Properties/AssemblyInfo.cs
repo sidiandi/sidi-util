@@ -25,9 +25,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Sidi.Util")]
 [assembly: AssemblyDescription("Nunit tests for Sidi.Util")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("sidi")]
-[assembly: AssemblyProduct("sidi-util")]
-[assembly: AssemblyCopyright("(c) 2008 andreas.grimme@gmx.net")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

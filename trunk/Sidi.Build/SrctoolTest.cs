@@ -26,18 +26,27 @@ using Sidi.Build;
 
 namespace Sidi.Build.Test
 {
+    /// <summary>
+    /// Test for SrcTool
+    /// </summary>
     [TestFixture]
-    public class SrctoolTestTest : TestBase
+    public class SrctoolTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         Srctool instance = null;
 
-        public SrctoolTestTest()
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public SrctoolTest()
         {
             log4net.Config.BasicConfigurator.Configure();
         }
         
+        /// <summary>
+        /// Creates a fresh SrcTool instance
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -46,6 +55,9 @@ namespace Sidi.Build.Test
 
         string pdbFile = FileUtil.BinFile("Sidi.Util.pdb");
 
+        /// <summary>
+        /// Dump source information of a PDB file
+        /// </summary>
         [Test]
         public void Test()
         {
@@ -55,6 +67,9 @@ namespace Sidi.Build.Test
             }
         }
 
+        /// <summary>
+        /// Write source server information to a PDB file
+        /// </summary>
         [Test]
         public void Instrument()
         {
