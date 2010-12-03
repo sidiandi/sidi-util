@@ -8,104 +8,106 @@
   <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.GoogleCode.Upload" />
   <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.SourceIndex" />
 
-    <PropertyGroup>
-        <RootDir>$(MSBuildProjectDirectory)</RootDir>
-		<SvnBin>$(LibDir)\SlikSvn\bin</SvnBin>
-		<NUnitBin>$(LibDir)\NUnit\bin\net-2.0</NUnitBin>
-	</PropertyGroup>
-    <PropertyGroup>
-        <OutputDir>$(RootDir)\..\..\build\$(ProjectName)_Release</OutputDir>
-        <PackageDir>$(RootDir)\..\..\build\$(ProjectName)_pack</PackageDir>
-        <DocDir>$(RootDir)\doc</DocDir>
-        <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
-        <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
-        <AnonymousSvnRoot>http://$(ProjectName).googlecode.com/svn</AnonymousSvnRoot>
-    </PropertyGroup>
-  
-    <ItemGroup>
-        <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
-    </ItemGroup>
-    
-    <Target Name="Update" >
-      <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
-    </Target>
+  <PropertyGroup>
+    <RootDir>$(MSBuildProjectDirectory)</RootDir>
+    <SvnBin>$(RootDir)\lib\SlikSvn\bin</SvnBin>
+    <NUnitBin>$(RootDir)\lib\NUnit\bin\net-2.0</NUnitBin>
+    <OutputDir>$(RootDir)\..\..\build\$(ProjectName)_Release</OutputDir>
+    <PackageDir>$(RootDir)\..\..\build\$(ProjectName)_pack</PackageDir>
+    <DocDir>$(RootDir)\doc</DocDir>
+    <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
+    <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
+    <AnonymousSvnRoot>http://$(ProjectName).googlecode.com/svn</AnonymousSvnRoot>
+  </PropertyGroup>
 
-    <Target Name="GetVersion" >
-        <SvnVersion 
-			ToolPath="$(SvnBin)"
-            LocalPath=".">
-            <Output TaskParameter="Revision" PropertyName="Revision" />
-        </SvnVersion>
-        <CreateProperty
-            Value="$(Major).$(Minor).$(Build).$(Revision)">
-            <Output
-                TaskParameter="Value"
-                PropertyName="Version" />
-        </CreateProperty>
-        <Message Text="Version is $(Version)" />
-        <AssemblyInfo CodeLanguage="CS"
-            OutputFile="VersionInfo.cs" 
-            AssemblyVersion="$(Version)" 
-            AssemblyFileVersion="$(Version)" />
-    </Target>
+  <ItemGroup>
+    <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
+  </ItemGroup>
 
-    <Target Name="CreateVersion" DependsOnTargets="Package">
-        <SvnCommit 
-			ToolPath="$(SvnBin)"
-			Targets="VersionInfo.cs" 
-			Message="Automatic build of $(ProjectName)" 
+  <Target Name="Update" >
+    <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
+  </Target>
+
+  <Target Name="GetVersion" >
+    <SvnVersion
+        ToolPath="$(SvnBin)"
+        LocalPath=".">
+      <Output TaskParameter="Revision" PropertyName="Revision" />
+    </SvnVersion>
+    <CreateProperty
+        Value="$(Major).$(Minor).$(Build).$(Revision)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="Version" />
+    </CreateProperty>
+    <Message Text="Version is $(Version)" />
+    <AssemblyInfo CodeLanguage="CS"
+        AssemblyCopyright = "Copyright (c) Andreas Grimme 2010"
+        AssemblyCompany="sidi"
+        AssemblyProduct="sidi-util"
+        OutputFile="VersionInfo.cs"
+        AssemblyVersion="$(Version)"
+        AssemblyFileVersion="$(Version)" />
+  </Target>
+
+  <Target Name="CreateVersion" DependsOnTargets="Package">
+    <SvnCommit
+        ToolPath="$(SvnBin)"
+  Targets="VersionInfo.cs"
+  Message="Automatic build of $(ProjectName)"
 		/>
-		<SvnCopy 
-			ToolPath="$(SvnBin)"
+    <SvnCopy
+        ToolPath="$(SvnBin)"
             SourcePath="$(SvnRoot)/trunk"
-            DestinationPath="$(SvnRoot)/tags/$(Version)" 
+            DestinationPath="$(SvnRoot)/tags/$(Version)"
             Message="Automatic build of $(ProjectName)" />
-    </Target>
+  </Target>
 
   <Target Name="Build" DependsOnTargets="GetVersion">
-        <MSBuild
-            Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=Any CPU">
-            <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
-        </MSBuild>
-    </Target>
+    <MSBuild
+        Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=Any CPU">
+      <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
+    </MSBuild>
+  </Target>
 
-    <Target Name="SourceIndex" DependsOnTargets="Build">
-        <Sidi.Build.SourceIndex
-            Directory = "$(MSBuildProjectDirectory)"
-            Url = "$(AnonymousSvnRoot)/tags/$(Version)/"
-            Modules = "@(Targets)"
+  <Target Name="SourceIndex" DependsOnTargets="Build">
+    <Sidi.Build.SourceIndex
+        Directory = "$(MSBuildProjectDirectory)"
+        Url = "$(AnonymousSvnRoot)/tags/$(Version)/"
+        Modules = "@(Targets)"
             />
-    </Target>
+  </Target>
 
-    <Target Name="UnitTest" DependsOnTargets="Build">
-		<NUnit Assemblies="@(Targets)" ToolPath="$(NUnitBin)" />
-	</Target>
+  <Target Name="UnitTest" DependsOnTargets="Build">
+    <NUnit ToolPath="$(NUnitBin)" Assemblies="@(Targets)" />
+    <RemoveDir Directories="$(OutputDir)\unit-test" />
+  </Target>
 
-    <Target Name="Documentation" DependsOnTargets="Build">
-	</Target>
+  <Target Name="Documentation" DependsOnTargets="Build">
+  </Target>
 
-    <ItemGroup>
-        <ZipFiles Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" />
-        <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
-    </ItemGroup>
-    
-    <Target Name="Package" DependsOnTargets="Build;UnitTest;SourceIndex;Documentation">
-        <MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
-        <Zip
-            Files="@(ZipFiles)"
-            WorkingDirectory="$(OutputDir)"
-            ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
-    </Target>
+  <ItemGroup>
+    <ZipFiles Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" />
+    <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
+  </ItemGroup>
 
-    <Target Name="Upload" DependsOnTargets="Package">
-        <GoogleCode.Upload
-            ProjectName="$(ProjectName)"
-            LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
-            RemoteFile="$(ProjectName)-$(Version).zip"
-            Summary="Build for Version $(Version)"
+  <Target Name="Package" DependsOnTargets="Build;UnitTest;SourceIndex;Documentation">
+    <MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
+    <Zip
+        Files="@(ZipFiles)"
+        WorkingDirectory="$(OutputDir)"
+        ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
+  </Target>
+
+  <Target Name="Upload" DependsOnTargets="Package">
+    <GoogleCode.Upload
+        ProjectName="$(ProjectName)"
+        LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
+        RemoteFile="$(ProjectName)-$(Version).zip"
+        Summary="Build for Version $(Version)"
             />
-    </Target>
-    
-    <Target Name="Release" DependsOnTargets="Upload" />
+  </Target>
+
+  <Target Name="Release" DependsOnTargets="Upload" />
 
 </Project>
