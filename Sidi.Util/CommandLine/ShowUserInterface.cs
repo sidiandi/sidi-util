@@ -21,7 +21,6 @@ namespace Sidi.CommandLine
             this.parser = parser;
         }
 
-        int y = 8;
         int margin = 4;
 
         void Stack(Control parent, Control child, ref int y)
