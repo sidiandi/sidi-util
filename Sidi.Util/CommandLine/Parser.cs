@@ -304,6 +304,11 @@ namespace Sidi.CommandLine
 
         public void Handle(IList<string> args)
         {
+            if (args.Count < 1)
+            {
+                throw new CommandLineException("value missing for option {0}".F(this.Name));
+            }
+            
             if (MemberInfo is FieldInfo)
             {
                 FieldInfo fi = (FieldInfo) MemberInfo;
@@ -464,7 +469,6 @@ namespace Sidi.CommandLine
             if (args.Count == 0)
             {
                 ShowUsage();
-                // ShowGui();
                 return;
             }
 
@@ -486,12 +490,7 @@ namespace Sidi.CommandLine
                     break;
                 }
 
-                if (HandleOption())
-                {
-                    continue;
-                }
-
-                if (HandleAction())
+                if (HandleParserItem())
                 {
                     continue;
                 }
@@ -594,33 +593,6 @@ namespace Sidi.CommandLine
             return false;
         }
 
-        bool HandleOption()
-        {
-            string optionName = args[0];
-            foreach (string op in optionPrefix)
-            {
-                if (args[0].StartsWith(op))
-                {
-                    optionName = args[0].Substring(op.Length);
-                    break;
-                }
-            }
-
-            if (optionName == null)
-            {
-                return false;
-            }
-
-            var option = GetOption(optionName);
-            if (option == null)
-            {
-                return false;
-            }
-            NextArg();
-            option.Handle(args);
-            return true;
-        }
-
         string NextArg()
         {
             string a = args[0];
@@ -676,64 +648,61 @@ namespace Sidi.CommandLine
             return true;
         }
 
-        MemberInfo FuzzyMatch(IEnumerable<MemberInfo> members, string name)
+        /// <summary>
+        /// Detects and removes an option prefix from name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        bool DetectOptionPrefix(ref string name)
         {
-            name = name.ToLower();
-            IEnumerable<MemberInfo> accessibleMembers = members.Where(x => Usage.Get(x) != null);
+            foreach (var p in optionPrefix)
+            {
+                if (name.StartsWith(p))
+                {
+                    name = name.Substring(p.Length);
+                    return true;
+                }
+            }
+            return false;
+        }
 
-            var exact = accessibleMembers.FirstOrDefault(x => IsExactMatch(name, x.Name));
+        IParserItem LookupParserItem(string name, IEnumerable<IParserItem> parserItems)
+        {
+            if (DetectOptionPrefix(ref name))
+            {
+                parserItems = parserItems.OfType<Option>().Cast<IParserItem>();
+            }
+
+            var exact = parserItems.FirstOrDefault(x => IsExactMatch(name, x.Name));
             if (exact != null)
             {
                 return exact;
             }
 
-            IEnumerable<MemberInfo> hits = accessibleMembers.Where(i => IsMatch(name, i.Name));
-
-            if (hits.Any())
+            var hits = parserItems.Where(x => IsMatch(name, x.Name)).ToList();
+            if (hits.Count == 1)
             {
-                if (hits.Count() > 1)
-                {
-                    throw new CommandLineException(
-                        String.Format(
-                            "Argument {0} is ambiguous. Possible arguments are: {1}",
-                            name,
-                            hits.Select(x => x.Name).Aggregate((x, y) => x + ", " + y)
-                            )
-                    );
-                }
-                else
-                {
-                    return hits.First();
-                }
+                return hits.First();
             }
-            else
+            else if (hits.Count == 0)
             {
                 return null;
             }
+            else
+            {
+                throw new CommandLineException(
+                    String.Format(
+                        "Argument {0} is ambiguous. Possible arguments are: {1}",
+                        name,
+                        hits.Select(x => x.Name).Aggregate((x, y) => x + ", " + y)
+                        ));
+            }
         }
 
-        Option GetOption(string name)
+        IParserItem LookupParserItem(string name)
         {
-            foreach (var i in Applications)
-            {
-                var AppType = i.GetType();
-                MemberInfo m = AppType.GetProperty(name);
-                if (m != null) return new Option(i, m);
-                m = AppType.GetField(name);
-                if (m != null) return new Option(i, m);
-            }
-
-            foreach (var i in Applications)
-            {
-                var AppType = i.GetType();
-                var m = FuzzyMatch(AppType.GetProperties(), name);
-                if (m != null) return new Option(i, m);
-
-                m = FuzzyMatch(AppType.GetFields(), name);
-                if (m != null) return new Option(i, m);
-            }
-
-            return null;
+            IEnumerable<IParserItem> parserItems = Items.ToList();
+            return LookupParserItem(name, parserItems);
         }
 
         public static object ParseValue(string stringRepresentation, Type type)
@@ -777,42 +746,40 @@ namespace Sidi.CommandLine
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
-        public Action GetAction(string actionName)
+        bool HandleParserItem()
         {
-            foreach (var i in Applications)
-            {
-                var m = (MethodInfo)FuzzyMatch(i.GetType().GetMethods(), actionName);
-                if (m != null)
-                {
-                    return new Action(i, m);
-                }
-            }
-            return null;
-        }
-
-        bool HandleAction()
-        {
-            string actionName = args[0];
-            var action = GetAction(actionName);
-            if (action == null)
+            var parserItem = LookupParserItem(args[0]);
+            if (parserItem == null)
             {
                 return false;
             }
 
             NextArg();
-            action.Handle(args);
+            if (parserItem is Option)
+            {
+                ((Option)parserItem).Handle(args);
+            }
+            else if (parserItem is Action)
+            {
+                ((Action)parserItem).Handle(args);
+            }
             return true;
         }
 
-        public IEnumerable<IParserItem> Items
+        /// <summary>
+        /// deprecated
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public Action GetAction(string actionName)
         {
-            get
-            {
-                return Actions.Cast<IParserItem>().Concat(Options.Cast<IParserItem>()).OrderBy(x => x.Name);
-            }
+            return (Action) LookupParserItem(actionName, Items.Where(x => x is Action));
         }
 
-        public IEnumerable<Action> Actions
+        /// <summary>
+        /// All available actions and options
+        /// </summary>
+        public IEnumerable<IParserItem> Items
         {
             get
             {
@@ -830,16 +797,7 @@ namespace Sidi.CommandLine
                             yield return new Action(application, i);
                         }
                     }
-                }
-            }
-        }
 
-        public IEnumerable<Option> Options
-        {
-            get
-            {
-                foreach (var application in Applications)
-                {
                     foreach (MemberInfo i in application.GetType().GetMembers())
                     {
                         string u = Usage.Get(i);
@@ -849,6 +807,28 @@ namespace Sidi.CommandLine
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// All actions
+        /// </summary>
+        public IEnumerable<Action> Actions
+        {
+            get
+            {
+                return Items.OfType<Action>();
+            }
+        }
+
+        /// <summary>
+        /// All options
+        /// </summary>
+        public IEnumerable<Option> Options
+        {
+            get
+            {
+                return Items.OfType<Option>();
             }
         }
 
