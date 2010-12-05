@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="Common.Targets" />
+    <PropertyGroup>
+        <ProjectName>sidi-util</ProjectName>
+        <Major>1</Major>
+        <Minor>1</Minor>
+        <Build>0</Build>
+		<MSBuildExtensionsPath>C:\work\sidi-util\lib</MSBuildExtensionsPath>
+    </PropertyGroup>
+    
+    <Import Project="$(MSBuildExtensionsPath)\sidi-util\google.code.Targets"/>
+
+</Project>
