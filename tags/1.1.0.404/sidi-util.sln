@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util", "Sidi.Util\Sidi.Util.csproj", "{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util.Test", "Sidi.Util.Test\Sidi.Util.Test.csproj", "{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07C0FD19-D688-4FDC-92A6-AD445879EE02}"
+	ProjectSection(SolutionItems) = preProject
+		Common.Targets = Common.Targets
+		COPYING = COPYING
+		COPYING.LESSER = COPYING.LESSER
+		get-prerequisites.pl = get-prerequisites.pl
+		header.txt = header.txt
+		NOTICE.txt = NOTICE.txt
+		README.txt = README.txt
+		release.msbuild = release.msbuild
+		TODO.txt = TODO.txt
+		VersionInfo.cs = VersionInfo.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Build", "Sidi.Build\Sidi.Build.csproj", "{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Build.Settings", "Sidi.Build.Settings\Sidi.Build.Settings.csproj", "{01C9E4F9-91F6-4600-9136-0A64EFF07BAB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01C9E4F9-91F6-4600-9136-0A64EFF07BAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01C9E4F9-91F6-4600-9136-0A64EFF07BAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01C9E4F9-91F6-4600-9136-0A64EFF07BAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01C9E4F9-91F6-4600-9136-0A64EFF07BAB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
