@@ -4,6 +4,6 @@
     <OutputPath>$(SolutionDir)..\..\build\$(SolutionName)_$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
 	<LibDir>$(SolutionDir)lib\</LibDir>
-    <!--<NoWarn>1591</NoWarn>-->
+    <NoWarn>1591</NoWarn>
 	</PropertyGroup>
 </Project>

@@ -6,7 +6,7 @@
         <Major>1</Major>
         <Minor>1</Minor>
         <Build>0</Build>
-		<MSBuildExtensionsPath>C:\work\sidi-util\lib</MSBuildExtensionsPath>
+		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\lib</MSBuildExtensionsPath>
     </PropertyGroup>
     
     <Import Project="$(MSBuildExtensionsPath)\sidi-util\google.code.Targets"/>
