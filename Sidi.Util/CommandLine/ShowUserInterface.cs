@@ -187,7 +187,7 @@ namespace Sidi.CommandLine
             try
             {
                 var p = at.ParameterTextBoxes.Select(x => x.Text).ToList();
-                at.Action.Handle(p);
+                at.Action.Handle(p, true);
                 ClearError(button);
             }
             catch (Exception ex)
@@ -227,7 +227,7 @@ namespace Sidi.CommandLine
             var option = (Option)textBox.Tag;
             try
             {
-                option.Handle(new string[] { textBox.Text }.ToList());
+                option.Handle(new string[] { textBox.Text }.ToList(), true);
                 ClearError(textBox);
             }
             catch (Exception ex)
