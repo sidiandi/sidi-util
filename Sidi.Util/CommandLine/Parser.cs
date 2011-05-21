@@ -87,6 +87,8 @@ namespace Sidi.CommandLine
         }
     }
 
+
+
     /// <summary>
     /// Properties marked with this attribute will be stored in the registry
     /// </summary>
@@ -103,6 +105,14 @@ namespace Sidi.CommandLine
     {
     }
 
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class SubCommandAttribute : System.Attribute
+    {
+        public SubCommandAttribute()
+        {
+        }
+    }
+
     public interface IParserItem
     {
         string Usage { get; }
@@ -110,6 +120,7 @@ namespace Sidi.CommandLine
         string Name { get; }
         object Application { get; }
         IEnumerable<string> Categories { get; }
+        void Handle(IList<string> args);
     }
     
     public class Action : IParserItem
@@ -172,7 +183,7 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        public void Handle(List<string> args)
+        public void Handle(IList<string> args)
         {
             var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
@@ -197,11 +208,18 @@ namespace Sidi.CommandLine
                 {
                     parameterValues[i] = Parser.ParseValue(args[i], parameters[i].ParameterType);
                 }
-                args.RemoveRange(0, parameters.Length);
+                foreach (var p in parameters)
+                {
+                    args.RemoveAt(0);
+                }
             }
 
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
-            MethodInfo.Invoke(Application, parameterValues);
+            var returnValue = MethodInfo.Invoke(Application, parameterValues);
+            if (returnValue != null)
+            {
+                Console.WriteLine(returnValue);
+            }
         }
     }
 
@@ -371,6 +389,178 @@ namespace Sidi.CommandLine
         }
     }
 
+    public class SubCommand : IParserItem
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public SubCommand(object application, MemberInfo memberInfo)
+        {
+            Application = application;
+            MemberInfo = memberInfo;
+        }
+
+        public object Application { get; private set; }
+        public MemberInfo MemberInfo { get; private set; }
+
+        public string Name { get { return MemberInfo.Name; } }
+        public string Usage { get { return Sidi.CommandLine.Usage.Get(MemberInfo); } }
+
+        public IEnumerable<string> Categories
+        {
+            get
+            {
+                var c = MemberInfo.GetCustomAttributes(typeof(CategoryAttribute), true)
+                    .Select(x => ((CategoryAttribute)x).Category);
+                return c.Any() ? c : new string[] { String.Empty };
+            }
+        }
+
+        public string Syntax
+        {
+            get
+            {
+                MemberInfo i = MemberInfo;
+                if (i.MemberType == MemberTypes.Field)
+                {
+                    FieldInfo fieldInfo = (FieldInfo)i;
+                    return String.Format(
+                        Parser.CultureInfo,
+                        "{0} [{1}]",
+                        i.Name,
+                        fieldInfo.FieldType.GetInfo()
+                        );
+                }
+                else if (i.MemberType == MemberTypes.Property)
+                {
+                    PropertyInfo propertyInfo = (PropertyInfo)i;
+                    return String.Format(
+                        Parser.CultureInfo,
+                        "{0} [{1}]",
+                        i.Name,
+                        propertyInfo.PropertyType.GetInfo()
+                        );
+                }
+                throw new InvalidDataException(i.GetType().ToString());
+            }
+        }
+
+        public object GetValue()
+        {
+            MemberInfo i = MemberInfo;
+            if (i.MemberType == MemberTypes.Field)
+            {
+                FieldInfo fieldInfo = (FieldInfo)i;
+                return fieldInfo.GetValue(Application);
+            }
+            else if (i.MemberType == MemberTypes.Property)
+            {
+                PropertyInfo propertyInfo = (PropertyInfo)i;
+                return propertyInfo.GetValue(Application, new object[] { });
+            }
+            throw new InvalidDataException(i.MemberType.ToString());
+        }
+
+        public Type Type
+        {
+            get
+            {
+                MemberInfo i = MemberInfo;
+                if (i.MemberType == MemberTypes.Field)
+                {
+                    FieldInfo fieldInfo = (FieldInfo)i;
+                    return fieldInfo.FieldType;
+                }
+                else if (i.MemberType == MemberTypes.Property)
+                {
+                    PropertyInfo propertyInfo = (PropertyInfo)i;
+                    return propertyInfo.PropertyType;
+                }
+                throw new InvalidDataException(i.MemberType.ToString());
+            }
+        }
+
+        public void PrintScriptFileSample(TextWriter w)
+        {
+            w.Write("# "); w.WriteLine(Usage);
+            w.Write("# "); w.WriteLine(Syntax);
+            w.WriteLine();
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Subcommand {0}", Name);
+        }
+
+        public void Handle(IList<string> args)
+        {
+            var p = new Parser(CommandInstance);
+            log.InfoFormat("{0}", this);
+            p.Parse(args);
+        }
+
+        object CommandInstance
+        {
+            get
+            {
+                var i = GetValue();
+                if (i == null)
+                {
+                    if (MemberInfo is FieldInfo)
+                    {
+                        var fi = (FieldInfo)MemberInfo;
+                        i = Activator.CreateInstance(fi.FieldType);
+                        fi.SetValue(Application, i);
+                    }
+                    else if (MemberInfo is PropertyInfo)
+                    {
+                        var pi = (PropertyInfo)MemberInfo;
+                                            i = Activator.CreateInstance(pi.PropertyType);
+
+                        pi.SetValue(Application, i, new object[]{});
+                    }
+                }
+                return i;
+            }
+        }
+
+        public string UsageText
+        {
+            get
+            {
+                string indent = "  ";
+                return String.Format(
+                    Parser.CultureInfo,
+                    "{0} [{1}]\r\n{2}\r\n{3}",
+                    Name,
+                    Type.GetInfo(),
+                    "default: {0}".F(IsPassword ? "-- hidden --" : GetValue()).Indent(indent),
+                    Usage.Indent(indent)
+                    );
+            }
+        }
+
+        public bool IsPersistent
+        {
+            get
+            {
+                return MemberInfo.GetCustomAttributes(typeof(PersistentAttribute), true).Any();
+            }
+        }
+
+        public bool IsPassword
+        {
+            get
+            {
+                return MemberInfo.GetCustomAttributes(typeof(PasswordAttribute), true).Any();
+            }
+        }
+
+        public static bool IsSubCommand(MemberInfo mi)
+        {
+            return mi.GetCustomAttributes(typeof(SubCommandAttribute), true).Any();
+        }
+    }
+
     public class CommandLineException : Exception
     {
         public CommandLineException(string reason)
@@ -460,11 +650,16 @@ namespace Sidi.CommandLine
             }
         }
 
-        List<string> args;
+        IList<string> args;
 
         public void Parse(string[] a_args)
         {
-            args = new List<string>(a_args);
+            Parse(a_args.ToList());
+        }
+
+        public void Parse(IList<string> a_args)
+        {
+            this.args = a_args;
 
             if (args.Count == 0)
             {
@@ -773,14 +968,7 @@ namespace Sidi.CommandLine
             }
 
             NextArg();
-            if (parserItem is Option)
-            {
-                ((Option)parserItem).Handle(args);
-            }
-            else if (parserItem is Action)
-            {
-                ((Action)parserItem).Handle(args);
-            }
+            parserItem.Handle(args);
             return true;
         }
 
@@ -818,10 +1006,20 @@ namespace Sidi.CommandLine
 
                     foreach (MemberInfo i in application.GetType().GetMembers())
                     {
-                        string u = Usage.Get(i);
-                        if ((i is FieldInfo || i is PropertyInfo) && u != null)
+                        if (SubCommand.IsSubCommand(i))
                         {
-                            yield return new Option(application, i);
+                            if ((i is FieldInfo || i is PropertyInfo))
+                            {
+                                yield return new SubCommand(application, i);
+                            }
+                        }
+                        else
+                        {
+                            string u = Usage.Get(i);
+                            if ((i is FieldInfo || i is PropertyInfo) && u != null)
+                            {
+                                yield return new Option(application, i);
+                            }
                         }
                     }
                 }
