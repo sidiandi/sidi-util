@@ -27,6 +27,7 @@ using Sidi.Util;
 using System.ComponentModel;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace Sidi.CommandLine
 {
@@ -120,7 +121,7 @@ namespace Sidi.CommandLine
         string Name { get; }
         object Application { get; }
         IEnumerable<string> Categories { get; }
-        void Handle(IList<string> args);
+        void Handle(IList<string> args, bool execute);
     }
     
     public class Action : IParserItem
@@ -183,7 +184,7 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        public void Handle(IList<string> args)
+        public void Handle(IList<string> args, bool execute)
         {
             var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
@@ -215,10 +216,13 @@ namespace Sidi.CommandLine
             }
 
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
+            if (execute)
+            {
             var returnValue = MethodInfo.Invoke(Application, parameterValues);
             if (returnValue != null)
             {
                 Console.WriteLine(returnValue);
+            }
             }
         }
     }
@@ -320,7 +324,7 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        public void Handle(IList<string> args)
+        public void Handle(IList<string> args, bool execute)
         {
             if (args.Count < 1)
             {
@@ -331,7 +335,7 @@ namespace Sidi.CommandLine
             {
                 FieldInfo fi = (FieldInfo) MemberInfo;
                 object v = Parser.ParseValue(args[0], fi.FieldType);
-                fi.SetValue(Application, v);
+                if (execute) fi.SetValue(Application, v);
                 args.RemoveAt(0);
                 if (!IsPassword)
                 {
@@ -342,7 +346,7 @@ namespace Sidi.CommandLine
             {
                 PropertyInfo pi = (PropertyInfo)MemberInfo;
                 object v = Parser.ParseValue(args[0], pi.PropertyType);
-                pi.SetValue(Application, v, new object[] { });
+                if (execute) pi.SetValue(Application, v, new object[] { });
                 args.RemoveAt(0);
                 if (!IsPassword)
                 {
@@ -491,11 +495,18 @@ namespace Sidi.CommandLine
             return String.Format("Subcommand {0}", Name);
         }
 
-        public void Handle(IList<string> args)
+        public void Handle(IList<string> args, bool execute)
         {
             var p = new Parser(CommandInstance);
             log.InfoFormat("{0}", this);
-            p.Parse(args);
+            if (execute)
+            {
+                p.Parse(args);
+            }
+            else
+            {
+                p.Check(args);
+            }
         }
 
         object CommandInstance
@@ -652,6 +663,36 @@ namespace Sidi.CommandLine
 
         IList<string> args;
 
+        public void Check(string[] args)
+        {
+            Check(args.ToList());
+        }
+
+        /// <summary>
+        /// Checks if the arguments are syntactically correct, but does not execute 
+        /// anything. Throws the same exceptions as Parse when the arguments contain
+        /// an error.
+        /// </summary>
+        /// <param name="a_args"></param>
+        public void Check(IList<string> a_args)
+        {
+            execute = false;
+            try
+            {
+                Parse(a_args);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                execute = true;
+            }
+        }
+
+        bool execute = true;
+
         public void Parse(string[] a_args)
         {
             Parse(a_args.ToList());
@@ -713,7 +754,7 @@ namespace Sidi.CommandLine
                         {
                             valueString = valueString.Decrypt(preferencesPassword);
                         }
-                        o.Handle(new string[] { valueString }.ToList());
+                        o.Handle(new string[] { valueString }.ToList(), true);
                     }
                 }
                 catch (Exception)
@@ -968,7 +1009,7 @@ namespace Sidi.CommandLine
             }
 
             NextArg();
-            parserItem.Handle(args);
+            parserItem.Handle(args, execute);
             return true;
         }
 
@@ -1274,6 +1315,33 @@ namespace Sidi.CommandLine
                         }
                     }
                 }
+            }
+        }
+
+        [DllImport("shell32.dll", SetLastError = true)]
+        static extern IntPtr CommandLineToArgvW(
+            [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
+
+        public static string[] CommandLineToArgs(string commandLine)
+        {
+            int argc;
+            var argv = CommandLineToArgvW(commandLine, out argc);
+            if (argv == IntPtr.Zero)
+                throw new System.ComponentModel.Win32Exception();
+            try
+            {
+                var args = new string[argc];
+                for (var i = 0; i < args.Length; i++)
+                {
+                    var p = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
+                    args[i] = Marshal.PtrToStringUni(p);
+                }
+
+                return args;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(argv);
             }
         }
     }
