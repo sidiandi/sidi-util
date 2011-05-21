@@ -64,8 +64,7 @@
       <HintPath>$(LibDir)\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(LibDir)\log4net\bin\net\2.0\release\log4net.dll</HintPath>
+      <HintPath>..\lib\log4net\bin\net\2.0\debug\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -73,8 +72,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(LibDir)\SQLite.NET\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\lib\SQLite.NET\bin\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
