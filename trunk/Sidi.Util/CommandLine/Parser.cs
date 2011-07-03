@@ -407,7 +407,16 @@ namespace Sidi.CommandLine
         public MemberInfo MemberInfo { get; private set; }
 
         public string Name { get { return MemberInfo.Name; } }
-        public string Usage { get { return Sidi.CommandLine.Usage.Get(MemberInfo); } }
+        public string Usage { get 
+        { 
+            var u = Sidi.CommandLine.Usage.Get(MemberInfo);
+            if (u != null)
+            {
+                return u;
+            }
+            return Sidi.CommandLine.Usage.Get(Type);
+        }
+        }
 
         public IEnumerable<string> Categories
         {
@@ -541,10 +550,8 @@ namespace Sidi.CommandLine
                 string indent = "  ";
                 return String.Format(
                     Parser.CultureInfo,
-                    "{0} [{1}]\r\n{2}\r\n{3}",
+                    "{0}\r\n{1}",
                     Name,
-                    Type.GetInfo(),
-                    "default: {0}".F(IsPassword ? "-- hidden --" : GetValue()).Indent(indent),
                     Usage.Indent(indent)
                     );
             }
@@ -1089,6 +1096,17 @@ namespace Sidi.CommandLine
             }
         }
 
+        /// <summary>
+        /// All options
+        /// </summary>
+        public IEnumerable<SubCommand> SubCommands
+        {
+            get
+            {
+                return Items.OfType<SubCommand>();
+            }
+        }
+
         public string ApplicationName
         {
             get
@@ -1224,6 +1242,20 @@ namespace Sidi.CommandLine
                     w.WriteLine("{0}Options", categoryText);
 
                     foreach (Option i in options)
+                    {
+                        w.WriteLine();
+                        w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));
+                    }
+                }
+
+                var subCommands = SubCommands.Where(x => x.Categories.Contains(category));
+
+                if (subCommands.Any())
+                {
+                    w.WriteLine();
+                    w.WriteLine("{0}Subcommands", categoryText);
+
+                    foreach (SubCommand i in subCommands)
                     {
                         w.WriteLine();
                         w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));
