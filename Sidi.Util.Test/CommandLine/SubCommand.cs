@@ -36,6 +36,8 @@ namespace Sidi.CommandLine
     [TestFixture]
     public class SubCommandTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [Usage("Test app")]
         public class App
         {
@@ -64,6 +66,17 @@ namespace Sidi.CommandLine
             var app = new App();
             var p = new Parser(app);
             p.Parse(new string[] { "Math", "Add", "1", "1", "Multiply", "10", "10"});
+        }
+
+        [Test]
+        public void HelpMessage()
+        {
+            var app = new App();
+            var p = new Parser(app);
+            var w = new StringWriter();
+            p.WriteUsage(w);
+            log.Info(w.ToString());
+            Assert.IsTrue(w.ToString().Contains("Math"));
         }
     }
 }
