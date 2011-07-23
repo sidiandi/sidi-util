@@ -72,6 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCalculationTest.cs" />
+    <Compile Include="Cache\LruCacheBackgroundTest.cs" />
+    <Compile Include="Cache\LruCacheTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="DumpExtensionsTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />

@@ -83,6 +83,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\ICache.cs" />
+    <Compile Include="Cache\LruCache.cs" />
+    <Compile Include="Cache\LruCacheBackground.cs" />
     <Compile Include="Util\ArchiveHandler.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
     <Compile Include="Util\ByteArrayEx.cs" />
