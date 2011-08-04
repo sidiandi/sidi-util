@@ -74,18 +74,7 @@ namespace Sidi.Cache
 
         public void Clear()
         {
-            lock (this)
-            {
-                if (typeof(IDisposable).IsAssignableFrom(typeof(Value)))
-                {
-                    foreach (var i in dictionary)
-                    {
-                        ((IDisposable)i.Value.value).Dispose();
-                    }
-                }
-                dictionary.Clear();
-                usage.Clear();
-            }
+            ShrinkTo(0);
         }
 
         /// <summary>
