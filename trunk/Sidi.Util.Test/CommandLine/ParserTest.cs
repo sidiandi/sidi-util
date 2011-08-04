@@ -385,6 +385,22 @@ namespace Sidi.CommandLine
             Assert.IsTrue(p.IsMatch("rufro", "RunFromLocal"));
             Assert.IsTrue(p.IsMatch("rfrlocal", "RunFromLocal"));
             Assert.IsFalse(p.IsMatch("rfrlocale", "RunFromLocal"));
+            Assert.IsTrue(p.IsMatch("red", "RemoveEmptyDirectories"));
+            Assert.IsTrue(p.IsMatch("reed", "RemoveEmptyDirectories"));
+            Assert.IsTrue(p.IsMatch("remd", "RemoveEmptyDirectories"));
+            Assert.IsFalse(p.IsMatch("remod", "RemoveEmptyDirectories"));
+            Assert.IsTrue(p.IsMatch("remoed", "RemoveEmptyDirectories"));
+        }
+
+        [Test]
+        public void IteratorSemantics()
+        {
+            var s = "sidi";
+            var a = s.GetEnumerator();
+            a.MoveNext();
+            var b = (CharEnumerator)a.Clone();
+            a.MoveNext();
+            Assert.AreNotEqual(a.Current, b.Current);
         }
 
         public class PreferencesTestApplication

@@ -880,33 +880,36 @@ namespace Sidi.CommandLine
 
         public bool IsMatch(string userInput, string memberName)
         {
-            var m = memberName.GetEnumerator();
-            foreach (var u in userInput)
+            return IsMatch(userInput, memberName, 0, 0);
+        }
+
+        bool IsMatch(string a, string b, int ia, int ib)
+        {
+            if (ia >= a.Length)
             {
-                if (!m.MoveNext())
-                {
-                    return false;
-                }
-
-                if (Char.ToLower(u) == Char.ToLower(m.Current))
-                {
-                    continue;
-                }
-
-                while (Char.IsLower(m.Current))
-                {
-                    if (!m.MoveNext())
-                    {
-                        return false;
-                    }
-                }
-
-                if (Char.ToLower(u) != Char.ToLower(m.Current))
-                {
-                    return false;
-                }
+                return true;
             }
-            return true;
+
+            if (ib >= b.Length)
+            {
+                return false;
+            }
+
+            if (Char.ToLower(a[ia]) != Char.ToLower(b[ib]))
+            {
+                return false;
+            }
+
+            var nc = ib + 1;
+            for (; nc < b.Length && !Char.IsUpper(b[nc]); ++nc)
+            {
+            }
+            if (IsMatch(a, b, ia + 1, nc))
+            {
+                return true;
+            }
+
+            return IsMatch(a, b, ia + 1, ib + 1);
         }
 
         /// <summary>
