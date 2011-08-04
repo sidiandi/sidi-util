@@ -206,6 +206,7 @@ namespace Sidi.Cache
                             {
                                 Monitor.Enter(this);
                             }
+                            log.InfoFormat("key={0}, queue={1}", k.Key, provideValueRequestQueue.Count);
                             cache.Update(k.Key, ce);
 
                             Monitor.Exit(this);
