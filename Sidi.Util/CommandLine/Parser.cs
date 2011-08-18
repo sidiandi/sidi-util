@@ -648,7 +648,7 @@ namespace Sidi.CommandLine
 
         public static void Run(object application, string[] args)
         {
-            Parser parser = new Parser(application);
+            Parser parser = new Parser(application);    
             try
             {
                 parser.LoadPreferences();

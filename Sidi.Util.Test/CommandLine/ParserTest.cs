@@ -413,6 +413,10 @@ namespace Sidi.CommandLine
             [Password]
             [Persistent]
             public string Password { set; get; }
+
+            [Usage("other option, is null by default")]
+            [Persistent]
+            public string AnotherOption { set; get; }
         }
 
         [Test]
