@@ -2,7 +2,7 @@
   <PropertyGroup>
     <_SolutionProjectConfiguration>Debug|Any CPU</_SolutionProjectConfiguration>
     <_SolutionProjectToolsVersion>3.5</_SolutionProjectToolsVersion>
-    <_SolutionProjectCacheVersion>3.5</_SolutionProjectCacheVersion>
+    <_SolutionProjectCacheVersion>4.0</_SolutionProjectCacheVersion>
   </PropertyGroup>
   <ItemGroup>
     <_SolutionProjectProjects Include="Sidi.Build.Settings\Sidi.Build.Settings.csproj" />
@@ -58,15 +58,16 @@
     <AspNetConfiguration>$(Configuration)</AspNetConfiguration>
   </PropertyGroup>
   <PropertyGroup>
-    <SolutionDir>C:\work\sidi-util\</SolutionDir>
+    <SolutionDir>D:\work\sidi-util\</SolutionDir>
     <SolutionExt>.sln</SolutionExt>
     <SolutionFileName>sidi-util.sln</SolutionFileName>
     <SolutionName>sidi-util</SolutionName>
-    <SolutionPath>C:\work\sidi-util\sidi-util.sln</SolutionPath>
+    <SolutionPath>D:\work\sidi-util\sidi-util.sln</SolutionPath>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '2.0'">v2.0</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' != '2.0'">v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and ('$(MSBuildToolsVersion)' == '3.5' or '$(MSBuildToolsVersion)' == '3.0')">v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '4.0'">v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Any CPU') ">
     <CurrentSolutionConfigurationContents>
