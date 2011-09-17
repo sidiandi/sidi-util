@@ -16,7 +16,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -33,6 +33,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,6 +81,12 @@
     <Compile Include="GraMath.cs" />
     <Compile Include="IntSetTest.cs" />
     <Compile Include="IO\CopyTest.cs" />
+    <Compile Include="IO\Long\Directory.cs" />
+    <Compile Include="IO\Long\Enum.cs" />
+    <Compile Include="IO\Long\File.cs" />
+    <Compile Include="IO\Long\EnumConfig.cs" />
+    <Compile Include="IO\Long\FileSystemInfo.cs" />
+    <Compile Include="IO\Long\LongName.cs" />
     <Compile Include="IO\PathExTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
@@ -89,16 +96,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\VersionInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
+    <Compile Include="Util\BinaryPrefix.cs" />
+    <Compile Include="Util\SizeCount.cs" />
     <Compile Include="Util\StringExTest.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="TokenizerUt.cs" />
     <Compile Include="UpdateCheckTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sidi.Util\Sidi.Util.csproj">
-      <Project>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</Project>
-      <Name>Sidi.Util</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="unit-test\UpdateInfo.xml">
@@ -121,6 +124,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sidi.Util\Sidi.Util.csproj">
+      <Project>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</Project>
+      <Name>Sidi.Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -21,7 +21,7 @@
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Sidi.Util.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <PublishUrl>http://localhost/Sidi.Util/</PublishUrl>
     <Install>true</Install>
@@ -37,6 +37,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,9 +76,7 @@
       <HintPath>..\lib\SQLite.NET\bin\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -86,8 +85,17 @@
     <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\LruCache.cs" />
     <Compile Include="Cache\LruCacheBackground.cs" />
+    <Compile Include="IO\Long\Directory.cs" />
+    <Compile Include="IO\Long\Enum.cs" />
+    <Compile Include="IO\Long\File.cs" />
+    <Compile Include="IO\Long\FileEnum.cs" />
+    <Compile Include="IO\Long\FileSystemInfo.cs" />
+    <Compile Include="IO\Long\FindData.cs" />
+    <Compile Include="IO\Long\Kernel32.cs" />
+    <Compile Include="IO\Long\LongName.cs" />
     <Compile Include="Util\ArchiveHandler.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
+    <Compile Include="Util\BinaryPrefix.cs" />
     <Compile Include="Util\ByteArrayEx.cs" />
     <Compile Include="CommandLine\ShowHelp.cs" />
     <Compile Include="CommandLine\ShowUserInterface.cs" />
