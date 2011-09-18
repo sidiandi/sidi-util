@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <StartProgram>C:\work\sidi-util\lib\NUnit\bin\net-2.0\nunit.exe</StartProgram>
+    <StartArguments>Sidi.Util.Test.dll</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <StartArguments>asds</StartArguments>
+  </PropertyGroup>
   <Import Project="..\Common.Targets" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartArguments>$(TargetDir)Sidi.Util.Test.dll</StartArguments>

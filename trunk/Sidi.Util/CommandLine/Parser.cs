@@ -629,21 +629,26 @@ namespace Sidi.CommandLine
             cultureInfo.DateTimeFormat = dtfi;
         }
 
-        public Parser(object application)
-            : this()
+        public Parser(params object[] applications)
+        : this()
         {
-            Applications.Add(application);
+            AddDefaultHandlers();
+            Applications.AddRange(applications);
         }
 
-        public Parser()
+        void AddDefaultHandlers()
+        {
+            Applications.Add(new ShowHelp(this));
+            Applications.Add(new ShowUserInterface(this));
+            Applications.Add(new WebServer(this));
+        }
+
+        internal Parser()
         {
             cultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
-
-            Applications.Add(new ShowHelp(this));
-            Applications.Add(new ShowUserInterface(this));
         }
 
         public static void Run(object application, string[] args)

@@ -30,8 +30,10 @@ using cm = System.ComponentModel;
 using System.IO;
 using Sidi.Util;
 using System.Linq;
+using System.Threading;
+using Sidi.CommandLine;
 
-namespace Sidi.CommandLine
+namespace Sidi.CommandLine.Test
 {
     [TestFixture]
     public class ParserTest : TestBase
@@ -109,14 +111,20 @@ namespace Sidi.CommandLine
         [Test, Explicit("interactive")]
         public void UserInterface()
         {
-            Parser p = new Parser();
-            p.Applications.Add(new TestApp());
-            p.Applications.Add(new TestMultiLineUsage());
-            p.Applications.Add(new MinimalTestApp());
-            p.Applications.Add(new TestAppWithDescription());
-            p.Applications.Add(new TestAppWithStringList());
+            var p = ParserWithAllTestApps();
             p.Parse(new string[]{"ui"});
         }
+
+        Parser ParserWithAllTestApps()
+        {
+            return new Parser(
+                new TestApp(),
+                new TestMultiLineUsage(),
+                new MinimalTestApp(),
+                new TestAppWithDescription(),
+                new TestAppWithStringList());
+        }
+
 
         [Test]
         public void Enum()
@@ -256,18 +264,24 @@ namespace Sidi.CommandLine
             [Usage("process all following arguments")]
             public void Action(List<string> args)
             {
+                foreach (var a in args)
+                {
+                    Console.WriteLine("argument: {0}", a);
+                }
                 args.Clear();
             }
 
-            public void Add(int x, int y)
+            public int Add(int x, int y)
             {
+                return x + y;
             }
 
             [Usage("adds a list of numbers")]
-            public void AddList(List<string> list)
+            public double AddList(List<string> list)
             {
-                log.Info(list.Select(x => Double.Parse(x)).Aggregate(0.0, (x, y) => x + y));
+                var result = list.Select(x => Double.Parse(x)).Aggregate(0.0, (x, y) => x + y);
                 list.Clear();
+                return result;
             }
 
             [Usage("adds")]
@@ -277,14 +291,36 @@ namespace Sidi.CommandLine
             }
 
             [Usage("adds")]
-            public void SubtractInt(int x, int y)
+            public int SubtractInt(int x, int y)
             {
+                return x - y;
             }
 
             [Usage("subtracts")]
             public double Subtract(double x, double y)
             {
                 return x - y;
+            }
+
+            [Usage("Writes lots of text to Console.Out")]
+            public void MuchText(int lines)
+            {
+                for (int i = 0; i < lines; ++i)
+                {
+                    Console.WriteLine("This is line {0} of a long text", i);
+                    Thread.Sleep(100);
+                }
+            }
+
+            [Usage("Directory list")]
+            public void Files(string dir)
+            {
+                var e = new Sidi.IO.Long.Enum();
+                e.AddRoot(new Sidi.IO.Long.LongName(dir));
+                foreach (var f in e.Depth())
+                {
+                    Console.WriteLine(f.FullPath.NoPrefix);
+                }
             }
         }
 
@@ -505,5 +541,18 @@ namespace Sidi.CommandLine
             p.Parse(new string[] { "--ru", "1"});
         }
 
+        [Test]
+        public void Serve()
+        {
+            var p = new Parser(new TestAppWithStringList());
+            p.Parse(new string[]{"Serve"});
+        }
+
+        [Test]
+        public void Serve2()
+        {
+            var p = ParserWithAllTestApps();
+            p.Parse(new string[] { "Serve" });
+        }
     }
 }

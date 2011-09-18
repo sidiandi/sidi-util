@@ -95,7 +95,6 @@ namespace Sidi.IO.Long
                 {
                     case ERROR_ALREADY_EXISTS:
                         return;
-                        break;
                     case ERROR_PATH_NOT_FOUND:
                         {
                             var p = path.ParentDirectory;

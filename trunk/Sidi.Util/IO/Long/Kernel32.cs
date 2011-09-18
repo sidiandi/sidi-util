@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Com = System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 
@@ -147,9 +148,9 @@ namespace Sidi.IO.Long
         struct WIN32_FILE_ATTRIBUTE_DATA
         {
             public System.IO.FileAttributes dwFileAttributes;
-            public FILETIME ftCreationTime;
-            public FILETIME ftLastAccessTime;
-            public FILETIME ftLastWriteTime;
+            public Com.FILETIME ftCreationTime;
+            public Com.FILETIME ftLastAccessTime;
+            public Com.FILETIME ftLastWriteTime;
             public uint nFileSizeHigh;
             public uint nFileSizeLow;
         }
