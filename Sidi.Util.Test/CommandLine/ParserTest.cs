@@ -59,7 +59,7 @@ namespace Sidi.CommandLine.Test
         };
 
         [Usage("App usage")]
-        class TestApp
+        public class TestApp
         {
             [Usage("sample action")]
             public void SayHello()
@@ -323,6 +323,9 @@ namespace Sidi.CommandLine.Test
                     Console.WriteLine(f.FullPath.NoPrefix);
                 }
             }
+
+            [SubCommand]
+            public TestApp Test { set; get; }
         }
 
         [Test]
@@ -556,11 +559,26 @@ namespace Sidi.CommandLine.Test
             var ws = new WebServer(p);
             ws.Prefix = "http://localhost:49160/";
             ws.StartServer();
-            var wc = new WebClient();
-            var result = wc.DownloadString("http://localhost:49160/Add?x=122&y=1");
-            Assert.IsTrue(result.Contains("123"));
-            log.Info(result);
-            ws.StopServer();
+            try
+            {
+                var wc = new WebClient();
+                string result;
+
+                result = wc.DownloadString("http://localhost:49160/");
+                Assert.IsTrue(result.Contains("Test"));
+                log.Info(result);
+
+                result = wc.DownloadString("http://localhost:49160/Add?x=122&y=1");
+                Assert.IsTrue(result.Contains("123"));
+
+                result = wc.DownloadString("http://localhost:49160/Test/SayHello");
+                Assert.IsTrue(result.Contains("Doe"), result);
+                log.Info(result);
+            }
+            finally
+            {
+                ws.StopServer();
+            }
         }
     }
 }

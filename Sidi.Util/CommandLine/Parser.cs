@@ -218,7 +218,7 @@ namespace Sidi.CommandLine
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
             if (execute)
             {
-            var returnValue = MethodInfo.Invoke(Application, parameterValues);
+                var returnValue = MethodInfo.Invoke(Application, parameterValues);
             if (returnValue != null)
             {
                 Console.WriteLine(returnValue);
@@ -518,7 +518,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        object CommandInstance
+        public object CommandInstance
         {
             get
             {
@@ -1205,8 +1205,7 @@ namespace Sidi.CommandLine
             get
             {
                 var categories =
-                    Actions.SelectMany(x => x.Categories)
-                    .Concat(Options.SelectMany(x => x.Categories))
+                    Items.SelectMany(x => x.Categories)
                     .Distinct().ToList();
                 categories.Sort();
                 return categories;
