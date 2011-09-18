@@ -18,7 +18,7 @@ namespace Sidi.IO.Long
         {
             private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            [Test]
+            [Test, Explicit]
             public void Depth()
             {
                 var e = new Enum();
@@ -29,7 +29,7 @@ namespace Sidi.IO.Long
                 }
             }
 
-            [Test]
+            [Test, Explicit]
             public void Breadth()
             {
                 var e = new Enum();

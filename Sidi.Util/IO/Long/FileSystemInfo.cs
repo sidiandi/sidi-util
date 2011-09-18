@@ -150,12 +150,12 @@ namespace Sidi.IO.Long
 
         static DateTime ToDateTime(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
         {
-            return DateTime.FromFileTime(((long)fileTime.dwHighDateTime << 32) | fileTime.dwLowDateTime);
+            return DateTime.FromFileTime((long)((((ulong)fileTime.dwHighDateTime) << 32) | (ulong) fileTime.dwLowDateTime));
         }
 
         static DateTime ToDateTimeUtc(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
         {
-            return DateTime.FromFileTimeUtc(((long)fileTime.dwHighDateTime << 32) | fileTime.dwLowDateTime);
+            return DateTime.FromFileTimeUtc((long)((((ulong)fileTime.dwHighDateTime) << 32) | (ulong)fileTime.dwLowDateTime));
         }
 
         public DateTime LastWriteTime
