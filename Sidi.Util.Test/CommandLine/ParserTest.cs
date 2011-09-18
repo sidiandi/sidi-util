@@ -32,6 +32,7 @@ using Sidi.Util;
 using System.Linq;
 using System.Threading;
 using Sidi.CommandLine;
+using System.Net;
 
 namespace Sidi.CommandLine.Test
 {
@@ -541,18 +542,25 @@ namespace Sidi.CommandLine.Test
             p.Parse(new string[] { "--ru", "1"});
         }
 
-        [Test]
+        [Test, Explicit("interactive")]
         public void Serve()
         {
             var p = new Parser(new TestAppWithStringList());
-            p.Parse(new string[]{"Serve"});
+            p.Parse(new string[] { "Prefix", "http://localhost:49160/", "Serve" });
         }
 
-        [Test]
+        [Test, Explicit("interactive")]
         public void Serve2()
         {
-            var p = ParserWithAllTestApps();
-            p.Parse(new string[] { "Serve" });
+            var p = new Parser(new TestAppWithStringList());
+            var ws = new WebServer(p);
+            ws.Prefix = "http://localhost:49160/";
+            ws.StartServer();
+            var wc = new WebClient();
+            var result = wc.DownloadString("http://localhost:49160/Add?x=122&y=1");
+            Assert.IsTrue(result.Contains("123"));
+            log.Info(result);
+            ws.StopServer();
         }
     }
 }
