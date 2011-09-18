@@ -11,6 +11,8 @@ using System.Net;
 using System.IO;
 using System.ComponentModel;
 using System.Net.Sockets;
+using System.Threading;
+using System.Web;
 
 namespace Sidi.CommandLine
 {
@@ -94,6 +96,26 @@ namespace Sidi.CommandLine
             throw new Exception("no free port for HttpListener");
         }
 
+        HttpListener httpListener = null;
+        Thread listenThread;
+
+        public void StartServer()
+        {
+            listenThread = new Thread(new ThreadStart(() =>
+                {
+                    this.Serve();
+                }));
+
+            listenThread.Start();
+        }
+
+        public void StopServer()
+        {
+            httpListener.Stop();
+            listenThread.Join();
+            listenThread = null;
+        }
+
         [Usage("Offers program functions on an embedded web server.")]
         [Category(WebServerCategory)]
         public void Serve()
@@ -108,7 +130,6 @@ namespace Sidi.CommandLine
                 }));
 
 
-            HttpListener httpListener = null;
             if (Prefix == null)
             {
                 httpListener = StartHttpListenerOnFreePort();
@@ -120,16 +141,18 @@ namespace Sidi.CommandLine
                 httpListener.Start();
             }
 
-            for (;;)
+            for (; ; )
             {
-                var context = httpListener.GetContext();
-                if (context.Request.Url.ToString().Contains("exit"))
+                try
+                {
+                    var context = httpListener.GetContext();
+                    Handle(context);
+                }
+                catch
                 {
                     break;
                 }
-                Handle(context);
             }
-            httpListener.Stop();
         }
 
         void HtmlHeader(TextWriter o)
@@ -140,7 +163,7 @@ namespace Sidi.CommandLine
 <title>{0}</title>
 </head>
 <body>
-<small>{1}</small>
+<small><a href=""/"">Home</a> | {1}</small>
 <hr />", parser.ApplicationName, parser.Info.Lines().Join("<br>"));
 
         }
@@ -184,12 +207,24 @@ namespace Sidi.CommandLine
             }
         }
 
+        void Form(TextWriter o, IParserItem item)
+        {
+            if (item is Action)
+            {
+                Form(o, (Action)item);
+            }
+            else if (item is Option)
+            {
+                Form(o, (Option)item);
+            }
+        }
+
         void OverviewItem(TextWriter o, IParserItem item)
         {
             if (item is Action)
             {
                 var action = (Action) item;
-                o.WriteLine(@"<p><a href=""/{0}?form"">{0}</a> - {1}", action.Name, action.Usage);
+                o.WriteLine(@"<p><a href=""/{0}.form"">{0}</a> - {1}", action.Name, action.Usage);
             }
             else if (item is Option)
             {
@@ -203,7 +238,7 @@ namespace Sidi.CommandLine
 
         void Form(TextWriter o, Action a)
         {
-            o.WriteLine(@"<form action=""/{0}"" method=""get"">
+            o.WriteLine(@"<form action=""{0}.html"" method=""get"">
 <h2>{0}</h2>
 <p>{2}</p>
 {1}
@@ -249,6 +284,50 @@ namespace Sidi.CommandLine
                 .ToList();
         }
 
+        void Run(IParserItem item, HttpListenerContext c, TextWriter cw)
+        {
+            TextWriter oldOut = Console.Out;
+            TextWriter oldError = Console.Error;
+            try
+            {
+                Console.SetOut(cw);
+                Console.SetError(cw);
+                if (item is Action)
+                {
+                    var action = (Action)item;
+                    action.Handle(GetParameterList(action.MethodInfo.GetParameters(), c.Request.Url), true);
+                }
+                else if (item is Option)
+                {
+                    var option = (Option) item;
+                    Console.WriteLine(option.GetValue());
+                }
+            }
+            catch (Exception e)
+            {
+                cw.WriteLine(e.ToString());
+            }
+            finally
+            {
+                Console.SetOut(oldOut);
+                Console.SetError(oldError);
+            }
+        }
+
+                    //else if (item is Option)
+                    //{
+                    //    var option = (Option) item;
+                    //    using (var o = new StreamWriter(c.Response.OutputStream))
+                    //    {
+                    //        o.WriteLine(option.GetValue().SafeToString());
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    c.Response.StatusCode = (int) HttpStatusCode.NotFound;
+                    //}
+
+        
         void Handle(HttpListenerContext c)
         {
             try
@@ -256,56 +335,55 @@ namespace Sidi.CommandLine
                 var parts = c.Request.Url.AbsolutePath.Split(new char[] { '/' });
                 if (parts.Length > 1 && !String.IsNullOrEmpty(parts[1]))
                 {
-                    var item = parser.Items.FirstOrDefault(x => parser.IsExactMatch(parts[1], x.Name));
-                    if (item is Action)
-                    {
-                        var action = (Action)item;
-                        using (var o = new StreamWriter(c.Response.OutputStream))
-                        {
-                            HtmlHeader(o);
+                    var page = parts.Last();
+                    var dotParts = page.Split('.');
+                    var itemName = dotParts.First();
+                    var mode = dotParts.Last();
+                    var item = parser.Items.FirstOrDefault(x => parser.IsExactMatch(itemName, x.Name));
+                    var query = HttpUtility.ParseQueryString(c.Request.Url.Query);
 
-                            if (c.Request.Url.Query == "?form")
-                            {
-                                Form(o, action);
-                            }
-                            else
-                            {
-                                TextWriter oldOut = Console.Out;
-                                TextWriter oldError = Console.Error;
-                                using (var cw = new CodeWriter(o))
+                    if (item != null)
+                    {
+                        switch (mode)
+                        {
+                            case "form":
                                 {
-                                    try
+                                    using (var o = new StreamWriter(c.Response.OutputStream))
                                     {
-                                        Console.SetOut(cw);
-                                        Console.SetError(cw);
-                                        action.Handle(GetParameterList(action.MethodInfo.GetParameters(), c.Request.Url), true);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        cw.WriteLine(e.ToString());
-                                    }
-                                    finally
-                                    {
-                                        Console.SetOut(oldOut);
-                                        Console.SetError(oldError);
+                                        HtmlHeader(o);
+                                        Form(o, item);
+                                        HtmlFooter(o);
                                     }
                                 }
-                            }
-
-                            HtmlFooter(o);
+                                break;
+                            case "html":
+                                {
+                                    using (var o = new StreamWriter(c.Response.OutputStream))
+                                    {
+                                        HtmlHeader(o);
+                                        using (var cw = new CodeWriter(o))
+                                        {
+                                            if (item is Action)
+                                            {
+                                                Run(item, c, cw);
+                                            }
+                                        }
+                                        HtmlFooter(o);
+                                    }
+                                }
+                                break;
+                            default:
+                                {
+                                    using (var o = new StreamWriter(c.Response.OutputStream))
+                                    {
+                                        if (item is Action)
+                                        {
+                                            Run((Action)item, c, o);
+                                        }
+                                    }
+                                }
+                                break;
                         }
-                    }
-                    else if (item is Option)
-                    {
-                        var option = (Option) item;
-                        using (var o = new StreamWriter(c.Response.OutputStream))
-                        {
-                            o.WriteLine(option.GetValue().SafeToString());
-                        }
-                    }
-                    else
-                    {
-                        c.Response.StatusCode = (int) HttpStatusCode.NotFound;
                     }
                 }
                 else
