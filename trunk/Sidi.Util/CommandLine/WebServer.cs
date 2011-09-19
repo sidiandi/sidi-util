@@ -74,7 +74,25 @@ namespace Sidi.CommandLine
 
         [Usage("HTTP prefix, e.g. http://*:12345/ . If undefined, a random port will be used.")]
         [Category(WebServerCategory)]
-        public string Prefix { set; get; }
+        public string Prefix
+        {
+            set
+            {
+                prefix = value;
+            }
+            get
+            {
+                if (prefix == null)
+                {
+                    return "http://{0}/{1}/".F(System.Environment.MachineName, parser.ApplicationName);
+                }
+                else
+                {
+                    return prefix;
+                }
+            }
+        }
+        string prefix;
 
         public HttpListener StartHttpListenerOnFreePort()
         {
@@ -138,16 +156,9 @@ namespace Sidi.CommandLine
 
             try
             {
-                if (Prefix == null)
-                {
-                    httpListener = StartHttpListenerOnFreePort();
-                }
-                else
-                {
-                    httpListener = new HttpListener();
-                    httpListener.Prefixes.Add(Prefix);
-                    httpListener.Start();
-                }
+                httpListener = new HttpListener();
+                httpListener.Prefixes.Add(Prefix);
+                httpListener.Start();
             }
             catch (HttpListenerException e)
             {
@@ -266,7 +277,7 @@ namespace Sidi.CommandLine
             else if (item is SubCommand)
             {
                 var subCommand = (SubCommand)item;
-                o.WriteLine(@"<p><a href=""{0}"">{0}</a> - {1}", subCommand.Name, subCommand.Usage);
+                o.WriteLine(@"<p><a href=""{0}"">{1}</a> - {2}", c.Path(subCommand.Name), subCommand.Name, subCommand.Usage);
             }
             else
             {
@@ -403,8 +414,9 @@ namespace Sidi.CommandLine
             var c = new Context();
             c.Http = http;
             var parts = c.Http.Request.Url.AbsolutePath.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-            c.Base = "/";
-            c.RelPath = parts.Skip(0).Join("/");
+            var baseParts = Context.SplitUrlPath(httpListener.Prefixes.First());
+            c.Base = "/" + baseParts.Skip(2).Join("/");
+            c.RelPath = parts.Skip(baseParts.Count()-2).Join("/");
             c.Parser = parser;
             Handle(c);
             log.InfoFormat("{0} {1}", http.Response.StatusCode, http.Request.Url);
