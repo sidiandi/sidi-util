@@ -84,7 +84,7 @@ namespace Sidi.CommandLine
             {
                 if (prefix == null)
                 {
-                    return "http://{0}/{1}/".F(System.Environment.MachineName, parser.ApplicationName);
+                    return "http://{0}/{1}/".F(System.Environment.MachineName, originalParser.MainApplication.GetType().Name);
                 }
                 else
                 {
