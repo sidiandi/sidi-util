@@ -557,21 +557,21 @@ namespace Sidi.CommandLine.Test
         {
             var p = new Parser(new TestAppWithStringList());
             var ws = new WebServer(p);
-            ws.Prefix = "http://localhost:49160/";
+            ws.Prefix = "http://localhost/SidiUtilTestApp/";
             ws.StartServer();
             try
             {
                 var wc = new WebClient();
                 string result;
 
-                result = wc.DownloadString("http://localhost:49160/");
+                result = wc.DownloadString(ws.Prefix);
                 Assert.IsTrue(result.Contains("Test"));
                 log.Info(result);
 
-                result = wc.DownloadString("http://localhost:49160/Add?x=122&y=1");
+                result = wc.DownloadString(ws.Prefix + "Add?x=122&y=1");
                 Assert.IsTrue(result.Contains("123"));
 
-                result = wc.DownloadString("http://localhost:49160/Test/SayHello");
+                result = wc.DownloadString(ws.Prefix + "Test/SayHello");
                 Assert.IsTrue(result.Contains("Doe"), result);
                 log.Info(result);
             }
