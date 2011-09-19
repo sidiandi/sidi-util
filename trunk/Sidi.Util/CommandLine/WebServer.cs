@@ -85,12 +85,18 @@ namespace Sidi.CommandLine
                     var listener = new HttpListener();
                     listener.Prefixes.Add("http://*:{0}/".F(port));
                     listener.Start();
-                    log.Info(listener.Prefixes);
                     return listener;
                 }
-                catch (Exception e)
+                catch (HttpListenerException e)
                 {
-                    log.WarnFormat("port {0} already used", port);
+                    if (e.ErrorCode == 183)
+                    {
+                        log.Warn("port {0} already used".F(port), e);
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
             throw new Exception("no free port for HttpListener");
@@ -130,17 +136,30 @@ namespace Sidi.CommandLine
                 }));
 
 
-            if (Prefix == null)
+            try
             {
-                httpListener = StartHttpListenerOnFreePort();
+                if (Prefix == null)
+                {
+                    httpListener = StartHttpListenerOnFreePort();
+                }
+                else
+                {
+                    httpListener = new HttpListener();
+                    httpListener.Prefixes.Add(Prefix);
+                    httpListener.Start();
+                }
             }
-            else
+            catch (HttpListenerException e)
             {
-                httpListener = new HttpListener(); 
-                httpListener.Prefixes.Add(Prefix);
-                httpListener.Start();
+                if (e.ErrorCode == 5)
+                {
+                    log.Warn("Run with administrator rights to use the web server.", e);
+                }
+                throw;
             }
 
+            log.InfoFormat("Web server running on {0}", httpListener.Prefixes.First());
+            
             for (; ; )
             {
                 try
@@ -178,7 +197,7 @@ namespace Sidi.CommandLine
             }
             cs.Reverse();
             return cs
-                .Select(x => @"<a href=""{0}"">{1}</a>".F(x.Base, x.Parser.ApplicationName))
+                .Select(x => @"<a href=""{0}"">{1}</a>".F(x.Base, x.Parser.MainApplication.GetType().Name))
                 .Join(" &gt ");
         }
 
@@ -194,7 +213,7 @@ namespace Sidi.CommandLine
             {
                 HtmlHeader(c, o);
                 var q = System.Web.HttpUtility.ParseQueryString(c.Http.Request.Url.Query);
-                
+
                 foreach (string k in q.Keys)
                 {
                     var option = c.Parser.Items.FirstOrDefault(x => x is Option && x.Name.Equals(k));
@@ -237,7 +256,7 @@ namespace Sidi.CommandLine
         {
             if (item is Action)
             {
-                var action = (Action) item;
+                var action = (Action)item;
                 o.WriteLine(@"<p><a href=""{0}.form"">{2}</a> - {1}", c.Path(action.Name), action.Usage, action.Name);
             }
             else if (item is Option)
@@ -246,7 +265,7 @@ namespace Sidi.CommandLine
             }
             else if (item is SubCommand)
             {
-                var subCommand = (SubCommand) item;
+                var subCommand = (SubCommand)item;
                 o.WriteLine(@"<p><a href=""{0}"">{0}</a> - {1}", subCommand.Name, subCommand.Usage);
             }
             else
@@ -286,7 +305,7 @@ namespace Sidi.CommandLine
         {
             var v = System.Web.HttpUtility.ParseQueryString(uri.Query);
             return parameters
-                .SelectMany(p => 
+                .SelectMany(p =>
                     {
                         var pv = v[p.Name];
                         if (pv == null)
@@ -320,7 +339,7 @@ namespace Sidi.CommandLine
                 }
                 else if (item is Option)
                 {
-                    var option = (Option) item;
+                    var option = (Option)item;
                     Console.WriteLine(option.GetValue());
                 }
             }
@@ -335,18 +354,18 @@ namespace Sidi.CommandLine
             }
         }
 
-                    //else if (item is Option)
-                    //{
-                    //    var option = (Option) item;
-                    //    using (var o = new StreamWriter(c.Response.OutputStream))
-                    //    {
-                    //        o.WriteLine(option.GetValue().SafeToString());
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    c.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                    //}
+        //else if (item is Option)
+        //{
+        //    var option = (Option) item;
+        //    using (var o = new StreamWriter(c.Response.OutputStream))
+        //    {
+        //        o.WriteLine(option.GetValue().SafeToString());
+        //    }
+        //}
+        //else
+        //{
+        //    c.Response.StatusCode = (int) HttpStatusCode.NotFound;
+        //}
 
 
         class Context
@@ -383,7 +402,7 @@ namespace Sidi.CommandLine
             log.Info(http.Request.Url);
             var c = new Context();
             c.Http = http;
-            var parts = c.Http.Request.Url.AbsolutePath.Split(new string[]{"/"}, StringSplitOptions.RemoveEmptyEntries);
+            var parts = c.Http.Request.Url.AbsolutePath.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
             c.Base = "/";
             c.RelPath = parts.Skip(0).Join("/");
             c.Parser = parser;
@@ -406,7 +425,7 @@ namespace Sidi.CommandLine
 
                     if (item is SubCommand)
                     {
-                        var subCommand = (SubCommand) item;
+                        var subCommand = (SubCommand)item;
                         var cs = new Context();
                         cs.Http = c.Http;
                         cs.Base = c.Path(subCommand.Name);
@@ -466,11 +485,11 @@ namespace Sidi.CommandLine
                 {
                     Overview(c);
                 }
-                c.Http.Response.StatusCode = (int) HttpStatusCode.OK;
+                c.Http.Response.StatusCode = (int)HttpStatusCode.OK;
             }
             catch (Exception e)
             {
-                c.Http.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                c.Http.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 using (var cw = new CodeWriter(c.Http.Response.OutputStream))
                 {
                     cw.WriteLine(e);
