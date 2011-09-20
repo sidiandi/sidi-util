@@ -31,7 +31,6 @@ using System.IO;
 using Sidi.Util;
 using System.Linq;
 using System.Threading;
-using Sidi.CommandLine;
 using System.Net;
 
 namespace Sidi.CommandLine.Test
@@ -578,6 +577,39 @@ namespace Sidi.CommandLine.Test
             finally
             {
                 ws.StopServer();
+            }
+        }
+
+        [Test, Explicit("interactive")]
+        public void ExternalWebServer()
+        {
+            var p = new Parser(new TestAppWithStringList());
+            var ws = new WebServer(p);
+
+            HttpListener listener = new HttpListener();
+            listener.Prefixes.Add(ws.Prefix);
+
+            listener.Start();
+            var serverThread = new Thread(new ThreadStart(() =>
+                {
+                    var c = listener.GetContext();
+                    ws.Handle(c);
+                    Thread.Sleep(100);
+                    listener.Stop();
+                }));
+            serverThread.Start();
+
+            try
+            {
+                var wc = new WebClient();
+                string result;
+
+                result = wc.DownloadString(ws.Prefix + "Add?x=122&y=1");
+                Assert.IsTrue(result.Contains("123"));
+            }
+            finally
+            {
+                serverThread.Join();
             }
         }
     }

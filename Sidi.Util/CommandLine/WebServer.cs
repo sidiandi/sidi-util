@@ -16,54 +16,30 @@ using System.Web;
 
 namespace Sidi.CommandLine
 {
-    public class CodeWriter : TextWriter
-    {
-        TextWriter o;
-        TextWriter ownO;
-
-        public CodeWriter(TextWriter o)
-        {
-            this.o = o;
-            this.o.WriteLine("<code>");
-        }
-
-        public CodeWriter(Stream o)
-            : this(new StreamWriter(o))
-        {
-            this.ownO = this.o;
-        }
-
-        public override Encoding Encoding
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override void WriteLine(string value)
-        {
-            foreach (var line in value.Lines())
-            {
-                o.WriteLine(line);
-                o.WriteLine("<br>");
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            o.WriteLine("</code>");
-            if (ownO != null)
-            {
-                ownO.Close();
-            }
-            base.Dispose(disposing);
-        }
-    }
-
     public class WebServer
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         Parser originalParser;
-        Parser parser;
+        Parser Parser
+        {
+            get
+            {
+                if (_parser == null)
+                {
+                    _parser = new Parser();
+                    _parser.Applications.AddRange(
+                        originalParser.Applications
+                        .Where(a =>
+                        {
+                            var ns = a.GetType().Namespace;
+                            return !ns.Equals(this.GetType().Namespace);
+                        }));
+                }
+                return _parser;
+            }
+        }
+        Parser _parser;
 
         public WebServer(Parser originalParser)
         {
@@ -94,32 +70,6 @@ namespace Sidi.CommandLine
         }
         string prefix;
 
-        public HttpListener StartHttpListenerOnFreePort()
-        {
-            for (int port = 49152; port <= 65535; ++port)
-            {
-                try
-                {
-                    var listener = new HttpListener();
-                    listener.Prefixes.Add("http://*:{0}/".F(port));
-                    listener.Start();
-                    return listener;
-                }
-                catch (HttpListenerException e)
-                {
-                    if (e.ErrorCode == 183)
-                    {
-                        log.Warn("port {0} already used".F(port), e);
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-            }
-            throw new Exception("no free port for HttpListener");
-        }
-
         HttpListener httpListener = null;
         Thread listenThread;
 
@@ -144,16 +94,6 @@ namespace Sidi.CommandLine
         [Category(WebServerCategory)]
         public void Serve()
         {
-            parser = new Parser();
-            parser.Applications.AddRange(
-                originalParser.Applications
-                .Where(a =>
-                {
-                    var ns = a.GetType().Namespace;
-                    return !ns.Equals(this.GetType().Namespace);
-                }));
-
-
             try
             {
                 httpListener = new HttpListener();
@@ -234,7 +174,7 @@ namespace Sidi.CommandLine
                     }
                 }
 
-                foreach (var category in parser.Categories)
+                foreach (var category in Parser.Categories)
                 {
                     var items = c.Parser.Items.Where(x => x.Categories.Contains(category));
                     if (items.Any())
@@ -408,16 +348,28 @@ namespace Sidi.CommandLine
             }
         }
 
-        void Handle(HttpListenerContext http)
+        public bool CanHandle(HttpListenerContext httpContext)
         {
+            var parts = Context.SplitUrlPath(httpContext.Request.Url.ToString());
+            var baseParts = Context.SplitUrlPath(Prefix);
+            return baseParts.SequenceEqual(parts.Take(baseParts.Count()), StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        public void Handle(HttpListenerContext http)
+        {
+            if (!CanHandle(http))
+            {
+                throw new Exception("Cannot handle {0}".F(http.Request.Url));
+            }
+
             log.Info(http.Request.Url);
             var c = new Context();
             c.Http = http;
-            var parts = c.Http.Request.Url.AbsolutePath.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-            var baseParts = Context.SplitUrlPath(httpListener.Prefixes.First());
+            var parts = Context.SplitUrlPath(c.Http.Request.Url.AbsolutePath);
+            var baseParts = Context.SplitUrlPath(Prefix);
             c.Base = "/" + baseParts.Skip(2).Join("/");
             c.RelPath = parts.Skip(baseParts.Count()-2).Join("/");
-            c.Parser = parser;
+            c.Parser = Parser;
             Handle(c);
             log.InfoFormat("{0} {1}", http.Response.StatusCode, http.Request.Url);
         }
@@ -468,7 +420,7 @@ namespace Sidi.CommandLine
                                     using (var o = new StreamWriter(c.Http.Response.OutputStream))
                                     {
                                         HtmlHeader(c, o);
-                                        using (var cw = new CodeWriter(o))
+                                        using (var cw = new HtmlCodeWriter(o))
                                         {
                                             if (item is Action)
                                             {
@@ -502,12 +454,54 @@ namespace Sidi.CommandLine
             catch (Exception e)
             {
                 c.Http.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                using (var cw = new CodeWriter(c.Http.Response.OutputStream))
+                using (var cw = new HtmlCodeWriter(c.Http.Response.OutputStream))
                 {
                     cw.WriteLine(e);
                 }
             }
             c.Http.Response.Close();
+        }
+    }
+
+    public class HtmlCodeWriter : TextWriter
+    {
+        TextWriter o;
+        TextWriter ownO;
+
+        public HtmlCodeWriter(TextWriter o)
+        {
+            this.o = o;
+            this.o.WriteLine("<code>");
+        }
+
+        public HtmlCodeWriter(Stream o)
+            : this(new StreamWriter(o))
+        {
+            this.ownO = this.o;
+        }
+
+        public override Encoding Encoding
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override void WriteLine(string value)
+        {
+            foreach (var line in value.Lines())
+            {
+                o.WriteLine(line);
+                o.WriteLine("<br>");
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            o.WriteLine("</code>");
+            if (ownO != null)
+            {
+                ownO.Close();
+            }
+            base.Dispose(disposing);
         }
     }
 }

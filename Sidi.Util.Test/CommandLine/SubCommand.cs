@@ -31,7 +31,7 @@ using System.IO;
 using Sidi.Util;
 using System.Linq;
 
-namespace Sidi.CommandLine
+namespace Sidi.CommandLine.Test
 {
     [TestFixture]
     public class SubCommandTest : TestBase
