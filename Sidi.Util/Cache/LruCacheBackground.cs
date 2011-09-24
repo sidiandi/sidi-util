@@ -28,10 +28,20 @@ namespace Sidi.Cache
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public LruCacheBackground(int maxCount, Func<Key, Value> provideValue, int threadCount)
+        public LruCacheBackground(int maxCount, int threadCount, Action<ProvideValueArgs> provideValue)
         : this(maxCount, threadCount)
         {
             this.provideValue = provideValue;
+        }
+
+        public LruCacheBackground(int maxCount, Func<Key, Value> provideValue, int threadCount)
+            : this(maxCount, threadCount)
+        {
+            this.provideValue = new Action<ProvideValueArgs>(args =>
+                {
+                    args.Value = provideValue(args.Key);
+                    args.ValueValid = true;
+                });
         }
 
         public LruCacheBackground(int maxCount, int threadCount)
@@ -61,10 +71,22 @@ namespace Sidi.Cache
         }
 
         LruCache<Key, CacheEntry> cache;
-        Func<Key, Value> provideValue;
+
+        public class ProvideValueArgs
+        {
+            public ProvideValueArgs(Key key)
+            {
+                this.Key = key;
+            }
+
+            public Key Key { get; private set; }
+            public Value Value;
+            public bool ValueValid;
+        }
+        Action<ProvideValueArgs> provideValue;
         List<Thread> workers;
 
-        public Func<Key, Value> ProvideValue
+        public Action<ProvideValueArgs> ProvideValue
         {
             set
             {
@@ -73,6 +95,19 @@ namespace Sidi.Cache
                     Clear();
                     provideValue = value;
                 }
+            }
+        }
+
+        public Func<Key, Value> ProvideValueFunc
+        {
+            set
+            {
+                var f = value;
+                ProvideValue = arg =>
+                    {
+                        arg.Value = f(arg.Key);
+                        arg.ValueValid = true;
+                    };
             }
         }
 
@@ -193,8 +228,16 @@ namespace Sidi.Cache
                             {
                                 try
                                 {
-                                    var value = provideValue(k.Key);
-                                    ce = new CacheEntry(value);
+                                    var args = new ProvideValueArgs(k.Key);
+                                    provideValue(args);
+                                    if (args.ValueValid)
+                                    {
+                                        ce = new CacheEntry(args.Value);
+                                    }
+                                    else
+                                    {
+                                        ce.m_state = State.Missing;
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

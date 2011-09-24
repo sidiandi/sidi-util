@@ -122,6 +122,7 @@
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
     <Compile Include="IO\FileUtilTest.cs" />
+    <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
