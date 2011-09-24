@@ -13,10 +13,11 @@ using System.ComponentModel;
 using System.Net.Sockets;
 using System.Threading;
 using System.Web;
+using System.Web.UI;
 
 namespace Sidi.CommandLine
 {
-    public class WebServer
+    public class WebServer : Sidi.Net.HtmlGenerator
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -125,18 +126,16 @@ namespace Sidi.CommandLine
             }
         }
 
-        void HtmlHeader(Context c, TextWriter o)
+        Action<TextWriter> StandardPage(Context c, params object[] childs)
         {
-            o.WriteLine(@"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01//EN"" ""http://www.w3.org/TR/html4/strict.dtd"">
-<html>
-<head>
-<title>{0}</title>
-</head>
-<body>
-<small>{1}</small>
-<hr />", c.Parser.ApplicationName, BreadCrumbs(c)
-       );
-
+            return 
+                html(
+                head(title(c.Parser.ApplicationName)),
+                body(
+                    small(BreadCrumbs(c)),
+                    hr(),
+                    childs
+                    ));
         }
 
         string BreadCrumbs(Context c)
@@ -162,32 +161,24 @@ namespace Sidi.CommandLine
         {
             using (var o = new StreamWriter(c.Http.Response.OutputStream))
             {
-                HtmlHeader(c, o);
-                var q = System.Web.HttpUtility.ParseQueryString(c.Http.Request.Url.Query);
+                    var q = System.Web.HttpUtility.ParseQueryString(c.Http.Request.Url.Query);
 
-                foreach (string k in q.Keys)
-                {
-                    var option = c.Parser.Items.FirstOrDefault(x => x is Option && x.Name.Equals(k));
-                    if (option != null)
+                    foreach (string k in q.Keys)
                     {
-                        option.Handle(new List<string>(new string[] { q[k] }), true);
-                    }
-                }
-
-                foreach (var category in Parser.Categories)
-                {
-                    var items = c.Parser.Items.Where(x => x.Categories.Contains(category));
-                    if (items.Any())
-                    {
-                        o.WriteLine("<h2>{0}</h2>", category);
-                        foreach (var item in items)
+                        var option = c.Parser.Items.FirstOrDefault(x => x is Option && x.Name.Equals(k));
+                        if (option != null)
                         {
-                            OverviewItem(c, o, item);
+                            option.Handle(new List<string>(new string[] { q[k] }), true);
                         }
                     }
-                }
 
-                HtmlFooter(c, o);
+                    StandardPage(c,
+                        Parser.Categories.Select(category =>
+                            div(h2(category),
+                            c.Parser.Items
+                                .Where(x => x.Categories.Contains(category))
+                                .Select(item => new Action<TextWriter>(w => OverviewItem(c, w, item))))))
+                                (o);
             }
         }
 
@@ -409,9 +400,7 @@ namespace Sidi.CommandLine
                                 {
                                     using (var o = new StreamWriter(c.Http.Response.OutputStream))
                                     {
-                                        HtmlHeader(c, o);
-                                        Form(o, item);
-                                        HtmlFooter(c, o);
+                                        StandardPage(c, new Action<TextWriter>(x => Form(x, item)))(o);
                                     }
                                 }
                                 break;
@@ -419,15 +408,16 @@ namespace Sidi.CommandLine
                                 {
                                     using (var o = new StreamWriter(c.Http.Response.OutputStream))
                                     {
-                                        HtmlHeader(c, o);
-                                        using (var cw = new HtmlCodeWriter(o))
-                                        {
-                                            if (item is Action)
+                                        StandardPage(c, new Action<TextWriter>(x =>
                                             {
-                                                Run(item, c.Http, cw);
-                                            }
-                                        }
-                                        HtmlFooter(c, o);
+                                                using (var cw = new HtmlCodeWriter(x))
+                                                {
+                                                    if (item is Action)
+                                                    {
+                                                        Run(item, c.Http, cw);
+                                                    }
+                                                }
+                                            }));
                                     }
                                 }
                                 break;
