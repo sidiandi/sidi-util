@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Sidi.Cache
 {
@@ -44,8 +45,14 @@ namespace Sidi.Cache
                 });
         }
 
+        string callStack;
+
         public LruCacheBackground(int maxCount, int threadCount)
         {
+            // add diagnostic information from call stack to track down
+            // leftover instances
+            callStack = new StackTrace().ToString();
+
             cache = new LruCache<Key, CacheEntry>(maxCount, x =>
                 {
                     return new CacheEntry(State.Missing, default(Value));
@@ -252,9 +259,12 @@ namespace Sidi.Cache
                             log.InfoFormat("key={0}, queue={1}", k.Key, provideValueRequestQueue.Count);
                             cache.Update(k.Key, ce);
 
-                            Monitor.Exit(this);
-                            OnEntryUpdated(k.Key);
-                            Monitor.Enter(this);
+                            if (ce.m_state == State.Complete)
+                            {
+                                Monitor.Exit(this);
+                                OnEntryUpdated(k.Key);
+                                Monitor.Enter(this);
+                            }
                         }
                     }
 
