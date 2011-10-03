@@ -142,5 +142,17 @@ namespace Sidi.Forms
             answer = dlg.Value;
             return result;
         }
+
+        public static void RunFullScreen(this Control c)
+        {
+            var f = c.AsForm(c.GetType().Name);
+            f.Visible = false;
+            var cancelButton = new Button();
+            cancelButton.DialogResult = DialogResult.Cancel;
+            f.Controls.Add(cancelButton);
+            var fsm = new FullscreenManager(f);
+            fsm.Fullscreen = true;
+            f.ShowDialog();
+        }
     }
 }

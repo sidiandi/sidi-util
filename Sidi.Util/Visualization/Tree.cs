@@ -5,26 +5,26 @@ using System.Text;
 
 namespace Sidi.Visualization
 {
-    public interface ITree
+    public interface ITree<T>
     {
-        object Data { get; }
+        T Data { get; }
         float Size { get; }
-        ITree Parent { get; }
-        IList<ITree> Children { get; set; }
+        ITree<T> Parent { get; }
+        IList<ITree<T>> Children { get; set; }
     }
 
-    public class Tree : ITree
+    public class Tree<T> : ITree<T>
     {
-        public object Data { get; set; }
+        public T Data { get; set; }
         public float Size { get; set; }
-        public ITree Parent { get; set; }
-        public IList<ITree> Children
+        public ITree<T> Parent { get; set; }
+        public IList<ITree<T>> Children
         {
             get
             {
                 if (children == null)
                 {
-                    children = new List<ITree>();
+                    children = new List<ITree<T>>();
                 }
                 return children;
             }
@@ -33,13 +33,16 @@ namespace Sidi.Visualization
                 children = value;
             }
         }
-        public IList<ITree> children;
+        public IList<ITree<T>> children;
 
+        /// <summary>
+        /// calculates the sum of the sizes of all children
+        /// </summary>
         public float ChildSize
         {
             get
             {
-                return Children.Cast<Tree>().Aggregate(0.0f, (s, i) => s + i.Size);
+                return Children.Aggregate(0.0f, (s, i) => s + i.Size);
             }
         }
     }

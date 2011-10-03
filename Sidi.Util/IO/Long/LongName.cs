@@ -212,7 +212,7 @@ namespace Sidi.IO.Long
 
         public override string ToString()
         {
-            return Param;
+            return NoPrefix;
         }
 
         public string Param

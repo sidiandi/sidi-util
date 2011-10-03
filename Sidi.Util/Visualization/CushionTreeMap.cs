@@ -9,7 +9,7 @@ namespace Sidi.Visualization
     /// <summary>
     /// http://www.win.tue.nl/~vanwijk/ctm.pdf
     /// </summary>
-    public class CushionTreeMap
+    public class CushionTreeMap<T>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -19,7 +19,7 @@ namespace Sidi.Visualization
         const float Is = 215;
         float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
 
-        public CushionTreeMap(ITree root)
+        public CushionTreeMap(ITree<T> root)
         {
             this.root = root;
             DoLayout = 
@@ -28,10 +28,10 @@ namespace Sidi.Visualization
                 ;
         }
 
-        ITree root;
-        ITree layoutTree;
+        ITree<T> root;
+        ITree<Layout> layoutTree;
 
-        public ITree LayoutTree
+        public ITree<Layout> LayoutTree
         {
             get
             {
@@ -44,16 +44,16 @@ namespace Sidi.Visualization
             layoutTree = UpdateLayoutTreeRecursive(null, root, rect);
         }
 
-        ITree UpdateLayoutTreeRecursive(ITree parent, ITree tree, float[,] rect)
+        ITree<Layout> UpdateLayoutTreeRecursive(ITree<Layout> parent, ITree<T> tree, float[,] rect)
         {
-            var layoutTree = new Tree();
+            var layoutTree = new Tree<Layout>();
             var layout = new Layout(tree);
             layoutTree.Data = layout;
             layoutTree.Parent = parent;
             layout.Rectangle = (float[,]) rect.Clone();
             layoutTree.Size = tree.Size;
 
-            if (tree.Children != null && tree.Children.Count > 0 && tree.Size > 0)
+            if (tree.Children != null && tree.Children.Count > 0 && tree.Size > 0 && layout.Rectangle.CoversPixel())
             {
                 var lc = new LayoutContext();
                 lc.Layout = tree.Children.Select(x => new Layout(x)).ToArray();
@@ -67,24 +67,14 @@ namespace Sidi.Visualization
             return layoutTree;
         }
 
-        public static bool Contains(float[,] r, float[] p)
-        {
-            return
-                r[0, 0] <= p[0] &&
-                r[0, 1] > p[0] &&
-                r[1, 0] <= p[1] &&
-                r[1, 1] > p[1];
-        }
-
-        public ITree GetLayoutAt(float[] p)
+        public ITree<Layout> GetLayoutAt(float[] p)
         {
             return GetLayoutAt(layoutTree, p);
         }
 
-        ITree GetLayoutAt(ITree t, float[] p)
+        ITree<Layout> GetLayoutAt(ITree<Layout> t, float[] p)
         {
-            var layout = (Layout)t.Data;
-            if (Contains(layout.Rectangle, p))
+            if (t != null && t.Data.Rectangle.Contains(p))
             {
                 foreach (var i in t.Children)
                 {
@@ -113,7 +103,7 @@ namespace Sidi.Visualization
             Render(bitmap, layoutTree, h, f, s);
         }
 
-        void Render(Bitmap bitmap, ITree t, float h, float f, float[,] s)
+        void Render(Bitmap bitmap, ITree<Layout> t, float h, float f, float[,] s)
         {
             s = (float[,])s.Clone();
             var layout = (Layout)t.Data;
@@ -150,14 +140,14 @@ namespace Sidi.Visualization
 
         public class Layout
         {
-            public Layout(ITree tree)
+            public Layout(ITree<T> tree)
             {
                 TreeNode = tree;
                 Rectangle = new float[2, 2];
             }
 
             public float[,] Rectangle;
-            public ITree TreeNode;
+            public ITree<T> TreeNode;
         }
 
         public Action<LayoutContext> DoLayout;
@@ -255,7 +245,16 @@ namespace Sidi.Visualization
 
             float aspectRatio = float.MaxValue;
             var width = Width(r, d);
+            if (width < float.Epsilon)
+            {
+                for (int i = b; i < e; ++i)
+                {
+                    layout[i].Rectangle = (float[,]) r.Clone();
+                }
+                return;
+            }
             var pixPerSize = Area(r) / SizeSum(layout, b, e);
+            var pixPerHeight = pixPerSize / width;
             var rowSize = 0.0f;
             float newRowSize;
             int rowEnd;
@@ -270,7 +269,7 @@ namespace Sidi.Visualization
                     continue;
                 }
 
-                newH = newRowSize * pixPerSize / width;
+                newH = newRowSize * pixPerHeight;
                 newAspectRatio = GetWorstAspectRatio(layout, b, rowEnd, pixPerSize, newH);
                 if (newAspectRatio > aspectRatio)
                 {
@@ -310,13 +309,7 @@ namespace Sidi.Visualization
             }
 
             // avoid rounding errors
-            {
-                var re = Math.Abs(layout[rowEnd - 1].Rectangle[(int)d, (int)Bound.Max] - r[(int)d, (int)Bound.Max]);
-                if (re > 0.01)
-                {
-                    throw new Exception(re.ToString());
-                }
-            }
+            layout[rowEnd - 1].Rectangle[(int)d, (int)Bound.Max] = r[(int)d, (int)Bound.Max];
 
             // check results
             for (int i = b; i < rowEnd; ++i)
@@ -373,13 +366,13 @@ namespace Sidi.Visualization
             float[,] s
             )
         {
-            var ey = (int)(r[(int)Dir.Y, (int)Bound.Max] - 0.5);
-            var by = (int)(r[(int)Dir.Y, (int)Bound.Min] +0.5);
-            var ex = (int)(r[(int)Dir.X, (int)Bound.Max] - 0.5);
-            var bx = (int)(r[(int)Dir.X, (int)Bound.Min] + 0.5);
-            for (int iy = by; iy <= ey; ++iy)
+            var ey = (int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Max]);
+            var by = (int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Min]);
+            var ex = (int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Max]);
+            var bx = (int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Min]);
+            for (int iy = by; iy < ey; ++iy)
             {
-                for (int ix = bx; ix <= ex; ++ix )
+                for (int ix = bx; ix < ex; ++ix )
                 {
                     var nx = (2 * s[(int)Dir.X, 1] * (ix + 0.5) + s[(int)Dir.X, 0]);
                     var ny = -(2 * s[(int)Dir.Y, 1] * (iy + 0.5) + s[(int)Dir.Y, 0]);
