@@ -20,6 +20,25 @@ namespace Sidi.Visualization
 
     public static class ArrayRectEx
     {
+        public static float Area(this float[,] r)
+        {
+            var w = r[0, 1] - r[0, 0];
+            var h = r[1, 1] - r[1, 0];
+            return w * h;
+        }
+
+        const float cf = 1.0f / 256.0f;
+
+        public static float[] ToArray(this Color c)
+        {
+            return new float[]
+            {
+                c.B * cf,
+                c.G * cf,
+                c.R * cf
+            };
+        }
+
         public static float[,] ToArray(this RectangleF r)
         {
             var ar = new float[2, 2];
@@ -33,6 +52,14 @@ namespace Sidi.Visualization
         public static float[] ToArray(this Point p)
         {
             return new float[] { p.X, p.Y };
+        }
+
+        public static void Add(this float[,] a, float[,] b)
+        {
+            a[0, 0] += b[0, 0];
+            a[0, 1] += b[0, 1];
+            a[1, 0] += b[1, 0];
+            a[1, 1] += b[1, 1];
         }
 
         public static Rectangle ToRectangle(this float[,] r)
