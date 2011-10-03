@@ -8,16 +8,16 @@ using Sidi.IO.Long;
 
 namespace Sidi.Visualization
 {
-    public class CushionTreeMapControl<T> : Control
+    public class TreeMapControl<T> : Control
     {
-        public static CushionTreeMapControl<T> FromTree(ITree<T> tree)
+        public static TreeMapControl<T> FromTree(ITree<T> tree)
         {
-            var c = new CushionTreeMapControl<T>();
-            c.TreeMap = new CushionTreeMap<T>(tree);
+            var c = new TreeMapControl<T>();
+            c.TreeMap = new TreeMap<T>(tree);
             return c;
         }
         
-        public CushionTreeMapControl()
+        public TreeMapControl()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer , true);
@@ -68,17 +68,17 @@ namespace Sidi.Visualization
             }
         }
 
-        ITree<CushionTreeMap<T>.Layout> GetLayoutAt(Point p)
+        ITree<TreeMap<T>.Layout> GetLayoutAt(Point p)
         {
             return TreeMap.GetLayoutAt(p.ToArray(), Int32.MaxValue);
         }
 
-        ITree<CushionTreeMap<T>.Layout> GetLayoutAt(Point p, int levels)
+        ITree<TreeMap<T>.Layout> GetLayoutAt(Point p, int levels)
         {
             return TreeMap.GetLayoutAt(p.ToArray(), levels);
         }
 
-        ITree<CushionTreeMap<T>.Layout> hoveredNode;
+        ITree<TreeMap<T>.Layout> hoveredNode;
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
         {
@@ -89,7 +89,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public CushionTreeMap<T> TreeMap { set; get; }
+        public TreeMap<T> TreeMap { set; get; }
 
         Bitmap cushions;
         void PaintCushions(PaintEventArgs e)
@@ -102,7 +102,7 @@ namespace Sidi.Visualization
             e.Graphics.DrawImage(cushions, 0, 0);
         }
 
-        public void Highlight(PaintEventArgs e, ITree<CushionTreeMap<T>.Layout> layoutNode, Color color)
+        public void Highlight(PaintEventArgs e, ITree<TreeMap<T>.Layout> layoutNode, Color color)
         {
             var b = new SolidBrush(Color.FromArgb(128, color));
             e.Graphics.FillRectangle(b, layoutNode.Data.Rectangle.ToRectangleF());
@@ -129,7 +129,7 @@ namespace Sidi.Visualization
             base.OnPaint(e);
         }
 
-        public ITree<CushionTreeMap<T>.Layout> MouseHoverNode
+        public ITree<TreeMap<T>.Layout> MouseHoverNode
         {
             get
             {
@@ -145,7 +145,7 @@ namespace Sidi.Visualization
         /// </summary>
         /// <param name="e"></param>
         /// <param name="tree"></param>
-        public void Track(PaintEventArgs e, ITree<CushionTreeMap<T>.Layout> tree)
+        public void Track(PaintEventArgs e, ITree<TreeMap<T>.Layout> tree)
         {
             for (; tree != null; tree = tree.Parent)
             {
@@ -155,7 +155,7 @@ namespace Sidi.Visualization
 
         Pen redPen = new Pen(Color.Red);
 
-        void DrawOutlines(PaintEventArgs e, ITree<CushionTreeMap<T>.Layout> layoutTree)
+        void DrawOutlines(PaintEventArgs e, ITree<TreeMap<T>.Layout> layoutTree)
         {
             var layout = layoutTree.Data;
             e.Graphics.DrawRectangle(redPen, layout.Rectangle.ToRectangle());
@@ -165,18 +165,18 @@ namespace Sidi.Visualization
             }
         }
 
-        public void ForEachNode(Action<ITree<CushionTreeMap<T>.Layout>> a)
+        public void ForEachNode(Action<ITree<TreeMap<T>.Layout>> a)
         {
             ForEachNode(TreeMap.LayoutTree, a);
         }
 
-        public void ForEachLeaf(Action<ITree<CushionTreeMap<T>.Layout>> a)
+        public void ForEachLeaf(Action<ITree<TreeMap<T>.Layout>> a)
         {
             ForEachLeaf(TreeMap.LayoutTree, a);
         }
 
-        void ForEachNode(ITree<CushionTreeMap<T>.Layout> layoutTree, 
-            Action<ITree<CushionTreeMap<T>.Layout>> a)
+        void ForEachNode(ITree<TreeMap<T>.Layout> layoutTree, 
+            Action<ITree<TreeMap<T>.Layout>> a)
         {
             a(layoutTree);
             foreach (var i in layoutTree.Children)
@@ -185,8 +185,8 @@ namespace Sidi.Visualization
             }
         }
 
-        void ForEachLeaf(ITree<CushionTreeMap<T>.Layout> layoutTree,
-            Action<ITree<CushionTreeMap<T>.Layout>> a)
+        void ForEachLeaf(ITree<TreeMap<T>.Layout> layoutTree,
+            Action<ITree<TreeMap<T>.Layout>> a)
         {
             if (layoutTree.Children.Count == 0)
             {
@@ -200,19 +200,19 @@ namespace Sidi.Visualization
 
         public class ItemEventEventArgs : EventArgs
         {
-            public ItemEventEventArgs(ITree<CushionTreeMap<T>.Layout> layout)
+            public ItemEventEventArgs(ITree<TreeMap<T>.Layout> layout)
             {
                 this.layout = layout;
             }
 
-            public ITree<CushionTreeMap<T>.Layout> Layout
+            public ITree<TreeMap<T>.Layout> Layout
             {
                 get
                 {
                     return layout;
                 }
             }
-            ITree<CushionTreeMap<T>.Layout> layout;
+            ITree<TreeMap<T>.Layout> layout;
 
             public T Item
             {

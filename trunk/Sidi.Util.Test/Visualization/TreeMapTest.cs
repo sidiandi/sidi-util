@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Sidi.Visualization
 {
     [TestFixture]
-    public class CushionTreeMapTest : TestBase
+    public class TreeMapTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -18,7 +18,7 @@ namespace Sidi.Visualization
 
         public static ITree<int> GetTestTree()
         {
-            var t = GetTestTree(null, 10, 4);
+            var t = GetTestTree(null, 10, 5);
             return t;
         }
 
@@ -54,7 +54,7 @@ namespace Sidi.Visualization
             t.Parent = parent;
             if (levels > 0)
             {
-                t.Children = Enumerable.Range(0, childCount)
+                t.Children = Enumerable.Range(0, rnd.Next(0, childCount))
                     .Select(c =>
                         {
                             var ct = GetTestTree(t, childCount, levels - 1);
