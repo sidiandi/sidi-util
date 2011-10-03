@@ -53,5 +53,19 @@ namespace Sidi.Visualization
                 r[(int)Dir.Y, (int)Bound.Max]);
         }
 
+        public static bool Contains(this float[,] r, float[] p)
+        {
+            return
+                r[0, 0] <= p[0] &&
+                r[0, 1] > p[0] &&
+                r[1, 0] <= p[1] &&
+                r[1, 1] > p[1];
+        }
+
+        public static bool CoversPixel(this float[,] r)
+        {
+            return ((int)r[0, 0] != (int)r[0, 1])
+                && ((int)r[1, 0] != (int)r[1, 1]);
+        }
     }
 }

@@ -150,7 +150,10 @@ namespace Sidi.IO.Long
 
         static DateTime ToDateTime(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
         {
-            return DateTime.FromFileTime((long)((((ulong)fileTime.dwHighDateTime) << 32) | (ulong) fileTime.dwLowDateTime));
+            uint h = (uint) fileTime.dwHighDateTime;
+            uint l = (uint) fileTime.dwLowDateTime;
+
+            return DateTime.FromFileTime(h << 32 | l);
         }
 
         static DateTime ToDateTimeUtc(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
@@ -179,6 +182,14 @@ namespace Sidi.IO.Long
             get
             {
                 return _findData.Name;
+            }
+        }
+
+        public string FileNameWithoutExtension
+        {
+            get
+            {
+                return System.IO.Path.GetFileNameWithoutExtension(_findData.Name);
             }
         }
 

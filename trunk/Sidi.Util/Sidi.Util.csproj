@@ -222,6 +222,8 @@
     <Compile Include="Visualization\CushionTreeMapControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Visualization\FileSystemTree.cs" />
+    <Compile Include="Visualization\HSLColor.cs" />
     <Compile Include="Visualization\Tree.cs" />
   </ItemGroup>
   <ItemGroup>

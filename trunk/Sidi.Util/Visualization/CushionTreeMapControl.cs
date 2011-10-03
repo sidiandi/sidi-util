@@ -8,8 +8,15 @@ using Sidi.IO.Long;
 
 namespace Sidi.Visualization
 {
-    public class CushionTreeMapControl : Control
+    public class CushionTreeMapControl<T> : Control
     {
+        public static CushionTreeMapControl<T> FromTree(ITree<T> tree)
+        {
+            var c = new CushionTreeMapControl<T>();
+            c.TreeMap = new CushionTreeMap<T>(tree);
+            return c;
+        }
+        
         public CushionTreeMapControl()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
@@ -18,24 +25,37 @@ namespace Sidi.Visualization
 
             this.SizeChanged += new EventHandler(CushionTreeMapControl_SizeChanged);
             this.MouseMove += new MouseEventHandler(CushionTreeMapControl_MouseMove);
+
+            this.MouseDoubleClick += (s, e) =>
+                {
+                    var l = GetLayoutAt(e.Location);
+                    if (ItemActivate != null)
+                    {
+                        ItemActivate(this, new ItemEventEventArgs(l));
+                    }
+                };
         }
 
         void CushionTreeMapControl_MouseMove(object sender, MouseEventArgs e)
         {
             var l = GetLayoutAt(e.Location);
-            if (l != layoutUnderMouse)
+            if (l != hoveredNode)
             {
-                layoutUnderMouse = l;
-                Invalidate();
+                hoveredNode = l;
+
+                if (ItemMouseHover != null)
+                {
+                    ItemMouseHover(this, new ItemEventEventArgs(l));
+                }
             }
         }
 
-        ITree GetLayoutAt(Point p)
+        ITree<CushionTreeMap<T>.Layout> GetLayoutAt(Point p)
         {
             return TreeMap.GetLayoutAt(p.ToArray());
         }
 
-        ITree layoutUnderMouse;
+        ITree<CushionTreeMap<T>.Layout> hoveredNode;
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
         {
@@ -46,7 +66,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public CushionTreeMap TreeMap { set; get; }
+        public CushionTreeMap<T> TreeMap { set; get; }
 
         Bitmap cushions;
         void PaintCushions(PaintEventArgs e)
@@ -59,35 +79,38 @@ namespace Sidi.Visualization
             e.Graphics.DrawImage(cushions, 0, 0);
         }
 
+        public void Highlight(PaintEventArgs e, ITree<CushionTreeMap<T>.Layout> layoutNode, Color color)
+        {
+            var b = new SolidBrush(Color.FromArgb(128, color));
+            e.Graphics.FillRectangle(b, layoutNode.Data.Rectangle.ToRectangleF());
+        }
+
+        public void Highlight(PaintEventArgs e, Color color, Func<T, T, bool> f)
+        {
+            if (MouseHoverNode != null)
+            {
+                var h = MouseHoverNode.Data.TreeNode.Data;
+                ForEachLeaf(n =>
+                {
+                    if (f(h, n.Data.TreeNode.Data))
+                    {
+                        Highlight(e, n, color);
+                    }
+                });
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             PaintCushions(e);
-
-                if (layoutUnderMouse != null)
-                {
-                    Track(e, layoutUnderMouse);
-                    DrawForEachNode(e, (ea, layout) =>
-                    {
-                        var fi = (Sidi.IO.Long.FileSystemInfo)layout.TreeNode.Data;
-                        var fi1 = (Sidi.IO.Long.FileSystemInfo)TreeNodeUnderMouse.Data;
-                        if (fi.Extension.Equals(fi1.Extension))
-                        {
-                            var b = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
-                            ea.Graphics.FillRectangle(b, layout.Rectangle.ToRectangleF());
-                        }
-                    });
-
-                    var fsi = (FileSystemInfo)TreeNodeUnderMouse.Data;
-                    e.Graphics.DrawString(fsi.FullPath.NoPrefix, font, textBrush, 0,0);
-                }
+            base.OnPaint(e);
         }
 
-        ITree TreeNodeUnderMouse
+        public ITree<CushionTreeMap<T>.Layout> MouseHoverNode
         {
             get
             {
-                var ly = (CushionTreeMap.Layout)layoutUnderMouse.Data;
-                return ly.TreeNode;
+                return hoveredNode;
             }
         }
 
@@ -99,20 +122,19 @@ namespace Sidi.Visualization
         /// </summary>
         /// <param name="e"></param>
         /// <param name="tree"></param>
-        public void Track(PaintEventArgs e, ITree tree)
+        public void Track(PaintEventArgs e, ITree<CushionTreeMap<T>.Layout> tree)
         {
             for (; tree != null; tree = tree.Parent)
             {
-                var layout = (CushionTreeMap.Layout)tree.Data;
-                e.Graphics.DrawRectangle(redPen, layout.Rectangle.ToRectangle());
+                e.Graphics.DrawRectangle(redPen, tree.Data.Rectangle.ToRectangle());
             }
         }
 
         Pen redPen = new Pen(Color.Red);
 
-        void DrawOutlines(PaintEventArgs e, ITree layoutTree)
+        void DrawOutlines(PaintEventArgs e, ITree<CushionTreeMap<T>.Layout> layoutTree)
         {
-            var layout = (CushionTreeMap.Layout)layoutTree.Data;
+            var layout = layoutTree.Data;
             e.Graphics.DrawRectangle(redPen, layout.Rectangle.ToRectangle());
             foreach (var i in layoutTree.Children)
             {
@@ -120,19 +142,67 @@ namespace Sidi.Visualization
             }
         }
 
-        void DrawForEachNode(PaintEventArgs e, Action<PaintEventArgs, CushionTreeMap.Layout> a)
+        public void ForEachNode(Action<ITree<CushionTreeMap<T>.Layout>> a)
         {
-            DrawForEachNode(e, TreeMap.LayoutTree, a);
+            ForEachNode(TreeMap.LayoutTree, a);
         }
 
-        void DrawForEachNode(PaintEventArgs e, ITree layoutTree, Action<PaintEventArgs, CushionTreeMap.Layout> a)
+        public void ForEachLeaf(Action<ITree<CushionTreeMap<T>.Layout>> a)
         {
-            var layout = (CushionTreeMap.Layout)layoutTree.Data;
-            a(e, layout);
+            ForEachLeaf(TreeMap.LayoutTree, a);
+        }
+
+        void ForEachNode(ITree<CushionTreeMap<T>.Layout> layoutTree, 
+            Action<ITree<CushionTreeMap<T>.Layout>> a)
+        {
+            a(layoutTree);
             foreach (var i in layoutTree.Children)
             {
-                DrawForEachNode(e, i, a);
+                ForEachNode(i, a);
             }
         }
+
+        void ForEachLeaf(ITree<CushionTreeMap<T>.Layout> layoutTree,
+            Action<ITree<CushionTreeMap<T>.Layout>> a)
+        {
+            if (layoutTree.Children.Count == 0)
+            {
+                a(layoutTree);
+            }
+            foreach (var i in layoutTree.Children)
+            {
+                ForEachLeaf(i, a);
+            }
+        }
+
+        public class ItemEventEventArgs : EventArgs
+        {
+            public ItemEventEventArgs(ITree<CushionTreeMap<T>.Layout> layout)
+            {
+                this.layout = layout;
+            }
+
+            public ITree<CushionTreeMap<T>.Layout> Layout
+            {
+                get
+                {
+                    return layout;
+                }
+            }
+            ITree<CushionTreeMap<T>.Layout> layout;
+
+            public T Item
+            {
+                get
+                {
+                    return layout.Data.TreeNode.Data;
+                }
+            }
+        }
+        
+        public delegate void ItemEventHandler(object sender, ItemEventEventArgs e);
+
+        public event ItemEventHandler ItemMouseHover;
+        public event ItemEventHandler ItemActivate;
     }
 }

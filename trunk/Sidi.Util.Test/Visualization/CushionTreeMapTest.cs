@@ -16,7 +16,7 @@ namespace Sidi.Visualization
         {
         }
 
-        public static ITree GetTestTree()
+        public static ITree<int> GetTestTree()
         {
             var t = GetTestTree(null, 10, 4);
             return t;
@@ -24,16 +24,16 @@ namespace Sidi.Visualization
 
         static Random rnd = new Random();
 
-        public static ITree GetSimpleTestTree()
+        public static ITree<int> GetSimpleTestTree()
         {
-            var t = new Tree();
+            var t = new Tree<int>();
             var count = 3;
             t.Children = Enumerable.Range(1, count).Select(i =>
                 {
-                    var c = new Tree();
+                    var c = new Tree<int>();
                     c.Size = i;
                     c.Data = i;
-                    return (ITree) c;
+                    return (ITree<int>) c;
                 }).ToList();
 
             if (t.Children.Any())
@@ -48,9 +48,9 @@ namespace Sidi.Visualization
             return t;
         }
 
-        static Tree GetTestTree(ITree parent, int childCount, int levels)
+        static Tree<int> GetTestTree(ITree<int> parent, int childCount, int levels)
         {
-            var t = new Tree();
+            var t = new Tree<int>();
             t.Parent = parent;
             if (levels > 0)
             {
@@ -59,7 +59,7 @@ namespace Sidi.Visualization
                         {
                             var ct = GetTestTree(t, childCount, levels - 1);
                             ct.Data = c;
-                            return (ITree)ct;
+                            return (ITree<int>)ct;
                         })
                     .ToList();
 
@@ -70,31 +70,6 @@ namespace Sidi.Visualization
                 t.Size = rnd.Next(10, 100);
             }
 
-            return t;
-        }
-
-        public static Tree GetDirTree(string dir)
-        {
-            return GetDirTreeRec(null, new Sidi.IO.Long.FileSystemInfo(new IO.Long.LongName(dir)));
-        }
-
-        static Tree GetDirTreeRec(ITree parent, Sidi.IO.Long.FileSystemInfo i)
-        {
-            var t = new Tree();
-            t.Parent = parent;
-            t.Data = i;
-            if (i.IsDirectory)
-            {
-                t.Children = i.GetChilds()
-                    .Select(x => (ITree) GetDirTreeRec(t, x))
-                    .OrderByDescending(x => x.Size)
-                    .ToList();
-                t.Size = t.ChildSize;
-            }
-            else
-            {
-                t.Size = i.Length;
-            }
             return t;
         }
     }
