@@ -34,6 +34,24 @@ namespace Sidi.Visualization
                         ItemActivate(this, new ItemEventEventArgs(l));
                     }
                 };
+
+            this.ContextMenu = new ContextMenu(new[]{
+                new MenuItem("Zoom In", (s,e ) => { ZoomIn(this.PointToClient(Control.MousePosition), 1); }),
+                new MenuItem("Zoom Out", (s,e) => { ZoomOut(1); })
+            });
+
+            this.KeyPress += (s, e) =>
+                {
+                    switch (e.KeyChar)
+                    {
+                        case '+':
+                            ZoomIn(PointToClient(Control.MousePosition), 1);
+                            break;
+                        case '-':
+                            ZoomOut(1);
+                            break;
+                    }
+                };
         }
 
         void CushionTreeMapControl_MouseMove(object sender, MouseEventArgs e)
@@ -52,7 +70,12 @@ namespace Sidi.Visualization
 
         ITree<CushionTreeMap<T>.Layout> GetLayoutAt(Point p)
         {
-            return TreeMap.GetLayoutAt(p.ToArray());
+            return TreeMap.GetLayoutAt(p.ToArray(), Int32.MaxValue);
+        }
+
+        ITree<CushionTreeMap<T>.Layout> GetLayoutAt(Point p, int levels)
+        {
+            return TreeMap.GetLayoutAt(p.ToArray(), levels);
         }
 
         ITree<CushionTreeMap<T>.Layout> hoveredNode;
@@ -73,8 +96,8 @@ namespace Sidi.Visualization
         {
             if (cushions == null || !cushions.Size.Equals(this.ClientSize))
             {
-                cushions = new Bitmap(this.ClientSize.Width, this.ClientSize.Height);
-                TreeMap.Render(cushions, this.ClientRectangle);
+                TreeMap.Bounds = new RectangleF(0, 0, ClientSize.Width, ClientSize.Height);
+                cushions = TreeMap.Render();
             }
             e.Graphics.DrawImage(cushions, 0, 0);
         }
@@ -204,5 +227,38 @@ namespace Sidi.Visualization
 
         public event ItemEventHandler ItemMouseHover;
         public event ItemEventHandler ItemActivate;
+
+        ITree<T> Tree
+        {
+            set
+            {
+                cushions.Dispose();
+                cushions = null;
+                TreeMap.Tree = value;
+                Invalidate();
+            }
+        }
+
+        public void ZoomIn(Point p, int levels)
+        {
+            Tree = GetLayoutAt(p, levels).Data.TreeNode;
+        }
+
+        public void ZoomOut(int levels)
+        {
+            var t = TreeMap.Tree;
+            for (int i = 0; i < levels; ++i)
+            {
+                if (t.Parent != null)
+                {
+                    t = t.Parent;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            Tree = t;
+        }
     }
 }

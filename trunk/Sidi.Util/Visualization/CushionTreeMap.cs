@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Sidi.Visualization
 {
@@ -13,7 +14,7 @@ namespace Sidi.Visualization
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        float h = 0.5f;
+        float h = 0.75f;
         float f = 0.75f;
         const float Ia = 40;
         const float Is = 215;
@@ -31,15 +32,43 @@ namespace Sidi.Visualization
         ITree<T> root;
         ITree<Layout> layoutTree;
 
+        public ITree<T> Tree
+        {
+            get
+            {
+                return root;
+            }
+
+            set
+            {
+                root = value;
+            }
+        }
+
         public ITree<Layout> LayoutTree
         {
             get
             {
+                if (layoutTree == null || layoutTree.Data.TreeNode != Tree || !layoutTree.Data.Rectangle.Equals(rect))
+                {
+                    UpdateLayoutTree();
+                }
                 return layoutTree;
             }
         }
 
-        public void UpdateLayoutTree(float[,] rect)
+        float[,] rect;
+        float[,] margin = new float[,] { { 0,0 }, { 0, 0 } };
+
+        public RectangleF Bounds
+        {
+            set
+            {
+                rect = value.ToArray();
+            }
+        }
+
+        void UpdateLayoutTree()
         {
             layoutTree = UpdateLayoutTreeRecursive(null, root, rect);
         }
@@ -58,6 +87,7 @@ namespace Sidi.Visualization
                 var lc = new LayoutContext();
                 lc.Layout = tree.Children.Select(x => new Layout(x)).ToArray();
                 lc.Rectangle = (float[,])rect.Clone();
+                lc.Rectangle.Add(margin);
                 DoLayout(lc);
                 layoutTree.Children = lc.Layout
                     .Select(x => UpdateLayoutTreeRecursive(layoutTree, x.TreeNode, x.Rectangle))
@@ -67,21 +97,24 @@ namespace Sidi.Visualization
             return layoutTree;
         }
 
-        public ITree<Layout> GetLayoutAt(float[] p)
+        public ITree<Layout> GetLayoutAt(float[] p, int levels)
         {
-            return GetLayoutAt(layoutTree, p);
+            return GetLayoutAt(layoutTree, p, levels);
         }
 
-        ITree<Layout> GetLayoutAt(ITree<Layout> t, float[] p)
+        ITree<Layout> GetLayoutAt(ITree<Layout> t, float[] p, int levels)
         {
             if (t != null && t.Data.Rectangle.Contains(p))
             {
-                foreach (var i in t.Children)
+                if (levels > 0)
                 {
-                    var il = GetLayoutAt(i, p);
-                    if (il != null)
+                    foreach (var i in t.Children)
                     {
-                        return il;
+                        var il = GetLayoutAt(i, p, levels - 1);
+                        if (il != null)
+                        {
+                            return il;
+                        }
                     }
                 }
                 return t;
@@ -92,18 +125,30 @@ namespace Sidi.Visualization
             }
         }
 
-        public void Render(
-            Bitmap bitmap,
-            System.Drawing.RectangleF r)
+        public Bitmap Render()
         {
-            var ar = r.ToArray();
-            UpdateLayoutTree(ar);
+            var bitmap = new Bitmap((int)(rect[0, 1] - rect[0, 0]), 
+                (int)(rect[1, 1] - rect[1, 0]),
+                PixelFormat.Format24bppRgb);
             var s = new float[2, 2];
             var surface = new float[4];
-            Render(bitmap, layoutTree, h, f, s);
+
+            var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                PixelFormat.Format24bppRgb);
+            try
+            {
+                Render(data, LayoutTree, h, f, s);
+            }
+            finally
+            {
+                bitmap.UnlockBits(data);
+            }
+
+            return bitmap;
         }
 
-        void Render(Bitmap bitmap, ITree<Layout> t, float h, float f, float[,] s)
+        void Render(BitmapData bitmap, ITree<Layout> t, float h, float f, float[,] s)
         {
             s = (float[,])s.Clone();
             var layout = (Layout)t.Data;
@@ -120,7 +165,7 @@ namespace Sidi.Visualization
 
             if (t.Children.Count == 0)
             {
-                RenderCushion(bitmap, r, s);
+                RenderCushion(bitmap, r, s, GetColor(t).ToArray());
             }
             else
             {
@@ -157,6 +202,8 @@ namespace Sidi.Visualization
             return r[(int)d, (int)Bound.Max] - r[(int)d, (int)Bound.Min];
         }
 
+        public Func<ITree<Layout>, Color> GetColor = layoutTree => Color.White;
+
         static void Stripes(LayoutContext c)
         {
             var d = c.Direction;
@@ -191,13 +238,6 @@ namespace Sidi.Visualization
                 s += c[i].TreeNode.Size;
             }
             return s;
-        }
-
-        static float Area(float[,] r)
-        {
-            var w = r[0, 1] - r[0, 0];
-            var h = r[1, 1] - r[1, 0];
-            return w * h;
         }
 
         static float GetWorstAspectRatio(Layout[] layout, int b, int e, float sizeToPix, float h)
@@ -253,7 +293,7 @@ namespace Sidi.Visualization
                 }
                 return;
             }
-            var pixPerSize = Area(r) / SizeSum(layout, b, e);
+            var pixPerSize = r.Area() / SizeSum(layout, b, e);
             var pixPerHeight = pixPerSize / width;
             var rowSize = 0.0f;
             float newRowSize;
@@ -298,7 +338,7 @@ namespace Sidi.Visualization
             {
                 layout[i].Rectangle[(int)d, (int)Bound.Min] = x;
                 var w = layout[i].TreeNode.Size * widthPerSize;
-                x += w;
+                x = Math.Min(x + w, r[(int)d, (int)Bound.Max]);
                 if (float.IsNaN(x))
                 {
                     throw new Exception();
@@ -307,9 +347,6 @@ namespace Sidi.Visualization
                 layout[i].Rectangle[(int)od, (int)Bound.Min] = rowRect[(int)od, (int)Bound.Min];
                 layout[i].Rectangle[(int)od, (int)Bound.Max] = rowRect[(int)od, (int)Bound.Max];
             }
-
-            // avoid rounding errors
-            layout[rowEnd - 1].Rectangle[(int)d, (int)Bound.Max] = r[(int)d, (int)Bound.Max];
 
             // check results
             for (int i = b; i < rowEnd; ++i)
@@ -336,16 +373,18 @@ namespace Sidi.Visualization
                 Squarify(layout, r, od, rowEnd, e);
             }
 
+            /*
             float ca = 0.0f;
             for (int i = b; i < e; ++i)
             {
-                ca += Area(layout[i].Rectangle);
+                ca += layout[i].Rectangle.Area();
             }
-            var pa = Area(r);
+            var pa = r.Area();
             if (Math.Abs(pa - ca) > 0.1)
             {
-                // throw new Exception();
+                throw new Exception();
             }
+             */
         }
 
         static Dir Flip(Dir d)
@@ -360,26 +399,32 @@ namespace Sidi.Visualization
             throw new ArgumentException(d.ToString());
         }
 
-        void RenderCushion(
-            Bitmap bitmap,
+        unsafe void RenderCushion(
+            BitmapData bitmap,
             float[,] r,
-            float[,] s
+            float[,] s,
+            float[] color
             )
         {
-            var ey = (int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Max]);
+            var ey = Math.Min((int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Max]), bitmap.Height);
             var by = (int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Min]);
-            var ex = (int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Max]);
+            var ex = Math.Min((int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Max]), bitmap.Width);
             var bx = (int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Min]);
             for (int iy = by; iy < ey; ++iy)
             {
+                byte* row = (byte*)bitmap.Scan0 + iy * bitmap.Stride + bx * 3;
                 for (int ix = bx; ix < ex; ++ix )
                 {
                     var nx = (2 * s[(int)Dir.X, 1] * (ix + 0.5) + s[(int)Dir.X, 0]);
                     var ny = -(2 * s[(int)Dir.Y, 1] * (iy + 0.5) + s[(int)Dir.Y, 0]);
                     var cosa = (nx * L[0] + ny * L[1] + L[2]) / Math.Sqrt(nx * nx + ny * ny + 1.0);
-                    var intensity = Math.Max(0, Math.Min(255, (int)(Ia + Math.Max(0, Is * cosa))));
-                    var c = Color.FromArgb(intensity, intensity, intensity);
-                    bitmap.SetPixel(ix, iy, c);
+                    var intensity = Ia + Math.Max(0, Is * cosa);
+                    *row = (byte) Math.Max(0, Math.Min(255, intensity * color[0]));
+                    ++row;
+                    *row = (byte) Math.Max(0, Math.Min(255, intensity * color[1]));
+                    ++row;
+                    *row = (byte) Math.Max(0, Math.Min(255, intensity * color[2]));
+                    ++row;
                 }
             }
         }

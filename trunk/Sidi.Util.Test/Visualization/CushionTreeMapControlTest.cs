@@ -24,19 +24,42 @@ namespace Sidi.Visualization
         {
             var c = CushionTreeMapControl<Sidi.IO.Long.FileSystemInfo>.FromTree((FileSystemTree.Get(new Sidi.IO.Long.LongName(
                 // Sidi.IO.FileUtil.BinFile(".")
-                @"C:\Users\Andreas\Pictures"
                 // @"C:\Users\Andreas\Pictures"
-                // @"C:\work"
+                // @"C:\Users\Andreas\Pictures"
+                @"C:\work\lib"
                 
                 ))));
 
+            c.TreeMap.GetColor = n => FileSystemTree.ExtensionToColor(n.Data.TreeNode.Data);
+
             c.Paint += (s, e) =>
             {
+                /*
                 c.ForEachLeaf(n =>
                 {
                     if (n.Data.TreeNode.Data.Extension.Length > 1)
                     {
                         c.Highlight(e, n, FileSystemTree.ExtensionToColor(n.Data.TreeNode.Data));
+                    }
+                });
+                 */
+
+                var white = new SolidBrush(Color.White);
+                var sf = new StringFormat();
+                sf.Alignment = StringAlignment.Center;
+                sf.LineAlignment = StringAlignment.Center;
+
+                c.ForEachNode(n =>
+                {
+                    if (n.Data.Rectangle.Area() > 10000)
+                    {
+                        e.Graphics.DrawString(
+                            n.Data.TreeNode.Data.Name, 
+                            c.Font, 
+                            white, 
+                            n.Data.Rectangle.ToRectangleF(),
+                            sf
+                            );
                     }
                 });
 
@@ -75,3 +98,4 @@ namespace Sidi.Visualization
         }
     }
 }
+    
