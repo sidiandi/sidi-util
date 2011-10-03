@@ -218,13 +218,13 @@
     </Compile>
     <Compile Include="Util\Zip.cs" />
     <Compile Include="Visualization\ArrayRect.cs" />
-    <Compile Include="Visualization\CushionTreeMap.cs" />
-    <Compile Include="Visualization\CushionTreeMapControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\HSLColor.cs" />
     <Compile Include="Visualization\Tree.cs" />
+    <Compile Include="Visualization\TreeMap.cs" />
+    <Compile Include="Visualization\TreeMapControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

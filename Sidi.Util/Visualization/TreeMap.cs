@@ -10,7 +10,7 @@ namespace Sidi.Visualization
     /// <summary>
     /// http://www.win.tue.nl/~vanwijk/ctm.pdf
     /// </summary>
-    public class CushionTreeMap<T>
+    public class TreeMap<T>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -20,7 +20,7 @@ namespace Sidi.Visualization
         const float Is = 215;
         float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
 
-        public CushionTreeMap(ITree<T> root)
+        public TreeMap(ITree<T> root)
         {
             this.root = root;
             DoLayout = 
@@ -197,11 +197,6 @@ namespace Sidi.Visualization
 
         public Action<LayoutContext> DoLayout;
 
-        static float Width(float[,] r, Dir d)
-        {
-            return r[(int)d, (int)Bound.Max] - r[(int)d, (int)Bound.Min];
-        }
-
         public Func<ITree<Layout>, Color> GetColor = layoutTree => Color.White;
 
         static void Stripes(LayoutContext c)
@@ -217,7 +212,7 @@ namespace Sidi.Visualization
                 od = Dir.X;
             }
 
-            float m = Width(c.Rectangle, d) / c.Layout.First().TreeNode.Parent.Size;
+            float m = c.Rectangle.Width(d) / c.Layout.First().TreeNode.Parent.Size;
             float x = c.Rectangle[(int)d, (int)Bound.Min];
             foreach (var tc in c.Layout)
             {
@@ -274,7 +269,7 @@ namespace Sidi.Visualization
             }
 
             // fill one row until aspect ratio gets worse again
-            if (Width(r, Dir.X) > Width(r, Dir.Y))
+            if (r.Width(Dir.X) > r.Width(Dir.Y))
             {
                 d = Dir.Y;
             }
@@ -284,7 +279,7 @@ namespace Sidi.Visualization
             }
 
             float aspectRatio = float.MaxValue;
-            var width = Width(r, d);
+            var width = r.Width(d);
             if (width < float.Epsilon)
             {
                 for (int i = b; i < e; ++i)

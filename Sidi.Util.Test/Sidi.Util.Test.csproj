@@ -135,8 +135,8 @@
     <Compile Include="TestBase.cs" />
     <Compile Include="TokenizerUt.cs" />
     <Compile Include="UpdateCheckTest.cs" />
-    <Compile Include="Visualization\CushionTreeMapTest.cs" />
-    <Compile Include="Visualization\CushionTreeMapControlTest.cs" />
+    <Compile Include="Visualization\TreeMapControlTest.cs" />
+    <Compile Include="Visualization\TreeMapTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="unit-test\UpdateInfo.xml">

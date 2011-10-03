@@ -39,6 +39,11 @@ namespace Sidi.Visualization
             };
         }
 
+        public static float Width(this float[,] r, Dir d)
+        {
+            return r[(int)d, (int)Bound.Max] - r[(int)d, (int)Bound.Min];
+        }
+
         public static float[,] ToArray(this RectangleF r)
         {
             var ar = new float[2, 2];

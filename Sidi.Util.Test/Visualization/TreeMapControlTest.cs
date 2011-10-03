@@ -11,39 +11,36 @@ using Sidi.IO;
 namespace Sidi.Visualization
 {
     [TestFixture]
-    public class CushionTreeMapControlTest : TestBase
+    public class TreeMapControlTest : TestBase
     {
         [Test, Explicit("interactive")]
-        public void Display()
+        public void TestTreeDisplay()
         {
-            Display(FileSystemTree.Get(new Sidi.IO.Long.LongName(Sidi.IO.FileUtil.BinFile("."))));
+            var t = TreeMapTest.GetTestTree();
+            var tm = TreeMapControl<int>.FromTree(t);
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void TestTreeWithColorDisplay()
+        {
+            var t = TreeMapTest.GetTestTree();
+            var tm = TreeMapControl<int>.FromTree(t);
+            tm.TreeMap.GetColor = n => new HSLColor(n.Data.TreeNode.Data * 36.0f, 50, 120);
+            tm.RunFullScreen();
         }
 
         [Test, Explicit("interactive")]
         public void Interact()
         {
-            var c = CushionTreeMapControl<Sidi.IO.Long.FileSystemInfo>.FromTree((FileSystemTree.Get(new Sidi.IO.Long.LongName(
-                // Sidi.IO.FileUtil.BinFile(".")
-                // @"C:\Users\Andreas\Pictures"
-                // @"C:\Users\Andreas\Pictures"
-                @"C:\work\lib"
-                
+            var c = TreeMapControl<Sidi.IO.Long.FileSystemInfo>.FromTree((FileSystemTree.Get(new Sidi.IO.Long.LongName(
+                Sidi.IO.FileUtil.BinFile(".")
                 ))));
 
             c.TreeMap.GetColor = n => FileSystemTree.ExtensionToColor(n.Data.TreeNode.Data);
 
             c.Paint += (s, e) =>
             {
-                /*
-                c.ForEachLeaf(n =>
-                {
-                    if (n.Data.TreeNode.Data.Extension.Length > 1)
-                    {
-                        c.Highlight(e, n, FileSystemTree.ExtensionToColor(n.Data.TreeNode.Data));
-                    }
-                });
-                 */
-
                 var white = new SolidBrush(Color.White);
                 var sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;
@@ -90,8 +87,8 @@ namespace Sidi.Visualization
 
         public void Display<T>(ITree<T> t)
         {
-            var tm = new CushionTreeMap<T>(t);
-            var c = new CushionTreeMapControl<T>();
+            var tm = new TreeMap<T>(t);
+            var c = new TreeMapControl<T>();
             c.TreeMap = tm;
             var f = c.AsForm("test Cushion Tree Map");
             System.Windows.Forms.Application.Run(f);
