@@ -14,16 +14,15 @@ namespace Sidi.Visualization
         }
 
         static Tree<Sidi.IO.Long.FileSystemInfo> GetRecursive(
-            ITree<Sidi.IO.Long.FileSystemInfo> parent,
+            Tree<Sidi.IO.Long.FileSystemInfo> parent,
             Sidi.IO.Long.FileSystemInfo i)
         {
-            var t = new Tree<Sidi.IO.Long.FileSystemInfo>();
-            t.Parent = parent;
+            var t = new Tree<Sidi.IO.Long.FileSystemInfo>(parent);
             t.Data = i;
             if (i.IsDirectory)
             {
                 t.Children = i.GetChilds()
-                    .Select(x => (ITree<Sidi.IO.Long.FileSystemInfo>)GetRecursive(t, x))
+                    .Select(x => GetRecursive(t, x))
                     .OrderByDescending(x => x.Size)
                     .ToList();
                 t.Size = t.ChildSize;

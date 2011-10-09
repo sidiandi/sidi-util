@@ -8,9 +8,20 @@ using Sidi.IO.Long;
 
 namespace Sidi.Visualization
 {
-    public class TreeMapControl<T> : Control
+    public static class TreeMapControlEx
     {
-        public static TreeMapControl<T> FromTree(ITree<T> tree)
+        public static TreeMapControl<T> CreateTreemapControl<T>(this T tree) where T : ITree
+        {
+            var tm = new TreeMap<T>(tree);
+            var c = new TreeMapControl<T>();
+            c.TreeMap = tm;
+            return c;
+        }
+    }
+
+    public class TreeMapControl<T> : Control where T: ITree
+    {
+        public static TreeMapControl<T> FromTree(T tree)
         {
             var c = new TreeMapControl<T>();
             c.TreeMap = new TreeMap<T>(tree);
@@ -68,17 +79,17 @@ namespace Sidi.Visualization
             }
         }
 
-        ITree<TreeMap<T>.Layout> GetLayoutAt(Point p)
+        Tree<TreeMap<T>.Layout> GetLayoutAt(Point p)
         {
             return TreeMap.GetLayoutAt(p.ToArray(), Int32.MaxValue);
         }
 
-        ITree<TreeMap<T>.Layout> GetLayoutAt(Point p, int levels)
+        Tree<TreeMap<T>.Layout> GetLayoutAt(Point p, int levels)
         {
             return TreeMap.GetLayoutAt(p.ToArray(), levels);
         }
 
-        ITree<TreeMap<T>.Layout> hoveredNode;
+        Tree<TreeMap<T>.Layout> hoveredNode;
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
         {
@@ -102,7 +113,7 @@ namespace Sidi.Visualization
             e.Graphics.DrawImage(cushions, 0, 0);
         }
 
-        public void Highlight(PaintEventArgs e, ITree<TreeMap<T>.Layout> layoutNode, Color color)
+        public void Highlight(PaintEventArgs e, Tree<TreeMap<T>.Layout> layoutNode, Color color)
         {
             var b = new SolidBrush(Color.FromArgb(128, color));
             e.Graphics.FillRectangle(b, layoutNode.Data.Rectangle.ToRectangleF());
@@ -112,10 +123,10 @@ namespace Sidi.Visualization
         {
             if (MouseHoverNode != null)
             {
-                var h = MouseHoverNode.Data.TreeNode.Data;
+                var h = MouseHoverNode.Data.TreeNode;
                 ForEachLeaf(n =>
                 {
-                    if (f(h, n.Data.TreeNode.Data))
+                    if (f(h, n.Data.TreeNode))
                     {
                         Highlight(e, n, color);
                     }
@@ -129,7 +140,7 @@ namespace Sidi.Visualization
             base.OnPaint(e);
         }
 
-        public ITree<TreeMap<T>.Layout> MouseHoverNode
+        public Tree<TreeMap<T>.Layout> MouseHoverNode
         {
             get
             {
@@ -145,7 +156,7 @@ namespace Sidi.Visualization
         /// </summary>
         /// <param name="e"></param>
         /// <param name="tree"></param>
-        public void Track(PaintEventArgs e, ITree<TreeMap<T>.Layout> tree)
+        public void Track(PaintEventArgs e, Tree<TreeMap<T>.Layout> tree)
         {
             for (; tree != null; tree = tree.Parent)
             {
@@ -155,7 +166,7 @@ namespace Sidi.Visualization
 
         Pen redPen = new Pen(Color.Red);
 
-        void DrawOutlines(PaintEventArgs e, ITree<TreeMap<T>.Layout> layoutTree)
+        void DrawOutlines(PaintEventArgs e, Tree<TreeMap<T>.Layout> layoutTree)
         {
             var layout = layoutTree.Data;
             e.Graphics.DrawRectangle(redPen, layout.Rectangle.ToRectangle());
@@ -165,18 +176,18 @@ namespace Sidi.Visualization
             }
         }
 
-        public void ForEachNode(Action<ITree<TreeMap<T>.Layout>> a)
+        public void ForEachNode(Action<Tree<TreeMap<T>.Layout>> a)
         {
             ForEachNode(TreeMap.LayoutTree, a);
         }
 
-        public void ForEachLeaf(Action<ITree<TreeMap<T>.Layout>> a)
+        public void ForEachLeaf(Action<Tree<TreeMap<T>.Layout>> a)
         {
             ForEachLeaf(TreeMap.LayoutTree, a);
         }
 
-        void ForEachNode(ITree<TreeMap<T>.Layout> layoutTree, 
-            Action<ITree<TreeMap<T>.Layout>> a)
+        void ForEachNode(Tree<TreeMap<T>.Layout> layoutTree, 
+            Action<Tree<TreeMap<T>.Layout>> a)
         {
             a(layoutTree);
             foreach (var i in layoutTree.Children)
@@ -185,10 +196,10 @@ namespace Sidi.Visualization
             }
         }
 
-        void ForEachLeaf(ITree<TreeMap<T>.Layout> layoutTree,
-            Action<ITree<TreeMap<T>.Layout>> a)
+        void ForEachLeaf(Tree<TreeMap<T>.Layout> layoutTree,
+            Action<Tree<TreeMap<T>.Layout>> a)
         {
-            if (layoutTree.Children.Count == 0)
+            if (!layoutTree.Children.Any())
             {
                 a(layoutTree);
             }
@@ -200,25 +211,25 @@ namespace Sidi.Visualization
 
         public class ItemEventEventArgs : EventArgs
         {
-            public ItemEventEventArgs(ITree<TreeMap<T>.Layout> layout)
+            public ItemEventEventArgs(Tree<TreeMap<T>.Layout> layout)
             {
                 this.layout = layout;
             }
 
-            public ITree<TreeMap<T>.Layout> Layout
+            public Tree<TreeMap<T>.Layout> Layout
             {
                 get
                 {
                     return layout;
                 }
             }
-            ITree<TreeMap<T>.Layout> layout;
+            Tree<TreeMap<T>.Layout> layout;
 
             public T Item
             {
                 get
                 {
-                    return layout.Data.TreeNode.Data;
+                    return layout.Data.TreeNode;
                 }
             }
         }
@@ -228,7 +239,7 @@ namespace Sidi.Visualization
         public event ItemEventHandler ItemMouseHover;
         public event ItemEventHandler ItemActivate;
 
-        ITree<T> Tree
+        T Tree
         {
             set
             {
@@ -251,7 +262,7 @@ namespace Sidi.Visualization
             {
                 if (t.Parent != null)
                 {
-                    t = t.Parent;
+                    t = (T) t.Parent;
                 }
                 else
                 {

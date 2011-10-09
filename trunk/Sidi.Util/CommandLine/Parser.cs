@@ -602,6 +602,8 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public const string categoryUserInterface = "User Interface";
+        
         List<object> m_applications = new List<object>();
         static string[] optionPrefix = new string[] { "--", "-", "/" };
         static CultureInfo cultureInfo;
@@ -640,7 +642,7 @@ namespace Sidi.CommandLine
         {
             Applications.Add(new ShowHelp(this));
             Applications.Add(new ShowUserInterface(this));
-            Applications.Add(new WebServer(this));
+            Applications.Add(new ShowWebServer(this));
         }
 
         internal Parser()

@@ -16,7 +16,7 @@ namespace Sidi.Visualization
         {
         }
 
-        public static ITree<int> GetTestTree()
+        public static Tree<int> GetTestTree()
         {
             var t = GetTestTree(null, 10, 5);
             return t;
@@ -24,16 +24,16 @@ namespace Sidi.Visualization
 
         static Random rnd = new Random();
 
-        public static ITree<int> GetSimpleTestTree()
+        public static Tree<int> GetSimpleTestTree()
         {
-            var t = new Tree<int>();
+            var t = new Tree<int>(null);
             var count = 3;
             t.Children = Enumerable.Range(1, count).Select(i =>
                 {
-                    var c = new Tree<int>();
+                    var c = new Tree<int>(t);
                     c.Size = i;
                     c.Data = i;
-                    return (ITree<int>) c;
+                    return c;
                 }).ToList();
 
             if (t.Children.Any())
@@ -48,10 +48,9 @@ namespace Sidi.Visualization
             return t;
         }
 
-        static Tree<int> GetTestTree(ITree<int> parent, int childCount, int levels)
+        static Tree<int> GetTestTree(Tree<int> parent, int childCount, int levels)
         {
-            var t = new Tree<int>();
-            t.Parent = parent;
+            var t = new Tree<int>(parent);
             if (levels > 0)
             {
                 t.Children = Enumerable.Range(0, rnd.Next(0, childCount))
@@ -59,7 +58,7 @@ namespace Sidi.Visualization
                         {
                             var ct = GetTestTree(t, childCount, levels - 1);
                             ct.Data = c;
-                            return (ITree<int>)ct;
+                            return ct;
                         })
                     .ToList();
 

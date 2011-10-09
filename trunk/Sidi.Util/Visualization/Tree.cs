@@ -5,26 +5,48 @@ using System.Text;
 
 namespace Sidi.Visualization
 {
-    public interface ITree<T>
+    public interface ITree
     {
-        T Data { get; }
         float Size { get; }
-        ITree<T> Parent { get; }
-        IList<ITree<T>> Children { get; set; }
+        ITree Parent { get; }
+        IEnumerable<ITree> Children { get; }
     }
 
-    public class Tree<T> : ITree<T>
+    public class Tree<T> : ITree
     {
+        public Tree(Tree<T> parent)
+        {
+            this.Parent = parent;
+        }
+
         public T Data { get; set; }
         public float Size { get; set; }
-        public ITree<T> Parent { get; set; }
-        public IList<ITree<T>> Children
+
+        ITree ITree.Parent
+        {
+            get
+            {
+                return this.Parent;
+            }
+        }
+
+        public Tree<T> Parent { get; set; }
+        
+        IEnumerable<ITree> ITree.Children
+        {
+            get
+            {
+                return this.Children;
+            }
+        }
+
+        public List<Tree<T>> Children
         {
             get
             {
                 if (children == null)
                 {
-                    children = new List<ITree<T>>();
+                    children = new List<Tree<T>>();
                 }
                 return children;
             }
@@ -33,7 +55,8 @@ namespace Sidi.Visualization
                 children = value;
             }
         }
-        public IList<ITree<T>> children;
+
+        List<Tree<T>> children;
 
         /// <summary>
         /// calculates the sum of the sizes of all children
@@ -43,6 +66,18 @@ namespace Sidi.Visualization
             get
             {
                 return Children.Aggregate(0.0f, (s, i) => s + i.Size);
+            }
+        }
+
+        public void UpdateSize()
+        {
+            if (Children.Any())
+            {
+                foreach (var i in Children)
+                {
+                    i.UpdateSize();
+                }
+                Size = ChildSize;
             }
         }
     }

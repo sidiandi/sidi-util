@@ -548,7 +548,7 @@ namespace Sidi.CommandLine.Test
         public void Serve()
         {
             var p = new Parser(new TestAppWithStringList());
-            p.Parse(new string[] { "Prefix", "http://localhost:49160/", "Serve" });
+            p.Parse(new string[] { "WebServer", "Run", "Browse" });
         }
 
         [Test, Explicit("interactive")]
@@ -556,7 +556,6 @@ namespace Sidi.CommandLine.Test
         {
             var p = new Parser(new TestAppWithStringList());
             var ws = new WebServer(p);
-            ws.Prefix = "http://localhost/SidiUtilTestApp/";
             ws.StartServer();
             try
             {

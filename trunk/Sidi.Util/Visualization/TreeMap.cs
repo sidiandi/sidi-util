@@ -10,7 +10,7 @@ namespace Sidi.Visualization
     /// <summary>
     /// http://www.win.tue.nl/~vanwijk/ctm.pdf
     /// </summary>
-    public class TreeMap<T>
+    public class TreeMap<T> where T : ITree
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -20,7 +20,7 @@ namespace Sidi.Visualization
         const float Is = 215;
         float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
 
-        public TreeMap(ITree<T> root)
+        public TreeMap(T root)
         {
             this.root = root;
             DoLayout = 
@@ -29,10 +29,10 @@ namespace Sidi.Visualization
                 ;
         }
 
-        ITree<T> root;
-        ITree<Layout> layoutTree;
+        T root;
+        Tree<Layout> layoutTree;
 
-        public ITree<T> Tree
+        public T Tree
         {
             get
             {
@@ -45,13 +45,13 @@ namespace Sidi.Visualization
             }
         }
 
-        public ITree<Layout> LayoutTree
+        public Tree<Layout> LayoutTree
         {
             get
             {
-                if (layoutTree == null || layoutTree.Data.TreeNode != Tree || !layoutTree.Data.Rectangle.Equals(rect))
+                if (layoutTree == null || (ITree)layoutTree.Data.TreeNode != (ITree)Tree || !layoutTree.Data.Rectangle.Equals(rect))
                 {
-                    UpdateLayoutTree();
+                    layoutTree = UpdateLayoutTreeRecursive(null, root, rect);
                 }
                 return layoutTree;
             }
@@ -68,24 +68,21 @@ namespace Sidi.Visualization
             }
         }
 
-        void UpdateLayoutTree()
+        Tree<Layout> UpdateLayoutTreeRecursive(Tree<Layout> parent, T tree, float[,] rect)
         {
-            layoutTree = UpdateLayoutTreeRecursive(null, root, rect);
-        }
+            var layoutTree = new Tree<Layout>(parent)
+            {
+                Data = new Layout(tree)
+                {
+                    Rectangle = (float[,])rect.Clone(),
+                },
+                Size = tree.Size,
+            };
 
-        ITree<Layout> UpdateLayoutTreeRecursive(ITree<Layout> parent, ITree<T> tree, float[,] rect)
-        {
-            var layoutTree = new Tree<Layout>();
-            var layout = new Layout(tree);
-            layoutTree.Data = layout;
-            layoutTree.Parent = parent;
-            layout.Rectangle = (float[,]) rect.Clone();
-            layoutTree.Size = tree.Size;
-
-            if (tree.Children != null && tree.Children.Count > 0 && tree.Size > 0 && layout.Rectangle.CoversPixel())
+            if (tree.Children.Any() && tree.Size > 0 && layoutTree.Data.Rectangle.CoversPixel())
             {
                 var lc = new LayoutContext();
-                lc.Layout = tree.Children.Select(x => new Layout(x)).ToArray();
+                lc.Layout = tree.Children.Select(x => new Layout((T)x)).ToArray();
                 lc.Rectangle = (float[,])rect.Clone();
                 lc.Rectangle.Add(margin);
                 DoLayout(lc);
@@ -97,12 +94,12 @@ namespace Sidi.Visualization
             return layoutTree;
         }
 
-        public ITree<Layout> GetLayoutAt(float[] p, int levels)
+        public Tree<Layout> GetLayoutAt(float[] p, int levels)
         {
             return GetLayoutAt(layoutTree, p, levels);
         }
 
-        ITree<Layout> GetLayoutAt(ITree<Layout> t, float[] p, int levels)
+        Tree<Layout> GetLayoutAt(Tree<Layout> t, float[] p, int levels)
         {
             if (t != null && t.Data.Rectangle.Contains(p))
             {
@@ -148,7 +145,7 @@ namespace Sidi.Visualization
             return bitmap;
         }
 
-        void Render(BitmapData bitmap, ITree<Layout> t, float h, float f, float[,] s)
+        void Render(BitmapData bitmap, Tree<Layout> t, float h, float f, float[,] s)
         {
             s = (float[,])s.Clone();
             var layout = (Layout)t.Data;
@@ -163,7 +160,7 @@ namespace Sidi.Visualization
                 }
             }
 
-            if (t.Children.Count == 0)
+            if (!t.Children.Any())
             {
                 RenderCushion(bitmap, r, s, GetColor(t).ToArray());
             }
@@ -185,19 +182,19 @@ namespace Sidi.Visualization
 
         public class Layout
         {
-            public Layout(ITree<T> tree)
+            public Layout(T tree)
             {
                 TreeNode = tree;
                 Rectangle = new float[2, 2];
             }
 
             public float[,] Rectangle;
-            public ITree<T> TreeNode;
+            public T TreeNode;
         }
 
         public Action<LayoutContext> DoLayout;
 
-        public Func<ITree<Layout>, Color> GetColor = layoutTree => Color.White;
+        public Func<Tree<Layout>, Color> GetColor = layoutTree => Color.White;
 
         static void Stripes(LayoutContext c)
         {
