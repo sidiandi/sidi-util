@@ -351,9 +351,7 @@ namespace Sidi.Cache
 
         Func<Key, Value> defaultValueWhileLoading;
 
-        #region IDisposable Members
-
-        public void Dispose()
+        void StopWorkers()
         {
             lock (this)
             {
@@ -361,10 +359,13 @@ namespace Sidi.Cache
                 Monitor.PulseAll(this);
             }
             workers.ForEach(x => x.Join());
-            cache.Dispose();
         }
 
-        #endregion
+        public void Dispose()
+        {
+            StopWorkers();
+            cache.Dispose();
+        }
 
         public void Clear()
         {

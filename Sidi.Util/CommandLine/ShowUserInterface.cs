@@ -7,6 +7,7 @@ using System.Drawing;
 using Sidi.Util;
 using Sidi.Forms;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Sidi.CommandLine
 {
@@ -40,6 +41,7 @@ namespace Sidi.CommandLine
         }
 
         [Usage("Show an interactive user interface")]
+        [Category(Parser.categoryUserInterface)]
         public void UserInterface()
         {
             Form main = new Form();

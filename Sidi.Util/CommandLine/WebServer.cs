@@ -14,9 +14,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Web;
 using System.Web.UI;
+using Sidi.IO;
+using Sidi.Net;
 
 namespace Sidi.CommandLine
 {
+    [Usage("Stand-alone web server")]
     public class WebServer : Sidi.Net.HtmlGenerator
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -47,10 +50,7 @@ namespace Sidi.CommandLine
             this.originalParser = originalParser;
         }
 
-        const string WebServerCategory = "Web Server";
-
-        [Usage("HTTP prefix, e.g. http://*:12345/ . If undefined, a random port will be used.")]
-        [Category(WebServerCategory)]
+        [Usage("URL of web server")]
         public string Prefix
         {
             set
@@ -76,14 +76,10 @@ namespace Sidi.CommandLine
 
         public void StartServer()
         {
-            listenThread = new Thread(new ThreadStart(() =>
-                {
-                    this.Serve();
-                }));
-
+            listenThread = new Thread(ServerThread);
             listenThread.Start();
         }
-
+        
         public void StopServer()
         {
             httpListener.Stop();
@@ -91,9 +87,19 @@ namespace Sidi.CommandLine
             listenThread = null;
         }
 
-        [Usage("Offers program functions on an embedded web server.")]
-        [Category(WebServerCategory)]
-        public void Serve()
+        [Usage("Run the web server in command line. Press Ctrl+C to stop")]
+        public void Run()
+        {
+            StartServer();
+        }
+
+        [Usage("Display web server in the default web browser")]
+        public void Browse()
+        {
+            this.Prefix.ShellOpen();
+        }
+
+        void ServerThread()
         {
             try
             {
@@ -138,7 +144,7 @@ namespace Sidi.CommandLine
                     ));
         }
 
-        string BreadCrumbs(Context c)
+        object BreadCrumbs(Context c)
         {
             var cs = new List<Context>();
             for (var i = c; i != null; i = i.Parent)
@@ -146,15 +152,7 @@ namespace Sidi.CommandLine
                 cs.Add(i);
             }
             cs.Reverse();
-            return cs
-                .Select(x => @"<a href=""{0}"">{1}</a>".F(x.Base, x.Parser.MainApplication.GetType().Name))
-                .Join(" &gt ");
-        }
-
-        void HtmlFooter(Context c, TextWriter o)
-        {
-            o.WriteLine(@"</body>
-</html>");
+            return cs.Select(x => a(href(x.Base), x.Parser.MainApplication.GetType().Name));
         }
 
         void Overview(Context c)
@@ -175,71 +173,87 @@ namespace Sidi.CommandLine
                     StandardPage(c,
                         Parser.Categories.Select(category =>
                             div(h2(category),
-                            c.Parser.Items
-                                .Where(x => x.Categories.Contains(category))
-                                .Select(item => new Action<TextWriter>(w => OverviewItem(c, w, item))))))
+                                c.Parser.Items
+                                    .Where(x => x.Categories.Contains(category))
+                                    .Select(item => OverviewItem(c, item))
+                                    )
+                               )
+                            )
                                 (o);
             }
         }
 
-        void Form(TextWriter o, IParserItem item)
+        object Form(IParserItem item)
         {
             if (item is Action)
             {
-                Form(o, (Action)item);
+                return Form((Action)item);
             }
             else if (item is Option)
             {
-                Form(o, (Option)item);
+                return Form((Option)item);
             }
+            throw new ArgumentException(item.ToString());
         }
 
-        void OverviewItem(Context c, TextWriter o, IParserItem item)
+        object OverviewItem(Context c, IParserItem item)
         {
             if (item is Action)
             {
                 var action = (Action)item;
-                o.WriteLine(@"<p><a href=""{0}.form"">{2}</a> - {1}", c.Path(action.Name), action.Usage, action.Name);
+                return p(a(href(c.Path(action.Name + ".form")), action.Name), " - ", action.Usage);
             }
             else if (item is Option)
             {
-                Form(o, (Option)item);
+                return Form((Option)item);
             }
             else if (item is SubCommand)
             {
                 var subCommand = (SubCommand)item;
-                o.WriteLine(@"<p><a href=""{0}"">{1}</a> - {2}", c.Path(subCommand.Name), subCommand.Name, subCommand.Usage);
+                return p(a(href(c.Path(subCommand.Name)), subCommand.Name), " - ", subCommand.Usage);
             }
             else
             {
-                o.WriteLine("<p>{0}</p> - not supported", item.Name);
+                return p(item.Name, " - ", "not supported");
             }
         }
 
-        void Form(TextWriter o, Action a)
+        object Form(Action a)
         {
-            o.WriteLine(@"<form action=""{0}.html"" method=""get"">
-<h2>{0}</h2>
-<p>{2}</p>
-{1}
-<p><input type=""submit"" value=""{0}"" /></p>
-</form>",
-                a.Name,
-                a.MethodInfo.GetParameters().Select(p => @"<p>{0} <input type=""text"" name=""{0}"" /> [{1}]</p>".F(
-                    p.Name, p.ParameterType.GetInfo())).Join(),
-                a.Usage);
+            return form(
+                action(a.Name + ".html"), 
+                method("get"),
+                h2(a.Name),
+                p(a.Usage),
+
+                // params
+                a.MethodInfo.GetParameters().Select(param =>
+                    p(
+                        param.Name, 
+                        input(type("text"), name(param.Name)), 
+                        "[", param.ParameterType.GetInfo(), "]"
+                        )
+                ),
+
+                p(input(type("submit"), value(a.Name)))
+            );
         }
 
-        void Form(TextWriter o, Option option)
+        object Form(Option option)
         {
-            o.WriteLine(@"<form action="""" method=""get"">
-<p>{0} <input type=""{4}"" name=""{0}"" value=""{3}"" /> [{1}] - {2}<input type=""submit"" value=""Set"" /></p>
-</form>",
-                option.Name,
-                option.Type.GetInfo(),
-                option.Usage,
-                option.GetValue().SafeToString(),
-                option.IsPassword ? "password" : "text"
+            return form(
+                action(String.Empty),
+                method("get"),
+                p(
+                    option.Name,
+                    input(
+                        type(option.IsPassword ? "password" : "text"),
+                        name(option.Name),
+                        value(option.GetValue().SafeToString())
+                        ),
+                    "[", option.Type.GetInfo(), "]",
+                    input(type("submit"), value("Set"))
+                    )
                 );
         }
 
@@ -277,7 +291,9 @@ namespace Sidi.CommandLine
                 if (item is Action)
                 {
                     var action = (Action)item;
+                    var startTime = DateTime.Now;
                     action.Handle(GetParameterList(action.MethodInfo.GetParameters(), c.Request.Url), true);
+                    Console.WriteLine("Completed in {0}", DateTime.Now - startTime);                
                 }
                 else if (item is Option)
                 {
@@ -353,16 +369,19 @@ namespace Sidi.CommandLine
                 throw new Exception("Cannot handle {0}".F(http.Request.Url));
             }
 
-            log.Info(http.Request.Url);
-            var c = new Context();
-            c.Http = http;
-            var parts = Context.SplitUrlPath(c.Http.Request.Url.AbsolutePath);
-            var baseParts = Context.SplitUrlPath(Prefix);
-            c.Base = "/" + baseParts.Skip(2).Join("/");
-            c.RelPath = parts.Skip(baseParts.Count()-2).Join("/");
-            c.Parser = Parser;
-            Handle(c);
-            log.InfoFormat("{0} {1}", http.Response.StatusCode, http.Request.Url);
+            using (log4net.NDC.Push(http.Request.RemoteEndPoint.Address.ToString()))
+            {
+                log.Info(http.Request.Url);
+                var c = new Context();
+                c.Http = http;
+                var parts = Context.SplitUrlPath(c.Http.Request.Url.AbsolutePath);
+                var baseParts = Context.SplitUrlPath(Prefix);
+                c.Base = "/" + baseParts.Skip(2).Join("/");
+                c.RelPath = parts.Skip(baseParts.Count() - 2).Join("/");
+                c.Parser = Parser;
+                Handle(c);
+                log.InfoFormat("{0} {1}", http.Response.StatusCode, http.Request.Url);
+            }
         }
 
         void Handle(Context c)
@@ -400,7 +419,7 @@ namespace Sidi.CommandLine
                                 {
                                     using (var o = new StreamWriter(c.Http.Response.OutputStream))
                                     {
-                                        StandardPage(c, new Action<TextWriter>(x => Form(x, item)))(o);
+                                        StandardPage(c, Form(item))(o);
                                     }
                                 }
                                 break;
@@ -408,16 +427,7 @@ namespace Sidi.CommandLine
                                 {
                                     using (var o = new StreamWriter(c.Http.Response.OutputStream))
                                     {
-                                        StandardPage(c, new Action<TextWriter>(x =>
-                                            {
-                                                using (var cw = new HtmlCodeWriter(x))
-                                                {
-                                                    if (item is Action)
-                                                    {
-                                                        Run(item, c.Http, cw);
-                                                    }
-                                                }
-                                            }));
+                                        StandardPage(c, Form(item), Verbose(cw => Run(item, c.Http, cw)))(o);
                                     }
                                 }
                                 break;
@@ -453,45 +463,15 @@ namespace Sidi.CommandLine
         }
     }
 
-    public class HtmlCodeWriter : TextWriter
+    public class ShowWebServer
     {
-        TextWriter o;
-        TextWriter ownO;
-
-        public HtmlCodeWriter(TextWriter o)
+        public ShowWebServer(Parser parser)
         {
-            this.o = o;
-            this.o.WriteLine("<code>");
+            WebServer = new WebServer(parser);
         }
 
-        public HtmlCodeWriter(Stream o)
-            : this(new StreamWriter(o))
-        {
-            this.ownO = this.o;
-        }
-
-        public override Encoding Encoding
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override void WriteLine(string value)
-        {
-            foreach (var line in value.Lines())
-            {
-                o.WriteLine(line);
-                o.WriteLine("<br>");
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            o.WriteLine("</code>");
-            if (ownO != null)
-            {
-                ownO.Close();
-            }
-            base.Dispose(disposing);
-        }
+        [Category(Parser.categoryUserInterface)]
+        [SubCommand]
+        public WebServer WebServer;
     }
 }

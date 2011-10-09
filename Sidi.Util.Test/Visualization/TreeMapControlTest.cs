@@ -17,7 +17,7 @@ namespace Sidi.Visualization
         public void TestTreeDisplay()
         {
             var t = TreeMapTest.GetTestTree();
-            var tm = TreeMapControl<int>.FromTree(t);
+            var tm = t.CreateTreemapControl();
             tm.RunFullScreen();
         }
 
@@ -25,7 +25,7 @@ namespace Sidi.Visualization
         public void TestTreeWithColorDisplay()
         {
             var t = TreeMapTest.GetTestTree();
-            var tm = TreeMapControl<int>.FromTree(t);
+            var tm = t.CreateTreemapControl();
             tm.TreeMap.GetColor = n => new HSLColor(n.Data.TreeNode.Data * 36.0f, 50, 120);
             tm.RunFullScreen();
         }
@@ -33,9 +33,10 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void Interact()
         {
-            var c = TreeMapControl<Sidi.IO.Long.FileSystemInfo>.FromTree((FileSystemTree.Get(new Sidi.IO.Long.LongName(
+            var c = FileSystemTree.Get(new Sidi.IO.Long.LongName(
                 Sidi.IO.FileUtil.BinFile(".")
-                ))));
+                ).ParentDirectory.ParentDirectory)
+                .CreateTreemapControl();
 
             c.TreeMap.GetColor = n => FileSystemTree.ExtensionToColor(n.Data.TreeNode.Data);
 
@@ -44,10 +45,11 @@ namespace Sidi.Visualization
                 var white = new SolidBrush(Color.White);
                 var sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;
-                sf.LineAlignment = StringAlignment.Center;
+                sf.LineAlignment = StringAlignment.Near;
 
                 c.ForEachNode(n =>
                 {
+
                     if (n.Data.Rectangle.Area() > 10000)
                     {
                         e.Graphics.DrawString(
@@ -75,7 +77,7 @@ namespace Sidi.Visualization
                 {
                     try
                     {
-                        e.Item.FullPath.NoPrefix.ShellOpen();
+                        e.Item.Data.FullPath.NoPrefix.ShellOpen();
                     }
                     catch
                     {
@@ -85,9 +87,9 @@ namespace Sidi.Visualization
             c.RunFullScreen();
         }
 
-        public void Display<T>(ITree<T> t)
+        public void Display<T>(T tree) where T : ITree
         {
-            var tm = new TreeMap<T>(t);
+            var tm = new TreeMap<T>(tree);
             var c = new TreeMapControl<T>();
             c.TreeMap = tm;
             var f = c.AsForm("test Cushion Tree Map");
