@@ -11,21 +11,44 @@ namespace Sidi.Net
 {
     public class HtmlGenerator
     {
+        public HtmlGenerator()
+        {
+            ErrorMessage = e => 
+            html(head(), body(Verbose(o => o.WriteLine(e.ToString()))));
+        }
+
         public Action<TextWriter> Tag(string tag, params object[] childs)
         {
             return o =>
             {
-                o.Write("<{0} ", tag);
-                foreach (var i in childs.OfType<Attribute>())
+                try
                 {
-                    i.Render(o);
+                    o.Write("<{0} ", tag);
+                    foreach (var i in childs.OfType<Attribute>())
+                    {
+                        i.Render(o);
+                    }
+                    o.WriteLine(">", tag);
+                    foreach (var i in childs)
+                    {
+                        RenderChild(o, i);
+                    }
                 }
-                o.WriteLine(">", tag);
-                foreach (var i in childs)
+                catch (Exception e)
                 {
-                    RenderChild(o, i);
+                    if (tag == "body")
+                    {
+                        this.Verbose(x => x.WriteLine(e.ToString()))(o);
+                    }
+                    else
+                    {
+                        throw new Exception(tag, e);
+                    }
                 }
-                o.WriteLine("</{0}>", tag);
+                finally
+                {
+                    o.WriteLine("</{0}>", tag);
+                }
             };
         }
 
@@ -55,6 +78,24 @@ namespace Sidi.Net
                 o.WriteLine(HttpUtility.HtmlEncode(i));
             }
         }
+
+        /// <summary>
+        /// Exception-safe way to render the html object to a TextWriter
+        /// </summary>
+        /// <param name="?"></param>
+        public void Write(TextWriter o, Func<object> htmlGenerator)
+        {
+            try
+            {
+                RenderChild(o, htmlGenerator());    
+            }
+            catch (Exception e)
+            {
+                ErrorMessage(e)(o);
+            }
+        }
+
+        public Func<Exception, Action<TextWriter>> ErrorMessage;
 
         public Action<TextWriter> html(params object[] childs)
         {
@@ -96,7 +137,7 @@ namespace Sidi.Net
             return new Attribute(childs);
         }
 
-        public object Verbose(Action<TextWriter> a)
+        public Action<TextWriter> Verbose(Action<TextWriter> a)
         {
             return new Action<TextWriter>(x =>
             {

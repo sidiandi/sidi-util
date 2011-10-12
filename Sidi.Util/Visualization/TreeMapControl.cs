@@ -24,7 +24,7 @@ namespace Sidi.Visualization
         public static TreeMapControl<T> FromTree(T tree)
         {
             var c = new TreeMapControl<T>();
-            c.TreeMap = new TreeMapLayout<T>(tree);
+            c.TreeLayout = new TreeMapLayout(tree);
             return c;
         }
         
@@ -69,6 +69,8 @@ namespace Sidi.Visualization
                             break;
                     }
                 };
+
+            CushionPainter = new CushionPainter<T>(this);
         }
 
         public T SelectedNode { set; get; }
@@ -88,194 +90,59 @@ namespace Sidi.Visualization
             }
         }
 
-        public Func<T, Color> NodeColor
-        {
-            set
-            {
-                TreeMap.GetColor = value;
-                RenderCushions();
-            }
-        }
+        public CushionPainter<T> CushionPainter;
 
         public void SetBinnedNodeColor(Func<T, IComparable> f)
         {
-            var bins = new Bins(TreeMap.Tree.GetAllNodes().Cast<T>().Select(f));
+            var bins = new Bins(TreeLayout.Tree.GetAllNodes().Cast<T>().Select(f));
             var colorMap = ColorMap.BlueRed(0.0, 1.0);
-            NodeColor = n => colorMap.ToColor(bins.Percentile(f(n)));
+            CushionPainter.NodeColor = n => colorMap.ToColor(bins.Percentile(f(n)));
         }
 
-        Tree<TreeMapLayout<T>.Layout> GetLayoutAt(Point p)
+        Tree<TreeMapLayout.Layout> GetLayoutAt(Point p)
         {
-            return TreeMap.GetLayoutAt(p.ToArray(), Int32.MaxValue);
+            return TreeLayout.GetLayoutAt(p.ToArray(), Int32.MaxValue);
         }
 
         public T GetNodeAt(Point p)
         {
-            return GetLayoutAt(p).Data.TreeNode;
+            return (T) GetLayoutAt(p).Data.TreeNode;
         }
 
-        Tree<TreeMapLayout<T>.Layout> GetLayoutAt(Point p, int levels)
+        Tree<TreeMapLayout.Layout> GetLayoutAt(Point p, int levels)
         {
-            return TreeMap.GetLayoutAt(p.ToArray(), levels);
+            return TreeLayout.GetLayoutAt(p.ToArray(), levels);
         }
 
-        Tree<TreeMapLayout<T>.Layout> hoveredNode;
+        Tree<TreeMapLayout.Layout> hoveredNode;
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
         {
-            if (cushions != null)
-            {
-                cushions.Dispose();
-                cushions = null;
-            }
+            TreeLayout.Bounds = this.Bounds;
         }
 
-        TreeMapLayout<T> TreeMap { set; get; }
+        public TreeMapLayout TreeLayout { set; get; }
 
         public T Tree
         {
             get
             {
-                return TreeMap.Tree;
+                return (T) TreeLayout.Tree;
             }
 
             set
             {
-                TreeMap = new TreeMapLayout<T>(value);
-                RenderCushions();
+                TreeLayout = new TreeMapLayout(value);
+                Invalidate();
             }
         }
 
-        Bitmap cushions;
-        void PaintCushions(PaintEventArgs e)
+        public LabelPainter<T> CreateLabelPainter()
         {
-            if (cushions == null || !cushions.Size.Equals(this.ClientSize))
-            {
-                RenderCushions();
-            }
-            if (cushions != null)
-            {
-                e.Graphics.DrawImage(cushions, 0, 0);
-            }
+            return new LabelPainter<T>(this.TreeLayout);
         }
 
-        public void RenderCushions()
-        {
-            if (cushions != null)
-            {
-                cushions.Dispose();
-                cushions = null;
-            }
-
-            var rect = new RectangleF(0, 0, ClientSize.Width, ClientSize.Height);
-            if (rect.Width > 0 && rect.Height > 0)
-            {
-                TreeMap.Bounds = rect;
-                cushions = TreeMap.Render();
-            }
-            Invalidate();
-        }
-
-        public LabelPainter CreateLabelPainter()
-        {
-            return new LabelPainter(this.TreeMap);
-        }
-
-        public class LabelPainter
-        {
-            public StringFormat StringFormat;
-
-            TreeMapLayout<T> treeMap;
-
-            public LabelPainter(TreeMapLayout<T> treeMap)
-            {
-                this.treeMap = treeMap;
-                StringFormat = new StringFormat()
-                {
-                    Alignment = StringAlignment.Center,
-                    LineAlignment = StringAlignment.Center
-                };
-
-                Font = new Font(FontFamily.GenericSansSerif, 10.0f);
-            }
-
-            public float MinArea = 100.0f;
-
-            public void Paint(PaintEventArgs e)
-            {
-                float maxArea = treeMap.LayoutTree.Data.Rectangle.Area();
-                alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
-                PaintRecursive(e, treeMap.LayoutTree);
-            }
-
-            public Font Font;
-
-            public Func<T, string> Text = t => t.ToString();
-
-            double alphaF;
-
-            bool PaintRecursive(PaintEventArgs e, Tree<TreeMapLayout<T>.Layout> n)
-            {
-                var rectArea = n.Data.Rectangle.Area();
-                if (rectArea < MinArea || !e.ClipRectangle.IntersectsWith(n.Data.Rectangle.ToRectangle()))
-                {
-                    return false;
-                }
-
-                var a50 = Math.Max(rectArea * 0.6, MinArea);
-
-                if (
-                    n.Parent != null && 
-                    (
-                        n.Children.All(c => c.Data.Rectangle.Area() < a50)
-                    ))
-                {
-                    var rect = n.Data.Rectangle.ToRectangleF();
-                    var text = Text(n.Data.TreeNode);
-                    var textSize = e.Graphics.MeasureString(text, Font);
-                    var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
-                    if ((scale * textSize.Height * 8) < rect.Height)
-                    {
-                        scale *= 2;
-                    }
-
-                    if (scale < 1.0)
-                    {
-                        return false;
-                    }
-
-                    var a = Util.ClipByte(255.0 - (Math.Log10(n.Data.Rectangle.Area()) - Math.Log10(MinArea)) * alphaF);
-
-                    var white = new SolidBrush(Color.FromArgb(a, Color.White));
-                    var font = new Font(FontFamily.GenericSansSerif, Font.Size * scale);
-
-                    e.Graphics.DrawString(
-                        text,
-                        font,
-                        white,
-                        rect,
-                        StringFormat
-                        );
-
-                    /*
-                    var gp = new GraphicsPath();
-                    gp.AddString(text, FontFamily.GenericSansSerif, (int)FontStyle.Regular, font.Size, rect, StringFormat);
-                    var outlinePen = new Pen(Color.FromArgb(a, Color.Black), 3.0f);
-                    e.Graphics.DrawPath(outlinePen, gp);
-                    e.Graphics.FillPath(white, gp);
-                     */
-                }
-
-                foreach (var c in n.Children)
-                {
-                    PaintRecursive(e, c);
-                }
-
-                return true;
-            }
-        }
-
-        public void Highlight(PaintEventArgs e, Tree<TreeMapLayout<T>.Layout> layoutNode, Color color)
+        public void Highlight(PaintEventArgs e, Tree<TreeMapLayout.Layout> layoutNode, Color color)
         {
             var b = new SolidBrush(Color.FromArgb(128, color));
             e.Graphics.FillRectangle(b, layoutNode.Data.Rectangle.ToRectangleF());
@@ -285,10 +152,10 @@ namespace Sidi.Visualization
         {
             if (MouseHoverNode != null)
             {
-                var h = MouseHoverNode.Data.TreeNode;
+                var hovered = (T) MouseHoverNode.Data.TreeNode;
                 ForEachLeaf(n =>
                 {
-                    if (f(h, n.Data.TreeNode))
+                    if (f(hovered, (T) n.Data.TreeNode))
                     {
                         Highlight(e, n, color);
                     }
@@ -298,11 +165,11 @@ namespace Sidi.Visualization
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            PaintCushions(e);
+            CushionPainter.Paint(e);
             base.OnPaint(e);
         }
 
-        public Tree<TreeMapLayout<T>.Layout> MouseHoverNode
+        public Tree<TreeMapLayout.Layout> MouseHoverNode
         {
             get
             {
@@ -318,7 +185,7 @@ namespace Sidi.Visualization
         /// </summary>
         /// <param name="e"></param>
         /// <param name="tree"></param>
-        public void Track(PaintEventArgs e, Tree<TreeMapLayout<T>.Layout> tree)
+        public void Track(PaintEventArgs e, Tree<TreeMapLayout.Layout> tree)
         {
             for (; tree != null; tree = tree.Parent)
             {
@@ -328,7 +195,7 @@ namespace Sidi.Visualization
 
         Pen redPen = new Pen(Color.Red);
 
-        void DrawOutlines(PaintEventArgs e, Tree<TreeMapLayout<T>.Layout> layoutTree)
+        void DrawOutlines(PaintEventArgs e, Tree<TreeMapLayout.Layout> layoutTree)
         {
             var layout = layoutTree.Data;
             e.Graphics.DrawRectangle(redPen, layout.Rectangle.ToRectangle());
@@ -338,18 +205,18 @@ namespace Sidi.Visualization
             }
         }
 
-        public void ForEachNode(Action<Tree<TreeMapLayout<T>.Layout>> a)
+        public void ForEachNode(Action<Tree<TreeMapLayout.Layout>> a)
         {
-            ForEachNode(TreeMap.LayoutTree, a);
+            ForEachNode(TreeLayout.LayoutTree, a);
         }
 
-        public void ForEachLeaf(Action<Tree<TreeMapLayout<T>.Layout>> a)
+        public void ForEachLeaf(Action<Tree<TreeMapLayout.Layout>> a)
         {
-            ForEachLeaf(TreeMap.LayoutTree, a);
+            ForEachLeaf(TreeLayout.LayoutTree, a);
         }
 
-        void ForEachNode(Tree<TreeMapLayout<T>.Layout> layoutTree, 
-            Action<Tree<TreeMapLayout<T>.Layout>> a)
+        void ForEachNode(Tree<TreeMapLayout.Layout> layoutTree, 
+            Action<Tree<TreeMapLayout.Layout>> a)
         {
             a(layoutTree);
             foreach (var i in layoutTree.Children)
@@ -358,8 +225,8 @@ namespace Sidi.Visualization
             }
         }
 
-        void ForEachLeaf(Tree<TreeMapLayout<T>.Layout> layoutTree,
-            Action<Tree<TreeMapLayout<T>.Layout>> a)
+        void ForEachLeaf(Tree<TreeMapLayout.Layout> layoutTree,
+            Action<Tree<TreeMapLayout.Layout>> a)
         {
             if (!layoutTree.Children.Any())
             {
@@ -373,25 +240,25 @@ namespace Sidi.Visualization
 
         public class ItemEventEventArgs : EventArgs
         {
-            public ItemEventEventArgs(Tree<TreeMapLayout<T>.Layout> layout)
+            public ItemEventEventArgs(Tree<TreeMapLayout.Layout> layout)
             {
                 this.layout = layout;
             }
 
-            public Tree<TreeMapLayout<T>.Layout> Layout
+            public Tree<TreeMapLayout.Layout> Layout
             {
                 get
                 {
                     return layout;
                 }
             }
-            Tree<TreeMapLayout<T>.Layout> layout;
+            Tree<TreeMapLayout.Layout> layout;
 
             public T Item
             {
                 get
                 {
-                    return layout.Data.TreeNode;
+                    return (T) layout.Data.TreeNode;
                 }
             }
         }
@@ -403,12 +270,12 @@ namespace Sidi.Visualization
 
         public void ZoomIn(Point p, int levels)
         {
-            Tree = GetLayoutAt(p, levels).Data.TreeNode;
+            Tree = (T) GetLayoutAt(p, levels).Data.TreeNode;
         }
 
         public void ZoomOut(int levels)
         {
-            var t = TreeMap.Tree;
+            var t = TreeLayout.Tree;
             for (int i = 0; i < levels; ++i)
             {
                 if (t.Parent != null)
@@ -420,7 +287,7 @@ namespace Sidi.Visualization
                     break;
                 }
             }
-            Tree = t;
+            Tree = (T) t;
         }
     }
 }
