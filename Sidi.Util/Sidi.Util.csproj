@@ -219,6 +219,9 @@
     </Compile>
     <Compile Include="Util\Zip.cs" />
     <Compile Include="Visualization\ArrayRect.cs" />
+    <Compile Include="Visualization\Bins.cs" />
+    <Compile Include="Visualization\ColorMap.cs" />
+    <Compile Include="Visualization\ColorScale.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\HSLColor.cs" />
     <Compile Include="Visualization\Tree.cs" />
@@ -226,6 +229,7 @@
     <Compile Include="Visualization\TreeMapControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Visualization\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

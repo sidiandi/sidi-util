@@ -3,14 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Threading;
 
 namespace Sidi.Visualization
 {
     public class FileSystemTree
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static Tree<Sidi.IO.Long.FileSystemInfo> Get(Sidi.IO.Long.LongName dir)
         {
             return GetRecursive(null, new Sidi.IO.Long.FileSystemInfo(dir));
+        }
+
+        public static Tree<Sidi.IO.Long.FileSystemInfo> GetBackground(Sidi.IO.Long.LongName dir)
+        {
+            var t = new Tree<Sidi.IO.Long.FileSystemInfo>(null) { Data = new IO.Long.FileSystemInfo(dir) };
+            t.Size = t.Data.Length;
+
+            var filler = new Thread(() =>
+                {
+                    GetChildrenRecursive(t);
+                });
+            filler.Start();
+            return t;
+        }
+
+        static void GetChildrenRecursive(Tree<Sidi.IO.Long.FileSystemInfo> t)
+        {
+            log.Info(t.Data);    
+            var i = t.Data;
+            if (i.IsDirectory)
+            {
+                t.Children = i.GetChilds()
+                    .Select(x => new Tree<Sidi.IO.Long.FileSystemInfo>(t){ Data = x, Size = x.Length })
+                    .OrderByDescending(x => x.Size)
+                    .ToList();
+
+                foreach (var c in t.Children)
+                {
+                    GetChildrenRecursive(c);
+                }
+            }
         }
 
         static Tree<Sidi.IO.Long.FileSystemInfo> GetRecursive(
@@ -36,32 +70,7 @@ namespace Sidi.Visualization
 
         public static Color ExtensionToColor(Sidi.IO.Long.FileSystemInfo i)
         {
-            string extString = i.Extension;
-            if (extString.Length > 1)
-            {
-                extString = extString.Substring(1);
-            }
-            else
-            {
-                extString = String.Empty;
-            }
-
-            var ext = SortPos(extString);
-            var hsl = new HSLColor(Color.Red);
-            hsl.Hue = 360.0 * ext;
-            return hsl;
-        }
-
-        static double SortPos(string x)
-        {
-            double f = 1.0;
-            double y = 0.0;
-            foreach (var c in x.ToLower())
-            {
-                f /= (double)('z' - 'a');
-                y += (double)(c - 'a') * f;
-            }
-            return y;
+            return ColorScale.ToColor(i.Extension);
         }
     }
 }

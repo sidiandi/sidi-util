@@ -80,5 +80,26 @@ namespace Sidi.Visualization
                 Size = ChildSize;
             }
         }
+
+        public override string ToString()
+        {
+            return Data.ToString();
+        }
+
+        public IEnumerable<Tree<T>> AllNodes
+        {
+            get
+            {
+                return new Tree<T>[] { this }.Concat(this.Children.SelectMany(c => c.AllNodes));
+            }
+        }
+    }
+
+    public static class ITreeEx
+    {
+        public static IEnumerable<ITree> GetAllNodes(this ITree tree)
+        {
+            return new ITree[] { tree }.Concat(tree.Children.SelectMany(c => c.GetAllNodes()));
+        }
     }
 }

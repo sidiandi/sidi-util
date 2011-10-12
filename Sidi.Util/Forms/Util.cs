@@ -150,6 +150,7 @@ namespace Sidi.Forms
             var cancelButton = new Button();
             cancelButton.DialogResult = DialogResult.Cancel;
             f.Controls.Add(cancelButton);
+            f.CancelButton = cancelButton;
             var fsm = new FullscreenManager(f);
             fsm.Fullscreen = true;
             f.ShowDialog();

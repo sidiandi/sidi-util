@@ -7,6 +7,8 @@ using Sidi.Forms;
 using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO;
+using Sidi.IO.Long;
+using System.Diagnostics;
 
 namespace Sidi.Visualization
 {
@@ -26,51 +28,50 @@ namespace Sidi.Visualization
         {
             var t = TreeMapTest.GetTestTree();
             var tm = t.CreateTreemapControl();
-            tm.TreeMap.GetColor = n => new HSLColor(n.Data.TreeNode.Data * 36.0f, 50, 120);
+            tm.NodeColor = n => new HSLColor(n.Data * 36.0f, 50, 120);
             tm.RunFullScreen();
         }
 
         [Test, Explicit("interactive")]
         public void Interact()
         {
-            var c = FileSystemTree.Get(new Sidi.IO.Long.LongName(
-                Sidi.IO.FileUtil.BinFile(".")
-                ).ParentDirectory.ParentDirectory)
+            var c = FileSystemTree.Get(
+                
+                // Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                @"H:\media\album"
+                
+                .Long())
                 .CreateTreemapControl();
 
-            c.TreeMap.GetColor = n => FileSystemTree.ExtensionToColor(n.Data.TreeNode.Data);
-
+            var lp = c.CreateLabelPainter();
+            lp.Text = t => t.Data.Name;
+            
             c.Paint += (s, e) =>
             {
-                var white = new SolidBrush(Color.White);
-                var sf = new StringFormat();
-                sf.Alignment = StringAlignment.Center;
-                sf.LineAlignment = StringAlignment.Near;
-
-                c.ForEachNode(n =>
-                {
-
-                    if (n.Data.Rectangle.Area() > 10000)
-                    {
-                        e.Graphics.DrawString(
-                            n.Data.TreeNode.Data.Name, 
-                            c.Font, 
-                            white, 
-                            n.Data.Rectangle.ToRectangleF(),
-                            sf
-                            );
-                    }
-                });
-
-                if (c.MouseHoverNode != null)
-                {
-                    e.Graphics.DrawString(c.MouseHoverNode.Data.TreeNode.Data.ToString(), c.Font, new SolidBrush(Color.White), 0, 0);
-                }
+                lp.Paint(e);
             };
+
+            c.ContextMenu.MenuItems.AddRange(new []
+            {
+                new MenuItem("Open in Explorer", (s, e) =>
+                {
+                    Process.Start("explorer.exe", "/select," + c.SelectedNode.Data.FullPath.ToString());
+                }){ Break = true },
+                new MenuItem("Color by File Type", (s,e) =>
+                {
+                    c.NodeColor = n => FileSystemTree.ExtensionToColor(n.Data);
+                }),
+                new MenuItem("Color by Change Date", (s,e) =>
+                    {
+                        c.SetBinnedNodeColor(n => n.Data.LastWriteTimeUtc);
+                    })
+            });
+
+            var ti = new ToolTip();
 
             c.ItemMouseHover += (s, e) =>
                 {
-                    c.Invalidate();
+                    ti.SetToolTip(c, e.Item.Data.FullPath.ToString());
                 };
 
             c.ItemActivate += (s, e) =>
@@ -89,9 +90,8 @@ namespace Sidi.Visualization
 
         public void Display<T>(T tree) where T : ITree
         {
-            var tm = new TreeMap<T>(tree);
             var c = new TreeMapControl<T>();
-            c.TreeMap = tm;
+            c.Tree = tree;
             var f = c.AsForm("test Cushion Tree Map");
             System.Windows.Forms.Application.Run(f);
         }
