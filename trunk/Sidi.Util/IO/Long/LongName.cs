@@ -121,6 +121,15 @@ namespace Sidi.IO.Long
                 }
                 else
                 {
+                    if (this.ParentDirectory.NoPrefix.EndsWith(":"))
+                    {
+                        fd = new FindData();
+                        fd.Attributes = System.IO.FileAttributes.Directory;
+                        fd.nFileSizeHigh = 0;
+                        fd.nFileSizeLow = 0;
+                        return true;
+                    }
+
                     fd = default(FindData);
                     return false;
                 }
@@ -195,7 +204,15 @@ namespace Sidi.IO.Long
             get
             {
                 var i = path.LastIndexOf(DirectorySeparator);
-                return path.Substring(i + 1);
+                var n = path.Substring(i + 1);
+                if (String.IsNullOrEmpty(n))
+                {
+                    return ".";
+                }
+                else
+                {
+                    return n;
+                }
             }
         }
 

@@ -10,7 +10,7 @@ namespace Sidi.Visualization
     /// <summary>
     /// http://www.win.tue.nl/~vanwijk/ctm.pdf
     /// </summary>
-    public class TreeMap<T> where T : ITree
+    public class TreeMapLayout<T> where T : ITree
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -20,7 +20,7 @@ namespace Sidi.Visualization
         const float Is = 215;
         float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
 
-        public TreeMap(T root)
+        public TreeMapLayout(T root)
         {
             this.root = root;
             DoLayout = 
@@ -162,7 +162,7 @@ namespace Sidi.Visualization
 
             if (!t.Children.Any())
             {
-                RenderCushion(bitmap, r, s, GetColor(t).ToArray());
+                RenderCushion(bitmap, r, s, GetColor(t.Data.TreeNode).ToArray());
             }
             else
             {
@@ -194,7 +194,20 @@ namespace Sidi.Visualization
 
         public Action<LayoutContext> DoLayout;
 
-        public Func<Tree<Layout>, Color> GetColor = layoutTree => Color.White;
+        public Func<T, Color> GetColor
+        {
+            set
+            {
+                getColor = value;
+            }
+
+            get
+            {
+                return getColor;
+            }
+        }
+
+        Func<T, Color> getColor = n => Color.White;
 
         static void Stripes(LayoutContext c)
         {
@@ -411,11 +424,11 @@ namespace Sidi.Visualization
                     var ny = -(2 * s[(int)Dir.Y, 1] * (iy + 0.5) + s[(int)Dir.Y, 0]);
                     var cosa = (nx * L[0] + ny * L[1] + L[2]) / Math.Sqrt(nx * nx + ny * ny + 1.0);
                     var intensity = Ia + Math.Max(0, Is * cosa);
-                    *row = (byte) Math.Max(0, Math.Min(255, intensity * color[0]));
+                    *row = Util.ClipByte(intensity * color[0]);
                     ++row;
-                    *row = (byte) Math.Max(0, Math.Min(255, intensity * color[1]));
+                    *row = Util.ClipByte(intensity * color[1]);
                     ++row;
-                    *row = (byte) Math.Max(0, Math.Min(255, intensity * color[2]));
+                    *row = Util.ClipByte(intensity * color[2]);
                     ++row;
                 }
             }

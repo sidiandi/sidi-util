@@ -37,5 +37,20 @@ namespace Sidi.IO.Long
             Assert.AreEqual(pCount, p.Count());
             Assert.AreEqual(part, p[0]);
         }
+
+        [Test]
+        public void SpecialPaths()
+        {
+            var p = @"C:\".Long();
+            Assert.AreEqual("C:", p.ParentDirectory.NoPrefix);
+            Assert.AreEqual(".", p.Name);
+
+            var fi = new FileSystemInfo(p);
+            Assert.AreEqual(@"C:\.".Long(), fi.FullPath);
+
+            Assert.AreEqual(0, new FileSystemInfo(@"C:\temp".Long()).Length);
+            
+            Assert.AreEqual(0, fi.Length);
+        }
     }
 }
