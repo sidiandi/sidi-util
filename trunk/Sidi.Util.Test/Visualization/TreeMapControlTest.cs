@@ -28,7 +28,7 @@ namespace Sidi.Visualization
         {
             var t = TreeMapTest.GetTestTree();
             var tm = t.CreateTreemapControl();
-            tm.NodeColor = n => new HSLColor(n.Data * 36.0f, 50, 120);
+            tm.CushionPainter.NodeColor = n => new HSLColor(n.Data * 36.0f, 50, 120);
             tm.RunFullScreen();
         }
 
@@ -59,7 +59,7 @@ namespace Sidi.Visualization
                 }){ Break = true },
                 new MenuItem("Color by File Type", (s,e) =>
                 {
-                    c.NodeColor = n => FileSystemTree.ExtensionToColor(n.Data);
+                    c.CushionPainter.NodeColor = n => FileSystemTree.ExtensionToColor(n.Data);
                 }),
                 new MenuItem("Color by Change Date", (s,e) =>
                     {

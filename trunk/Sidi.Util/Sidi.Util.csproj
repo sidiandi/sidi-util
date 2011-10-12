@@ -222,8 +222,10 @@
     <Compile Include="Visualization\Bins.cs" />
     <Compile Include="Visualization\ColorMap.cs" />
     <Compile Include="Visualization\ColorScale.cs" />
+    <Compile Include="Visualization\CushionPainter.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\HSLColor.cs" />
+    <Compile Include="Visualization\LabelPainter.cs" />
     <Compile Include="Visualization\Tree.cs" />
     <Compile Include="Visualization\TreeMap.cs" />
     <Compile Include="Visualization\TreeMapControl.cs">

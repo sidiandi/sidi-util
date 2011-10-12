@@ -10,17 +10,11 @@ namespace Sidi.Visualization
     /// <summary>
     /// http://www.win.tue.nl/~vanwijk/ctm.pdf
     /// </summary>
-    public class TreeMapLayout<T> where T : ITree
+    public class TreeMapLayout
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        float h = 0.75f;
-        float f = 0.75f;
-        const float Ia = 40;
-        const float Is = 215;
-        float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
-
-        public TreeMapLayout(T root)
+        public TreeMapLayout(ITree root)
         {
             this.root = root;
             DoLayout = 
@@ -29,10 +23,10 @@ namespace Sidi.Visualization
                 ;
         }
 
-        T root;
+        ITree root;
         Tree<Layout> layoutTree;
 
-        public T Tree
+        public ITree Tree
         {
             get
             {
@@ -66,9 +60,14 @@ namespace Sidi.Visualization
             {
                 rect = value.ToArray();
             }
+
+            get
+            {
+                return rect.ToRectangleF();
+            }
         }
 
-        Tree<Layout> UpdateLayoutTreeRecursive(Tree<Layout> parent, T tree, float[,] rect)
+        Tree<Layout> UpdateLayoutTreeRecursive(Tree<Layout> parent, ITree tree, float[,] rect)
         {
             var layoutTree = new Tree<Layout>(parent)
             {
@@ -82,7 +81,7 @@ namespace Sidi.Visualization
             if (tree.Children.Any() && tree.Size > 0 && layoutTree.Data.Rectangle.CoversPixel())
             {
                 var lc = new LayoutContext();
-                lc.Layout = tree.Children.Select(x => new Layout((T)x)).ToArray();
+                lc.Layout = tree.Children.Select(x => new Layout(x)).ToArray();
                 lc.Rectangle = (float[,])rect.Clone();
                 lc.Rectangle.Add(margin);
                 DoLayout(lc);
@@ -122,57 +121,6 @@ namespace Sidi.Visualization
             }
         }
 
-        public Bitmap Render()
-        {
-            var bitmap = new Bitmap((int)(rect[0, 1] - rect[0, 0]), 
-                (int)(rect[1, 1] - rect[1, 0]),
-                PixelFormat.Format24bppRgb);
-            var s = new float[2, 2];
-            var surface = new float[4];
-
-            var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                PixelFormat.Format24bppRgb);
-            try
-            {
-                Render(data, LayoutTree, h, f, s);
-            }
-            finally
-            {
-                bitmap.UnlockBits(data);
-            }
-
-            return bitmap;
-        }
-
-        void Render(BitmapData bitmap, Tree<Layout> t, float h, float f, float[,] s)
-        {
-            s = (float[,])s.Clone();
-            var layout = (Layout)t.Data;
-            var r = layout.Rectangle;
-            
-            if (t.Parent != null)
-            {
-                for (int d = 0; d < 2; ++d)
-                {
-                    AddRidge(r[(int)d, (int)Bound.Min], r[(int)d, (int)Bound.Max], h,
-                        ref s[(int)d, (int)0], ref s[(int)d, (int)1]);
-                }
-            }
-
-            if (!t.Children.Any())
-            {
-                RenderCushion(bitmap, r, s, GetColor(t.Data.TreeNode).ToArray());
-            }
-            else
-            {
-                foreach (var i in t.Children)
-                {
-                    Render(bitmap, i, h * f, f, s);
-                }
-            }
-        }
-
         public class LayoutContext
         {
             public float[,] Rectangle;
@@ -182,32 +130,17 @@ namespace Sidi.Visualization
 
         public class Layout
         {
-            public Layout(T tree)
+            public Layout(ITree tree)
             {
                 TreeNode = tree;
                 Rectangle = new float[2, 2];
             }
 
             public float[,] Rectangle;
-            public T TreeNode;
+            public ITree TreeNode;
         }
 
         public Action<LayoutContext> DoLayout;
-
-        public Func<T, Color> GetColor
-        {
-            set
-            {
-                getColor = value;
-            }
-
-            get
-            {
-                return getColor;
-            }
-        }
-
-        Func<T, Color> getColor = n => Color.White;
 
         static void Stripes(LayoutContext c)
         {
@@ -404,40 +337,5 @@ namespace Sidi.Visualization
             throw new ArgumentException(d.ToString());
         }
 
-        unsafe void RenderCushion(
-            BitmapData bitmap,
-            float[,] r,
-            float[,] s,
-            float[] color
-            )
-        {
-            var ey = Math.Min((int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Max]), bitmap.Height);
-            var by = (int)Math.Ceiling(r[(int)Dir.Y, (int)Bound.Min]);
-            var ex = Math.Min((int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Max]), bitmap.Width);
-            var bx = (int)Math.Ceiling(r[(int)Dir.X, (int)Bound.Min]);
-            for (int iy = by; iy < ey; ++iy)
-            {
-                byte* row = (byte*)bitmap.Scan0 + iy * bitmap.Stride + bx * 3;
-                for (int ix = bx; ix < ex; ++ix )
-                {
-                    var nx = (2 * s[(int)Dir.X, 1] * (ix + 0.5) + s[(int)Dir.X, 0]);
-                    var ny = -(2 * s[(int)Dir.Y, 1] * (iy + 0.5) + s[(int)Dir.Y, 0]);
-                    var cosa = (nx * L[0] + ny * L[1] + L[2]) / Math.Sqrt(nx * nx + ny * ny + 1.0);
-                    var intensity = Ia + Math.Max(0, Is * cosa);
-                    *row = Util.ClipByte(intensity * color[0]);
-                    ++row;
-                    *row = Util.ClipByte(intensity * color[1]);
-                    ++row;
-                    *row = Util.ClipByte(intensity * color[2]);
-                    ++row;
-                }
-            }
-        }
-
-        void AddRidge(float x1, float x2, float h, ref float s1, ref float s2)
-        {
-            s1 = s1 + 4*h*(x2+x1)/(x2-x1);
-            s2 = s2 - 4*h/(x2-x1);
-        }
     }
 }
