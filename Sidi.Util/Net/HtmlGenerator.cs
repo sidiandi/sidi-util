@@ -82,7 +82,8 @@ namespace Sidi.Net
         /// <summary>
         /// Exception-safe way to render the html object to a TextWriter
         /// </summary>
-        /// <param name="?"></param>
+        /// <param name="o"></param>
+        /// <param name="htmlGenerator"></param>
         public void Write(TextWriter o, Func<object> htmlGenerator)
         {
             try
