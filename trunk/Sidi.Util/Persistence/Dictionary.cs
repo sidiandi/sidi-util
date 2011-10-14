@@ -19,12 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Data.Common;
+using System.Linq;
 
 namespace Sidi.Persistence
 {
-    public class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
+    public sealed class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
     {
-        class Record
+        public class Record
         {
             public Record()
             {
@@ -47,6 +48,13 @@ namespace Sidi.Persistence
         }
 
         Collection<Record> collection;
+        public Collection<Record> Collection
+        {
+            get
+            {
+                return collection;
+            }
+        }
 
         public Dictionary(string a_path, string a_table)
         {
@@ -83,7 +91,7 @@ namespace Sidi.Persistence
 
         public ICollection<TKey> Keys
         {
-            get { throw new Exception("The method or operation is not implemented."); }
+            get { return collection.Select(r => r.key).ToList(); }
         }
 
         public bool Remove(TKey key)
@@ -113,7 +121,7 @@ namespace Sidi.Persistence
 
         public ICollection<TValue> Values
         {
-            get { throw new Exception("The method or operation is not implemented."); }
+            get { return collection.Select(r => r.data).ToList(); }
         }
 
         public TValue this[TKey key]
@@ -135,62 +143,66 @@ namespace Sidi.Persistence
 
         #endregion
 
-        #region ICollection<KeyValuePair<TKey,TValue>> Members
-
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            throw new Exception("The method or operation is not implemented.");
+            this[item.Key] = item.Value;
         }
 
         public void Clear()
         {
-            throw new Exception("The method or operation is not implemented.");
+            collection.Clear();
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return ContainsKey(item.Key) && item.Equals(this[item.Key]);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            throw new Exception("The method or operation is not implemented.");
+            var i = arrayIndex;
+            foreach (var r in collection.Select("1"))
+            {
+                array[i++] = new KeyValuePair<TKey,TValue>(r.key, r.data);
+            }
         }
 
         public int Count
         {
-            get { throw new Exception("The method or operation is not implemented."); }
+            get { return collection.Count; }
         }
 
         public bool IsReadOnly
         {
-            get { throw new Exception("The method or operation is not implemented."); }
+            get { return false; }
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            throw new Exception("The method or operation is not implemented.");
+            if (Contains(item))
+            {
+                this.Remove(item.Key);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-
-        #endregion
-
-        #region IEnumerable<KeyValuePair<TKey,TValue>> Members
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            throw new Exception("The method or operation is not implemented.");
+            return collection
+                .Select(i => new KeyValuePair<TKey, TValue>(i.key, i.data))
+                .GetEnumerator();
         }
-
-        #endregion
-
-        #region IEnumerable Members
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            throw new Exception("The method or operation is not implemented.");
+            return collection
+                .Select(i => new KeyValuePair<TKey, TValue>(i.key, i.data))
+                .GetEnumerator();
         }
-
-        #endregion
 
         public void Dispose()
         {
