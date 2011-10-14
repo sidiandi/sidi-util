@@ -53,6 +53,17 @@ namespace Sidi.Net
             Console.WriteLine(o.ToString());
         }
 
+        [Test]
+        public void Table()
+        {
+            var e = Enumerable.Range(0, 10);
+
+            table(
+                th("Value", "Square"), 
+                TableRows(e, x => x, x => x * x))
+            (Console.Out);
+        }
+
         /// <summary>
         /// Generates attribute and tag for form HtmlGenerator.cs
         /// </summary>

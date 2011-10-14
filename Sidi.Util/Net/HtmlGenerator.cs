@@ -23,12 +23,12 @@ namespace Sidi.Net
             {
                 try
                 {
-                    o.Write("<{0} ", tag);
+                    o.Write("<{0}", tag);
                     foreach (var i in childs.OfType<Attribute>())
                     {
                         i.Render(o);
                     }
-                    o.WriteLine(">", tag);
+                    o.Write(">", tag);
                     foreach (var i in childs)
                     {
                         RenderChild(o, i);
@@ -61,7 +61,7 @@ namespace Sidi.Net
             }
             else if (i is string)
             {
-                o.WriteLine(HttpUtility.HtmlEncode(i));
+                o.Write(HttpUtility.HtmlEncode(i));
             }
             else if (i is System.Collections.IEnumerable)
             {
@@ -75,7 +75,7 @@ namespace Sidi.Net
             }
             else
             {
-                o.WriteLine(HttpUtility.HtmlEncode(i));
+                o.Write(HttpUtility.HtmlEncode(i));
             }
         }
 
@@ -93,6 +93,11 @@ namespace Sidi.Net
             {
                 ErrorMessage(e)(o);
             }
+        }
+
+        public object TableRows<T>(IEnumerable<T> e, params Func<T, object>[] format)
+        {
+            return e.Select(r => tr(format.Select(c => td(c(r)))));
         }
 
         public Func<Exception, Action<TextWriter>> ErrorMessage;
@@ -127,7 +132,7 @@ namespace Sidi.Net
                     var key = e.Current;
                     e.MoveNext();
                     var value = e.Current;
-                    o.Write("{0}={1} ", key, HttpUtility.HtmlEncode(value.ToString()).Quote());
+                    o.Write(" {0}={1} ", key, HttpUtility.HtmlEncode(value.ToString()).Quote());
                 }
             }
         }
