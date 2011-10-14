@@ -14,7 +14,7 @@ namespace Sidi.Visualization
         public static ColorMap BlueRed(double x0, double x1)
         {
             int lutLength = 256;
-            return new ColorMap(x0, x1, ColorRange(256, Color.Blue, Color.Red));
+            return new ColorMap(x0, x1, ColorRange(lutLength, Color.Blue, Color.Red));
         }
 
         public static Color[] ColorRange(int length, Color c0, Color c1)
@@ -48,7 +48,6 @@ namespace Sidi.Visualization
             public Color Color;
         }
 
-        ControlPoint[] ControlPoints;
         double m;
         double x0;
 
@@ -69,31 +68,6 @@ namespace Sidi.Visualization
             }
         }
         
-        public Color CalcColor(double x)
-        {
-            var i = ControlPoints.BinarySearch(cp => cp.Value > x);
-            if (i == 0)
-            {
-                return ControlPoints[i].Color;
-            }
-            else if (i == ControlPoints.Length)
-            {
-                return ControlPoints[i - 1].Color;
-            }
-            else
-            {
-                var x0 = ControlPoints[i - 1].Value;
-                var x1 = ControlPoints[i].Value;
-                var y0 = ControlPoints[i - 1].Color;
-                var y1 = ControlPoints[i].Color;
-
-                return Color.FromArgb(255,
-                    Util.ClipByte(Interpolate(x0, x1, y0.R, y1.R, x)),
-                    Util.ClipByte(Interpolate(x0, x1, y0.G, y1.G, x)),
-                    Util.ClipByte(Interpolate(x0, x1, y0.B, y1.B, x)));
-            }
-        }
-
         double Interpolate(double x0, double x1, double y0, double y1, double x)
         {
             return (x - x0) / (x1 - x0) * (y1 - y0) + y0;
