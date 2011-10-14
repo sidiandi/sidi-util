@@ -5,31 +5,4 @@
     <StartArguments>Sidi.Util.Test.dll</StartArguments>
     <StartAction>Program</StartAction>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <StartArguments>asds</StartArguments>
-  </PropertyGroup>
-  <Import Project="..\Common.Targets" />
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>$(TargetDir)Sidi.Util.Test.dll</StartArguments>
-    <StartAction>Program</StartAction>
-    <StartProgram>$(LibDir)NUnit\bin\net-2.0\nunit.exe</StartProgram>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <StartArguments>asds</StartArguments>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PublishUrlHistory>
-    </PublishUrlHistory>
-    <InstallUrlHistory>
-    </InstallUrlHistory>
-    <SupportUrlHistory>
-    </SupportUrlHistory>
-    <UpdateUrlHistory>
-    </UpdateUrlHistory>
-    <BootstrapperUrlHistory>
-    </BootstrapperUrlHistory>
-    <FallbackCulture>en-US</FallbackCulture>
-    <VerifyUploadedFiles>true</VerifyUploadedFiles>
-    <ErrorReportUrlHistory />
-  </PropertyGroup>
 </Project>

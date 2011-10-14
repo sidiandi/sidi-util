@@ -69,6 +69,27 @@ namespace Sidi.Persistence
         }
 
         [Test()]
+        public void Enumerate()
+        {
+            var count = 10;
+            var lasti = count - 1;
+            foreach (var i in Enumerable.Range(0, count))
+            {
+                dictionary[i.ToString()] = (i * i).ToString();
+            }
+
+            Assert.AreEqual(count, dictionary.Count);
+            Assert.AreEqual(count, dictionary.Keys.Count());
+            Assert.IsTrue(dictionary.Keys.Any(x => x == lasti.ToString()));
+            Assert.IsTrue(dictionary.Values.Any(x => x == (lasti*lasti).ToString()));
+
+            foreach (var i in dictionary)
+            {
+                Console.WriteLine(i);
+            }
+        }
+
+        [Test()]
         public void MassReadWrite()
         {
             Stopwatch w = new Stopwatch();
