@@ -41,16 +41,37 @@ namespace Sidi.IO.Long
         [Test]
         public void SpecialPaths()
         {
-            var p = @"C:\".Long();
-            Assert.AreEqual("C:", p.ParentDirectory.NoPrefix);
-            Assert.AreEqual(".", p.Name);
+            for (var p = System.Environment.SystemDirectory.Long(); p != null; p = p.ParentDirectory)
+            {
+                Console.WriteLine(p);
+                Assert.IsTrue(Directory.Exists(p));
+                Console.WriteLine(Directory.GetChilds(p).Join());
+            }
+        }
 
-            var fi = new FileSystemInfo(p);
-            Assert.AreEqual(@"C:\.".Long(), fi.FullPath);
+        [Test]
+        public void UncPaths()
+        {
+            var tempDir = System.IO.Path.GetTempPath();
+            Assert.IsTrue(Directory.Exists(tempDir.Long()));
 
-            Assert.AreEqual(0, new FileSystemInfo(@"C:\temp".Long()).Length);
-            
-            Assert.AreEqual(0, fi.Length);
+            var unc = @"\\" + System.Environment.MachineName + @"\" + tempDir.Substring(0, 1) + "$" + tempDir.Substring(2);
+            Assert.IsTrue(System.IO.Directory.Exists(unc));
+
+            var longNameUnc = unc.Long();
+            Assert.IsTrue(Directory.Exists(longNameUnc));
+            Assert.IsTrue(longNameUnc.IsUnc);
+
+            tempDir = longNameUnc.NoPrefix;
+            Assert.IsTrue(System.IO.Directory.Exists(tempDir));
+
+            for (var i = longNameUnc; i != null; i = i.ParentDirectory)
+            {
+                Console.WriteLine(i);
+                Console.WriteLine(i.Parts.Join("|"));
+                Console.WriteLine(Directory.GetChilds(i).Join());
+                Assert.IsTrue(Directory.Exists(i));
+            }
         }
     }
 }
