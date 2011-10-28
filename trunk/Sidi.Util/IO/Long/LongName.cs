@@ -57,12 +57,24 @@ namespace Sidi.IO.Long
     public class LongName
     {
         const string longNamePrefix = @"\\?\";
+        const string longUncPrefix = @"\\?\UNC\";
+        const string shortUncPrefix = @"\\";
 
         public LongName(string path)
         {
-            if (path.StartsWith(longNamePrefix))
+            // remove trailing slash
+            if (path.EndsWith(@"\"))
+            {
+                path = path.Substring(0, path.Length - 1);
+            }
+            
+            if (path.StartsWith(longNamePrefix) || path.StartsWith(longUncPrefix))
             {
                 this.path = path;
+            }
+            else if (path.StartsWith(shortUncPrefix))
+            {
+                this.path = longUncPrefix + path.Substring(shortUncPrefix.Length);
             }
             else
             {
@@ -112,6 +124,15 @@ namespace Sidi.IO.Long
 
         internal bool GetFindData(out FindData fd)
         {
+            if (IsRoot)
+            {
+                fd = new FindData();
+                fd.Attributes = System.IO.FileAttributes.Directory;
+                fd.nFileSizeHigh = 0;
+                fd.nFileSizeLow = 0;
+                return true;
+            }
+
             using (var f = Directory.FindFileRaw(this).GetEnumerator())
             {
                 if (f.MoveNext())
@@ -121,15 +142,6 @@ namespace Sidi.IO.Long
                 }
                 else
                 {
-                    if (this.ParentDirectory.NoPrefix.EndsWith(":"))
-                    {
-                        fd = new FindData();
-                        fd.Attributes = System.IO.FileAttributes.Directory;
-                        fd.nFileSizeHigh = 0;
-                        fd.nFileSizeLow = 0;
-                        return true;
-                    }
-
                     fd = default(FindData);
                     return false;
                 }
@@ -149,11 +161,13 @@ namespace Sidi.IO.Long
             }
         }
 
-        public IList<string> Parts
+        public static readonly char DirectorySeparatorChar = System.IO.Path.DirectorySeparatorChar;
+
+        public string[] Parts
         {
             get
             {
-                return this.path.Split(System.IO.Path.DirectorySeparatorChar).Skip(3).ToList();
+                return this.path.Split(DirectorySeparatorChar).Skip(3).ToArray();
             }
         }
 
@@ -194,8 +208,15 @@ namespace Sidi.IO.Long
         {
             get
             {
-                var i = path.LastIndexOf(DirectorySeparator);
-                return new LongName(path.Substring(0, i));
+                if (IsRoot)
+                {
+                    return null;
+                }
+                else
+                {
+                    var i = path.LastIndexOf(DirectorySeparator);
+                    return new LongName(path.Substring(0, i));
+                }
             }
         }
 
@@ -222,8 +243,14 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return path.Substring(longNamePrefix.Length);
-
+                if (path.StartsWith(longUncPrefix))
+                {
+                    return shortUncPrefix + path.Substring(longUncPrefix.Length);
+                }
+                else
+                {
+                    return path.Substring(longNamePrefix.Length);
+                }
             }
         }
 
@@ -237,6 +264,40 @@ namespace Sidi.IO.Long
             get
             {
                 return path;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if ParentDirectory would return null
+        /// </summary>
+        public bool IsRoot
+        {
+            get
+            {
+                if (IsUnc)
+                {
+                    return Parts.Length <= 3;
+                }
+                else
+                {
+                    return IsDriveRoot;
+                }
+            }
+        }
+
+        public bool IsDriveRoot
+        {
+            get
+            {
+                return path.StartsWith(longNamePrefix) && path.EndsWith(":") && path.Length == longNamePrefix.Length + 2;
+            }
+        }
+
+        public bool IsUnc
+        {
+            get
+            {
+                return path.StartsWith(longUncPrefix);
             }
         }
 
