@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine
 {
@@ -155,9 +156,21 @@ namespace Sidi.CommandLine
             {
                 MethodInfo i = MethodInfo;
                 string parameters = i.GetParameters()
-                    .Select(pi => String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo()))
+                    .Select(pi => FormatParameter(pi))
                     .Join(" ");
                 return String.Format("{0} {1}", i.Name, parameters);
+            }
+        }
+
+        static string FormatParameter(ParameterInfo pi)
+        {
+            if (pi.ParameterType.IsArray)
+            {
+                return String.Format("[{0}: list of {1}, termintated by ';']", pi.Name, pi.ParameterType.GetElementType().GetInfo());
+            }
+            else
+            {
+                return String.Format("[{0}: {1}]", pi.Name, pi.ParameterType.GetInfo());
             }
         }
 
@@ -165,10 +178,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                string parameters = MethodInfo.GetParameters().Select(pi =>
-                {
-                    return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                }).Join(" ");
+                string parameters = MethodInfo.GetParameters().Select(pi => FormatParameter(pi)).Join(" ");
 
                 return String.Format("{0} {1}\r\n{2}",
                     Name,
@@ -184,36 +194,55 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
+        object GetParameter(Type type, IList<string> list)
+        {
+            if (type.IsArray)
+            {
+                var elements = new List<object>();
+                for (;list.Any();)
+                {
+                    if (list.First().Equals(Parser.ListTerminator))
+                    {
+                        list.RemoveAt(0);
+                        break;
+                    }
+                    else
+                    {
+                        elements.Add(Parser.ParseValue(list.First(), type.GetElementType()));
+                        list.RemoveAt(0);
+                    }
+                }
+
+                var a = Array.CreateInstance(type.GetElementType(), elements.Count);
+                foreach (var i in elements.Counted())
+                {
+                    a.SetValue(i.Value, i.Key);
+                }
+                return a;
+            }
+            else
+            {
+                var r = Parser.ParseValue(list.First(), type);
+                list.RemoveAt(0);
+                return r;
+            }
+        }
+
         public void Handle(IList<string> args, bool execute)
         {
             var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
 
-            if (parameters.Length > 0 && parameters[0].ParameterType == typeof(List<string>))
+            if (args.Count < parameters.Length)
             {
-                parameterValues = new object[] { args };
+                throw new CommandLineException(String.Format("Not enough parameters for action \"{0}\". {1} parameters are required, but only {2} are supplied.\r\n\r\n{3}\r\n",
+                    Name,
+                    parameters.Length,
+                    args.Count,
+                    UsageText));
             }
-            else
-            {
-                if (args.Count < parameters.Length)
-                {
-                    throw new CommandLineException(String.Format("Not enough parameters for action \"{0}\". {1} parameters are required, but only {2} are supplied.\r\n\r\n{3}\r\n",
-                        Name,
-                        parameters.Length,
-                        args.Count,
-                        UsageText));
-                }
 
-                parameterValues = new object[parameters.Length];
-                for (int i = 0; i < parameters.Length; ++i)
-                {
-                    parameterValues[i] = Parser.ParseValue(args[i], parameters[i].ParameterType);
-                }
-                foreach (var p in parameters)
-                {
-                    args.RemoveAt(0);
-                }
-            }
+            parameterValues = parameters.Select(p => GetParameter(p.ParameterType, args)).ToArray();
 
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
             if (execute)
@@ -506,15 +535,18 @@ namespace Sidi.CommandLine
 
         public void Handle(IList<string> args, bool execute)
         {
-            var p = new Parser(CommandInstance);
+            var parser = new Parser(CommandInstance);
             log.InfoFormat("{0}", this);
-            if (execute)
+            while (args.Any() && args.First() != Parser.ListTerminator)
             {
-                p.Parse(args);
-            }
-            else
-            {
-                p.Check(args);
+                if (execute)
+                {
+                    parser.ParseSingleCommand(args);
+                }
+                else
+                {
+                    parser.CheckSingleCommand(args);
+                }
             }
         }
 
@@ -579,6 +611,63 @@ namespace Sidi.CommandLine
         }
     }
 
+    public class SubParser : IParserItem
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        Parser parser;
+
+        public SubParser(Parser p)
+        {
+            parser = p;
+        }
+        
+        public string Usage
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string UsageText
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string Name
+        {
+            get { return parser.ApplicationName; }
+        }
+
+        public object Application
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IEnumerable<string> Categories
+        {
+            get { return new string[]{}; }
+        }
+
+        public void Handle(IList<string> args, bool execute)
+        {
+            using (log4net.NDC.Push(this.Name))
+            {
+                while (args.Any())
+                {
+                    if (args.First().Equals(Parser.ListTerminator))
+                    {
+                        args.RemoveAt(0);
+                        break;
+                    }
+
+                    if (execute)
+                    {
+                        parser.ParseSingleCommand(args);
+                    }
+                }
+            }
+        }
+    }
+
     public class CommandLineException : Exception
     {
         public CommandLineException(string reason)
@@ -602,6 +691,7 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public const string ListTerminator = ";";
         public const string categoryUserInterface = "User Interface";
         
         List<object> m_applications = new List<object>();
@@ -614,6 +704,8 @@ namespace Sidi.CommandLine
         {
             get { return m_applications; }
         }
+
+        public List<IParserItem> SubParsers = new List<IParserItem>();
 
         public object MainApplication
         {
@@ -634,11 +726,11 @@ namespace Sidi.CommandLine
         public Parser(params object[] applications)
         : this()
         {
-            AddDefaultHandlers();
+            AddDefaultUserInterface();
             Applications.AddRange(applications);
         }
 
-        void AddDefaultHandlers()
+        void AddDefaultUserInterface()
         {
             Applications.Add(new ShowHelp(this));
             Applications.Add(new ShowUserInterface(this));
@@ -675,8 +767,6 @@ namespace Sidi.CommandLine
             }
         }
 
-        IList<string> args;
-
         public void Check(string[] args)
         {
             Check(args.ToList());
@@ -705,6 +795,29 @@ namespace Sidi.CommandLine
             }
         }
 
+        /// <summary>
+        /// Checks if the arguments are syntactically correct, but does not execute 
+        /// anything. Throws the same exceptions as Parse when the arguments contain
+        /// an error.
+        /// </summary>
+        /// <param name="a_args"></param>
+        public void CheckSingleCommand(IList<string> a_args)
+        {
+            execute = false;
+            try
+            {
+                ParseSingleCommand(a_args);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                execute = true;
+            }
+        }
+
         bool execute = true;
 
         public void Parse(string[] a_args)
@@ -712,10 +825,8 @@ namespace Sidi.CommandLine
             Parse(a_args.ToList());
         }
 
-        public void Parse(IList<string> a_args)
+        public void Parse(IList<string> args)
         {
-            this.args = a_args;
-
             if (args.Count == 0)
             {
                 ShowUsage();
@@ -726,32 +837,37 @@ namespace Sidi.CommandLine
 
             while (args.Count > 0)
             {
-                foreach (var i in Applications)
-                {
-                    if (i is CommandLineHandler)
-                    {
-                        CommandLineHandler h = (CommandLineHandler)i;
-                        h.BeforeParse(args);
-                    }
-                }
-
-                if (args.Count == 0)
-                {
-                    break;
-                }
-
-                if (HandleParserItem())
-                {
-                    continue;
-                }
-
-                if (HandleUnknown())
-                {
-                    continue;
-                }
-
-                throw new CommandLineException("Argument " + args[0] + " is unknown.");
+                ParseSingleCommand(args);
             }
+        }
+
+        public void ParseSingleCommand(IList<string> args)
+        {
+            foreach (var i in Applications)
+            {
+                if (i is CommandLineHandler)
+                {
+                    CommandLineHandler h = (CommandLineHandler)i;
+                    h.BeforeParse(args);
+                }
+            }
+
+            if (args.Count == 0)
+            {
+                return;
+            }
+
+            if (HandleParserItem(args))
+            {
+                return;
+            }
+
+            if (HandleUnknown(args))
+            {
+                return;
+            }
+
+            throw new CommandLineException("Argument " + args[0] + " is unknown.");
         }
 
         public void LoadPreferences()
@@ -846,7 +962,7 @@ namespace Sidi.CommandLine
         /// </summary>
         public string PreferencesKey { get; set; }
 
-        bool HandleUnknown()
+        bool HandleUnknown(IList<string> args)
         {
             foreach (var i in Applications)
             {
@@ -861,7 +977,7 @@ namespace Sidi.CommandLine
             return false;
         }
 
-        string NextArg()
+        string NextArg(IList<string> args)
         {
             string a = args[0];
             args.RemoveAt(0);
@@ -1017,7 +1133,7 @@ namespace Sidi.CommandLine
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
-        bool HandleParserItem()
+        bool HandleParserItem(IList<string> args)
         {
             var parserItem = LookupParserItem(args[0]);
             if (parserItem == null)
@@ -1025,7 +1141,7 @@ namespace Sidi.CommandLine
                 return false;
             }
 
-            NextArg();
+            NextArg(args);
             parserItem.Handle(args, execute);
             return true;
         }
@@ -1047,6 +1163,11 @@ namespace Sidi.CommandLine
         {
             get
             {
+                foreach (var s in SubParsers)
+                {
+                    yield return s;
+                }
+                
                 foreach (var application in Applications)
                 {
                     foreach (MethodInfo i in application.GetType().GetMethods())
@@ -1384,6 +1505,11 @@ namespace Sidi.CommandLine
             {
                 Marshal.FreeHGlobal(argv);
             }
+        }
+
+        public void AddSubParser(Parser parser)
+        {
+            this.SubParsers.Add(new SubParser(parser));
         }
     }
 }
