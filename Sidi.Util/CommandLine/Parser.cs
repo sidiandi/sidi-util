@@ -174,6 +174,9 @@ namespace Sidi.CommandLine
             }
         }
 
+        /// <summary>
+        /// Formatted usage information with parameters
+        /// </summary>
         public string UsageText
         {
             get
@@ -194,37 +197,46 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        object GetParameter(Type type, IList<string> list)
+        object GetParameter(ParameterInfo parameter, IList<string> list)
         {
-            if (type.IsArray)
-            {
-                var elements = new List<object>();
-                for (;list.Any();)
-                {
-                    if (list.First().Equals(Parser.ListTerminator))
-                    {
-                        list.RemoveAt(0);
-                        break;
-                    }
-                    else
-                    {
-                        elements.Add(Parser.ParseValue(list.First(), type.GetElementType()));
-                        list.RemoveAt(0);
-                    }
-                }
+            var type = parameter.ParameterType;
 
-                var a = Array.CreateInstance(type.GetElementType(), elements.Count);
-                foreach (var i in elements.Counted())
-                {
-                    a.SetValue(i.Value, i.Key);
-                }
-                return a;
-            }
-            else
+            try
             {
-                var r = Parser.ParseValue(list.First(), type);
-                list.RemoveAt(0);
-                return r;
+                if (type.IsArray)
+                {
+                    var elements = new List<object>();
+                    for (; list.Any(); )
+                    {
+                        if (list.First().Equals(Parser.ListTerminator))
+                        {
+                            list.RemoveAt(0);
+                            break;
+                        }
+                        else
+                        {
+                            elements.Add(Parser.ParseValue(list.First(), type.GetElementType()));
+                            list.RemoveAt(0);
+                        }
+                    }
+
+                    var a = Array.CreateInstance(type.GetElementType(), elements.Count);
+                    foreach (var i in elements.Counted())
+                    {
+                        a.SetValue(i.Value, i.Key);
+                    }
+                    return a;
+                }
+                else
+                {
+                    var r = Parser.ParseValue(list.First(), type);
+                    list.RemoveAt(0);
+                    return r;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new InvalidParameterException(parameter);
             }
         }
 
@@ -233,16 +245,27 @@ namespace Sidi.CommandLine
             var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
 
-            if (args.Count < parameters.Length)
+            try
             {
-                throw new CommandLineException(String.Format("Not enough parameters for action \"{0}\". {1} parameters are required, but only {2} are supplied.\r\n\r\n{3}\r\n",
-                    Name,
-                    parameters.Length,
-                    args.Count,
-                    UsageText));
+                parameterValues = parameters.Select(p => GetParameter(p, args)).ToArray();
             }
-
-            parameterValues = parameters.Select(p => GetParameter(p.ParameterType, args)).ToArray();
+            catch (InvalidParameterException ipe)
+            {
+                var parameter = ipe.Parameter;
+                if (args.Any())
+                {
+                    throw new CommandLineException("Parameter {0} could not be read from argument list {1}\r\n{2}".F(
+                        FormatParameter(parameter),
+                        args.Select(i => i.Quote()).Join(" "),
+                        this.UsageText
+                        ));
+                }
+                else
+                {
+                    throw new CommandLineException("Parameter {0} is missing.\r\n{1}".F(
+                        FormatParameter(parameter), this.UsageText));
+                }
+            }
 
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
             if (execute)
@@ -674,6 +697,16 @@ namespace Sidi.CommandLine
             : base(reason)
         {
         }
+    }
+
+    public class InvalidParameterException : Exception
+    {
+        public InvalidParameterException(ParameterInfo parameter)
+        {
+            this.Parameter = parameter;
+        }
+
+        public ParameterInfo Parameter { get; private set; }
     }
 
     /// <summary>

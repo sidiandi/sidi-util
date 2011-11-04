@@ -365,6 +365,21 @@ namespace Sidi.CommandLine.Test
         }
 
         [Test]
+        public void WrongParameterType()
+        {
+            var p = new Parser(new TestAppWithStringList());
+            try
+            {
+                p.Parse(new string[] { "Add", "1", "car"});
+            }
+            catch (CommandLineException e)
+            {
+                log.Info(e.Message);
+                Assert.IsTrue(e.Message.Contains(p.GetAction("Add").Usage));
+            }
+        }
+
+        [Test]
         public void ArgList()
         {
             Parser parser = new Parser(new TestAppWithStringList());
