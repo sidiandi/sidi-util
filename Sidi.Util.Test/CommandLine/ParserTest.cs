@@ -262,13 +262,12 @@ namespace Sidi.CommandLine.Test
         public class TestAppWithStringList
         {
             [Usage("process all following arguments")]
-            public void Action(List<string> args)
+            public void Action(params string[] args)
             {
                 foreach (var a in args)
                 {
                     Console.WriteLine("argument: {0}", a);
                 }
-                args.Clear();
             }
 
             public int Add(int x, int y)
@@ -277,10 +276,9 @@ namespace Sidi.CommandLine.Test
             }
 
             [Usage("adds a list of numbers")]
-            public double AddList(List<string> list)
+            public double AddList(params double[] list)
             {
-                var result = list.Select(x => Double.Parse(x)).Aggregate(0.0, (x, y) => x + y);
-                list.Clear();
+                var result = list.Aggregate(0.0, (x, y) => x + y);
                 return result;
             }
 
@@ -610,6 +608,17 @@ namespace Sidi.CommandLine.Test
             {
                 serverThread.Join();
             }
+        }
+
+        [Test]
+        public void SubParser()
+        {
+            var a = new TestAppWithStringList();
+            var p = new Parser(a);
+            p.Parse(new string[] { "Action", "1", "2", "3", ";", "AddList", "1", "2", "3", ";" });
+            p.AddSubParser(new Parser(a));
+            p.Parse(new string[] { "TestAppWithStringList", "Action", "1", "2", "3", ";", ";", "AddList", "1", "2", "3", ";" });
+            p.WriteUsage(Console.Out);
         }
     }
 }

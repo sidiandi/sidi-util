@@ -123,6 +123,20 @@
     <Compile Include="Cache\LruCache.cs" />
     <Compile Include="Cache\LruCacheBackground.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
+    <Compile Include="Forms\ChooseOneDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChooseOneDialog.designer.cs">
+      <DependentUpon>ChooseOneDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Prompt.cs" />
+    <Compile Include="Forms\SelectObjectsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SelectObjectsDialog.designer.cs">
+      <DependentUpon>SelectObjectsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="IO\Long\Directory.cs" />
     <Compile Include="IO\Long\Enum.cs" />
     <Compile Include="IO\Long\File.cs" />
@@ -265,6 +279,12 @@
     <None Include="Sidi.Util.snk" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\ChooseOneDialog.resx">
+      <DependentUpon>ChooseOneDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SelectObjectsDialog.resx">
+      <DependentUpon>SelectObjectsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Util\UpdateForm.resx">
       <DependentUpon>UpdateForm.cs</DependentUpon>
       <SubType>Designer</SubType>
