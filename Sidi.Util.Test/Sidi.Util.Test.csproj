@@ -112,8 +112,14 @@
     <Compile Include="Cache\LruCacheTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="DumpExtensionsTest.cs" />
+    <Compile Include="Extensions\IEnumerableExtensionsTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />
+    <Compile Include="Forms\PromptTest.cs" />
     <Compile Include="GraMath.cs" />
+    <Compile Include="IMAP\ArgParserTest.cs" />
+    <Compile Include="IMAP\Rfc822MessageTest.cs" />
+    <Compile Include="IMAP\ServerTest.cs" />
+    <Compile Include="IMAP\SessionTest.cs" />
     <Compile Include="IntSetTest.cs" />
     <Compile Include="IO\CopyTest.cs" />
     <Compile Include="IO\Long\Directory.cs" />
@@ -126,6 +132,7 @@
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
     <Compile Include="IO\FileUtilTest.cs" />
+    <Compile Include="Net\AbnfTest.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServerTest.cs" />
     <Compile Include="Persistence\Collection.cs" />

@@ -6,6 +6,8 @@ using System.IO;
 using System.Windows.Forms;
 using System.Reflection;
 using Sidi.Util;
+using System.Diagnostics;
+using Sidi.IO;
 
 namespace Sidi.Forms
 {
@@ -78,6 +80,46 @@ namespace Sidi.Forms
 
     public class Prompt
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public static string EditInteractive(string text)
+        {
+            string tf = null;
+            try
+            {
+                tf = Path.GetTempFileName();
+                File.WriteAllText(tf, text);
+
+                Process p = new Process();
+
+                p.StartInfo.FileName = FileUtil.CatDir(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    "Notepad++", "notepad++.exe");
+                p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
+
+                if (!File.Exists(p.StartInfo.FileName))
+                {
+                    p.StartInfo.FileName = "notepad.exe";
+                    p.StartInfo.Arguments = tf.Quote();
+                }
+
+                p.Start();
+                log.Info(p.DetailedInfo());
+                p.WaitForExit();
+                return File.ReadAllText(tf);
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(tf);
+                }
+                catch
+                {
+                }
+            }
+        }
+
         public static T ChooseOne<T>(IEnumerable<T> list)
         {
             var d = new ChooseOneDialog();

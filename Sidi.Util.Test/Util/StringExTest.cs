@@ -45,12 +45,6 @@ namespace Sidi.Util
             Assert.AreEqual("world", t.GetSection("SectionB"));
         }
 
-        [Test, Explicit("interactive")]
-        public void EditInteractive()
-        {
-            log.Info("Hello, world".EditInteractive());
-        }
-
         [Test]
         public void SafeToString()
         {

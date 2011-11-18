@@ -23,6 +23,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Sidi.IO;
+using Microsoft.CSharp;
+using System.CodeDom;
 
 namespace Sidi.Util
 {
@@ -244,43 +246,6 @@ namespace Sidi.Util
         {
             return Regex.Replace(text, @"\u2022", "_");
         }
-        public static string EditInteractive(this string text)
-        {
-            string tf = null;
-            try
-            {
-                tf = Path.GetTempFileName();
-                File.WriteAllText(tf, text);
-
-                Process p = new Process();
-
-                p.StartInfo.FileName = FileUtil.CatDir(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    "Notepad++", "notepad++.exe");
-                p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
-
-                if (!File.Exists(p.StartInfo.FileName))
-                {
-                    p.StartInfo.FileName = "notepad.exe";
-                    p.StartInfo.Arguments = tf.Quote();
-                }
-
-                p.Start();
-                log.Info(p.DetailedInfo());
-                p.WaitForExit();
-                return File.ReadAllText(tf);
-            }
-            finally
-            {
-                try
-                {
-                    File.Delete(tf);
-                }
-                catch
-                {
-                }
-            }
-        }
 
         public static IEnumerable<string> Lines(this string text)
         {
@@ -295,6 +260,14 @@ namespace Sidi.Util
             e = e.SkipWhile(x => !x.StartsWith(sectionHead)).Skip(1);
             e = e.TakeWhile(x => !x.StartsWith("["));
             return e.JoinLines();
+        }
+
+        public static string ToLiteral(this string input)
+        {
+            var writer = new StringWriter();
+            CSharpCodeProvider provider = new CSharpCodeProvider();
+            provider.GenerateCodeFromExpression(new CodePrimitiveExpression(input), writer, null);
+            return writer.GetStringBuilder().ToString();
         }
 
         /// <summary>
