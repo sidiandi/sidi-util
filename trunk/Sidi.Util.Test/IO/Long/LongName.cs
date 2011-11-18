@@ -73,5 +73,21 @@ namespace Sidi.IO.Long
                 Assert.IsTrue(Directory.Exists(i));
             }
         }
+
+        [Test]
+        public void MakeFileName()
+        {
+            var validName = "I am a valid filename";
+            var invalidName = System.IO.Path.GetInvalidFileNameChars().Join(" ");
+
+            Assert.IsTrue(validName.IsValidFilename());
+            Assert.IsFalse(invalidName.IsValidFilename());
+
+            var f = invalidName.MakeFilename();
+            Assert.IsTrue(f.IsValidFilename());
+            Assert.AreNotEqual(invalidName, f);
+            Assert.AreEqual(System.IO.Path.GetInvalidFileNameChars().Select(c => "_").Join(" "), f);
+            Assert.AreEqual(validName, validName.MakeFilename());
+        }
     }
 }

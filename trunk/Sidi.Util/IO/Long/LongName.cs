@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sidi.Util;
+using System.Text.RegularExpressions;
 
 namespace Sidi.IO.Long
 {
@@ -13,6 +14,33 @@ namespace Sidi.IO.Long
         public static LongName Long(this string x)
         {
             return new LongName(x);
+        }
+
+        static Regex invalidFilenameRegex = new Regex(
+            System.IO.Path.GetInvalidFileNameChars()
+            .Select(n => Regex.Escape(new String(n,1)))
+            .Join("|"));
+
+        public static string MakeFilename(this string x)
+        {
+            return Truncate(invalidFilenameRegex.Replace(x, "_"), LongName.MaxFilenameLength);
+        }
+
+        static string Truncate(string x, int maxLength)
+        {
+            if (x.Length > maxLength)
+            {
+                return x.Substring(0, maxLength);
+            }
+            else
+            {
+                return x;
+            }
+        }
+
+        public static bool IsValidFilename(this string x)
+        {
+            return x.Length <= LongName.MaxFilenameLength && !invalidFilenameRegex.IsMatch(x);
         }
 
         public static void EnsureNotExists(this LongName ln)
@@ -187,6 +215,8 @@ namespace Sidi.IO.Long
             return CatDir(parts.Select(x => x.NoPrefix).ToArray());
         }
 
+        public const int MaxFilenameLength = 255;
+
         void Check()
         {
             if (this.path.Length > 32000)
@@ -195,7 +225,7 @@ namespace Sidi.IO.Long
             }
 
             var parts = Parts;
-            var tooLong = parts.FirstOrDefault(x => x.Length > 255);
+            var tooLong = parts.FirstOrDefault(x => x.Length > MaxFilenameLength);
             if (tooLong != null)
             {
                 throw new System.IO.PathTooLongException(tooLong);

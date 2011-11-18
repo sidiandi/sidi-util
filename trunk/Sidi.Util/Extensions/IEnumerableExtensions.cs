@@ -13,6 +13,24 @@ namespace Sidi.Extensions
             return e.Select(i => new KeyValuePair<int, T>(index++, i));
         }
 
+        public static T Best<T, S>(this IEnumerable<T> x, Func<T, S> f) where S : IComparable<S>
+        {
+            var e = x.GetEnumerator();
+            e.MoveNext();
+            S max = f(e.Current);
+            T best = e.Current;
+            for (; e.MoveNext(); )
+            {
+                var s = f(e.Current);
+                if (max.CompareTo(s) < 0)
+                {
+                    max = s;
+                    best = e.Current;
+                }
+            }
+            return best;
+        }
+
         public static IEnumerable<KeyValuePair<K, V>> Combine<K, V>(this IEnumerable<K> keys, IEnumerable<V> values)
         {
             var v = values.GetEnumerator();
