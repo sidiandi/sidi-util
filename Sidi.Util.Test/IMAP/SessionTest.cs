@@ -30,7 +30,7 @@ namespace Sidi.IMAP
             Assert.AreEqual(1000, e.Count);
         }
 
-        [Test]
+        [Test, Explicit("unstable")]
         public void RetrieveDataItem()
         {
             var mailbox = new EmlMailbox(this.TestFile(@"mail").Long());

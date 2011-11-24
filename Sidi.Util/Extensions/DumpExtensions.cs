@@ -77,42 +77,15 @@ namespace Sidi.Extensions
         {
             return new ListFormat<T>(e);
         }
-            
+
         public static void PrintTable<T>(this IEnumerable<T> e, TextWriter o, params Func<T, object>[] columns)
         {
-            var rows = e
-                .Select(i =>
-                    columns.Select(x => 
-                    {
-                        try
-                        {
-                            return x(i).SafeToString();
-                        }
-                        catch (Exception ex)
-                        {
-                            return ex.ToString();
-                        }
-                    }).ToArray())
-                    .ToList();
-
-            int[] w = new int[columns.Length];
-            for (int i = 0; i < w.Length; ++i)
+            var lf = e.ListFormat();
+            foreach (var f in columns)
             {
-                foreach (var r in rows)
-                {
-                    w[i] = Math.Min(MaxColumnWidth, Math.Max(w[i], r[i].Length));
-                }
+                lf.AddColumn(String.Empty, f);
             }
-
-            foreach (var i in rows)
-            {
-                for (int c = 0; c < columns.Length; ++c)
-                {
-                    o.Write(String.Format("{0,-" + w[c] + "}", i[c]));
-                    o.Write("|");
-                }
-                o.WriteLine();
-            }
+            lf.RenderText(o);
         }
     }
 }
