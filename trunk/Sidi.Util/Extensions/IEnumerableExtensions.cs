@@ -13,6 +13,44 @@ namespace Sidi.Extensions
             return e.Select(i => new KeyValuePair<int, T>(index++, i));
         }
 
+        /// <summary>
+        /// like select, but silently ignores exceptions in f
+        /// </summary>
+        /// <typeparam name="X"></typeparam>
+        /// <typeparam name="Y"></typeparam>
+        /// <param name="x"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public static IEnumerable<Y> SafeSelect<X, Y>(this IEnumerable<X> x, Func<X, Y> f)
+        {
+            foreach (var i in x)
+            {
+                Y y = default(Y);
+                bool ok = false;
+                try
+                {
+                    y = f(i);
+                    ok = true;
+                }
+                catch (Exception e)
+                {
+                }
+
+                if (ok)
+                {
+                    yield return y;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the maximum element as defined by f
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="S"></typeparam>
+        /// <param name="x"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
         public static T Best<T, S>(this IEnumerable<T> x, Func<T, S> f) where S : IComparable<S>
         {
             var e = x.GetEnumerator();

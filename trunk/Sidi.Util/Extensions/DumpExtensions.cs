@@ -21,8 +21,9 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Linq;
+using Sidi.Util;
 
-namespace Sidi.Util
+namespace Sidi.Extensions
 {
     public static class DumpExtensions
     {
@@ -70,15 +71,29 @@ namespace Sidi.Util
             list.PrintTable(o, i => i.Key, i => i.Value());
         }
 
-        static int MaxColumnWidth = 20;
-            
-        public static void PrintTable<T>(this IEnumerable<T> e, TextWriter o, params Func<T, string>[] columns)
+        static int MaxColumnWidth = 40;
+
+        public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e)
         {
-            var rows = new List<string[]>();
-            foreach (var i in e)
-            {
-                rows.Add(columns.Select(x => x(i)).Select(x => x == null ? String.Empty : x).ToArray());
-            }
+            return new ListFormat<T>(e);
+        }
+            
+        public static void PrintTable<T>(this IEnumerable<T> e, TextWriter o, params Func<T, object>[] columns)
+        {
+            var rows = e
+                .Select(i =>
+                    columns.Select(x => 
+                    {
+                        try
+                        {
+                            return x(i).SafeToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            return ex.ToString();
+                        }
+                    }).ToArray())
+                    .ToList();
 
             int[] w = new int[columns.Length];
             for (int i = 0; i < w.Length; ++i)

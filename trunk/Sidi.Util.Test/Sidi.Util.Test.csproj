@@ -111,7 +111,7 @@
     <Compile Include="Cache\LruCacheBackgroundTest.cs" />
     <Compile Include="Cache\LruCacheTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
-    <Compile Include="DumpExtensionsTest.cs" />
+    <Compile Include="Extensions\DumpExtensionsTest.cs" />
     <Compile Include="Extensions\IEnumerableExtensionsTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />
     <Compile Include="Forms\PromptTest.cs" />
@@ -141,6 +141,7 @@
     <Compile Include="..\VersionInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
+    <Compile Include="Util\ListFormatTest.cs" />
     <Compile Include="Util\SizeCount.cs" />
     <Compile Include="Util\StringExTest.cs" />
     <Compile Include="TestBase.cs" />
@@ -176,6 +177,11 @@
       <Project>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</Project>
       <Name>Sidi.Util</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="unit-test\mail\message-1-1456.eml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
