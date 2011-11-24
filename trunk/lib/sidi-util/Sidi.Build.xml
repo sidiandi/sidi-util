@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sidi.Build</name>
+    </assembly>
+    <members>
+        <member name="T:Sidi.Build.GoogleCode.Upload">
+            <summary>
+            Upload a file to a project hosted at http://code.google.com 
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.Execute">
+            <summary>
+            Upload the file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.CreateAuthorizationToken(System.String,System.String)">
+            <summary>
+            Creates the authorization token.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.WriteLine(System.IO.Stream,System.String)">
+            <summary>
+            Writes the string to the specified stream and concatenates a newline.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.GoogleCode.Upload.WriteFile(System.IO.Stream,System.String)">
+            <summary>
+            Writes the specified file to the specified stream.
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.UserName">
+            <summary>
+            User name for the Google Code profile
+            </summary>
+            The UserName can also be specified in the registry under HKEY_CURRENT_USER\Software\MSBuild.Community.Tasks.GoogleCode.Upload\$(ProjectName)\UserName
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.Password">
+            <summary>
+            Password for the Google Code profile. Note that this is NOT your global Google Account password.
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.ProjectName">
+            <summary>
+            Name of the Google Code project
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.LocalFile">
+            <summary>
+            Local path of the file to be uploaded
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.RemoteFile">
+            <summary>
+            Name of the file on the server
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.GoogleCode.Upload.Summary">
+            <summary>
+            Summary for the upload
+            </summary>
+        </member>
+        <member name="T:Sidi.Build.Pdbstr">
+            <summary>
+            Reads and writes streams in PDB files. Wrapper for the pdbstr.exe tool.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Pdbstr.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Pdbstr.Write(System.String,System.String,System.String)">
+            <summary>
+            Write a stream to a PDB file
+            </summary>
+            <param name="pdbFile">PDB file name</param>
+            <param name="streamName">Name of the stream</param>
+            <param name="content">Content of the stream</param>
+        </member>
+        <member name="M:Sidi.Build.Pdbstr.Read(System.String,System.String)">
+            <summary>
+            Reads a stream from a PDB file
+            </summary>
+            <param name="pdbFile">PDB file name</param>
+            <param name="streamName">Stream name</param>
+            <returns>Content of the stream</returns>
+        </member>
+        <member name="T:Sidi.Build.SourceIndex">
+            <summary>
+            Modifies the symbol files (*.pdb) of specified modules so that the debugger can download 
+            the source files from a URL
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.SourceIndex.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.SourceIndex.Execute">
+            <summary>
+            Executes the task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Build.SourceIndex.AddSourceIndex(System.String)">
+            <summary>
+            Modifies pdbFile so that it references the source files not over a local directory but an URL
+            </summary>
+            <param name="pdbFile"></param>
+        </member>
+        <member name="P:Sidi.Build.SourceIndex.SrcsrvStream">
+            <summary>
+            Name of the stream in the PDB file containing the source information
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.SourceIndex.Directory">
+            <summary>
+            Local source directory
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.SourceIndex.Url">
+            <summary>
+            URL that contains the same source files as the local source directory
+            </summary>
+        </member>
+        <member name="P:Sidi.Build.SourceIndex.Modules">
+            <summary>
+            Modules to be source-indexed
+            </summary>
+        </member>
+        <member name="T:Sidi.Build.Test.SourceIndexTest">
+            <summary>
+            Test for SourceIndex
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SourceIndexTest.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SourceIndexTest.SetUp">
+            <summary>
+            Test setup. Creates a fresh SourceIndex instance.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SourceIndexTest.Test">
+            <summary>
+            Add information to a PDB under which URLs the source files can be found.
+            </summary>
+        </member>
+        <member name="T:Sidi.Build.Srctool">
+            <summary>
+            Extract source information from a PDB file. Wrapper for srctool.exe. 
+            "Debugging Tools for Windows (x86)" must be installed.
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Srctool.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Srctool.DumpRaw(System.String)">
+            <summary>
+            Dumps the original source file names
+            </summary>
+            <param name="pdbFile">PDB file name</param>
+            <returns>Sequence of source file names</returns>
+        </member>
+        <member name="T:Sidi.Build.Test.SrctoolTest">
+            <summary>
+            Test for SrcTool
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SrctoolTest.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SrctoolTest.SetUp">
+            <summary>
+            Creates a fresh SrcTool instance
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SrctoolTest.Test">
+            <summary>
+            Dump source information of a PDB file
+            </summary>
+        </member>
+        <member name="M:Sidi.Build.Test.SrctoolTest.Instrument">
+            <summary>
+            Write source server information to a PDB file
+            </summary>
+        </member>
+    </members>
+</doc>
