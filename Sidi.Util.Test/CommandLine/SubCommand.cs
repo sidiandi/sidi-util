@@ -78,5 +78,19 @@ namespace Sidi.CommandLine.Test
             log.Info(w.ToString());
             Assert.IsTrue(w.ToString().Contains("Math"));
         }
+
+        [Test]
+        public void HelpMessage2()
+        {
+            var app = new App();
+            var p = new Parser(app);
+            var w = new StringWriter();
+            var consoleOut = Console.Out;
+            Console.SetOut(w);
+            p.Parse(new string[] { "Math" });
+            Console.SetOut(consoleOut);
+            log.Info(w.ToString());
+            Assert.IsTrue(w.ToString().Contains("adds a and b"));
+        }
     }
 }

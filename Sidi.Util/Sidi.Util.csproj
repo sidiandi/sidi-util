@@ -86,7 +86,13 @@
     <Compile Include="Cache\LruCache.cs" />
     <Compile Include="Cache\LruCacheBackground.cs" />
     <Compile Include="Collections\SelectList.cs" />
+    <Compile Include="CommandLine\Action.cs" />
+    <Compile Include="CommandLine\Attributes.cs" />
+    <Compile Include="CommandLine\IParserItem.cs" />
+    <Compile Include="CommandLine\Option.cs" />
+    <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
+    <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Forms\ChooseOneDialog.cs">
       <SubType>Form</SubType>
@@ -126,7 +132,6 @@
     <Compile Include="CommandLine\ShowHelp.cs" />
     <Compile Include="CommandLine\ShowUserInterface.cs" />
     <Compile Include="Util\Comparer.cs" />
-    <Compile Include="Util\DumpExtensions.cs" />
     <Compile Include="IO\Copy.cs" />
     <Compile Include="IO\Find.cs" />
     <Compile Include="Forms\BossController.cs">
@@ -184,6 +189,7 @@
     <Compile Include="Persistence\Dictionary.cs" />
     <Compile Include="Pop3\Server.cs" />
     <Compile Include="..\VersionInfo.cs" />
+    <Compile Include="Util\ListFormat.cs" />
     <Compile Include="Util\ProcessEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\RandomEx.cs" />
