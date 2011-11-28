@@ -133,7 +133,11 @@ namespace Sidi.Persistence
         [TearDown]
         public void Deinit()
         {
-            addressBook.Dispose();
+            if (addressBook != null)
+            {
+                addressBook.Dispose();
+                addressBook = null;
+            }
         }
 
         [Test]
