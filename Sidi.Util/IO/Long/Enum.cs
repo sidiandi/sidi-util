@@ -66,12 +66,15 @@ namespace Sidi.IO.Long
         /// <returns></returns>
         public IEnumerable<FileSystemInfo> Depth()
         {
+            Count = 0;
             var stack = new List<FileSystemInfo>(root);
 
             for (; stack.Count > 0; )
             {
                 var i = stack.First();
                 stack.RemoveAt(0);
+
+                Progress(i);
 
                 if (Output(i))
                 {
@@ -91,6 +94,7 @@ namespace Sidi.IO.Long
         /// <returns></returns>
         public IEnumerable<FileSystemInfo> Breadth()
         {
+            Count = 0;
             var stack = new List<FileSystemInfo>(root);
 
             for (; stack.Count > 0; )
@@ -98,9 +102,12 @@ namespace Sidi.IO.Long
                 var i = stack.First();
                 stack.RemoveAt(0);
 
+                Progress(i);
+
                 if (Output(i))
                 {
                     yield return i;
+                    ++Count;
                 }
 
                 if (i.IsDirectory && Follow(i))
@@ -111,12 +118,27 @@ namespace Sidi.IO.Long
             }
         }
 
+        public TimeSpan LogInterval { get; set; }
+        public int Count { get; private set; }
+
+        DateTime nextReport = DateTime.MinValue;
+
+        void Progress(FileSystemInfo i)
+        {
+            var now = DateTime.Now;
+            if (now > nextReport)
+            {
+                nextReport = now + LogInterval;
+                log.InfoFormat("{0}: {1}", Count, i);
+            }
+        }
+
         bool MustFollow(FileSystemInfo i)
         {
             var f = i.IsDirectory && Follow(i);
             if (f)
             {
-                log.InfoFormat("Follow {0}", i);
+                log.DebugFormat("Follow {0}", i);
             }
             return f;
         }

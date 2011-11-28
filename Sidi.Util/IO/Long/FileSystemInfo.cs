@@ -63,7 +63,7 @@ namespace Sidi.IO.Long
 
         void SetAttributes(System.IO.FileAttributes a, bool value)
         {
-            Attributes = (Attributes & a) | (value ? a : 0);
+            Attributes = (Attributes & ~a) | (value ? a : 0);
         }
 
         public bool IsDirectory

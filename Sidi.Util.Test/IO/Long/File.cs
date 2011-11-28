@@ -104,5 +104,16 @@ namespace Sidi.IO.Long
                 Assert.IsFalse(File.Exists(lp));
                 Assert.IsTrue(Directory.Exists(root));
             }
+
+            [Test]
+            public void DeleteReadOnlyFiles()
+            {
+                CreateSampleFile(lp);
+                var info = new FileSystemInfo(lp);
+                Assert.IsFalse(info.ReadOnly);
+                info.ReadOnly = true;
+                Assert.IsTrue(info.ReadOnly);
+                File.Delete(lp);
+            }
         }
 }

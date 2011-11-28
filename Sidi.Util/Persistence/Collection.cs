@@ -688,6 +688,18 @@ namespace Sidi.Persistence
             insert.ExecuteNonQuery();
         }
 
+        public void AddRange(IEnumerable<T> range)
+        {
+            using (var t = this.BeginTransaction())
+            {
+                foreach (var i in range)
+                {
+                    Add(i);
+                }
+                t.Commit();
+            }
+        }
+
         public void Clear()
         {
             DbCommand clear = connection.CreateCommand();
