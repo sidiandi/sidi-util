@@ -128,8 +128,14 @@ namespace Sidi.CommandLine
             log.InfoFormat("{0}", this);
             if (args.Any())
             {
-                while (args.Any() && args.First() != Parser.ListTerminator)
+                while (args.Any())
                 {
+                    if (args.First() == Parser.ListTerminator)
+                    {
+                        args.RemoveAt(0);
+                        break;
+                    }
+
                     if (execute)
                     {
                         parser.ParseSingleCommand(args);

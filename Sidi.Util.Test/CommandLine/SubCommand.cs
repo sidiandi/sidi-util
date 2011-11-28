@@ -92,5 +92,14 @@ namespace Sidi.CommandLine.Test
             log.Info(w.ToString());
             Assert.IsTrue(w.ToString().Contains("adds a and b"));
         }
+
+        [Test]
+        public void MultipleSubcommands()
+        {
+            var app = new App();
+            var p = new Parser(app);
+            p.Parse(new string[] { "Math", "Add", "1", "1", ";", "Math", "Multiply", "2", "2" });
+            p.Parse(new string[] { "Math", "Add", "1", "1", "Multiply", "2", "2" });
+        }
     }
 }
