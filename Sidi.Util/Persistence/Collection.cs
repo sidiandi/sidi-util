@@ -211,6 +211,7 @@ namespace Sidi.Persistence
             b.DataSource = path;
             b.DateTimeFormat = SQLiteDateFormats.ISO8601;
             b.UseUTF16Encoding = true;
+            b.DefaultTimeout = Int32.MaxValue;
             bool create = !File.Exists(path);
             if (create)
             {
@@ -237,18 +238,22 @@ namespace Sidi.Persistence
 
             table = a_table;
 
-            bool create = false;
-            create |= !TableExists(table);
-            if (create)
+            using (var t = this.BeginTransaction())
             {
-                CreateTable();
-            }
-            else
-            {
-                if (!CheckTableSchema())
+                bool create = false;
+                create |= !TableExists(table);
+                if (create)
                 {
-                    throw new System.InvalidCastException();
+                    CreateTable();
                 }
+                else
+                {
+                    if (!CheckTableSchema())
+                    {
+                        throw new System.InvalidCastException();
+                    }
+                }
+                t.Commit();
             }
 
             insert = connection.CreateCommand();
@@ -642,6 +647,10 @@ namespace Sidi.Persistence
                 {
                     i.SetValue(item, null);
                 }
+                else if (i.FieldType() == typeof(string))
+                {
+                    i.SetValue(item, reader.GetString(index));
+                }
                 else if (i.FieldType() == typeof(DateTime))
                 {
                     i.SetValue(item, reader.GetDateTime(index));
@@ -670,13 +679,22 @@ namespace Sidi.Persistence
                 {
                     i.SetValue(item, reader.GetGuid(index));
                 }
+                else if (reader.GetFieldType(index) == typeof(string))
+                {
+                    // FieldType must be constructible from string
+                    var stringConstructor = i.FieldType().GetConstructor(new Type[] { typeof(string) });
+                    var value = stringConstructor.Invoke(new object[] { reader.GetString(index) });
+                    i.SetValue(item, value);
+                }
                 else
                 {
-                    i.SetValue(item, reader[index]);
+                    i.SetValue(item, reader.GetValue(index));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                log.Warn(String.Format("{0}", i.FieldType()), ex);
+                throw ex;
             }
         }
 

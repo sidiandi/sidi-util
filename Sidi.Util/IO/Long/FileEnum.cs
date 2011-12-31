@@ -6,6 +6,7 @@ using Sidi.Util;
 using System.IO;
 using Sidi.CommandLine;
 using System.Text.RegularExpressions;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IO.Long
 {
@@ -16,7 +17,7 @@ namespace Sidi.IO.Long
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Enum Enumerator = new Enum();
+        public FileEnum Enumerator = new FileEnum();
         List<Regex> exclude = new List<Regex>();
         
         public EnumConfig()

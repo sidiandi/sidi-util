@@ -27,8 +27,7 @@ namespace Sidi.Util
 
             {
                 data.ListFormat()
-                    .AddColumn("Name")
-                    .AddColumn("LastWriteTime")
+                    .Property("Name", "LastWriteTime")
                     .RenderText(Console.Out);
             }
 

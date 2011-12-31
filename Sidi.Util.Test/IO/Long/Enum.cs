@@ -6,13 +6,10 @@ using Sidi.Util;
 using System.IO;
 using NUnit.Framework;
 using Sidi.CommandLine;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IO.Long
 {
-    public class FileTypeTest
-    {
-    }
-
         [TestFixture]
         public class EnumTest : TestBase
         {
@@ -21,7 +18,7 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Depth()
             {
-                var e = new Enum();
+                var e = new FileEnum();
                 e.AddRoot(TestTree);
                 foreach (var i in e.Depth())
                 {
@@ -32,20 +29,20 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Breadth()
             {
-                var e = new Enum();
+                var e = new FileEnum();
                 e.AddRoot(TestTree);
                 var d = e.Depth();
                 var b = e.Depth();
                 Assert.IsFalse(d.Except(b).Any());
             }
 
-            LongName TestTree = Sidi.IO.FileUtil.BinFile(".").Long();
+            Path TestTree = Sidi.IO.FileUtil.BinFile(".").Long();
 
             [Test]
             public void Output()
             {
-                var e = new Enum();
-                e.Output = Enum.OnlyFiles;
+                var e = new FileEnum();
+                e.Output = FileEnum.OnlyFiles;
                 e.AddRoot(TestTree);
                 var files = e.Depth().ToList();
                 Assert.IsTrue(files.Any());
@@ -55,10 +52,10 @@ namespace Sidi.IO.Long
             [Test]
             public void FileType()
             {
-                var e = new Enum();
+                var e = new FileEnum();
                 var fileType = new FileType("exe");
-                e.Output = x => Enum.OnlyFiles(x) && fileType.Is(x.Name);
-                e.Follow = x => Enum.NoDotNoHidden(x) && x.Name != "test";
+                e.Output = x => FileEnum.OnlyFiles(x) && fileType.Is(x.Name);
+                e.Follow = x => FileEnum.NoDotNoHidden(x) && x.Name != "test";
 
                 e.AddRoot(TestTree);
                 var files = e.Depth().ToList();
@@ -69,8 +66,8 @@ namespace Sidi.IO.Long
             [Test]
             public void Unique()
             {
-                var e = new Enum();
-                e.Output = Enum.OnlyFiles;
+                var e = new FileEnum();
+                e.Output = FileEnum.OnlyFiles;
                 e.AddRoot(TestTree);
                 var maybeIdentical = e.Depth()
                     .GroupBy(x => x.Length)

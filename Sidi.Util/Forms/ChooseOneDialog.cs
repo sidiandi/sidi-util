@@ -22,54 +22,33 @@ namespace Sidi.Forms
         {
             get
             {
-                return listViewObjects.SelectedItems.Cast<ListViewItem>().First().Tag;
+                return listViewObjects.SelectedObjects.First();
             }
         }
 
-        public IEnumerable<IColumnInfo> Columns { set; get; }
+        public IEnumerable<IColumnInfo> Columns
+        {
+            set
+            {
+                this.listViewObjects.ColumnDefinition = value.ToList();
+                listViewObjects.UpdateDisplay();
+            }
+            get
+            {
+                return listViewObjects.ColumnDefinition;
+            }
+        }
 
         public IEnumerable<object> Objects
         {
             set
             {
-                if (value.Any())
-                {
-                    this.Text = "Choose one {0}".F(value.First().GetType());
-                }
-
-                listViewObjects.Items.Clear();
-                listViewObjects.Columns.Clear();
-                listViewObjects.HeaderStyle = ColumnHeaderStyle.Clickable;
-                
-                foreach (var c in Columns)
-                {
-                    listViewObjects.Columns.Add(c.Name, -1);
-                }
-                if (listViewObjects.Columns.Count > 0)
-                {
-                    listViewObjects.Columns[listViewObjects.Columns.Count - 1].Width = -2;
-                }
-                foreach (object i in value)
-                {
-                    ListViewItem item = new ListViewItem();
-                    item.Text = Columns.First().Value(i);
-                    item.Tag = i;
-                    foreach (var c in Columns.Skip(1))
-                    {
-                        item.SubItems.Add(c.Value(i));
-                    }
-                    listViewObjects.Items.Add(item);
-                }
+                listViewObjects.Items = value.ToList();
             }
 
             get
             {
-                List<object> objects = new List<object>();
-                foreach (ListViewItem i in listViewObjects.Items)
-                {
-                    objects.Add(i.Tag);
-                }
-                return objects;
+                return listViewObjects.Items.Cast<object>();
             }
         }
 

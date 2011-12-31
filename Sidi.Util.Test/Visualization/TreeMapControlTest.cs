@@ -9,6 +9,7 @@ using System.Drawing;
 using Sidi.IO;
 using Sidi.IO.Long;
 using System.Diagnostics;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.Visualization
 {
@@ -55,7 +56,7 @@ namespace Sidi.Visualization
             {
                 new MenuItem("Open in Explorer", (s, e) =>
                 {
-                    Process.Start("explorer.exe", "/select," + c.SelectedNode.Data.FullPath.ToString());
+                    Process.Start("explorer.exe", "/select," + c.SelectedNode.Data.FullName.ToString());
                 }){ Break = true },
                 new MenuItem("Color by File Type", (s,e) =>
                 {
@@ -71,14 +72,14 @@ namespace Sidi.Visualization
 
             c.ItemMouseHover += (s, e) =>
                 {
-                    ti.SetToolTip(c, e.Item.Data.FullPath.ToString());
+                    ti.SetToolTip(c, e.Item.Data.FullName.ToString());
                 };
 
             c.ItemActivate += (s, e) =>
                 {
                     try
                     {
-                        e.Item.Data.FullPath.NoPrefix.ShellOpen();
+                        e.Item.Data.FullName.NoPrefix.ShellOpen();
                     }
                     catch
                     {

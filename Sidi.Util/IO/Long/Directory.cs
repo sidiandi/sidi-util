@@ -13,16 +13,16 @@ namespace Sidi.IO.Long
         const string ThisDir = ".";
         const string UpDir = "..";
 
-        public static void Delete(LongName directory)
+        public static void Delete(Path directory)
         {
             if (!Kernel32.RemoveDirectory(directory.Param))
             {
-                new FileSystemInfo(directory).ReadOnly = false;
+                new FileSystemInfo(directory).IsReadOnly = false;
                 Kernel32.RemoveDirectory(directory.Param).CheckApiCall(directory);
             }
         }
 
-        public static bool Exists(LongName directory)
+        public static bool Exists(Path directory)
         {
             FindData fd;
             if (directory.GetFindData(out fd))
@@ -35,7 +35,7 @@ namespace Sidi.IO.Long
             }
         }
 
-        public static void Move(LongName from, LongName to)
+        public static void Move(Path from, Path to)
         {
             Kernel32.MoveFileEx(from.Param, to.Param, 0).CheckApiCall(String.Format("{0} -> {1}", from, to));
         }
@@ -45,7 +45,7 @@ namespace Sidi.IO.Long
         /// </summary>
         /// <param name="searchPath"></param>
         /// <returns></returns>
-        internal static IEnumerable<FindData> FindFileRaw(LongName searchPath)
+        internal static IEnumerable<FindData> FindFileRaw(Path searchPath)
         {
             FindData fd;
 
@@ -62,7 +62,7 @@ namespace Sidi.IO.Long
             }
         }
 
-        public static IList<FileSystemInfo> GetChilds(LongName directory)
+        public static IList<FileSystemInfo> GetChilds(Path directory)
         {
             return FindFile(directory.CatDir("*")).ToList();
         }
@@ -72,14 +72,14 @@ namespace Sidi.IO.Long
         /// </summary>
         /// <param name="searchPath">File search path complete with wildcards, e.g. C:\temp\*.doc</param>
         /// <returns></returns>
-        public static IEnumerable<FileSystemInfo> FindFile(LongName searchPath)
+        public static IEnumerable<FileSystemInfo> FindFile(Path searchPath)
         {
             return FindFileRaw(searchPath)
                 .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
                 .Select(x => new FileSystemInfo(searchPath.ParentDirectory, x));
         }
 
-        public static void Create(LongName path)
+        public static void Create(Path path)
         {
             CreateDirectoryInternal(path);
         }
@@ -87,7 +87,7 @@ namespace Sidi.IO.Long
         const int ERROR_ALREADY_EXISTS = 183;
         const int ERROR_PATH_NOT_FOUND = 3;
 
-        static void CreateDirectoryInternal(LongName path)
+        static void CreateDirectoryInternal(Path path)
         {
             if (!Kernel32.CreateDirectory(path.Param, IntPtr.Zero))
             {

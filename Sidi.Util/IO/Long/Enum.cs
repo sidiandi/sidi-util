@@ -23,18 +23,27 @@ namespace Sidi.IO.Long
 
         public bool Is(string fileName)
         {
-            return e.Contains(Path.GetExtension(fileName).ToLower());
+            return e.Contains(new Path(fileName).Extension.ToLower());
         }
     }
 
-    public class Enum
+    public class FileEnum
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Enum()
+        public FileEnum()
         {
+            Visit = x => { };
             Follow = x => true;
             Output = x => true;
+        }
+
+        public static IEnumerable<FileSystemInfo> AllFiles(Path root)
+        {
+            var e = new FileEnum();
+            e.AddRoot(root);
+            e.Output = FileEnum.OnlyFiles;
+            return e.Depth();
         }
         
         /// <summary>
@@ -45,18 +54,27 @@ namespace Sidi.IO.Long
         /// <summary>
         /// Set this function to decide which directories should be followed.
         /// </summary>
-        public Func<FileSystemInfo, bool> Follow { set; get; } 
+        public Func<FileSystemInfo, bool> Follow { set; get; }
 
+        /// <summary>
+        /// Set this function to see every file, not matter if output or not.
+        /// </summary>
+        public Action<FileSystemInfo> Visit { set; get; }
+
+        /// <summary>
+        /// Counts the visited files
+        /// </summary>
+        public int Count { private set; get; }
+        
         List<FileSystemInfo> root = new List<FileSystemInfo>();
 
         /// <summary>
         /// Adds a start root for Depth() and Breath(). Multiple start roots are supported.
         /// </summary>
         /// <param name="path"></param>
-        public void AddRoot(LongName path)
+        public void AddRoot(Path path)
         {
             var startItem = new FileSystemInfo(path);
-            log.Info(startItem);
             root.Add(startItem);
         }
 
@@ -74,7 +92,7 @@ namespace Sidi.IO.Long
                 var i = stack.First();
                 stack.RemoveAt(0);
 
-                Progress(i);
+                Visit(i);
 
                 if (Output(i))
                 {
@@ -83,7 +101,7 @@ namespace Sidi.IO.Long
 
                 if (MustFollow(i))
                 {
-                    stack.InsertRange(0, i.GetChilds());
+                    stack.InsertRange(0, i.GetFileSystemInfos());
                 }
             }
         }
@@ -102,7 +120,7 @@ namespace Sidi.IO.Long
                 var i = stack.First();
                 stack.RemoveAt(0);
 
-                Progress(i);
+                Visit(i);
 
                 if (Output(i))
                 {
@@ -112,26 +130,12 @@ namespace Sidi.IO.Long
 
                 if (i.IsDirectory && Follow(i))
                 {
-                    log.InfoFormat("Directory {0}", i);
-                    stack.InsertRange(stack.Count, i.GetChilds());
+                    stack.InsertRange(stack.Count, i.GetFileSystemInfos());
                 }
             }
         }
 
-        public TimeSpan LogInterval { get; set; }
-        public int Count { get; private set; }
-
         DateTime nextReport = DateTime.MinValue;
-
-        void Progress(FileSystemInfo i)
-        {
-            var now = DateTime.Now;
-            if (now > nextReport)
-            {
-                nextReport = now + LogInterval;
-                log.InfoFormat("{0}: {1}", Count, i);
-            }
-        }
 
         bool MustFollow(FileSystemInfo i)
         {

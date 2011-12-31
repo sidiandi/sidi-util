@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using Sidi.Util;
+using System.Runtime.InteropServices;
 
 namespace Sidi.IO.Long
 {
@@ -11,16 +12,16 @@ namespace Sidi.IO.Long
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void Delete(LongName path)
+        public static void Delete(Path path)
         {
             if (!Kernel32.DeleteFile(path.Param))
             {
-                new FileSystemInfo(path).ReadOnly = false;
+                new FileSystemInfo(path).IsReadOnly = false;
                 Kernel32.DeleteFile(path.Param).CheckApiCall(path);
             }
         }
 
-        public static bool Exists(LongName path)
+        public static bool Exists(Path path)
         {
             using (var f = Directory.FindFile(path).GetEnumerator())
             {
@@ -35,7 +36,7 @@ namespace Sidi.IO.Long
             }
         }
 
-        public static System.IO.FileStream Open(LongName path, System.IO.FileMode fileMode)
+        public static System.IO.FileStream Open(Path path, System.IO.FileMode fileMode)
         {
             Kernel32.EFileAccess dwDesiredAccess = Kernel32.EFileAccess.GenericAll;
             Kernel32.EFileShare dwShareMode = Kernel32.EFileShare.None;
@@ -67,12 +68,12 @@ namespace Sidi.IO.Long
             return new System.IO.FileStream(h, access);
         }
 
-        public static System.IO.StreamWriter TextWriter(LongName p)
+        public static System.IO.StreamWriter TextWriter(Path p)
         {
             return new System.IO.StreamWriter(Open(p, System.IO.FileMode.Create));
         }
 
-        public static System.IO.StreamReader TextReader(LongName p)
+        public static System.IO.StreamReader TextReader(Path p)
         {
             return new System.IO.StreamReader(Open(p, System.IO.FileMode.Open));
         }
@@ -119,7 +120,7 @@ namespace Sidi.IO.Long
         //
         //   System.NotSupportedException:
         //     sourceFileName or destFileName is in an invalid format.
-        public static void Copy(LongName sourceFileName, LongName destFileName)
+        public static void Copy(Path sourceFileName, Path destFileName)
         {
             Copy(sourceFileName, destFileName, false);
         }
@@ -168,19 +169,81 @@ namespace Sidi.IO.Long
         //
         //   System.NotSupportedException:
         //     sourceFileName or destFileName is in an invalid format.
-        public static void Copy(LongName sourceFileName, LongName destFileName, bool overwrite)
+        public static void Copy(Path sourceFileName, Path destFileName, bool overwrite)
         {
             Kernel32.CopyFile(sourceFileName.Param, destFileName.Param, overwrite)
                 .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
         }
 
-        public static void CreateHardLink(LongName fileName, LongName existingFileName)
+        //
+        // Summary:
+        //     Moves a specified file to a new location, providing the option to specify
+        //     a new file name.
+        //
+        // Parameters:
+        //   sourceFileName:
+        //     The name of the file to move.
+        //
+        //   destFileName:
+        //     The new path for the file.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     The destination file already exists.
+        //
+        //   System.ArgumentNullException:
+        //     sourceFileName or destFileName is null.
+        //
+        //   System.ArgumentException:
+        //     sourceFileName or destFileName is a zero-length string, contains only white
+        //     space, or contains invalid characters as defined in System.IO.Path.InvalidPathChars.
+        //
+        //   System.UnauthorizedAccessException:
+        //     The caller does not have the required permission.
+        //
+        //   System.IO.FileNotFoundException:
+        //     sourceFileName was not found.
+        //
+        //   System.IO.PathTooLongException:
+        //     The specified path, file name, or both exceed the system-defined maximum
+        //     length. For example, on Windows-based platforms, paths must be less than
+        //     248 characters, and file names must be less than 260 characters.
+        //
+        //   System.IO.DirectoryNotFoundException:
+        //     The path specified in sourceFileName or destFileName is invalid, (for example,
+        //     it is on an unmapped drive).
+        //
+        //   System.NotSupportedException:
+        //     sourceFileName or destFileName is in an invalid format.
+        public static void Move(Path sourceFileName, Path destFileName)
+        {
+            Kernel32.MoveFileEx(sourceFileName.Param, destFileName.Param, 0)
+                .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
+        }
+
+        public static void CreateHardLink(Path fileName, Path existingFileName)
         {
             Kernel32.CreateHardLink(fileName.Param, existingFileName.Param, IntPtr.Zero)
                 .CheckApiCall(String.Format("{0} -> {1}", fileName, existingFileName));
         }
 
-        public static bool EqualByTime(LongName f1, LongName f2)
+        public static void CopyOrHardLink(Path source, Path dest)
+        {
+            if (!dest.Exists)
+            {
+                dest.EnsureParentDirectoryExists();
+                if (source.PathRoot.Equals(dest.PathRoot))
+                {
+                    CreateHardLink(dest, source);
+                }
+                else
+                {
+                    File.Copy(source, dest);
+                }
+            }
+        }
+
+        public static bool EqualByTime(Path f1, Path f2)
         {
             FindData d1;
             FindData d2;
@@ -192,6 +255,54 @@ namespace Sidi.IO.Long
             {
                 return false;
             }
+        }
+
+        [DllImport("msvcrt.dll")]
+        static extern int memcmp(byte[] b1, byte[] b2, long count);
+
+        static bool Equals(byte[] b1, byte[] b2, int count)
+        {
+            // Validate buffers are the same length.
+            // This also ensures that the count does not exceed the length of either buffer.  
+            return memcmp(b1, b2, count) == 0;
+        }
+
+        public static bool EqualByContent(Path f1, Path f2)
+        {
+            FindData d1;
+            FindData d2;
+            if (!(f1.GetFindData(out d1) && f2.GetFindData(out d2)))
+            {
+                return false;
+            }
+
+            if (d1.Length != d2.Length)
+            {
+                return false;
+            }
+
+            const int bufSize = 0x1000;
+            byte[] b1 = new byte[bufSize];
+            byte[] b2 = new byte[bufSize];
+
+            using (var s1 = Open(f1, System.IO.FileMode.Open))
+            {
+                using (var s2 = Open(f2, System.IO.FileMode.Open))
+                {
+                    int readCount = s1.Read(b1, 0, bufSize);
+                    if (readCount != s2.Read(b2, 0, bufSize))
+                    {
+                        return false;
+                    }
+
+                    if (!Equals(b1, b2, readCount))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }

@@ -10,10 +10,10 @@ namespace Sidi.Util
     {
         public ListFormat(IEnumerable<T> data)
         {
-            this.data = data;
+            this.Data = data;
         }
 
-        IEnumerable<T> data;
+        public IEnumerable<T> Data { get; private set; }
 
         public class Column
         {
@@ -45,20 +45,20 @@ namespace Sidi.Util
             return this;
         }
 
-        public ListFormat<T> AddColumn(string caption)
+        public ListFormat<T> Property(params string[] propertyNames)
         {
-            var p = typeof(T).GetProperty(caption);
-            var noArgs = new object[]{};
-            Columns.Add(new Column(caption, x => p.GetValue(x, noArgs)));
+            foreach (var caption in propertyNames)
+            {
+                var p = typeof(T).GetProperty(caption);
+                var noArgs = new object[] { };
+                Columns.Add(new Column(caption, x => p.GetValue(x, noArgs)));
+            }
             return this;
         }
 
         public ListFormat<T> PropertyColumns()
         {
-            foreach (var p in typeof(T).GetProperties())
-            {
-                AddColumn(p.Name);
-            }
+            Property(typeof(T).GetProperties().Select(x => x.Name).ToArray());
             return this;
         }
 
@@ -68,7 +68,7 @@ namespace Sidi.Util
 
         public void RenderText(TextWriter o)
         {
-            var rows = data
+            var rows = Data
                 .Select(i => Columns.Select(x => x.GetText(i)).ToArray())
                 .ToList();
 
