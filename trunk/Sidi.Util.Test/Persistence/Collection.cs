@@ -25,6 +25,8 @@ using NUnit.Framework;
 using Sidi.Persistence;
 using System.Threading;
 using Sidi.IO;
+using System.Linq;
+using L = Sidi.IO.Long;
 
 namespace Sidi.Persistence
 {
@@ -378,9 +380,98 @@ namespace Sidi.Persistence
         }
 
         [Test]
-        public void Query()
+        public void ThreadSafety()
         {
-            
+            var p = TestFile("thread_safety.sqlite");
+            p.EnsureFileSystemEntryNotExists();
+            using (var addresses = new Collection<Address>(p))
+            {
+                var threadCount = 10;
+                var insertCount = 10;
+                var threads = Enumerable.Range(0, threadCount)
+                    .Select(n =>
+                        {
+                            var t = new Thread(() =>
+                                {
+                                    for (int i = 0; i < insertCount; ++i)
+                                    {
+                                        lock (addresses)
+                                        {
+                                            addresses.Add(new Address()
+                                            {
+                                                Name = "test",
+                                            });
+                                        }
+                                    }
+                                });
+                            t.Start();
+                            return t;
+                        })
+                        .ToList();
+
+                threads.ForEach(t => t.Join());
+
+                Assert.AreEqual(threadCount * insertCount, addresses.Count);
+            }
+        }
+
+        [Test]
+        public void ThreadSafety2()
+        {
+            var p = TestFile("thread_safety.sqlite");
+            p.EnsureFileSystemEntryNotExists();
+
+            var threadCount = 10;
+            var insertCount = 10;
+            var threads = Enumerable.Range(0, threadCount)
+                .Select(n =>
+                {
+                    var t = new Thread(() =>
+                    {
+                        using (var addresses = new Collection<Address>(p))
+                        {
+                            for (int i = 0; i < insertCount; ++i)
+                            {
+                                log.InfoFormat("Thread {0}: add", Thread.CurrentThread.ManagedThreadId);
+                                addresses.Add(new Address()
+                                {
+                                    Name = "test",
+                                });
+                            }
+                        }
+                    });
+                    t.Start();
+                    return t;
+                })
+                    .ToList();
+
+            threads.ForEach(t => t.Join());
+
+            var db = new Collection<Address>(p);
+            Assert.AreEqual(threadCount * insertCount, db.Count);
+        }
+
+        public class FileInfo
+        {
+            [RowId]
+            public long Id;
+
+            [Data]
+            public L.Path Path;
+        }
+
+        [Test]
+        public void Path()
+        {
+            var p = TestFile("path.sqlite");
+            new L.Path(p).EnsureNotExists();
+            var db = new Collection<FileInfo>(p);
+            db.Add(new FileInfo()
+            {
+                Path = new L.Path(@"C:\temp")
+            });
+
+            Assert.AreEqual(new L.Path(@"C:\temp"), db.First().Path);
         }
     }
 }

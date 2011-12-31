@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using NUnit.Framework;
 using Sidi.Util;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IO.Long
 {
@@ -13,8 +14,8 @@ namespace Sidi.IO.Long
         {
             private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            public LongName root;
-            public LongName lp;
+            public Path root;
+            public Path lp;
 
             [SetUp]
             public void Setup()
@@ -53,11 +54,11 @@ namespace Sidi.IO.Long
                     CreateSampleFile(root.CatDir(i.ToString()));
                 }
 
-                var e = new FileSystemInfo(root).GetChilds();
+                var e = new FileSystemInfo(root).GetFileSystemInfos();
                 Assert.IsTrue(e.Count() >= 10);
             }
 
-            public void CreateSampleFile(LongName lp)
+            public void CreateSampleFile(Path lp)
             {
                 using (var f = File.Open(lp, System.IO.FileMode.Create))
                 {
@@ -97,7 +98,7 @@ namespace Sidi.IO.Long
             public void Move()
             {
                 CreateSampleFile(lp);
-                var m = new LongName(lp.Parts.Take(20));
+                var m = new Path(lp.Parts.Take(20));
                 var dest = root.CatDir("moved");
                 Directory.Move(m, dest);
                 Assert.IsTrue(Directory.Exists(dest));
@@ -110,10 +111,27 @@ namespace Sidi.IO.Long
             {
                 CreateSampleFile(lp);
                 var info = new FileSystemInfo(lp);
-                Assert.IsFalse(info.ReadOnly);
-                info.ReadOnly = true;
-                Assert.IsTrue(info.ReadOnly);
+                Assert.IsFalse(info.IsReadOnly);
+                info.IsReadOnly = true;
+                Assert.IsTrue(info.IsReadOnly);
                 File.Delete(lp);
+            }
+
+            [Test]
+            public void Equal()
+            {
+                var f1 = lp;
+                CreateSampleFile(f1);
+                var f2 = f1.CatName(".copy");
+                File.Copy(f1, f2);
+                Assert.IsTrue(File.EqualByContent(f1, f2));
+
+                using (var s = File.Open(f2, System.IO.FileMode.Create))
+                {
+                    s.WriteByte(0);
+                }
+
+                Assert.IsFalse(File.EqualByContent(f1, f2));
             }
         }
 }

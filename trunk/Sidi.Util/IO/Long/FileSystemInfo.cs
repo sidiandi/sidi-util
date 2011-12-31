@@ -2,20 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IO.Long
 {
     public class FileSystemInfo : IEquatable<FileSystemInfo>
     {
-        public LongName FullPath
+        public Path FullName
         {
             get
             {
-                return parentDirectory.CatDir(Name);
+                if (parentDirectory == null)
+                {
+                    return new Path(Name);
+                }
+                else
+                {
+                    return parentDirectory.CatDir(Name);
+                }
             }
         }
 
-        public FileSystemInfo(LongName path)
+        public FileSystemInfo(Path path)
         {
             path = path.Canonic;
             parentDirectory = path.ParentDirectory;
@@ -23,7 +31,7 @@ namespace Sidi.IO.Long
             _findDataValid = false;
         }
 
-        internal FileSystemInfo(LongName directory, FindData findData)
+        internal FileSystemInfo(Path directory, FindData findData)
         {
             _findData = findData;
             parentDirectory = directory;
@@ -38,12 +46,12 @@ namespace Sidi.IO.Long
 
             set
             {
-                Kernel32.SetFileAttributes(FullPath.Param, value).CheckApiCall(FullPath);
+                Kernel32.SetFileAttributes(FullName.Param, value).CheckApiCall(FullName);
                 _findData.Attributes = value;
             }
         }
 
-        public bool ReadOnly
+        public bool IsReadOnly
         {
             set
             {
@@ -95,9 +103,33 @@ namespace Sidi.IO.Long
             }
         }
 
-        public IEnumerable<FileSystemInfo> GetChilds()
+        public IList<FileSystemInfo> GetFileSystemInfos()
         {
-            return Directory.GetChilds(FullPath);
+            return Directory.GetChilds(FullName);
+        }
+
+        public IList<FileSystemInfo> GetDirectories()
+        {
+            return GetDirectories("*");
+        }
+
+        public IList<FileSystemInfo> GetDirectories(string searchPattern)
+        {
+            return Directory.FindFile(FullName.CatDir(searchPattern))
+                .Where(x => x.IsDirectory)
+                .ToList();
+        }
+
+        public IList<FileSystemInfo> GetFiles()
+        {
+            return GetFiles("*");
+        }
+
+        public IList<FileSystemInfo> GetFiles(string searchPattern)
+        {
+            return Directory.FindFile(FullName.CatDir(searchPattern))
+                .Where(x => !x.IsDirectory)
+                .ToList();
         }
 
         public DateTime CreationTime
@@ -120,7 +152,10 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return Directory.FindFile(FullPath).Any();
+                return FullName.IsRoot ? 
+                    System.IO.Directory.Exists(FullName.NoPrefix + @"\")
+                    :
+                    Directory.FindFile(FullName).Any();
             }
         }
 
@@ -150,10 +185,10 @@ namespace Sidi.IO.Long
 
         static DateTime ToDateTime(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
         {
-            uint h = (uint) fileTime.dwHighDateTime;
-            uint l = (uint) fileTime.dwLowDateTime;
-
-            return DateTime.FromFileTime(h << 32 | l);
+            ulong h = (uint)fileTime.dwHighDateTime;
+            h <<= 32;
+            ulong l = (uint)fileTime.dwLowDateTime;
+            return DateTime.FromFileTime((long)(h | l));
         }
 
         static DateTime ToDateTimeUtc(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
@@ -161,7 +196,6 @@ namespace Sidi.IO.Long
             ulong h = (uint) fileTime.dwHighDateTime;
             h <<= 32;
             ulong l = (uint)fileTime.dwLowDateTime;
-
             return DateTime.FromFileTimeUtc((long)(h | l));
         }
 
@@ -199,12 +233,12 @@ namespace Sidi.IO.Long
 
         public void Delete()
         {
-            FullPath.EnsureNotExists();
+            FullName.EnsureNotExists();
         }
 
         public void Refresh()
         {
-            _findData = FullPath.FindData;
+            _findData = FullName.FindData;
             _findDataValid = true;
         }
 
@@ -222,16 +256,16 @@ namespace Sidi.IO.Long
         FindData _findData;
         bool _findDataValid = false;
 
-        LongName parentDirectory;
+        Path parentDirectory;
 
         public override string ToString()
         {
-            return FullPath.ToString();
+            return FullName.ToString();
         }
 
         public override int GetHashCode()
         {
-            return FullPath.GetHashCode();
+            return FullName.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -248,7 +282,7 @@ namespace Sidi.IO.Long
 
         public bool Equals(FileSystemInfo other)
         {
-            return FullPath.Equals(other.FullPath);
+            return FullName.Equals(other.FullName);
         }
     }
 }

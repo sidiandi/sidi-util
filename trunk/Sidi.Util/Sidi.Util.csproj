@@ -85,6 +85,7 @@
     <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\LruCache.cs" />
     <Compile Include="Cache\LruCacheBackground.cs" />
+    <Compile Include="Collections\Cache.cs" />
     <Compile Include="Collections\SelectList.cs" />
     <Compile Include="CommandLine\Action.cs" />
     <Compile Include="CommandLine\Attributes.cs" />
@@ -100,6 +101,9 @@
     <Compile Include="Forms\ChooseOneDialog.designer.cs">
       <DependentUpon>ChooseOneDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\GenericListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\Prompt.cs" />
     <Compile Include="Forms\SelectObjectsDialog.cs">
       <SubType>Form</SubType>
@@ -113,8 +117,10 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\Long\CopyOp.cs" />
     <Compile Include="IO\Long\Directory.cs" />
     <Compile Include="IO\Long\Enum.cs" />
+    <Compile Include="IO\Long\Extensions\PathExtensions.cs" />
     <Compile Include="IO\Long\File.cs" />
     <Compile Include="IO\Long\FileEnum.cs" />
     <Compile Include="IO\Long\FileSystemInfo.cs" />
@@ -267,6 +273,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

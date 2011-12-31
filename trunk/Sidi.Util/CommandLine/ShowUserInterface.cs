@@ -34,17 +34,306 @@ namespace Sidi.CommandLine
             y = child.Bottom + margin;
         }
 
-        class ActionTag
+        void StackNoXAlign(Control parent, Control child, ref int y)
         {
-            public List<TextBox> ParameterTextBoxes = new List<TextBox>();
-            public Action Action;
+            child.Top = y;
+            child.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            parent.Controls.Add(child);
+            y = child.Bottom + margin;
         }
 
-        [Usage("Show an interactive user interface")]
-        [Category(Parser.categoryUserInterface)]
-        public void UserInterface()
+        public Form ToDialog(Action action)
+        {
+            var at = new ActionTag(action);
+
+            var control = new Form()
+            {
+                Text = action.Name,
+                Width = 640,
+                AutoSize = true,
+            };
+
+            var layout = new TableLayoutPanel()
+            {
+                ColumnCount = 1,
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(8),
+                // CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
+            };
+            control.Controls.Add(layout);
+
+            var usage = new Label()
+            {
+                Text = action.Usage,
+                Dock = DockStyle.Top,
+                AutoSize = true,
+            };
+
+            layout.Controls.Add(usage, 0, 0);
+
+            var paramsPanel = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                AutoSize = true,
+            };
+
+            int row = 0;
+            foreach (var p in action.MethodInfo.GetParameters())
+            {
+                var paramLabel = new Label()
+                {
+                    Text = "{0} [{1}]".F(p.Name, p.ParameterType.GetInfo()),
+                    AutoSize = true
+                };
+
+                paramsPanel.Controls.Add(paramLabel, 0, row);
+
+                var paramInput = new TextBox()
+                {
+                    Dock = DockStyle.Fill,
+                };
+                paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
+                paramInput.Tag = p;
+                paramsPanel.Controls.Add(paramInput, 1, row);
+
+                at.ParameterTextBoxes.Add(paramInput);
+
+                ++row;
+            }
+
+            layout.Controls.Add(paramsPanel,0,1);
+
+            var buttonRow = new FlowLayoutPanel()
+            {
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
+                Dock = DockStyle.Fill,
+            };
+            
+            var button = new Button()
+            {
+                Text = action.Name,
+                AutoSize = true,
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
+                Tag = at,
+            };
+            at.Button = button;
+            button.Click += new EventHandler((s, e) =>
+                {
+                    if (at.Execute())
+                    {
+                        control.Close();
+                    }
+                });
+            buttonRow.Controls.Add(button);
+
+            var cancelButton = new Button()
+            {
+                Text = "Cancel",
+                AutoSize = true,
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
+            };
+            buttonRow.Controls.Add(cancelButton);
+            cancelButton.Click += new EventHandler((s, e) =>
+            {
+                control.Close();
+            });
+
+            layout.Controls.Add(buttonRow, 0, 2);
+            control.AcceptButton = button;
+            control.CancelButton = cancelButton;
+            return control;
+        }
+
+        public Control ToControl(Action action)
+        {
+            var at = new ActionTag(action);
+
+            var control = new GroupBox()
+            {
+                Text = action.Name,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+
+            var layout = new TableLayoutPanel()
+            {
+                ColumnCount = 1,
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+            };
+            control.Controls.Add(layout);
+
+            var usage = new Label()
+            {
+                Text = action.Usage,
+                Dock = DockStyle.Top,
+                AutoSize = true,
+            };
+
+            layout.Controls.Add(usage, 0, 0);
+
+
+            var paramsPanel = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                AutoSize = true,
+            };
+
+            int row = 0;
+            foreach (var p in action.MethodInfo.GetParameters())
+            {
+                var paramLabel = new Label()
+                {
+                    Text = "{0} [{1}]".F(p.Name, p.ParameterType.GetInfo()),
+                    AutoSize = true
+                };
+
+                paramsPanel.Controls.Add(paramLabel, 0, row);
+
+                var paramInput = new TextBox()
+                {
+                    Dock = DockStyle.Fill,
+                };
+                paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
+                paramInput.Tag = p;
+                paramsPanel.Controls.Add(paramInput, 1, row);
+
+                at.ParameterTextBoxes.Add(paramInput);
+
+                ++row;
+            }
+
+            layout.Controls.Add(paramsPanel, 0, 1);
+
+            var button = new Button()
+            {
+                Text = action.Name,
+                AutoSize = true,
+                Tag = at,
+            };
+            at.Button = button;
+            button.Click += new EventHandler(button_Click);
+
+            layout.Controls.Add(button, 0, 2);
+            return control;
+        }
+
+        public Control ToControl(SubCommand subCommand)
+        {
+            var control = new GroupBox()
+            {
+                Text = subCommand.Name,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+
+            var layout = new TableLayoutPanel()
+            {
+                ColumnCount = 1,
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+            };
+            control.Controls.Add(layout);
+
+            var usage = new Label()
+            {
+                Text = subCommand.Usage,
+                Dock = DockStyle.Top,
+                AutoSize = true,
+            };
+
+            layout.Controls.Add(usage, 0, 0);
+
+            var button = new Button()
+            {
+                Text = subCommand.Name,
+                AutoSize = true,
+            };
+
+            button.Click += new EventHandler((s, e) =>
+            {
+                var p = new Parser(subCommand.CommandInstance);
+                var subCommandDialog = ToDialog(p);
+                subCommandDialog.ShowDialog();
+            });
+
+            layout.Controls.Add(button, 0, 2);
+            return control;
+        }
+
+        Control ToControl(Option option)
+        {
+            var panel = new TableLayoutPanel()
+            {
+                ColumnCount = 2,
+                AutoSize = true,
+            };
+
+            var label = new Label()
+            {
+                Text = option.Usage,
+                AutoSize = true
+            };
+            panel.Controls.Add(label,0,0);
+
+            var paramLabel = new Label();
+            paramLabel.Text = option.Syntax;
+            paramLabel.AutoSize = true;
+            panel.Controls.Add(paramLabel,0,1);
+
+            var paramInput = new TextBox();
+            inputs.Add(paramInput);
+            if (option.IsPassword)
+            {
+                paramInput.PasswordChar = '*';
+            }
+            panel.Controls.Add(paramInput,1,1);
+            paramInput.Left = paramLabel.Right + margin;
+
+            paramInput.Text = Support.SafeToString(option.GetValue());
+            paramInput.Tag = option;
+            paramInput.TextChanged += new EventHandler(paramInput_Leave);
+
+            return panel;
+        }
+
+        class ActionTag
+        {
+            public ActionTag(Action action)
+            {
+                Action = action;
+            }
+            public List<TextBox> ParameterTextBoxes = new List<TextBox>();
+            public Action Action { get; private set; }
+            public Button Button { get; set; }
+
+            public bool Execute()
+            {
+                try
+                {
+                    var p = ParameterTextBoxes.Select(x => x.Text).ToList();
+                    Action.Handle(p, true);
+                    ClearError(Button);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+                    SetError(Button, msg);
+                    return false;
+                }
+            }
+        }
+
+        Form ToDialog(Parser parser)
         {
             Form main = new Form();
+
+            var mouseWheelSupport = new MouseWheelSupport(main);
+
             main.Width = 640;
             main.Height = 480;
             main.Text = parser.ApplicationName;
@@ -52,105 +341,72 @@ namespace Sidi.CommandLine
             var t = new TabControl();
             t.Dock = DockStyle.Fill;
 
-            foreach (var category in parser.Categories)
+            var items = parser.Items.Where(item => !((item.Application is ShowHelp || item.Application is ShowUserInterface || item.Application is ShowWebServer)));
+            var categories = items.SelectMany(i => i.Categories).Distinct().ToList();
+
+            foreach (var category in categories)
             {
                 var page = new TabPage(String.IsNullOrEmpty(category) ? "General" : category);
 
-                var c = new ScrollableControl();
-                c.Dock = DockStyle.Fill;
-
-                int y = 0;
-
-                foreach (var item in parser.Items.Where(x => x.Categories.Contains(category)))
+                var c = new TableLayoutPanel()
                 {
-                    y += 3 * margin;
-                    if (item.Application is ShowHelp || item.Application is ShowUserInterface)
-                    {
-                        continue;
-                    }
+                    ColumnCount = 1,
+                    Dock = DockStyle.Fill,
+                    AutoScroll = true,
+                };
+                c.ColumnStyles.Add(new ColumnStyle()
+                {
+                    SizeType = SizeType.Percent,
+                    Width = 100,
+                });
+                page.Controls.Add(c);
 
+                foreach (var item in items.Where(x => x.Categories.Contains(category)))
+                {
+                    Control childControl = null;
                     if (item is Action)
                     {
-                        Action action = (Action)item;
-
-                        var at = new ActionTag();
-                        at.Action = action;
-
-                        foreach (var p in action.MethodInfo.GetParameters())
-                        {
-                            var paramLabel = new Label();
-                            paramLabel.Text = "{0} [{1}]".F(p.Name, p.ParameterType.GetInfo());
-                            paramLabel.AutoSize = true;
-                            int y1 = y;
-                            Stack(c, paramLabel, ref y1);
-
-                            var paramInput = new TextBox();
-                            paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
-                            paramInput.Tag = p;
-                            Stack(c, paramInput, ref y);
-                            paramInput.Left = paramLabel.Right + margin;
-                            at.ParameterTextBoxes.Add(paramInput);
-                        }
-
-                        var button = new Button();
-                        button.Text = item.Name;
-                        button.Top = y;
-                        button.Tag = at;
-                        button.Click += new EventHandler(button_Click);
-                        {
-                            int y2 = y;
-                            Stack(c, button, ref y);
-                            y = y2;
-                        }
-                        button.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-                        button.AutoSize = true;
-
-                        var label = new Label();
-                        label.Text = item.Usage;
-                        label.AutoSize = true;
-                        Stack(c, label, ref y);
-                        label.Left = button.Right + margin;
+                        childControl = ToControl((Action)item);
+                    }
+                    else if (item is Option)
+                    {
+                        childControl = ToControl((Option)item);
+                    }
+                    else if (item is SubCommand)
+                    {
+                        childControl = ToControl((SubCommand)item);
                     }
 
-                    if (item is Option)
+                    if (childControl != null)
                     {
-                        var label = new Label();
-                        label.Text = item.Usage;
-                        label.AutoSize = true;
-                        Stack(c, label, ref y);
-
-                        var option = item as Option;
-                        
-                        var paramLabel = new Label();
-                        paramLabel.Text = option.Syntax;
-                        paramLabel.AutoSize = true;
-                        int y1 = y;
-                        Stack(c, paramLabel, ref y1);
-
-                        var paramInput = new TextBox();
-                        inputs.Add(paramInput);
-                        if (option.IsPassword)
-                        {
-                            paramInput.PasswordChar = '*';
-                        }
-                        Stack(c, paramInput, ref y);
-                        paramInput.Left = paramLabel.Right + margin;
-
-                        paramInput.Text = Support.SafeToString(option.GetValue());
-                        paramInput.Tag = option;
-                        paramInput.TextChanged += new EventHandler(paramInput_Leave);
+                        childControl.Width = 200;
+                        c.Controls.Add(childControl);
                     }
                 }
 
-                c.AutoScroll = true; 
-                
-                page.Controls.Add(c);
                 t.TabPages.Add(page);
             }
             
             main.Controls.Add(t);
 
+            return main;
+        }
+
+        [Usage("Show an interactive user interface")]
+        [Category(Parser.categoryUserInterface)]
+        public void UserInterface()
+        {
+            var main = ToDialog(parser);
             main.ShowDialog();
+        }
+
+        [Usage("Show dialog for the specified command")]
+        [Category(Parser.categoryUserInterface)]
+        public void ShowDialog(string command)
+        {
+            var action = (Action) parser.LookupParserItem(command);
+            var dialog = ToDialog(action);
+            System.Windows.Forms.Application.Run(dialog);
         }
 
         List<TextBox> inputs = new List<TextBox>();
@@ -185,28 +441,18 @@ namespace Sidi.CommandLine
         void button_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
-            var at = (ActionTag)button.Tag;
-            try
-            {
-                var p = at.ParameterTextBoxes.Select(x => x.Text).ToList();
-                at.Action.Handle(p, true);
-                ClearError(button);
-            }
-            catch (Exception ex)
-            {
-                var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
-                SetError(button, msg);
-            }
+            var at = (ActionTag) button.Tag;
+            at.Execute();
             Refresh();
         }
 
-        void SetError(Control c, string message)
+        public static void SetError(Control c, string message)
         {
             c.BackColor = errorColor;
             tooltip.SetToolTip(c, message);
         }
 
-        void ClearError(Control c)
+        public static void ClearError(Control c)
         {
             if (c is TextBox)
             {
@@ -220,8 +466,8 @@ namespace Sidi.CommandLine
             tooltip.SetToolTip(c, null);
         }
 
-        ToolTip tooltip = new ToolTip();
-        Color errorColor = Color.Pink;
+        static ToolTip tooltip = new ToolTip();
+        static Color errorColor = Color.Pink;
 
         void paramInput_Leave(object sender, EventArgs e)
         {

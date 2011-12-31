@@ -543,7 +543,12 @@ namespace Sidi.CommandLine
             }
         }
 
-        IParserItem LookupParserItem(string name)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name">Specifies the parser item. Abbreviations allowed.</param>
+        /// <returns></returns>
+        public IParserItem LookupParserItem(string name)
         {
             IEnumerable<IParserItem> parserItems = Items.ToList();
             return LookupParserItem(name, parserItems);
@@ -587,6 +592,19 @@ namespace Sidi.CommandLine
             {
                 return Enum.Parse(type, stringRepresentation);
             }
+
+            var parse = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
+            if (parse != null)
+            {
+                return parse.Invoke(null, new object[] { stringRepresentation });
+            }
+
+            var ctor = type.GetConstructor(new Type[] { typeof(string) });
+            if (ctor != null)
+            {
+                return ctor.Invoke(new object[] { stringRepresentation });
+            }
+
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 

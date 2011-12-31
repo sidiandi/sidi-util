@@ -27,11 +27,11 @@ using NUnit.Framework;
 //TODO - Add imports your going to test here
 using Sidi.CommandLine;
 using cm = System.ComponentModel;
-using System.IO;
 using Sidi.Util;
 using System.Linq;
 using System.Threading;
 using System.Net;
+using Sidi.IO.Long;
 
 namespace Sidi.CommandLine.Test
 {
@@ -68,6 +68,12 @@ namespace Sidi.CommandLine.Test
                 {
                     Console.WriteLine(Result);
                 }
+            }
+
+            [Usage("Say hello to")]
+            public void Greet(string name, string greeting, int times)
+            {
+                Console.WriteLine("Hello, {0}", name);
             }
 
             [Usage("Determines to whom to say hello.")]
@@ -108,14 +114,7 @@ namespace Sidi.CommandLine.Test
         {
         }
 
-        [Test, Explicit("interactive")]
-        public void UserInterface()
-        {
-            var p = ParserWithAllTestApps();
-            p.Parse(new string[]{"ui"});
-        }
-
-        Parser ParserWithAllTestApps()
+        public static Parser ParserWithAllTestApps()
         {
             return new Parser(
                 new TestApp(),
@@ -124,7 +123,6 @@ namespace Sidi.CommandLine.Test
                 new TestAppWithDescription(),
                 new TestAppWithStringList());
         }
-
 
         [Test]
         public void Enum()
@@ -204,10 +202,6 @@ namespace Sidi.CommandLine.Test
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "SayHello" });
             Assert.AreEqual(helloBert, app.Result);
 
-            app = new TestApp();
-            Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "sh" });
-            Assert.AreEqual(helloBert, app.Result);
-
             app = new TestApp(); 
             Sidi.CommandLine.Parser.Run(app, new string[] { "--n", "Bert", "say" });
             Assert.AreEqual(helloBert, app.Result);
@@ -253,7 +247,7 @@ namespace Sidi.CommandLine.Test
             Parser parser = new Parser(new TestAppWithDescription());
             parser.Parse(new string[] { "--SomeOption", "hello", "SomeAction" });
 
-            StringWriter w = new StringWriter();
+            var w = new System.IO.StringWriter();
             parser.PrintSampleScript(w);
             Assert.IsTrue(w.ToString().Contains("marker_for_test_aoifq7ft48q"));
         }
@@ -313,11 +307,11 @@ namespace Sidi.CommandLine.Test
             [Usage("Directory list")]
             public void Files(string dir)
             {
-                var e = new Sidi.IO.Long.Enum();
-                e.AddRoot(new Sidi.IO.Long.LongName(dir));
+                var e = new Sidi.IO.Long.FileEnum();
+                e.AddRoot(new Sidi.IO.Long.Path(dir));
                 foreach (var f in e.Depth())
                 {
-                    Console.WriteLine(f.FullPath.NoPrefix);
+                    Console.WriteLine(f.FullName.NoPrefix);
                 }
             }
 
@@ -509,7 +503,7 @@ namespace Sidi.CommandLine.Test
             var a = new PreferencesTestApplication();
             var p = "24985624856";
             a.Password = p;
-            var w = new StringWriter();
+            var w = new System.IO.StringWriter();
             new Parser(a).WriteUsage(w);
             Assert.IsFalse(w.ToString().Contains(a.Password), w.ToString());
         }
@@ -634,6 +628,13 @@ namespace Sidi.CommandLine.Test
             p.AddSubParser(new Parser(a));
             p.Parse(new string[] { "TestAppWithStringList", "Action", "1", "2", "3", ";", ";", "AddList", "1", "2", "3", ";" });
             p.WriteUsage(Console.Out);
+        }
+
+        [Test]
+        public void ParseValues()
+        {
+            var ln = (Path) Parser.ParseValue(@"C:\temp", typeof(Path));
+            Assert.AreEqual(new Path(@"C:\temp"), ln);
         }
     }
 }

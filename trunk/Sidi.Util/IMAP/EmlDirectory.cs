@@ -5,12 +5,13 @@ using System.Text;
 using Sidi.IO.Long;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IMAP
 {
     public class EmlMailbox : IMailbox
     {
-        public EmlMailbox(LongName directory)
+        public EmlMailbox(Path directory)
         {
             this.directory = directory;
             if (!Directory.Exists(directory))
@@ -21,7 +22,7 @@ namespace Sidi.IMAP
                 .Where(x => !x.IsDirectory && x.Name.EndsWith(".eml", StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
         }
-        LongName directory;
+        Path directory;
         IList<FileSystemInfo> mails;
 
         public IList<IMail> Items
@@ -65,7 +66,7 @@ namespace Sidi.IMAP
             {
                 if (_Message == null)
                 {
-                    using (var r = File.Open(fileInfo.FullPath, System.IO.FileMode.Open))
+                    using (var r = File.Open(fileInfo.FullName, System.IO.FileMode.Open))
                     {
                         _Message = Rfc822Message.Parse(new System.IO.StreamReader(r));
                     }
@@ -118,18 +119,18 @@ namespace Sidi.IMAP
             this.directory = directory.Long();
         }
 
-        LongName directory;
+        Path directory;
 
         public IList<string> MailboxNames
         {
             get
             {
                 var rootLength = directory.NoPrefix.Length;
-                var e = new Sidi.IO.Long.Enum();
+                var e = new Sidi.IO.Long.FileEnum();
                 e.AddRoot(directory);
                 e.Output = x => x.IsDirectory;
                 return e.Depth()
-                    .Select(x => x.FullPath.NoPrefix.Substring(rootLength).Replace(@"\", Delimiter))
+                    .Select(x => x.FullName.NoPrefix.Substring(rootLength).Replace(@"\", Delimiter))
                     .Where(x => !String.IsNullOrEmpty(x))
                     .ToList();
             }
@@ -147,7 +148,7 @@ namespace Sidi.IMAP
 
         public IMailbox GetMailbox(string name)
         {
-            return new EmlMailbox(directory.CatDir(name.Replace(Delimiter, Sidi.IO.Long.LongName.DirectorySeparator)));
+            return new EmlMailbox(directory.CatDir(name.Replace(Delimiter, Sidi.IO.Long.Path.DirectorySeparator)));
         }
     }
 }

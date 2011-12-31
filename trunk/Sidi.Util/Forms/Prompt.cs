@@ -134,6 +134,21 @@ namespace Sidi.Forms
             }
         }
 
+        public static T ChooseOne<T>(ListFormat<T> list)
+        {
+            var d = new ChooseOneDialog();
+            d.Objects = list.Data.Cast<object>();
+            d.Columns = list.Columns.Select(c => new ColumnInfo<T>(c.Name, c.GetText)).ToList();
+            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                return (T)d.SelectedObject;
+            }
+            else
+            {
+                return default(T);
+            }
+        }
+
         public static void Choose<T>(IEnumerable<T> list, IEnumerable<IColumnInfo> columns, Action<T> action)
         {
             var d = new ChooseOneDialog();

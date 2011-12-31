@@ -11,12 +11,12 @@ namespace Sidi.Visualization
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Tree<Sidi.IO.Long.FileSystemInfo> Get(Sidi.IO.Long.LongName dir)
+        public static Tree<Sidi.IO.Long.FileSystemInfo> Get(Sidi.IO.Long.Path dir)
         {
             return GetRecursive(null, new Sidi.IO.Long.FileSystemInfo(dir));
         }
 
-        public static Tree<Sidi.IO.Long.FileSystemInfo> GetBackground(Sidi.IO.Long.LongName dir)
+        public static Tree<Sidi.IO.Long.FileSystemInfo> GetBackground(Sidi.IO.Long.Path dir)
         {
             var t = new Tree<Sidi.IO.Long.FileSystemInfo>(null) { Data = new IO.Long.FileSystemInfo(dir) };
             t.Size = t.Data.Length;
@@ -35,7 +35,7 @@ namespace Sidi.Visualization
             var i = t.Data;
             if (i.IsDirectory)
             {
-                t.Children = i.GetChilds()
+                t.Children = i.GetFileSystemInfos()
                     .Select(x => new Tree<Sidi.IO.Long.FileSystemInfo>(t){ Data = x, Size = x.Length })
                     .OrderByDescending(x => x.Size)
                     .ToList();
@@ -55,7 +55,8 @@ namespace Sidi.Visualization
             t.Data = i;
             if (i.IsDirectory)
             {
-                t.Children = i.GetChilds()
+                log.Info(i);
+                t.Children = i.GetFileSystemInfos()
                     .Select(x => GetRecursive(t, x))
                     .OrderByDescending(x => x.Size)
                     .ToList();

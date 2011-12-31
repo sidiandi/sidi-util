@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.listViewObjects = new System.Windows.Forms.ListView();
+            this.listViewObjects = new GenericListView();
             this.columnHeaderPath = new System.Windows.Forms.ColumnHeader();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
@@ -39,9 +39,6 @@
             this.listViewObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.listViewObjects.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeaderPath});
-            this.listViewObjects.FullRowSelect = true;
             this.listViewObjects.Location = new System.Drawing.Point(12, 12);
             this.listViewObjects.MultiSelect = false;
             this.listViewObjects.Name = "listViewObjects";
@@ -94,7 +91,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView listViewObjects;
+        private GenericListView listViewObjects;
         private System.Windows.Forms.ColumnHeader columnHeaderPath;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonOK;

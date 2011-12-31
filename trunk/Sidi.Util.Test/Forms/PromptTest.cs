@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using System.Diagnostics;
+using Sidi.Extensions;
 
 namespace Sidi.Forms
 {
@@ -17,6 +19,13 @@ namespace Sidi.Forms
             var text = "Hello, World";
             var result = Prompt.EditInteractive(text);
             log.Info(result);
+        }
+
+        [Test, Explicit("interactive")]
+        public void Choose()
+        {
+            var p = Process.GetProcesses();
+            Prompt.ChooseOne(p.ListFormat().AddColumn("Name", x => x.ProcessName).AddColumn("id", x => x.Id));
         }
     }
 }

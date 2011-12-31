@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Sidi.Util;
 using NUnit.Framework;
+using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IO.Long
 {
@@ -18,13 +19,13 @@ namespace Sidi.IO.Long
         [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
         public void Check()
         {
-            var ln = new LongName(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
+            var ln = new Path(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
         }
 
         [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
         public void Check2()
         {
-            var ln = new LongName(new string('0', 256));
+            var ln = new Path(new string('0', 256));
         }
 
         [Test]
@@ -32,7 +33,7 @@ namespace Sidi.IO.Long
         {
             var pCount = 40;
             var part = "0000000000";
-            var ln = new LongName(Enumerable.Range(0, pCount).Select(x => part).Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
+            var ln = new Path(Enumerable.Range(0, pCount).Select(x => part).Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
             var p = ln.Parts;
             Assert.AreEqual(pCount, p.Count());
             Assert.AreEqual(part, p[0]);
@@ -80,14 +81,30 @@ namespace Sidi.IO.Long
             var validName = "I am a valid filename";
             var invalidName = System.IO.Path.GetInvalidFileNameChars().Join(" ");
 
-            Assert.IsTrue(validName.IsValidFilename());
-            Assert.IsFalse(invalidName.IsValidFilename());
+            Assert.IsTrue(Path.IsValidFilename(validName));
+            Assert.IsFalse(Path.IsValidFilename(invalidName));
 
-            var f = invalidName.MakeFilename();
-            Assert.IsTrue(f.IsValidFilename());
+            var f = Path.GetValidFilename(invalidName);
+            Assert.IsTrue(Path.IsValidFilename(f));
             Assert.AreNotEqual(invalidName, f);
             Assert.AreEqual(System.IO.Path.GetInvalidFileNameChars().Select(c => "_").Join(" "), f);
-            Assert.AreEqual(validName, validName.MakeFilename());
+            Assert.AreEqual(validName, Path.GetValidFilename(validName));
+        }
+
+        [Test]
+        public void PathRoot()
+        {
+            var n = System.IO.Path.GetTempPath().Long();
+            Assert.AreEqual(System.IO.Path.GetPathRoot(n.NoPrefix), n.PathRoot.NoPrefix + @"\");
+        }
+
+        [Test]
+        public void Relative()
+        {
+            var n = new Path(@"C:\temp\abc.txt");
+            var root = new Path(@"C:\Temp");
+            Assert.AreEqual(new Path("abc.txt"), n.RelativeTo(root));
+
         }
     }
 }
