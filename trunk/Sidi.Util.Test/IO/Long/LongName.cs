@@ -14,8 +14,10 @@ namespace Sidi.IO.Long
     }
 
     [TestFixture]
-    public class LongNameTest
+    public class LongNameTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
         public void Check()
         {
@@ -104,7 +106,20 @@ namespace Sidi.IO.Long
             var n = new Path(@"C:\temp\abc.txt");
             var root = new Path(@"C:\Temp");
             Assert.AreEqual(new Path("abc.txt"), n.RelativeTo(root));
+            Assert.AreEqual(new Path(), n.RelativeTo(n));
+        }
 
+        [Test]
+        public void Dots()
+        {
+            var name = "Wir können auch anders...";
+            var p = TestFile("LongName").Long();
+            var d = p.CatDir(name);
+            log.Info(d);
+            d.EnsureNotExists();
+            Assert.IsFalse(d.Exists);
+            d.EnsureDirectoryExists();
+            Assert.IsTrue(Directory.Exists(d));
         }
     }
 }
