@@ -133,7 +133,7 @@
     <Compile Include="IO\Long\File.cs" />
     <Compile Include="IO\Long\EnumConfig.cs" />
     <Compile Include="IO\Long\FileSystemInfo.cs" />
-    <Compile Include="IO\Long\LongName.cs" />
+    <Compile Include="IO\Long\PathTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
