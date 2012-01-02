@@ -63,6 +63,10 @@ namespace Sidi.IO.Long
             {
                 this.path = longUncPrefix + path.Substring(shortUncPrefix.Length);
             }
+            else if (String.IsNullOrEmpty(path))
+            {
+                this.path = String.Empty;
+            }
             else
             {
                 this.path = pathPrefix + path;
@@ -329,6 +333,16 @@ namespace Sidi.IO.Long
 
         const StringComparison stringComparison = StringComparison.InvariantCultureIgnoreCase;
 
+        public static Path Empty
+        {
+            get
+            {
+                return empty;
+            }
+        }
+        static Path empty = new Path();
+
+        
         public override bool Equals(object obj)
         {
             if (obj is Path)
