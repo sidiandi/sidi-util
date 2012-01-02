@@ -9,6 +9,8 @@ namespace Sidi.IO.Long
 {
     public class Directory
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         const string PathSep = @"\";
         const string ThisDir = ".";
         const string UpDir = "..";
@@ -20,6 +22,7 @@ namespace Sidi.IO.Long
                 new FileSystemInfo(directory).IsReadOnly = false;
                 Kernel32.RemoveDirectory(directory.Param).CheckApiCall(directory);
             }
+            log.InfoFormat("Delete {0}", directory);
         }
 
         public static bool Exists(Path directory)

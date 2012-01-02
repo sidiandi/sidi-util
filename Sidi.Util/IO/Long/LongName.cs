@@ -42,6 +42,11 @@ namespace Sidi.IO.Long
             return x.Length <= Path.MaxFilenameLength && !invalidFilenameRegex.IsMatch(x);
         }
 
+        public Path()
+        {
+            path = String.Empty;
+        }
+
         public Path(string path)
         {
             // remove trailing slash
@@ -255,7 +260,11 @@ namespace Sidi.IO.Long
         {
             get
             {
-                if (path.StartsWith(longUncPrefix))
+                if (String.IsNullOrEmpty(path))
+                {
+                    return String.Empty;
+                }
+                else if (path.StartsWith(longUncPrefix))
                 {
                     return shortUncPrefix + path.Substring(longUncPrefix.Length);
                 }
@@ -339,7 +348,9 @@ namespace Sidi.IO.Long
                 throw new ArgumentOutOfRangeException("root");
             }
 
-            return new Path(path.Substring(root.path.Length + DirectorySeparator.Length));
+            var rp = root.Parts;
+
+            return new Path(Parts.Skip(rp.Length));
         }
 
         public void EnsureNotExists()

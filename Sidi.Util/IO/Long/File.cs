@@ -19,6 +19,36 @@ namespace Sidi.IO.Long
                 new FileSystemInfo(path).IsReadOnly = false;
                 Kernel32.DeleteFile(path.Param).CheckApiCall(path);
             }
+            log.InfoFormat("Delete {0}", path);
+        }
+
+        public static void WriteAllText(Path path, string contents)
+        {
+            using (var w = StreamWriter(path))
+            {
+                w.Write(contents);
+            }
+        }
+
+        public static string ReadAllText(Path path)
+        {
+            using (var r = StreamReader(path))
+            {
+                return r.ReadToEnd();
+            }
+        }
+
+        public static System.IO.StreamReader StreamReader(Path path)
+        {
+            var s = Open(path, System.IO.FileMode.Open);
+            return new System.IO.StreamReader(s);
+        }
+
+        public static System.IO.StreamWriter StreamWriter(Path path)
+        {
+            path.EnsureParentDirectoryExists();
+            var s = Open(path, System.IO.FileMode.Create);
+            return new System.IO.StreamWriter(s);
         }
 
         public static bool Exists(Path path)
