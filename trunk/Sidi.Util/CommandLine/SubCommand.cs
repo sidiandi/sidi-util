@@ -32,7 +32,12 @@ namespace Sidi.CommandLine
                 {
                     return u;
                 }
-                return Sidi.CommandLine.Usage.Get(Type);
+                u = Sidi.CommandLine.Usage.Get(Type);
+                if (u != null)
+                {
+                    return u;
+                }
+                return String.Empty;
             }
         }
 

@@ -348,6 +348,13 @@ namespace Sidi.CommandLine
                 {
                 }
             }
+
+            foreach (var s in SubCommands)
+            {
+                var p = new Parser();
+                p.Applications.Add(s.CommandInstance);
+                p.LoadPreferences();
+            }
         }
 
         /// <summary>
@@ -373,6 +380,13 @@ namespace Sidi.CommandLine
                         Registry.SetValue(GetPreferencesKey(o), o.Name, v.ToString());
                     }
                 }
+            }
+
+            foreach (var s in SubCommands)
+            {
+                var p = new Parser();
+                p.Applications.Add(s.CommandInstance);
+                p.StorePreferences();
             }
         }
 

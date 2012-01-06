@@ -28,7 +28,15 @@ namespace Sidi.Collections
                     var b = new BinaryFormatter();
                     using (var stream = System.IO.File.OpenRead(path))
                     {
-                        return (T)b.Deserialize(stream);
+                        var cacheContent= b.Deserialize(stream);
+                        if (cacheContent is Exception)
+                        {
+                            throw (Exception) cacheContent;
+                        }
+                        else
+                        {
+                            return (T)cacheContent;
+                        }
                     }
                 },
                 (path, t) =>

@@ -47,8 +47,9 @@ namespace Sidi.Collections
                 var r = c.GetCached(d, () => 1 / d);
                 Assert.IsTrue(false);
             }
-            catch
+            catch (Exception e)
             {
+                Assert.IsTrue(e is System.DivideByZeroException);
             }
 
             try
@@ -56,8 +57,9 @@ namespace Sidi.Collections
                 var r = c.GetCached(d, () => 1 / d);
                 Assert.IsTrue(false);
             }
-            catch
+            catch (Exception e)
             {
+                Assert.AreEqual(typeof(System.DivideByZeroException), e.GetType());
             }
         }
     }
