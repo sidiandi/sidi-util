@@ -137,10 +137,12 @@ namespace Sidi.IO.Long
             [Test]
             public void WriteAllText()
             {
-                var p = this.TestFile("Long").Long().CatDir("Wir können auch anders...", ".moviesidi");
-                p.EnsureParentDirectoryExists();
+                var d = this.TestFile("Long").Long().CatDir("blablabla");
+                d.EnsureNotExists();
+                var p = d.CatDir(".moviesidi");
                 File.WriteAllText(p, "hello");
                 Assert.AreEqual("hello", File.ReadAllText(p));
+                d.EnsureNotExists();
             }
         }
 }

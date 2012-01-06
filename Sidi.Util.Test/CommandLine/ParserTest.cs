@@ -636,5 +636,29 @@ namespace Sidi.CommandLine.Test
             var ln = (Path) Parser.ParseValue(@"C:\temp", typeof(Path));
             Assert.AreEqual(new Path(@"C:\temp"), ln);
         }
+
+        class MySubCommand
+        {
+            [Usage("Name"), Persistent]
+            public string Name { get; set; }
+        }
+
+        [Usage("Tests persistence of options in subcommands")]
+        class MyApp
+        {
+            [SubCommand]
+            public MySubCommand Sub;
+        }
+
+        [Test]
+        public void PersistenceInSubcommands()
+        {
+            var name = "Donald";
+            Parser.Run(new MyApp(), new string[]{"Sub", "Name", name});
+
+            var a = new MyApp();
+            Parser.Run(a, new string[] {});
+            Assert.AreEqual(name, a.Sub.Name);
+        }
     }
 }

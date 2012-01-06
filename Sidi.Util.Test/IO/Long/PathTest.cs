@@ -109,7 +109,8 @@ namespace Sidi.IO.Long
             Assert.AreEqual(new Path(), n.RelativeTo(n));
         }
 
-        [Test]
+        /*
+        [Test, Explicit]
         public void Dots()
         {
             var name = "Wir können auch anders...";
@@ -120,6 +121,9 @@ namespace Sidi.IO.Long
             Assert.IsFalse(d.Exists);
             d.EnsureDirectoryExists();
             Assert.IsTrue(Directory.Exists(d));
+            d.EnsureNotExists();
+            Assert.IsFalse(Directory.Exists(d));
         }
+         */
     }
 }
