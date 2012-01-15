@@ -5,6 +5,7 @@ using System.Text;
 using Sidi.Util;
 using NUnit.Framework;
 using Sidi.IO.Long.Extensions;
+using System.Xml.Serialization;
 
 namespace Sidi.IO.Long
 {
@@ -125,5 +126,23 @@ namespace Sidi.IO.Long
             Assert.IsFalse(Directory.Exists(d));
         }
          */
+
+        [Test]
+        public void IsValid()
+        {
+            Assert.IsTrue(Path.IsValid(@"C:\temp"));
+        }
+
+        [Test]
+        public void XmlSerialize()
+        {
+            var n = System.IO.Path.GetTempPath().Long();
+            var s = new XmlSerializer(typeof(Path));
+            var t = new System.IO.StringWriter();
+            s.Serialize(t, n);
+            log.Info(t.ToString());
+            var n1 = s.Deserialize(new System.IO.StringReader(t.ToString()));
+            Assert.AreEqual(n, n1);
+        }
     }
 }
