@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using Sidi.Util;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace Sidi.IO.Long
 {
-    public class Path
+    public class Path : IXmlSerializable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -17,6 +18,12 @@ namespace Sidi.IO.Long
 
         static Regex invalidFilenameRegex = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
+            .Select(n => Regex.Escape(new String(n, 1)))
+            .Join("|"));
+
+        static Regex invalidFilenameRegexWithoutWildcards = new Regex(
+            System.IO.Path.GetInvalidFileNameChars()
+            .Where(x => x != '*' && x != '?')
             .Select(n => Regex.Escape(new String(n, 1)))
             .Join("|"));
 
@@ -42,6 +49,11 @@ namespace Sidi.IO.Long
             return x.Length <= Path.MaxFilenameLength && !invalidFilenameRegex.IsMatch(x);
         }
 
+        public static bool IsValidFilenameWithWildcards(string x)
+        {
+            return x.Length <= Path.MaxFilenameLength && !invalidFilenameRegexWithoutWildcards.IsMatch(x);
+        }
+
         public Path()
         {
             path = String.Empty;
@@ -49,6 +61,8 @@ namespace Sidi.IO.Long
 
         public Path(string path)
         {
+            Check(path);
+
             // remove trailing slash
             if (path.EndsWith(@"\"))
             {
@@ -71,7 +85,6 @@ namespace Sidi.IO.Long
             {
                 this.path = pathPrefix + path;
             }
-            Check();
         }
 
         public Path(IEnumerable<string> parts)
@@ -208,18 +221,45 @@ namespace Sidi.IO.Long
 
         public const int MaxFilenameLength = 255;
 
-        void Check()
+        const int MaxPathLength = 32000;
+
+        public static bool IsValid(string path)
         {
-            if (this.path.Length > 32000)
+            try
             {
-                throw new System.IO.PathTooLongException(this.path);
+                new Path(path);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        static void Check(string path)
+        {
+            if (path.Length > MaxPathLength)
+            {
+                throw new System.IO.PathTooLongException();
             }
 
-            var parts = Parts;
-            var tooLong = parts.FirstOrDefault(x => x.Length > MaxFilenameLength);
-            if (tooLong != null)
+            var parts = path.Split(DirectorySeparatorChar);
+
+            for (int i = 0; i < Math.Min(1, parts.Length); ++i)
             {
-                throw new System.IO.PathTooLongException(tooLong);
+                var x = parts[i];
+                if (!IsValidFilename(x))
+                {
+                    if (i == 0 && IsValidDriveRoot(x))
+                    {
+                        continue;
+                    }
+                    if (i == parts.Length - 1 && IsValidFilenameWithWildcards(x))
+                    {
+                        continue;
+                    }
+                    throw new System.IO.PathTooLongException(x);
+                }
             }
         }
 
@@ -316,6 +356,11 @@ namespace Sidi.IO.Long
             {
                 return path.StartsWith(pathPrefix) && path.EndsWith(":") && path.Length == pathPrefix.Length + 2;
             }
+        }
+
+        public static bool IsValidDriveRoot(string driveRoot)
+        {
+            return Regex.IsMatch(driveRoot, @"^[A-Z]\:$", RegexOptions.IgnoreCase);
         }
 
         public bool IsUnc
@@ -425,6 +470,20 @@ namespace Sidi.IO.Long
                 return System.IO.Path.GetFileNameWithoutExtension(Name);
             }
         }
-    }
 
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+            path = reader.ReadString();
+        }
+
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            writer.WriteString(path);
+        }
+    }
 }

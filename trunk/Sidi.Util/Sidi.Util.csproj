@@ -60,9 +60,8 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.5.452, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(LibDir)\ICSharpCode.SharpZipLib.dll</HintPath>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>..\lib\log4net\bin\net\2.0\debug\log4net.dll</HintPath>
@@ -127,6 +126,7 @@
     <Compile Include="IO\Long\FindData.cs" />
     <Compile Include="IO\Long\Kernel32.cs" />
     <Compile Include="IO\Long\Path.cs" />
+    <Compile Include="IO\Long\PathTypeConverter.cs" />
     <Compile Include="Net\Abnf.cs" />
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
