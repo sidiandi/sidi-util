@@ -141,14 +141,14 @@
             <param name="uid"></param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Directory.FindFileRaw(Sidi.IO.Long.LongName)">
+        <member name="M:Sidi.IO.Long.Directory.FindFileRaw(Sidi.IO.Long.Path)">
             <summary>
             Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
             </summary>
             <param name="searchPath"></param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Directory.FindFile(Sidi.IO.Long.LongName)">
+        <member name="M:Sidi.IO.Long.Directory.FindFile(Sidi.IO.Long.Path)">
             <summary>
             Enumerates found files. Make sure that the Enumerator is closed properly to free the Find handle.
             </summary>
@@ -161,46 +161,56 @@
             </summary>
             <param name="extensions">list of extensions without "."</param>
         </member>
-        <member name="M:Sidi.IO.Long.Enum.AddRoot(Sidi.IO.Long.LongName)">
+        <member name="M:Sidi.IO.Long.FileEnum.AddRoot(Sidi.IO.Long.Path)">
             <summary>
             Adds a start root for Depth() and Breath(). Multiple start roots are supported.
             </summary>
             <param name="path"></param>
         </member>
-        <member name="M:Sidi.IO.Long.Enum.Depth">
+        <member name="M:Sidi.IO.Long.FileEnum.Depth">
             <summary>
             Recurses all start roots depth-first
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Enum.Breadth">
+        <member name="M:Sidi.IO.Long.FileEnum.Breadth">
             <summary>
             Recurses all start roots breadth-first
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Enum.OnlyFiles(Sidi.IO.Long.FileSystemInfo)">
+        <member name="M:Sidi.IO.Long.FileEnum.OnlyFiles(Sidi.IO.Long.FileSystemInfo)">
             <summary>
             Follows files only
             </summary>
             <param name="i"></param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Enum.NoDotNoHidden(Sidi.IO.Long.FileSystemInfo)">
+        <member name="M:Sidi.IO.Long.FileEnum.NoDotNoHidden(Sidi.IO.Long.FileSystemInfo)">
             <summary>
             Only follows elements which do not start with . and are not hidden
             </summary>
             <param name="i"></param>
             <returns></returns>
         </member>
-        <member name="P:Sidi.IO.Long.Enum.Output">
+        <member name="P:Sidi.IO.Long.FileEnum.Output">
             <summary>
             Set this function to decide which files should be returned.
             </summary>
         </member>
-        <member name="P:Sidi.IO.Long.Enum.Follow">
+        <member name="P:Sidi.IO.Long.FileEnum.Follow">
             <summary>
             Set this function to decide which directories should be followed.
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Long.FileEnum.Visit">
+            <summary>
+            Set this function to see every file, not matter if output or not.
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Long.FileEnum.Count">
+            <summary>
+            Counts the visited files
             </summary>
         </member>
         <member name="T:Sidi.IO.Long.EnumConfig">
@@ -208,7 +218,7 @@
             Command line parser interface for Sidi.IO.Long.Enum
             </summary>
         </member>
-        <member name="P:Sidi.IO.Long.LongName.IsRoot">
+        <member name="P:Sidi.IO.Long.Path.IsRoot">
             <summary>
             Returns true if ParentDirectory would return null
             </summary>
@@ -576,6 +586,13 @@
             Detects and removes an option prefix from name
             </summary>
             <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.CommandLine.Parser.LookupParserItem(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="name">Specifies the parser item. Abbreviations allowed.</param>
             <returns></returns>
         </member>
         <member name="M:Sidi.CommandLine.Parser.GetAction(System.String)">
