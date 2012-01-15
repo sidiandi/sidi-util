@@ -21,10 +21,6 @@
     <AnonymousSvnRoot>http://$(ProjectName).googlecode.com/svn</AnonymousSvnRoot>
   </PropertyGroup>
 
-  <ItemGroup>
-    <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
-  </ItemGroup>
-
   <Target Name="Update" >
     <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
   </Target>
@@ -87,13 +83,11 @@
   <Target Name="Documentation" DependsOnTargets="Build">
   </Target>
 
-  <ItemGroup>
-    <ZipFiles Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" />
-    <DocFiles Include="$(OutputDir)\$(ProjectName).chm" />
-  </ItemGroup>
-
   <Target Name="Package" DependsOnTargets="Build;UnitTest;SourceIndex;Documentation">
-    <MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
+    <CreateItem Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" >
+		<Output TaskParameter="Include" ItemName="ZipFiles"/>
+	</CreateItem>
+	<MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
     <Zip
         Files="@(ZipFiles)"
         WorkingDirectory="$(OutputDir)"

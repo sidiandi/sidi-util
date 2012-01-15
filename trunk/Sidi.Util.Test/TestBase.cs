@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using Sidi.IO;
 using Sidi.Util;
+using System.Reflection;
 
 namespace Sidi
 {
@@ -37,7 +38,11 @@ namespace Sidi
 
         protected string TestFile(string relPath)
         {
-            return FileUtil.BinFile("unit-test".CatDir(relPath));
+            return new Sidi.IO.Long.Path(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath)
+                .ParentDirectory
+                .ParentDirectory
+                .CatDir("sidi-util_test", relPath)
+                .NoPrefix;
         }
     }
 }

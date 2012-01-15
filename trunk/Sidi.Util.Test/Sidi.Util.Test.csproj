@@ -157,11 +157,6 @@
     <Compile Include="Visualization\TreeMapTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="unit-test\UpdateInfo.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -184,12 +179,11 @@
       <Name>Sidi.Util</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="unit-test\mail\message-1-1456.eml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>robocopy /s $(ProjectDir)unit-test $(TargetDir)..\sidi-util_test
+exit 0</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
