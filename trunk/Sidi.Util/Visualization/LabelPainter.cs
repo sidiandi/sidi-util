@@ -34,6 +34,7 @@ namespace Sidi.Visualization
 
         public void ShowLevels(int index)
         {
+            focusPointEnabled = false;
             int i;
             for (i = 0; i < 1; ++i)
             {
@@ -49,6 +50,12 @@ namespace Sidi.Visualization
             }
         }
 
+        public void ToggleLevelVisibility(int index)
+        {
+            focusPointEnabled = false;
+            LevelVisible[index] = !LevelVisible[index];
+        }
+        
         public void Focus(Point focusPoint)
         {
             this.focusPoint = focusPoint;
