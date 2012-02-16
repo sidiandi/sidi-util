@@ -124,6 +124,7 @@ namespace Sidi.Visualization
         Func<T, Color> nodeColor = n => Color.White;
 
         Bitmap renderCache;
+        object renderCacheTreeLayout;
 
         public void InvalidateRenderCache()
         {
@@ -136,7 +137,7 @@ namespace Sidi.Visualization
         
         public void Paint(PaintEventArgs e)
         {
-            if (renderCache == null || !renderCache.Size.Equals(control.Size))
+            if (renderCache == null || !renderCache.Size.Equals(control.Size) || renderCacheTreeLayout != control.TreeLayout)
             {
                 InvalidateRenderCache();
             }
@@ -144,6 +145,7 @@ namespace Sidi.Visualization
             if (renderCache == null)
             {
                 renderCache = Render();
+                renderCacheTreeLayout = this.control.TreeLayout;
             }
             e.Graphics.DrawImage(renderCache, 0, 0);
         }

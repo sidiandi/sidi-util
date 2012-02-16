@@ -78,14 +78,14 @@ namespace Sidi.Visualization
 
         void CushionTreeMapControl_MouseMove(object sender, MouseEventArgs e)
         {
-            var l = GetLayoutAt(e.Location);
-            if (l != hoveredNode)
+            var node = GetLayoutAt(e.Location);
+            if (node != hoveredNode)
             {
-                hoveredNode = l;
+                hoveredNode = node;
 
-                if (ItemMouseHover != null)
+                if (ItemMouseHover != null && hoveredNode != null)
                 {
-                    ItemMouseHover(this, new ItemEventEventArgs(l));
+                    ItemMouseHover(this, new ItemEventEventArgs(hoveredNode));
                 }
             }
         }
@@ -133,13 +133,14 @@ namespace Sidi.Visualization
             set
             {
                 TreeLayout = new TreeMapLayout(value);
+                TreeLayout.Bounds = this.Bounds;
                 Invalidate();
             }
         }
 
         public LabelPainter<T> CreateLabelPainter()
         {
-            return new LabelPainter<T>(this.TreeLayout);
+            return new LabelPainter<T>(this);
         }
 
         public void Highlight(PaintEventArgs e, Tree<TreeMapLayout.Layout> layoutNode, Color color)
@@ -268,9 +269,21 @@ namespace Sidi.Visualization
         public event ItemEventHandler ItemMouseHover;
         public event ItemEventHandler ItemActivate;
 
+        static IList<ITree> GetLineage(ITree t)
+        {
+            var lineage = new List<ITree>();
+            for (var i = t; i != null; i = i.Parent)
+            {
+                lineage.Add(i);
+            }
+            lineage.Reverse();
+            return lineage;
+        }
+
         public void ZoomIn(Point p, int levels)
         {
-            Tree = (T) GetLayoutAt(p, levels).Data.TreeNode;
+            var itree = GetLayoutAt(p, levels).Data.TreeNode;
+            Tree = (T)itree;
         }
 
         public void ZoomOut(int levels)

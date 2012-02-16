@@ -27,6 +27,7 @@ using System.Threading;
 using Sidi.IO;
 using System.Linq;
 using L = Sidi.IO.Long;
+using System.Linq.Expressions;
 
 namespace Sidi.Persistence
 {
@@ -164,20 +165,22 @@ namespace Sidi.Persistence
         [Test]
         public void Write()
         {
-            DbTransaction t = addressBook.BeginTransaction();
-            addressBook.Clear();
-            Random r = new Random();
-            for (int i = 0; i < count; ++i)
+            using (var t = addressBook.BeginTransaction())
             {
-                Address a = new Address();
-                a.Name = "Bert";
-                a.Street = "Some Street";
-                a.City = "Nowhere";
-                a.Zip = i;
-                a.Income = r.NextDouble();
-                addressBook.Add(a);
+                addressBook.Clear();
+                Random r = new Random();
+                for (int i = 0; i < count; ++i)
+                {
+                    Address a = new Address();
+                    a.Name = "Bert";
+                    a.Street = "Some Street";
+                    a.City = "Nowhere";
+                    a.Zip = i;
+                    a.Income = r.NextDouble();
+                    addressBook.Add(a);
+                }
+                t.Commit();
             }
-            t.Commit();
         }
 
         [Test]
@@ -200,6 +203,22 @@ namespace Sidi.Persistence
                 ++c;
             }
             Assert.That(c == count);
+        }
+
+        [Test]
+        public void QueryByLambdaExpressions()
+        {
+            var r = addressBook.Query(a => a.Zip == 3);
+            Assert.AreEqual(1, r.Count());
+
+            r = addressBook.Query(a => a.Name == "Bert");
+            Assert.AreEqual(count, r.Count);
+
+            r = addressBook.Query(a => a.Name == "Bert" && a.Zip == 3);
+            Assert.AreEqual(1, r.Count);
+
+            var entry = addressBook.Find(a => a.Zip == 3);
+            Assert.AreEqual(3, entry.Zip);
         }
 
         [Test]
@@ -376,7 +395,7 @@ namespace Sidi.Persistence
 
             var name = "sidi";
             var cmd = c.CreateCommand("select oid from @table where Name = {0}", name);
-            Assert.AreEqual(name, c.Select(cmd)[0].Name);
+            Assert.AreEqual(name, c.Query(cmd)[0].Name);
         }
 
         [Test]
@@ -472,6 +491,31 @@ namespace Sidi.Persistence
             });
 
             Assert.AreEqual(new L.Path(@"C:\temp"), db.First().Path);
+        }
+
+        [Test]
+        public void SqlExpression()
+        {
+            var a = new Address();
+            Expression<Func<Address, bool>> f = i => i.Zip == 3;
+            Assert.AreEqual("(Zip = 3)", Collection<Address>.SqlPredicate(f.Body));
+
+            f = i => i.Zip == 3 && i.Name == "Bert";
+            Assert.AreEqual("((Zip = 3) AND (Name = \"Bert\"))", Collection<Address>.SqlPredicate(f.Body));
+        }
+
+        [Test]
+        public void SqlExpressionResolve()
+        {
+            var bert = "Bert";
+            Expression<Func<Address, bool>> f = i => i.Zip == 3 && i.Name == bert;
+            Assert.AreEqual("((Zip = 3) AND (Name = \"Bert\"))", Collection<Address>.SqlPredicate(f.Body));
+
+            f = i => i.Zip == (1 + 2);
+            Assert.AreEqual("(Zip = 3)", Collection<Address>.SqlPredicate(f.Body));
+
+            f = i => i.Name == bert + bert;
+            Assert.AreEqual("(Name = \"BertBert\")", Collection<Address>.SqlPredicate(f.Body));
         }
     }
 }

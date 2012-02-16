@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace Sidi.Visualization
 {
-    class ColorScale
+    public class ColorScale
     {
         public static Color ToColor(string x)
         {

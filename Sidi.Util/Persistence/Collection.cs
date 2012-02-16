@@ -25,6 +25,7 @@ using System.Reflection;
 using System.IO;
 using System.Linq;
 using Sidi.Util;
+using System.Linq.Expressions;
 
 namespace Sidi.Persistence
 {
@@ -177,9 +178,9 @@ namespace Sidi.Persistence
             SetRowIdParam(command, GetRowId(parameters));
         }
 
-        public DbCommand CreateCommand(string sql)
+        public SQLiteCommand CreateCommand(string sql)
         {
-            SQLiteCommand command = connection.CreateCommand();
+            var command = connection.CreateCommand();
             AddFieldParams(command);
             AddRowIdParam(command);
             sql = sql.Replace("@table", table);
@@ -187,9 +188,9 @@ namespace Sidi.Persistence
             return command;
         }
 
-        public DbCommand CreateCommand(string sql, params object[] parameters)
+        public SQLiteCommand CreateCommand(string sql, params object[] parameters)
         {
-            SQLiteCommand command = connection.CreateCommand();
+            var command = connection.CreateCommand();
             for (int i = 0; i < parameters.Length; ++i)
             {
                 var p = command.CreateParameter();
@@ -469,7 +470,95 @@ namespace Sidi.Persistence
         {
             SQLiteCommand command = connection.CreateCommand();
             command.CommandText = query;
-            return Select(command);
+            return Query(command);
+        }
+
+        static string GetOperator(ExpressionType nodeType)
+        {
+            switch (nodeType)
+            {
+                case ExpressionType.Equal:
+                    return "=";
+                case ExpressionType.GreaterThan:
+                    return ">";
+                case ExpressionType.GreaterThanOrEqual:
+                    return ">=";
+                case ExpressionType.LessThan:
+                    return "<";
+                case ExpressionType.LessThanOrEqual:
+                    return "<=";
+                case ExpressionType.AndAlso:
+                    return "AND";
+                default:
+                    throw new NotImplementedException(nodeType.ToString());
+            }
+        }
+
+        static string SqlConstant(object o)
+        {
+            var t = o.GetType();
+            if (t == typeof(int) || t == typeof(long))
+            {
+                return o.ToString();
+            }
+            else
+            {
+                return o.ToString().Quote();
+            }
+        }
+
+        public static string SqlPredicate(Expression e)
+        {
+            try
+            {
+                var o = Expression.Lambda(e).Compile().DynamicInvoke();
+                return SqlConstant(o);
+            }
+            catch
+            {
+            }
+            
+            if (e is BinaryExpression)
+            {
+                var be = (BinaryExpression)e;
+                var op = GetOperator(be.NodeType);
+                return String.Format("({0} {1} {2})", SqlPredicate(be.Left), op, SqlPredicate(be.Right));
+            }
+            else if (e is MemberExpression)
+            {
+                var me = (MemberExpression)e;
+                if (me.Expression.NodeType == ExpressionType.Constant)
+                {
+                    var c = (ConstantExpression) me.Expression;
+                    var v = me.Member.GetValue(c.Value);
+                    return v.ToString().Quote();
+                }
+                else
+                {
+                    return me.Member.Name;
+                }
+            }
+            else if (e is ConstantExpression)
+            {
+                var ce = (ConstantExpression)e;
+                return SqlConstant(ce.Value);
+            }
+            else
+            {
+                throw new NotImplementedException(e.GetType().ToString());
+            }
+        }
+
+        public IList<T> Query(Expression<Func<T, bool>> predicate)
+        {
+            var command = CreateCommand("select {0} from {1} where {2}".F(rowIdColumn, table, SqlPredicate(predicate.Body)));
+            return Query(command);
+        }
+
+        public T Find(Expression<Func<T, bool>> predicate)
+        {
+            var command = CreateCommand("select {0} from {1} where {2} limit 1".F(rowIdColumn, table, SqlPredicate(predicate.Body)));
+            return Find(command);
         }
 
         public T Find(string query)
@@ -477,41 +566,24 @@ namespace Sidi.Persistence
             List<long> ids = new List<long>();
             select = connection.CreateCommand();
             select.CommandText = String.Format("select {0} from {1} where {2}", rowIdColumn, table, query);
-            SQLiteDataReader reader = select.ExecuteReader();
-            try
-            {
-                while (reader.Read())
-                {
-                    return this[(long)reader[0]];
-                }
-                return default(T);
-            }
-            finally
-            {
-                reader.Close();
-            }
+            return Find(select);
         }
 
-        T Find(DbCommand select)
+        T Find(SQLiteCommand select)
         {
-            SQLiteDataReader reader = (SQLiteDataReader)select.ExecuteReader();
-            try
+            using (var reader = (SQLiteDataReader)select.ExecuteReader())
             {
                 while (reader.Read())
                 {
                     return this[(long)reader[0]];
                 }
                 return default(T);
-            }
-            finally
-            {
-                reader.Close();
             }
         }
 
         public T Find(string query, string paramName, object param)
         {
-            DbCommand select = CreateCommand(String.Format("select {0} from @table where {1}", rowIdColumn, query));
+            var select = CreateCommand(String.Format("select {0} from @table where {1}", rowIdColumn, query));
             SQLiteParameter p = new SQLiteParameter(paramName);
             select.Parameters.Add(p);
             select.Parameters[paramName].Value = param;
@@ -522,19 +594,15 @@ namespace Sidi.Persistence
         {
             select = connection.CreateCommand();
             select.CommandText = String.Format("select {0} from {1} where {2}", "oid", table, query);
-            return Select(select);
+            return Query(select);
         }
 
-        public IList<T> Select(DbCommand select)
+        public IList<T> Query(SQLiteCommand select)
         {
-            List<long> ids = new List<long>();
-            SQLiteDataReader reader = ((SQLiteCommand)select).ExecuteReader();
-            while (reader.Read())
+            using (var reader = select.ExecuteReader())
             {
-                ids.Add((long)reader[0]);
+                return new ResultProxy<T>(this, reader.Cast<DbDataRecord>().Select(r => (long)r[0]).ToList());
             }
-            reader.Close();
-            return new ResultProxy<T>(this, ids);
         }
 
         public T this[long key]
@@ -561,16 +629,10 @@ namespace Sidi.Persistence
         T Get(long key)
         {
             SetRowIdParam(getDataByRowId, key);
-            SQLiteDataReader reader = getDataByRowId.ExecuteReader();
-            try
+            using (var reader = getDataByRowId.ExecuteReader())
             {
                 reader.Read();
-                T result = FromReader(reader);
-                return result;
-            }
-            finally
-            {
-                reader.Close();
+                return FromReader(reader);
             }
         }
 
@@ -728,7 +790,7 @@ namespace Sidi.Persistence
         public bool Contains(T item)
         {
             SetFieldParams(containsQuery, item);
-            IList<T> result = Select(containsQuery);
+            IList<T> result = Query(containsQuery);
             return result.Count > 0;
         }
 
@@ -780,14 +842,8 @@ namespace Sidi.Persistence
         public IEnumerator<T> GetEnumerator()
         {
             SQLiteCommand all = connection.CreateCommand();
-            all.CommandText = String.Format("select {0} from {1};",
-                SelectFieldList, table);
-            SQLiteDataReader reader = all.ExecuteReader();
-            while (reader.Read())
-            {
-                yield return FromReader(reader);
-            }
-            reader.Close();
+            all.CommandText = String.Format("select {0} from {1};", this.rowIdColumn, this.table);
+            return Query(all).GetEnumerator();
         }
 
         #endregion
