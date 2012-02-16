@@ -19,6 +19,20 @@ namespace Sidi.Visualization
             this.Parent = parent;
         }
 
+        public IList<T> Lineage
+        {
+            get
+            {
+                var lineage = new List<T>();
+                for (var i = this; i != null; i = i.Parent)
+                {
+                    lineage.Add(i.Data);
+                }
+                lineage.Reverse();
+                return lineage;
+            }
+        }
+
         public T Data { get; set; }
         public float Size { get; set; }
 
@@ -78,6 +92,7 @@ namespace Sidi.Visualization
                     i.UpdateSize();
                 }
                 Size = ChildSize;
+                Children = Children.OrderByDescending(x => x.Size).ToList();
             }
         }
 

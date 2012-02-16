@@ -10,6 +10,7 @@ using Sidi.IO;
 using Sidi.IO.Long;
 using System.Diagnostics;
 using Sidi.IO.Long.Extensions;
+using System.Text.RegularExpressions;
 
 namespace Sidi.Visualization
 {
@@ -87,6 +88,51 @@ namespace Sidi.Visualization
                 };
 
             c.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void Simple()
+        {
+            var file = TestFile(@"mail\message-1-1456.eml");
+            var words = Regex.Split(File.ReadAllText(new Sidi.IO.Long.Path(file)), @"\s+");
+            SimpleTreeMap.Show(words.Select(x => new SimpleTreeMap.Item()
+                {
+                    Lineage = x.Cast<object>().ToArray(),
+                    Size = 1.0f,
+                    Color = Color.White,
+                }));
+        }
+
+        [Test, Explicit("interactive")] 
+        public void Simple2()
+        {
+            var file = new Sidi.IO.Long.Path(TestFile(@".")).ParentDirectory.ParentDirectory;
+            var files = Sidi.IO.Long.FileEnum.AllFiles(file);
+
+            var data = files.Select(x => new SimpleTreeMap.ColorMapItem()
+            {
+                Lineage = x.FullName.Parts.ToArray(),
+                Size = x.Length,
+                Color = x.Extension.ToLower(),
+            });
+
+            SimpleTreeMap.Show(data);
+        }
+
+        [Test, Explicit("interactive")]
+        public void Simple3()
+        {
+            var file = new Sidi.IO.Long.Path(@"C:\work\lib");
+            var files = Sidi.IO.Long.FileEnum.AllFiles(file);
+
+            var data = files.Select(x => new SimpleTreeMap.LinearColorMapItem()
+            {
+                Lineage = x.FullName.Parts.ToArray(),
+                Size = x.Length,
+                Color = x.LastWriteTime.Ticks,
+            });
+
+            SimpleTreeMap.Show(data);
         }
 
         public void Display<T>(T tree) where T : ITree
