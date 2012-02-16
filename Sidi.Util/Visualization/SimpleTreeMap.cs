@@ -111,9 +111,12 @@ namespace Sidi.Visualization
             var ti = new ToolTip();
             tm.ItemMouseHover += (s, e) =>
             {
-                ti.SetToolTip(tm, e.Item.Lineage.Where(i => i != null).Join(LineageSeparator).ToString());
-                lp.Focus(tm.PointToClient(Control.MousePosition));
-                tm.Invalidate();
+                if (Control.ModifierKeys == Keys.Shift)
+                {
+                    ti.SetToolTip(tm, e.Item.Lineage.Where(i => i != null).Join(LineageSeparator).ToString());
+                    lp.Focus(tm.PointToClient(Control.MousePosition));
+                    tm.Invalidate();
+                }
             };
 
             tm.Paint += (s, e) =>
@@ -132,7 +135,7 @@ namespace Sidi.Visualization
                     }
                     else
                     {
-                        lp.LevelVisible[index] = !lp.LevelVisible[index];
+                        lp.ToggleLevelVisibility(index);
                     }
                     tm.Invalidate();
                 }
