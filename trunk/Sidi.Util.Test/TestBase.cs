@@ -22,6 +22,11 @@ using System.Text;
 using Sidi.IO;
 using Sidi.Util;
 using System.Reflection;
+using log4net.Repository.Hierarchy;
+using log4net;
+using log4net.Appender;
+using log4net.Layout;
+using System.IO;
 
 namespace Sidi
 {
@@ -29,7 +34,19 @@ namespace Sidi
     {
         static TestBase()
         {
-            log4net.Config.BasicConfigurator.Configure();
+            var traceAppender = new TraceAppender()
+            {
+                Layout = new PatternLayout()
+                {
+                    ConversionPattern = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline",
+                },
+            };
+
+            traceAppender.ActivateOptions();
+
+            var hierarchy = (Hierarchy)LogManager.GetRepository();
+            hierarchy.Root.AddAppender(traceAppender);
+            hierarchy.Configured = true;
         }
 
         public TestBase()
