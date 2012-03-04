@@ -201,8 +201,149 @@ namespace Sidi.IO.Long
         //     sourceFileName or destFileName is in an invalid format.
         public static void Copy(Path sourceFileName, Path destFileName, bool overwrite)
         {
-            Kernel32.CopyFile(sourceFileName.Param, destFileName.Param, overwrite)
-                .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
+            Copy(sourceFileName, destFileName, overwrite, (p) =>
+                {
+                    log.Info(p.Message);
+                });
+        }
+
+        public class CopyProgress
+        {
+            public DateTime Start;
+            
+            public DateTime End
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public TimeSpan Elapsed
+            {
+                get
+                {
+                    return DateTime.Now - Start;
+                }
+            }
+
+            public double Speed
+            {
+                get
+                {
+                    return SafeDiv(TotalBytesTransferred, Elapsed.TotalSeconds);
+                }
+            }
+
+            public double PercentComplete
+            {
+                get
+                {
+                    return SafeDiv((double)TotalBytesTransferred, (double)TotalFileSize) * 100.0;
+                }
+            }
+
+            public TimeSpan RemainingTime
+            {
+                get
+                {
+                    var el = Elapsed;
+                    if (el < TimeSpan.FromSeconds(1.0))
+                    {
+                        return TimeSpan.FromHours(1);
+                    }
+                    else
+                    {
+                        return TimeSpan.FromSeconds(
+                            el.TotalSeconds * ((double)TotalFileSize / (double)TotalBytesTransferred - 1.0));
+                    }
+                }
+            }
+
+            static double SafeDiv(double n, double d)
+            {
+                try
+                {
+                    return n / d;
+                }
+                catch (DivideByZeroException ex)
+                {
+                    return 0;
+                }
+            }
+
+            public long TotalFileSize;
+            public long TotalBytesTransferred;
+
+            public Path Source;
+            public Path Destination;
+
+            static BinaryPrefix binaryPrefix = new BinaryPrefix();
+
+            public string Message
+            {
+                get
+                {
+                    return String.Format("{0:F0}% complete ({5} of {6}, {3:hh\\:mm\\:ss} remaining, {4}): {1} -> {2}",
+                        PercentComplete,
+                        Source,
+                        Destination,
+                        RemainingTime,
+                        String.Format(binaryPrefix, "{0:B}B/s", (long)Speed),
+                        String.Format(binaryPrefix, "{0:B}B", TotalBytesTransferred),
+                        String.Format(binaryPrefix, "{0:B}B", TotalFileSize)
+                        );
+                }
+            }
+        }
+
+        static TimeSpan progressInterval = TimeSpan.FromSeconds(1);
+        
+        public static void Copy(
+            Path sourceFileName,
+            Path destFileName,
+            bool overwrite,
+            Action<CopyProgress> progressCallback)
+        {
+            Int32 pbCancel = 0;
+            var progress = new CopyProgress()
+            {
+                Source = sourceFileName,
+                Destination = destFileName,
+                Start = DateTime.Now,
+            };
+
+            var nextProgress = DateTime.Now + progressInterval;
+
+
+            Kernel32.CopyFileEx(
+                sourceFileName.Param,
+                destFileName.Param,
+                new Kernel32.CopyProgressRoutine(
+                    (long TotalFileSize,
+            long TotalBytesTransferred,
+            long StreamSize,
+            long StreamBytesTransferred,
+            uint dwStreamNumber,
+            Kernel32.CopyProgressCallbackReason dwCallbackReason,
+            IntPtr hSourceFile,
+            IntPtr hDestinationFile,
+            IntPtr lpData) =>
+                    {
+                        var n = DateTime.Now;
+                        if (n > nextProgress)
+                        {
+                            progress.TotalFileSize = TotalFileSize;
+                            progress.TotalBytesTransferred = TotalBytesTransferred;
+                            progressCallback(progress);
+                            nextProgress = n + progressInterval;
+                        }
+                        return Kernel32.CopyProgressResult.PROGRESS_CONTINUE;
+                    }),
+            IntPtr.Zero,
+           ref pbCancel,
+           overwrite ? 0 : Kernel32.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
+            .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
         }
 
         //

@@ -7,6 +7,14 @@ namespace Sidi.Extensions
 {
     public static class IEnumerableExtensions
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        /// <summary>
+        /// Returns a counted (0-based) enumeration.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
         public static IEnumerable<KeyValuePair<int, T>> Counted<T>(this IEnumerable<T> e)
         {
             int index = 0;
@@ -14,7 +22,7 @@ namespace Sidi.Extensions
         }
 
         /// <summary>
-        /// like select, but silently ignores exceptions in f
+        /// Like Select, but silently ignores exceptions in f
         /// </summary>
         /// <typeparam name="X"></typeparam>
         /// <typeparam name="Y"></typeparam>
@@ -34,6 +42,7 @@ namespace Sidi.Extensions
                 }
                 catch (Exception e)
                 {
+                    log.Warn(Sidi.Util.StringEx.SafeToString(i), e);
                 }
 
                 if (ok)

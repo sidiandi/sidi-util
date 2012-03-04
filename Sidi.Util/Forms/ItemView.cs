@@ -100,6 +100,21 @@ namespace Sidi.Forms
             {
                 get
                 {
+                    if (backgroundBrush == null)
+                    {
+                        backgroundBrush = CalcBackgroundBrush();
+                    }
+                    return backgroundBrush;
+                }
+
+                set
+                {
+                    backgroundBrush = value;
+                }
+            }
+
+            Brush CalcBackgroundBrush()
+            {
                     if (Selected)
                     {
                         return new SolidBrush(Color.FromKnownColor(KnownColor.Highlight));
@@ -119,8 +134,9 @@ namespace Sidi.Forms
                         }
                         return new SolidBrush(c);
                     }
-                }
             }
+
+            Brush backgroundBrush;
         }
 
         public interface IItemFormat
@@ -151,7 +167,7 @@ namespace Sidi.Forms
             {
             }
 
-            public void Paint(PaintArgs e)
+            public virtual void Paint(PaintArgs e)
             {
                 StringFormat sf = new StringFormat();
                 sf.FormatFlags = 
@@ -225,7 +241,7 @@ namespace Sidi.Forms
             {
             }
             
-            public void Paint(PaintArgs e)
+            public virtual void Paint(PaintArgs e)
             {
                 Point o = e.Rect.Location;
                 int i;
@@ -472,6 +488,7 @@ namespace Sidi.Forms
         IItemFormat m_itemFormat;
         IItemLayout m_itemLayout;
         int m_focusedItemIndex = 0;
+        bool m_lastItemFocused = false;
 
         public IList<Item> List
         {
@@ -645,11 +662,16 @@ namespace Sidi.Forms
             context.WindowSize = this.ClientSize;
             context.ItemCount = All.End;
             ItemLayout.Update(context);
-
             // update scrollbars
-
-
             PerformLayout();
+
+            if (m_lastItemFocused)
+            {
+                if (context.ItemCount >= 1)
+                {
+                    UiSetFocusedItem(context.ItemCount - 1);
+                }
+            }
         }
 
         Rectangle Union(Rectangle r1, Rectangle r2)
@@ -958,7 +980,9 @@ namespace Sidi.Forms
         void UiSetFocusedItem(int index)
         {
             InvalidateItem(FocusedItemIndex);
-            m_focusedItemIndex = All.Clip(index);
+            var all = All;
+            m_focusedItemIndex = all.Clip(index);
+            m_lastItemFocused = all.End - 1 == m_focusedItemIndex;
             EnsureVisible(FocusedItemIndex);
             InvalidateItem(FocusedItemIndex);
             OnFocusedItemChanged();

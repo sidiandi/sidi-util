@@ -83,6 +83,31 @@ namespace Sidi.IO.Long
             }
 
             [Test]
+            public void CopyProgress()
+            {
+                var bigSampleFile = root.CatDir("big");
+                
+                using (var f = File.Open(bigSampleFile, System.IO.FileMode.Create))
+                {
+                    var b = new byte[1024*1024];
+                    for (int i = 0; i < 100; ++i)
+                    {
+                        f.Write(b, 0, b.Length);
+                    }
+                }
+
+                log.Info(bigSampleFile.Info.Length);
+                var lpCopy = bigSampleFile.CatName(".copy");
+                File.Copy(bigSampleFile, lpCopy, true, (p) =>
+                {
+                    log.Info(p.Message);
+                });
+                Assert.IsTrue(File.Exists(lpCopy));
+                lpCopy.EnsureNotExists();
+                bigSampleFile.EnsureNotExists();
+            }
+
+            [Test]
             public void HardLink()
             {
                 CreateSampleFile(lp);
