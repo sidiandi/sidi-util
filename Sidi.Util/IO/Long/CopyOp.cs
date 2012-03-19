@@ -7,6 +7,23 @@ namespace Sidi.IO.Long
 {
     public class CopyOp
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public static void Move(Path from, Path to)
+        {
+            if (File.Exists(from))
+            {
+                to.EnsureParentDirectoryExists();
+                File.Move(from, to);
+            }
+            else if (Directory.Exists(from))
+            {
+                to.EnsureParentDirectoryExists();
+                Directory.Move(from, to);
+            }
+            log.InfoFormat("moved {0} to {1}", from, to);
+        }
+        
         public CopyOp()
         {
             CopyRequired = (s, d) => true;

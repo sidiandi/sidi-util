@@ -516,6 +516,20 @@ namespace Sidi.Persistence
 
             f = i => i.Name == bert + bert;
             Assert.AreEqual("(Name = \"BertBert\")", Collection<Address>.SqlPredicate(f.Body));
+
+            f = i => i.Name != bert;
+            Assert.AreEqual("(Name != \"Bert\")", Collection<Address>.SqlPredicate(f.Body));
+        }
+
+        [Test]
+        public void QueryDateTime()
+        {
+            var x = DateTime.Now;
+            var c = new Collection<AllDataTypes>(testFile);
+            c.Add(new AllDataTypes() { aDateTime = x });
+
+            var r = c.Query(dt => dt.aDateTime == x);
+            Assert.AreEqual(1, r.Count);
         }
     }
 }

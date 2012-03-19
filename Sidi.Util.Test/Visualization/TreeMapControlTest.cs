@@ -95,12 +95,14 @@ namespace Sidi.Visualization
         {
             var file = TestFile(@"mail\message-1-1456.eml");
             var words = Regex.Split(File.ReadAllText(new Sidi.IO.Long.Path(file)), @"\s+");
-            SimpleTreeMap.Show(words.Select(x => new SimpleTreeMap.Item()
+            var st = new SimpleTreeMap();
+            st.Items = words.Select(x => new SimpleTreeMap.Item()
                 {
                     Lineage = x.Cast<object>().ToArray(),
                     Size = 1.0f,
                     Color = Color.White,
-                }));
+                });
+            st.Show();
         }
 
         [Test, Explicit("interactive")] 
@@ -116,7 +118,7 @@ namespace Sidi.Visualization
                 Color = x.Extension.ToLower(),
             });
 
-            SimpleTreeMap.Show(data);
+            SimpleTreeMap.Show(SimpleTreeMap.ToItems(data));
         }
 
         [Test, Explicit("interactive")]
@@ -132,7 +134,7 @@ namespace Sidi.Visualization
                 Color = x.LastWriteTime.Ticks,
             });
 
-            SimpleTreeMap.Show(data);
+            SimpleTreeMap.Show(SimpleTreeMap.ToItems(data));
         }
 
         public void Display<T>(T tree) where T : ITree
