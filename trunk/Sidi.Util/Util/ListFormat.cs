@@ -45,13 +45,35 @@ namespace Sidi.Util
             return this;
         }
 
+        public ListFormat<T> Add(params Func<T, object>[] stringifiers)
+        {
+            foreach (var f in stringifiers)
+            {
+                AddColumn(String.Empty, f);
+            }
+            return this;
+        }
+
         public ListFormat<T> Property(params string[] propertyNames)
         {
             foreach (var caption in propertyNames)
             {
                 var p = typeof(T).GetProperty(caption);
-                var noArgs = new object[] { };
-                Columns.Add(new Column(caption, x => p.GetValue(x, noArgs)));
+                if (p != null)
+                {
+                    var noArgs = new object[] { };
+                    Columns.Add(new Column(caption, x => p.GetValue(x, noArgs)));
+                    continue;
+                }
+
+                var f = typeof(T).GetField(caption);
+                if (f != null)
+                {
+                    Columns.Add(new Column(caption, x => f.GetValue(x)));
+                    continue;
+                }
+
+                throw new ArgumentOutOfRangeException(caption);
             }
             return this;
         }
@@ -66,8 +88,24 @@ namespace Sidi.Util
         public string ColumnSeparator = "|";
         public int MaxColumnWidth = 60;
 
+        public void RenderText()
+        {
+            RenderText(Console.Out);
+        }
+
+        public ListFormat<T> DefaultColumns()
+        {
+            if (!Columns.Any())
+            {
+                AddColumn(typeof(T).Name, x => x.ToString());
+            }
+            return this;
+        }
+        
         public void RenderText(TextWriter o)
         {
+            DefaultColumns();
+
             var rows = Data
                 .Select(i => Columns.Select(x => x.GetText(i)).ToArray())
                 .ToList();

@@ -489,6 +489,8 @@ namespace Sidi.Persistence
                     return "<=";
                 case ExpressionType.AndAlso:
                     return "AND";
+                case ExpressionType.NotEqual:
+                    return "!=";
                 default:
                     throw new NotImplementedException(nodeType.ToString());
             }
@@ -500,6 +502,10 @@ namespace Sidi.Persistence
             if (t == typeof(int) || t == typeof(long))
             {
                 return o.ToString();
+            }
+            else if (t == typeof(DateTime))
+            {
+                return ((DateTime)o).ToString("yyyy-MM-dd HH:mm:ss.fffffff").Quote();
             }
             else
             {
@@ -552,6 +558,7 @@ namespace Sidi.Persistence
         public IList<T> Query(Expression<Func<T, bool>> predicate)
         {
             var command = CreateCommand("select {0} from {1} where {2}".F(rowIdColumn, table, SqlPredicate(predicate.Body)));
+            log.Info(command);
             return Query(command);
         }
 

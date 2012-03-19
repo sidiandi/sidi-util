@@ -99,9 +99,9 @@ namespace Sidi.Visualization
 
         public string LineageSeparator = "/";
         
-        public TreeMapControl<Tree<Data>> CreateControl(IEnumerable<Item> data)
+        public TreeMapControl<Tree<Data>> CreateControl()
         {
-            var tree = MakeTree(data);
+            var tree = MakeTree(Items);
             var tm = tree.CreateTreemapControl();
 
             tm.CushionPainter.NodeColor = t => t.Data.Item.Color;
@@ -161,21 +161,19 @@ namespace Sidi.Visualization
             return tm;
         }
 
-        public static void Show(IEnumerable<Item> data)
+        public IEnumerable<Item> Items { get; set; }
+
+        public void Show()
         {
-            var stm = new SimpleTreeMap();
-            var c = stm.CreateControl(data);
+            var c = CreateControl();
             Sidi.Forms.Util.RunFullScreen(c);
         }
 
-        public static void Show(IEnumerable<ColorMapItem> data)
+        public static void Show(IEnumerable<Item> items )
         {
-            Show(ToItems(data));
-        }
-
-        public static void Show(IEnumerable<LinearColorMapItem> data)
-        {
-            Show(ToItems(data));
+            var st = new SimpleTreeMap();
+            st.Items = items;
+            st.Show();
         }
     }
 }
