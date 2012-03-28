@@ -88,6 +88,7 @@
     <Compile Include="Collections\SelectList.cs" />
     <Compile Include="CommandLine\Action.cs" />
     <Compile Include="CommandLine\Attributes.cs" />
+    <Compile Include="CommandLine\ShowUserInterface2.cs" />
     <Compile Include="CommandLine\IParserItem.cs" />
     <Compile Include="CommandLine\Option.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
