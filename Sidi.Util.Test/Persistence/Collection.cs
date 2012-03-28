@@ -525,11 +525,13 @@ namespace Sidi.Persistence
         public void QueryDateTime()
         {
             var x = DateTime.Now;
-            var c = new Collection<AllDataTypes>(testFile);
-            c.Add(new AllDataTypes() { aDateTime = x });
+            using (var c = new Collection<AllDataTypes>(testFile))
+            {
+                c.Add(new AllDataTypes() { aDateTime = x });
 
-            var r = c.Query(dt => dt.aDateTime == x);
-            Assert.AreEqual(1, r.Count);
+                var r = c.Query(dt => dt.aDateTime == x);
+                Assert.AreEqual(1, r.Count);
+            }
         }
     }
 }

@@ -24,5 +24,12 @@ namespace Sidi.CommandLine.Test
             var c = ui.ToDialog(p.GetAction("SayHelloTo"));
             System.Windows.Forms.Application.Run(c);
         }
+
+        [Test, Explicit("ui")]
+        public void UI2()
+        {
+            var p = ParserTest.ParserWithAllTestApps();
+            new ShowUserInterface2(p).UserInterface();
+        }
     }
 }
