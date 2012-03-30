@@ -88,11 +88,12 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.SQLite">
       <HintPath>..\lib\SQLite.NET\bin\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\lib\HtmlAgilityPack-1.4.0\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <SpecificVersion>False</SpecificVersion>
@@ -128,6 +129,7 @@
     <Compile Include="IMAP\SessionTest.cs" />
     <Compile Include="IntSetTest.cs" />
     <Compile Include="IO\CopyTest.cs" />
+    <Compile Include="IO\Long\CopyProgressTest.cs" />
     <Compile Include="IO\Long\Directory.cs" />
     <Compile Include="IO\Long\Enum.cs" />
     <Compile Include="IO\Long\File.cs" />
