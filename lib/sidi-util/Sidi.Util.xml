@@ -80,9 +80,17 @@
             <param name="o"></param>
             <param name="htmlGenerator"></param>
         </member>
+        <member name="M:Sidi.Extensions.IEnumerableExtensions.Counted``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns a counted (0-based) enumeration.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
         <member name="M:Sidi.Extensions.IEnumerableExtensions.SafeSelect``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1})">
             <summary>
-            like select, but silently ignores exceptions in f
+            Like Select, but silently ignores exceptions in f
             </summary>
             <typeparam name="X"></typeparam>
             <typeparam name="Y"></typeparam>
