@@ -83,7 +83,7 @@
   <Target Name="Documentation" DependsOnTargets="Build">
   </Target>
 
-  <Target Name="Package" DependsOnTargets="Build;UnitTest;SourceIndex;Documentation">
+  <Target Name="Package" DependsOnTargets="Update;Build;UnitTest;SourceIndex;Documentation">
     <CreateItem Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" >
 		<Output TaskParameter="Include" ItemName="ZipFiles"/>
 	</CreateItem>
