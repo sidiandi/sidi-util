@@ -40,14 +40,13 @@ namespace Sidi.IO.Long
 
         public static System.IO.StreamReader StreamReader(Path path)
         {
-            var s = Open(path, System.IO.FileMode.Open);
+            var s = OpenRead(path);
             return new System.IO.StreamReader(s);
         }
 
         public static System.IO.StreamWriter StreamWriter(Path path)
         {
-            path.EnsureParentDirectoryExists();
-            var s = Open(path, System.IO.FileMode.Create);
+            var s = OpenWrite(path);
             return new System.IO.StreamWriter(s);
         }
 
@@ -88,6 +87,8 @@ namespace Sidi.IO.Long
                     dwCreationDisposition = Kernel32.ECreationDisposition.OpenExisting;
                     access = System.IO.FileAccess.Read;
                     break;
+                default:
+                    throw new NotImplementedException(fileMode.ToString());
             }
 
             var h = Kernel32.CreateFile(path.Param, dwDesiredAccess,
@@ -98,6 +99,17 @@ namespace Sidi.IO.Long
             return new System.IO.FileStream(h, access);
         }
 
+        public static System.IO.FileStream OpenWrite(Path path)
+        {
+            path.EnsureParentDirectoryExists();
+            return Open(path, System.IO.FileMode.Create);
+        }
+
+        public static System.IO.FileStream OpenRead(Path path)
+        {
+            return Open(path, System.IO.FileMode.Open);
+        }
+        
         public static System.IO.StreamWriter TextWriter(Path p)
         {
             return new System.IO.StreamWriter(Open(p, System.IO.FileMode.Create));
@@ -207,96 +219,6 @@ namespace Sidi.IO.Long
                 });
         }
 
-        public class CopyProgress
-        {
-            public DateTime Start;
-            
-            public DateTime End
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public TimeSpan Elapsed
-            {
-                get
-                {
-                    return DateTime.Now - Start;
-                }
-            }
-
-            public double Speed
-            {
-                get
-                {
-                    return SafeDiv(TotalBytesTransferred, Elapsed.TotalSeconds);
-                }
-            }
-
-            public double PercentComplete
-            {
-                get
-                {
-                    return SafeDiv((double)TotalBytesTransferred, (double)TotalFileSize) * 100.0;
-                }
-            }
-
-            public TimeSpan RemainingTime
-            {
-                get
-                {
-                    var el = Elapsed;
-                    if (el < TimeSpan.FromSeconds(1.0))
-                    {
-                        return TimeSpan.FromHours(1);
-                    }
-                    else
-                    {
-                        return TimeSpan.FromSeconds(
-                            el.TotalSeconds * ((double)TotalFileSize / (double)TotalBytesTransferred - 1.0));
-                    }
-                }
-            }
-
-            static double SafeDiv(double n, double d)
-            {
-                try
-                {
-                    return n / d;
-                }
-                catch (DivideByZeroException ex)
-                {
-                    return 0;
-                }
-            }
-
-            public long TotalFileSize;
-            public long TotalBytesTransferred;
-
-            public Path Source;
-            public Path Destination;
-
-            static BinaryPrefix binaryPrefix = new BinaryPrefix();
-
-            public string Message
-            {
-                get
-                {
-                    return String.Format("{0:F0}% complete ({5} of {6}, {3:hh\\:mm\\:ss} remaining, {4}): {1} -> {2}",
-                        PercentComplete,
-                        Source,
-                        Destination,
-                        RemainingTime,
-                        String.Format(binaryPrefix, "{0:B}B/s", (long)Speed),
-                        String.Format(binaryPrefix, "{0:B}B", TotalBytesTransferred),
-                        String.Format(binaryPrefix, "{0:B}B", TotalFileSize)
-                        );
-                }
-            }
-        }
-
         static TimeSpan progressInterval = TimeSpan.FromSeconds(1);
         
         public static void Copy(
@@ -306,15 +228,9 @@ namespace Sidi.IO.Long
             Action<CopyProgress> progressCallback)
         {
             Int32 pbCancel = 0;
-            var progress = new CopyProgress()
-            {
-                Source = sourceFileName,
-                Destination = destFileName,
-                Start = DateTime.Now,
-            };
+            var progress = new CopyProgress(sourceFileName, destFileName);
 
             var nextProgress = DateTime.Now + progressInterval;
-
 
             Kernel32.CopyFileEx(
                 sourceFileName.Param,
@@ -333,8 +249,7 @@ namespace Sidi.IO.Long
                         var n = DateTime.Now;
                         if (n > nextProgress)
                         {
-                            progress.TotalFileSize = TotalFileSize;
-                            progress.TotalBytesTransferred = TotalBytesTransferred;
+                            progress.Update(TotalBytesTransferred, TotalFileSize);
                             progressCallback(progress);
                             nextProgress = n + progressInterval;
                         }
@@ -344,6 +259,8 @@ namespace Sidi.IO.Long
            ref pbCancel,
            overwrite ? 0 : Kernel32.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
             .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
+            var totalBytes = destFileName.Info.Length;
+            progress.Update(totalBytes, totalBytes);
         }
 
         //

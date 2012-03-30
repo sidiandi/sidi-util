@@ -169,5 +169,25 @@ namespace Sidi.IO.Long
                 Assert.AreEqual("hello", File.ReadAllText(p));
                 d.EnsureNotExists();
             }
+
+            [Test]
+            public void Open()
+            {
+                var text = "world";
+                var d = this.TestFile("Long").Long().CatDir("234234", "23443", "blablabla");
+                using (var s = File.StreamWriter(d))
+                {
+                    s.WriteLine("hello");
+                }
+                using (var s = File.StreamWriter(d))
+                {
+                    s.Write(text);
+                }
+                using (var s = File.StreamReader(d))
+                {
+                    Assert.AreEqual(text, s.ReadToEnd());
+                }
+                Assert.AreEqual(text, File.ReadAllText(d));
+            }
         }
 }
