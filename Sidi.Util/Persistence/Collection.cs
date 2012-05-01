@@ -309,7 +309,7 @@ namespace Sidi.Persistence
             string sql = String.Format("create table {0} ({1})", table, FieldDefinition);
             SQLiteCommand c = connection.CreateCommand();
             c.CommandText = sql;
-            c.ExecuteNonQuery();
+            ExecuteNonQuery(c);
             CreateIndex();
         }
 
@@ -319,27 +319,38 @@ namespace Sidi.Persistence
             {
                 if (IsIndexed(i))
                 {
-                    SQLiteCommand c = connection.CreateCommand();
-                    string fields = i.Name;
                     Indexed indexed = (Indexed)i.GetCustomAttributes(typeof(Indexed), false)[0];
-                    if (indexed.Fields != null)
+                    var fields = indexed.Fields;
+                    if (fields == null)
                     {
-                        fields = indexed.Fields;
+                        fields = new[] { i.Name };
                     }
-                    c.CommandText = String.Format(
-                        "create {2} index if not exists {0}_{1} on {0} ({3})",
-                        table, 
-                        i.Name, 
-                        IsUnique(i) ? "unique" : String.Empty, 
-                        fields);
-                    c.ExecuteNonQuery();
-
-                    
-                    c.CommandText = String.Format("create index if not exists {0}_{1} on {0} ({1})",
-                        table, i.Name);
-                    c.ExecuteNonQuery();
+                    CreateIndex(fields, indexed.Unique || IsUnique(i));
                 }
             }
+
+            foreach (var index in typeof(T).GetCustomAttributes(typeof(Indexed), true).Cast<Indexed>())
+            {
+                CreateIndex(index.Fields, index.Unique);
+            }
+        }
+
+        void CreateIndex(string[] fields, bool unique)
+        {
+            SQLiteCommand c = connection.CreateCommand();
+            c.CommandText = String.Format(
+                "create {2} index if not exists {0}_{1} on {0} ({3})",
+                table,
+                fields.Join("_"),
+                unique ? "unique" : String.Empty,
+                fields.Join(", "));
+            ExecuteNonQuery(c);
+        }
+
+        void ExecuteNonQuery(SQLiteCommand c)
+        {
+            log.Info(c.CommandText);
+            c.ExecuteNonQuery();
         }
 
         bool TableExists(string table)

@@ -106,7 +106,7 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        public void Handle(IList<string> args, bool execute)
+        public object Handle(IList<string> args, bool execute)
         {
             if (args.Count < 1)
             {
@@ -119,9 +119,15 @@ namespace Sidi.CommandLine
                 object v = Parser.ParseValue(args[0], fi.FieldType);
                 if (execute) fi.SetValue(Application, v);
                 args.RemoveAt(0);
-                if (!IsPassword)
+                if (IsPassword)
                 {
-                    log.InfoFormat("Option {0} = {1}", fi.Name, fi.GetValue(Application));
+                    return null;
+                }
+                else
+                {
+                    var r = fi.GetValue(Application);
+                    log.InfoFormat("Option {0} = {1}", fi.Name, r);
+                    return null;
                 }
             }
             else if (MemberInfo is PropertyInfo)
@@ -130,16 +136,21 @@ namespace Sidi.CommandLine
                 object v = Parser.ParseValue(args[0], pi.PropertyType);
                 if (execute) pi.SetValue(Application, v, new object[] { });
                 args.RemoveAt(0);
-                if (!IsPassword)
+                if (IsPassword)
                 {
-                    log.InfoFormat("Option {0} = {1}", pi.Name, pi.GetValue(Application, new object[] { }));
+                    return null;
+                }
+                else
+                {
+                    var r = pi.GetValue(Application, new object[] { });
+                    log.InfoFormat("Option {0} = {1}", pi.Name, r);
+                    return null;
                 }
             }
             else
             {
                 throw new CommandLineException("option is of invalid type: {0}".F(MemberInfo));
             }
-
         }
 
         public string UsageText

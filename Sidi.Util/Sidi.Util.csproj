@@ -124,6 +124,7 @@
     <Compile Include="IO\Long\Extensions\PathExtensions.cs" />
     <Compile Include="IO\Long\File.cs" />
     <Compile Include="IO\Long\FileEnum.cs" />
+    <Compile Include="IO\Long\FileList.cs" />
     <Compile Include="IO\Long\FileSystemInfo.cs" />
     <Compile Include="IO\Long\FindData.cs" />
     <Compile Include="IO\Long\Kernel32.cs" />
@@ -178,10 +179,12 @@
     <Compile Include="Forms\Viewport.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Util\Dump.cs" />
     <Compile Include="Util\EncryptString.cs" />
     <Compile Include="Util\GraMath.cs" />
     <Compile Include="Collections\History.cs" />
     <Compile Include="Util\IArchive.cs" />
+    <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\Interval.cs" />
     <Compile Include="Collections\IntSet.cs" />
     <Compile Include="IO\PathEx.cs" />

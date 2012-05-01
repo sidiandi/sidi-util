@@ -25,8 +25,13 @@ namespace Sidi.Collections
             return GetCached(key, provider,
                 path =>
                 {
+                    if (path.Exists && path.Info.Length == 0)
+                    {
+                        return null;
+                    }
+
                     var b = new BinaryFormatter();
-                    using (var stream = System.IO.File.OpenRead(path))
+                    using (var stream = File.OpenRead(path))
                     {
                         var cacheContent= b.Deserialize(stream);
                         if (cacheContent is Exception)
@@ -41,21 +46,24 @@ namespace Sidi.Collections
                 },
                 (path, t) =>
                 {
-                    var b = new BinaryFormatter();
                     path.EnsureParentDirectoryExists();
-                    using (var stream = System.IO.File.OpenWrite(path))
+                    using (var stream = File.OpenWrite(path))
                     {
-                        b.Serialize(stream, t);
+                        if (t != null)
+                        {
+                            var b = new BinaryFormatter();
+                            b.Serialize(stream, t);
+                        }
                     }
                 });
         }
 
-        public T GetCached<T>(object key, Func<T> provider, Func<string, object> reader, Action<string, object> writer)
+        public T GetCached<T>(object key, Func<T> provider, Func<Path, object> reader, Action<Path, object> writer)
         {
             var p = CachePath(key);
             if (p.Exists)
             {
-                var cachedValue = reader(p.NoPrefix);
+                var cachedValue = reader(p);
                 if (cachedValue is Exception)
                 {
                     throw (Exception)cachedValue;
@@ -71,12 +79,12 @@ namespace Sidi.Collections
                 {
                     var result = provider();
                     p.EnsureParentDirectoryExists();
-                    writer(p.NoPrefix, result);
+                    writer(p, result);
                     return result;
                 }
                 catch (Exception e)
                 {
-                    writer(p.NoPrefix, e);
+                    writer(p, e);
                     throw e;
                 }
             }

@@ -44,7 +44,6 @@ namespace Sidi.IO.Long
             get
             {
                 var speed = SafeDiv(TotalBytesTransferred, Elapsed.TotalSeconds);
-                log.Info(speed);
                 return speed;
             }
         }
@@ -61,7 +60,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                var seconds = Elapsed.TotalSeconds * SafeDiv((double)TotalFileSize, (double)TotalBytesTransferred - 1.0);
+                var seconds = Elapsed.TotalSeconds * SafeDiv((double)TotalFileSize - (double)TotalBytesTransferred, (double) TotalBytesTransferred);
                 if (seconds < 1 || seconds > TimeSpan.MaxValue.TotalSeconds)
                 {
                     return TimeSpan.FromHours(1);

@@ -127,7 +127,7 @@ namespace Sidi.CommandLine
             return String.Format("Subcommand {0}", Name);
         }
 
-        public void Handle(IList<string> args, bool execute)
+        public object Handle(IList<string> args, bool execute)
         {
             var parser = new Parser(CommandInstance);
             log.InfoFormat("{0}", this);
@@ -155,6 +155,7 @@ namespace Sidi.CommandLine
             {
                 parser.ShowUsage();
             }
+            return null;
         }
 
         public object CommandInstance
