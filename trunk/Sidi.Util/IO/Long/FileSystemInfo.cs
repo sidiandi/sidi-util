@@ -25,7 +25,7 @@ namespace Sidi.IO.Long
 
         public FileSystemInfo(Path path)
         {
-            path = path.Canonic;
+            path = path.GetFullPath();
             parentDirectory = path.ParentDirectory;
             _findData.Name = path.Name;
             _findDataValid = false;

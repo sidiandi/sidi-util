@@ -125,7 +125,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public void Handle(IList<string> args, bool execute)
+        public object Handle(IList<string> args, bool execute)
         {
             var parameters = MethodInfo.GetParameters();
             object[] parameterValues;
@@ -155,11 +155,11 @@ namespace Sidi.CommandLine
             log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
             if (execute)
             {
-                var returnValue = MethodInfo.Invoke(Application, parameterValues);
-                if (returnValue != null)
-                {
-                    Console.WriteLine(returnValue);
-                }
+                return MethodInfo.Invoke(Application, parameterValues);
+            }
+            else
+            {
+                return null;
             }
         }
     }

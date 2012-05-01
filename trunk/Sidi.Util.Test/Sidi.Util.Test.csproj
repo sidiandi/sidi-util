@@ -149,6 +149,8 @@
     <Compile Include="..\VersionInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
+    <Compile Include="Util\Dump.cs" />
+    <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\ListFormatTest.cs" />
     <Compile Include="Util\SizeCount.cs" />
     <Compile Include="Util\StringExTest.cs" />

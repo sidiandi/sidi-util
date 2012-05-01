@@ -227,40 +227,49 @@ namespace Sidi.IO.Long
             bool overwrite,
             Action<CopyProgress> progressCallback)
         {
-            Int32 pbCancel = 0;
-            var progress = new CopyProgress(sourceFileName, destFileName);
+            try
+            {
+                Int32 pbCancel = 0;
+                var progress = new CopyProgress(sourceFileName, destFileName);
 
-            var nextProgress = DateTime.Now + progressInterval;
+                var nextProgress = DateTime.Now + progressInterval;
 
-            Kernel32.CopyFileEx(
-                sourceFileName.Param,
-                destFileName.Param,
-                new Kernel32.CopyProgressRoutine(
-                    (long TotalFileSize,
-            long TotalBytesTransferred,
-            long StreamSize,
-            long StreamBytesTransferred,
-            uint dwStreamNumber,
-            Kernel32.CopyProgressCallbackReason dwCallbackReason,
-            IntPtr hSourceFile,
-            IntPtr hDestinationFile,
-            IntPtr lpData) =>
-                    {
-                        var n = DateTime.Now;
-                        if (n > nextProgress)
+                Kernel32.CopyFileEx(
+                    sourceFileName.Param,
+                    destFileName.Param,
+                    new Kernel32.CopyProgressRoutine(
+                        (long TotalFileSize,
+                long TotalBytesTransferred,
+                long StreamSize,
+                long StreamBytesTransferred,
+                uint dwStreamNumber,
+                Kernel32.CopyProgressCallbackReason dwCallbackReason,
+                IntPtr hSourceFile,
+                IntPtr hDestinationFile,
+                IntPtr lpData) =>
                         {
-                            progress.Update(TotalBytesTransferred, TotalFileSize);
-                            progressCallback(progress);
-                            nextProgress = n + progressInterval;
-                        }
-                        return Kernel32.CopyProgressResult.PROGRESS_CONTINUE;
-                    }),
-            IntPtr.Zero,
-           ref pbCancel,
-           overwrite ? 0 : Kernel32.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
-            .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
-            var totalBytes = destFileName.Info.Length;
-            progress.Update(totalBytes, totalBytes);
+                            var n = DateTime.Now;
+                            if (n > nextProgress)
+                            {
+                                progress.Update(TotalBytesTransferred, TotalFileSize);
+                                progressCallback(progress);
+                                nextProgress = n + progressInterval;
+                            }
+                            return Kernel32.CopyProgressResult.PROGRESS_CONTINUE;
+                        }),
+                IntPtr.Zero,
+               ref pbCancel,
+               overwrite ? 0 : Kernel32.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
+                .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
+                var totalBytes = destFileName.Info.Length;
+                progress.Update(totalBytes, totalBytes);
+            }
+            catch (Exception ex)
+            {
+                log.Warn(sourceFileName, ex);
+                destFileName.EnsureNotExists();
+                throw ex;
+            }
         }
 
         //

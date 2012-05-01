@@ -94,7 +94,7 @@ namespace Sidi.CommandLine
             get { return new string[]{}; }
         }
 
-        public void Handle(IList<string> args, bool execute)
+        public object Handle(IList<string> args, bool execute)
         {
             using (log4net.NDC.Push(this.Name))
             {
@@ -111,6 +111,7 @@ namespace Sidi.CommandLine
                         parser.ParseSingleCommand(args);
                     }
                 }
+                return null;
             }
         }
     }
@@ -196,6 +197,12 @@ namespace Sidi.CommandLine
 
         internal Parser()
         {
+            var dumper = new Dump() { MaxLevel = 1 };
+            ProcessResult = result =>
+                {
+                    dumper.Write(result, Console.Out);
+                };
+            
             cultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
@@ -631,9 +638,12 @@ namespace Sidi.CommandLine
             }
 
             NextArg(args);
-            parserItem.Handle(args, execute);
+            var result = parserItem.Handle(args, execute);
+            ProcessResult(result);
             return true;
         }
+
+        Action<object> ProcessResult;
 
         /// <summary>
         /// deprecated

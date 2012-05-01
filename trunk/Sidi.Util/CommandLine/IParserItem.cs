@@ -12,6 +12,6 @@ namespace Sidi.CommandLine
         string Name { get; }
         object Application { get; }
         IEnumerable<string> Categories { get; }
-        void Handle(IList<string> args, bool execute);
+        object Handle(IList<string> args, bool execute);
     }
 }

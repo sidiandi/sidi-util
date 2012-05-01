@@ -533,5 +533,32 @@ namespace Sidi.Persistence
                 Assert.AreEqual(1, r.Count);
             }
         }
+
+        [Indexed(Fields = new []{"A", "B", "C"}, Unique=true) ]
+        class IndexedData
+        {
+            [RowId]
+            public long oid;
+
+            [Data]
+            public string A;
+
+            [Data]
+            public string B;
+
+            [Data]
+            public string C;
+        }
+
+        [Test]
+        public void Index()
+        {
+            using (var c = new Collection<IndexedData>(testFile))
+            {
+                c.Add(new IndexedData() { A = "A", B = "B", C = "C" });
+                c.Add(new IndexedData() { A = "A", B = "B", C = "C" });
+                Assert.AreEqual(1, c.Count);
+            }
+        }
     }
 }

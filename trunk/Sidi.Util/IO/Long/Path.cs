@@ -198,6 +198,11 @@ namespace Sidi.IO.Long
                 return new FileSystemInfo(this);
             }
         }
+
+        public Path GetFullPath()
+        {
+            return new Path(System.IO.Path.GetFullPath(this.NoPrefix));
+        }
         
         public Path CatDir(IEnumerable<string> parts)
         {
@@ -269,7 +274,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                if (IsRoot)
+                if (IsRoot || String.IsNullOrEmpty(path))
                 {
                     return null;
                 }

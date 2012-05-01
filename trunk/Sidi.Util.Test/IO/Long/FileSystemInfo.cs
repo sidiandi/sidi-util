@@ -22,5 +22,21 @@ namespace Sidi.IO.Long
             log.Info(c.GetFileSystemInfos().Join());
             Assert.IsTrue(c.Exists);
         }
+
+        [Test]
+        public void DotHandling()
+        {
+            var dot = new Path(".");
+            Assert.IsTrue(dot.Info.Exists);
+        }
+
+        [Test]
+        public void Fullname()
+        {
+            var currentDirectory = new Path(System.Environment.CurrentDirectory);
+            var dot = new Path(".");
+            dot.Info.DumpProperties(Console.Out);
+            Assert.AreEqual(currentDirectory, dot.Info.FullName);
+        }
     }
 }

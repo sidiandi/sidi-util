@@ -36,17 +36,14 @@ namespace Sidi.Persistence
     {
     }
 
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)]
     public class Indexed : Attribute
     {
-        public string Fields;
+        public string[] Fields;
+        public bool Unique = false;
 
         public Indexed()
         {
-        }
-        public Indexed(string a_fields)
-        {
-            Fields = a_fields;
         }
     }
 
