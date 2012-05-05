@@ -152,10 +152,8 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return FullName.IsRoot ? 
-                    System.IO.Directory.Exists(FullName.NoPrefix + @"\")
-                    :
-                    Directory.FindFile(FullName).Any();
+                FindData fd;
+                return FullName.GetFindData(out fd);
             }
         }
 

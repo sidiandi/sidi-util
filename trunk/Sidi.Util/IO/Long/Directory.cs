@@ -34,6 +34,11 @@ namespace Sidi.IO.Long
             }
             else
             {
+                if (directory.IsUnc && directory.Parts.Length == 4)
+                {
+                    return System.IO.Directory.Exists(directory.NoPrefix);
+                }
+
                 return false;
             }
         }
@@ -85,6 +90,14 @@ namespace Sidi.IO.Long
         public static void Create(Path path)
         {
             CreateDirectoryInternal(path);
+        }
+
+        public static Path Current
+        {
+            get
+            {
+                return new Path(System.Environment.CurrentDirectory);
+            }
         }
 
         const int ERROR_ALREADY_EXISTS = 183;
