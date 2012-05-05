@@ -27,6 +27,11 @@ namespace Sidi.IO.Long
             .Select(n => Regex.Escape(new String(n, 1)))
             .Join("|"));
 
+        public static implicit operator Path(string text)
+        {
+            return new Path(text);
+        }
+
         public static string GetValidFilename(string x)
         {
             return Truncate(invalidFilenameRegex.Replace(x, "_"), Path.MaxFilenameLength);
@@ -68,22 +73,22 @@ namespace Sidi.IO.Long
             {
                 path = path.Substring(0, path.Length - 1);
             }
-            
-            if (path.StartsWith(pathPrefix) || path.StartsWith(longUncPrefix))
-            {
-                this.path = path;
-            }
-            else if (path.StartsWith(shortUncPrefix))
-            {
-                this.path = longUncPrefix + path.Substring(shortUncPrefix.Length);
-            }
-            else if (String.IsNullOrEmpty(path))
+
+            if (String.IsNullOrEmpty(path))
             {
                 this.path = String.Empty;
             }
+            else if (path.StartsWith(pathPrefix))
+            {
+                this.path = path.Substring(pathPrefix.Length);
+            }
+            else if (path.StartsWith(longUncPrefix))
+            {
+                this.path = shortUncPrefix + path.Substring(longUncPrefix.Length);
+            }
             else
             {
-                this.path = pathPrefix + path;
+                this.path = path;
             }
         }
 
@@ -127,7 +132,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return new FileSystemInfo(this).Exists;
+                return Info.Exists;
             }
         }
 
@@ -187,7 +192,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return this.path.Split(DirectorySeparatorChar).Skip(3).ToArray();
+                return this.path.Split(DirectorySeparatorChar).ToArray();
             }
         }
 
@@ -195,13 +200,36 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return new FileSystemInfo(this);
+                return new FileSystemInfo(this.GetFullPath());
             }
         }
 
         public Path GetFullPath()
         {
-            return new Path(System.IO.Path.GetFullPath(this.NoPrefix));
+            var p = Parts;
+            Path full = null;
+            if (IsUnc)
+            {
+                full = this;
+            }
+            else if (String.IsNullOrEmpty(p[0]))
+            {
+                // concat with drive
+                full = new Path(Directory.Current.Parts[0]).CatDir(this.Parts.Skip(1));
+            }
+            else if (IsValidDriveRoot(p[0]))
+            {
+                full = this;
+            }
+            else
+            {
+                // concat with current directory
+                full = Directory.Current.CatDir(this);
+            }
+
+            full = full.Canonic;
+
+            return full;
         }
         
         public Path CatDir(IEnumerable<string> parts)
@@ -274,15 +302,21 @@ namespace Sidi.IO.Long
         {
             get
             {
-                if (IsRoot || String.IsNullOrEmpty(path))
+                var p = GetFullPath().Parts;
+
+                if (IsUnc)
+                {
+                    if (p.Length <= 4)
+                    {
+                        return null;
+                    }
+                }
+
+                if (p.Length <= 1)
                 {
                     return null;
                 }
-                else
-                {
-                    var i = path.LastIndexOf(DirectorySeparator);
-                    return new Path(path.Substring(0, i));
-                }
+                return new Path(p.Take(p.Length - 1));
             }
         }
 
@@ -290,16 +324,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                var i = path.LastIndexOf(DirectorySeparator);
-                var n = path.Substring(i + 1);
-                if (String.IsNullOrEmpty(n))
-                {
-                    return ".";
-                }
-                else
-                {
-                    return n;
-                }
+                return GetFullPath().Parts.Last();
             }
         }
 
@@ -309,18 +334,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                if (String.IsNullOrEmpty(path))
-                {
-                    return String.Empty;
-                }
-                else if (path.StartsWith(longUncPrefix))
-                {
-                    return shortUncPrefix + path.Substring(longUncPrefix.Length);
-                }
-                else
-                {
-                    return path.Substring(pathPrefix.Length);
-                }
+                return path;
             }
         }
 
@@ -333,7 +347,18 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return path;
+                if (String.IsNullOrEmpty(path))
+                {
+                    return String.Empty;
+                }
+                else if (path.StartsWith(shortUncPrefix))
+                {
+                    return longUncPrefix + path.Substring(shortUncPrefix.Length);
+                }
+                else
+                {
+                    return pathPrefix + path;
+                }
             }
         }
 
@@ -346,7 +371,7 @@ namespace Sidi.IO.Long
             {
                 if (IsUnc)
                 {
-                    return Parts.Length <= 3;
+                    return Parts.Length <= 1;
                 }
                 else
                 {
@@ -359,7 +384,8 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return path.StartsWith(pathPrefix) && path.EndsWith(":") && path.Length == pathPrefix.Length + 2;
+                var p = Parts;
+                return p.Length == 1 && IsValidDriveRoot(p[0]);
             }
         }
 
@@ -372,7 +398,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return path.StartsWith(longUncPrefix);
+                return path.StartsWith(shortUncPrefix);
             }
         }
 

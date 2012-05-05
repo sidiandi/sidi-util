@@ -17,10 +17,12 @@ namespace Sidi.IO.Long
         [Test]
         public void DriveRoot()
         {
-            var c = new FileSystemInfo(@"C:".Long());
+            var drive = Directory.Current.PathRoot;
+            Assert.IsTrue(drive.IsRoot);
+            var c = new FileSystemInfo(drive);
+            Assert.IsTrue(c.Exists);
             c.DumpProperties(Console.Out);
             log.Info(c.GetFileSystemInfos().Join());
-            Assert.IsTrue(c.Exists);
         }
 
         [Test]

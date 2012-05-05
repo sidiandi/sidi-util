@@ -32,6 +32,20 @@ namespace Sidi.IO.Long
         }
 
         [Test]
+        public void FullPath()
+        {
+            var ln = new Path(Enumerable.Range(0, 100).Select(x => "0000000000"));
+            var cd = new Path(System.Environment.CurrentDirectory);
+            Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
+
+            ln = new Path(@"\" + ln.NoPrefix);
+            Assert.AreEqual(new Path(cd.PathRoot.ToString() + ln.ToString()), ln.GetFullPath());
+
+            ln = new Path(".");
+            Assert.AreEqual(Directory.Current, ln.GetFullPath());
+        }
+
+        [Test]
         public void Parts()
         {
             var pCount = 40;
@@ -143,6 +157,14 @@ namespace Sidi.IO.Long
             log.Info(t.ToString());
             var n1 = s.Deserialize(new System.IO.StringReader(t.ToString()));
             Assert.AreEqual(n, n1);
+        }
+
+        [Test]
+        public void StringCast()
+        {
+            var stringPath = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            Path p = stringPath;
+            Assert.AreEqual(new Path(stringPath), p);
         }
     }
 }
