@@ -516,5 +516,16 @@ namespace Sidi.IO.Long
         {
             writer.WriteString(path);
         }
+
+        /// <summary>
+        /// Replaces the extension of a path
+        /// </summary>
+        /// <param name="newExtension">new extension including the ".", e.g. ".txt"</param>
+        /// <returns></returns>
+        public Path ReplaceExtension(string newExtension)
+        {
+            return ParentDirectory.CatDir(FileNameWithoutExtension + newExtension);
+        }
+
     }
 }
