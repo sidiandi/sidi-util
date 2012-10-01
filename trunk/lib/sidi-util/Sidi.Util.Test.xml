@@ -4,14 +4,14 @@
         <name>Sidi.Util.Test</name>
     </assembly>
     <members>
-        <member name="T:Sidi.IO.Long.EnumConfigTest">
-            <summary>
-            Command line parser interface for Sidi.IO.Long.Enum
-            </summary>
-        </member>
         <member name="M:Sidi.Net.HtmlGeneratorTest.GenerateCode">
             <summary>
             Generates attribute and tag for form HtmlGenerator.cs
+            </summary>
+        </member>
+        <member name="T:Sidi.IO.Long.EnumConfigTest">
+            <summary>
+            Command line parser interface for Sidi.IO.Long.Enum
             </summary>
         </member>
         <member name="T:Sidi.Util.RegistrySerializerTest.Debugger">
