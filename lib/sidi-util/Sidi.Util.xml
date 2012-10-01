@@ -4,81 +4,71 @@
         <name>Sidi.Util</name>
     </assembly>
     <members>
-        <member name="T:Sidi.Cache.LruCache`2">
+        <member name="F:Sidi.Forms.SelectObjectsDialog.components">
             <summary>
-            Least Recently Used Cache.
+            Required designer variable.
             </summary>
-            <typeparam name="Key"></typeparam>
-            <typeparam name="Value"></typeparam>
         </member>
-        <member name="M:Sidi.Cache.LruCache`2.#ctor(System.Int32,System.Func{`0,`1})">
+        <member name="M:Sidi.Forms.SelectObjectsDialog.Dispose(System.Boolean)">
             <summary>
-            
+            Clean up any resources being used.
             </summary>
-            <param name="maxCount">Maximal number of items the cache can hold.</param>
-            <param name="provideValue">Delegate to create a cache item if it is not in the cache.</param>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         </member>
-        <member name="M:Sidi.Cache.LruCache`2.Update(`0,`1)">
+        <member name="M:Sidi.Forms.SelectObjectsDialog.InitializeComponent">
             <summary>
-            Updates a cache entry without changing the least-recently-used position.
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
             </summary>
-            <param name="key"></param>
-            <param name="value"></param>
         </member>
-        <member name="M:Sidi.Cache.LruCache`2.ShrinkTo(System.Int32)">
+        <member name="F:Sidi.Forms.ChooseOneDialog.components">
             <summary>
-            Removes cached items if there are more than newCount.
+            Required designer variable.
             </summary>
-            <param name="newCount"></param>
         </member>
-        <member name="P:Sidi.Cache.LruCache`2.Item(`0)">
+        <member name="M:Sidi.Forms.ChooseOneDialog.Dispose(System.Boolean)">
             <summary>
-            Indexer to get a cached item. 
+            Clean up any resources being used.
             </summary>
-            <param name="key"></param>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Sidi.Forms.ChooseOneDialog.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:Sidi.IMAP.IMailbox.GetByUid(System.UInt32)">
+            <summary>
+            Returns the message sequence number for a uid, or 0 if UID is not found
+            </summary>
+            <param name="uid"></param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.Cache.LruCacheBackground`2.Contains(`0)">
+        <member name="M:Sidi.Visualization.TreeMapControl`1.Track(System.Windows.Forms.PaintEventArgs,Sidi.Visualization.Tree{Sidi.Visualization.TreeMapLayout.Layout})">
             <summary>
-            Returns true if the item specified by key is in the cache. 
+            Outlines specified layout item and all its parents
             </summary>
-            <param name="key"></param>
+            <param name="e"></param>
+            <param name="tree"></param>
+        </member>
+        <member name="T:Sidi.Net.Pop3.Server">
+            <summary>
+            Implements a POP3 server as specified in http://tools.ietf.org/html/rfc1939
+            </summary>
+        </member>
+        <member name="T:Sidi.Forms.MouseWheelSupport">
+            <summary>
+            Mouse Wheel Support.
+            </summary>
+        </member>
+        <member name="M:Sidi.Extensions.IEnumerableExtensions.Counted``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns a counted (0-based) enumeration.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
             <returns></returns>
-        </member>
-        <member name="E:Sidi.Cache.LruCacheBackground`2.EntryUpdated">
-            <summary>
-            Fires when an entry in the cache was updated.
-            </summary>
-            Warning: this event will be fired by a background thread.
-        </member>
-        <member name="P:Sidi.Cache.LruCacheBackground`2.Item(`0)">
-            <summary>
-            Indexer to get a cached item. 
-            </summary>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="P:Sidi.CommandLine.Action.UsageText">
-            <summary>
-            Formatted usage information with parameters
-            </summary>
-        </member>
-        <member name="T:Sidi.CommandLine.PersistentAttribute">
-            <summary>
-            Properties marked with this attribute will be stored in the registry
-            </summary>
-        </member>
-        <member name="T:Sidi.CommandLine.PasswordAttribute">
-            <summary>
-            Properties marked with this attribute will not be displayed to the user
-            </summary>
-        </member>
-        <member name="M:Sidi.Net.HtmlGenerator.Write(System.IO.TextWriter,System.Func{System.Object})">
-            <summary>
-            Exception-safe way to render the html object to a TextWriter
-            </summary>
-            <param name="o"></param>
-            <param name="htmlGenerator"></param>
         </member>
         <member name="M:Sidi.Extensions.IEnumerableExtensions.Counted``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
@@ -108,162 +98,264 @@
             <param name="f"></param>
             <returns></returns>
         </member>
-        <member name="F:Sidi.Forms.ChooseOneDialog.components">
+        <member name="P:Sidi.CommandLine.Action.UsageText">
             <summary>
-            Required designer variable.
+            Formatted usage information with parameters
             </summary>
         </member>
-        <member name="M:Sidi.Forms.ChooseOneDialog.Dispose(System.Boolean)">
+        <member name="T:Sidi.Util.StringEncrypt">
             <summary>
-            Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        </member>
-        <member name="M:Sidi.Forms.ChooseOneDialog.InitializeComponent">
-            <summary>
-            Required method for Designer support - do not modify
-            the contents of this method with the code editor.
+            encrypt and decrypt strings
             </summary>
         </member>
-        <member name="F:Sidi.Forms.SelectObjectsDialog.components">
+        <member name="M:Sidi.Util.StringEncrypt.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
             <summary>
-            Required designer variable.
+            Encrypts the string.
             </summary>
-        </member>
-        <member name="M:Sidi.Forms.SelectObjectsDialog.Dispose(System.Boolean)">
-            <summary>
-            Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        </member>
-        <member name="M:Sidi.Forms.SelectObjectsDialog.InitializeComponent">
-            <summary>
-            Required method for Designer support - do not modify
-            the contents of this method with the code editor.
-            </summary>
-        </member>
-        <member name="M:Sidi.IMAP.IMailbox.GetByUid(System.UInt32)">
-            <summary>
-            Returns the message sequence number for a uid, or 0 if UID is not found
-            </summary>
-            <param name="uid"></param>
+            <param name="clearText">The clear text.</param>
+            <param name="Key">The key.</param>
+            <param name="IV">The IV.</param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Directory.FindFileRaw(Sidi.IO.Long.Path)">
+        <member name="M:Sidi.Util.StringEncrypt.Encrypt(System.String,System.String)">
             <summary>
-            Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
+            Encrypts the string.
             </summary>
-            <param name="searchPath"></param>
+            <param name="clearText">The clear text.</param>
+            <param name="Password">The password.</param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.Directory.FindFile(Sidi.IO.Long.Path)">
+        <member name="M:Sidi.Util.StringEncrypt.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
             <summary>
-            Enumerates found files. Make sure that the Enumerator is closed properly to free the Find handle.
+            Decrypts the string.
             </summary>
-            <param name="searchPath">File search path complete with wildcards, e.g. C:\temp\*.doc</param>
+            <param name="cipherData">The cipher data.</param>
+            <param name="Key">The key.</param>
+            <param name="IV">The IV.</param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Long.FileType.#ctor(System.String[])">
+        <member name="M:Sidi.Util.StringEncrypt.Decrypt(System.String,System.String)">
             <summary>
-            Specify all extensions you want to match
+            Decrypts the string.
             </summary>
-            <param name="extensions">list of extensions without "."</param>
-        </member>
-        <member name="M:Sidi.IO.Long.FileEnum.AddRoot(Sidi.IO.Long.Path)">
-            <summary>
-            Adds a start root for Depth() and Breath(). Multiple start roots are supported.
-            </summary>
-            <param name="path"></param>
-        </member>
-        <member name="M:Sidi.IO.Long.FileEnum.Depth">
-            <summary>
-            Recurses all start roots depth-first
-            </summary>
+            <param name="cipherText">The cipher text.</param>
+            <param name="Password">The password.</param>
             <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.Long.FileEnum.Breadth">
-            <summary>
-            Recurses all start roots breadth-first
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.Long.FileEnum.OnlyFiles(Sidi.IO.Long.FileSystemInfo)">
-            <summary>
-            Follows files only
-            </summary>
-            <param name="i"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.Long.FileEnum.NoDotNoHidden(Sidi.IO.Long.FileSystemInfo)">
-            <summary>
-            Only follows elements which do not start with . and are not hidden
-            </summary>
-            <param name="i"></param>
-            <returns></returns>
-        </member>
-        <member name="P:Sidi.IO.Long.FileEnum.Output">
-            <summary>
-            Set this function to decide which files should be returned.
-            </summary>
-        </member>
-        <member name="P:Sidi.IO.Long.FileEnum.Follow">
-            <summary>
-            Set this function to decide which directories should be followed.
-            </summary>
-        </member>
-        <member name="P:Sidi.IO.Long.FileEnum.Visit">
-            <summary>
-            Set this function to see every file, not matter if output or not.
-            </summary>
-        </member>
-        <member name="P:Sidi.IO.Long.FileEnum.Count">
-            <summary>
-            Counts the visited files
-            </summary>
-        </member>
-        <member name="T:Sidi.IO.Long.EnumConfig">
-            <summary>
-            Command line parser interface for Sidi.IO.Long.Enum
-            </summary>
         </member>
         <member name="P:Sidi.IO.Long.Path.IsRoot">
             <summary>
             Returns true if ParentDirectory would return null
             </summary>
         </member>
-        <member name="F:Sidi.Net.Abnf.Match.Types">
+        <member name="T:Sidi.Visualization.TreeMapLayout">
             <summary>
-            Used for Create
+            http://www.win.tue.nl/~vanwijk/ctm.pdf
             </summary>
         </member>
-        <member name="P:Sidi.Net.Abnf.Match.Item(System.String)">
+        <member name="T:Sidi.Visualization.ColorMap">
             <summary>
-            Returns the first child rule with name
+            Interpolates a scalar to a color
             </summary>
-            <param name="name"></param>
-            <returns>null, if rule not present</returns>
         </member>
-        <member name="M:Sidi.IO.Copy.CopyToDir(System.String,System.String)">
+        <member name="M:Sidi.IO.PathEx.IsChild(System.String,System.String)">
+            <summary>
+            Returns true if path is inside of directory or its sub-directories
+            </summary>
+            <param name="path"></param>
+            <param name="directory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.PathEx.CopyTo(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Copies to another stream
+            </summary>
+            <param name="source">Source stream</param>
+            <param name="dest">Destination stream</param>
+        </member>
+        <member name="M:Sidi.Util.GraMath.CalcTransform(System.Drawing.Rectangle,System.Drawing.Rectangle)">
+            <summary>
+            Calculates the 2D transform to required convert rectangle src to rectangle dst
+            </summary>
+            <param name="src"></param>
+            <param name="dst"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.GraMath.Center(System.Drawing.Rectangle)">
+            <summary>
+            Returns the center point of the rectangle.
+            </summary>
+            <param name="r"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.GraMath.Area(System.Drawing.Size)">
+            <summary>
+            returns the area for a size.
+            </summary>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.GraMath.Center(System.Drawing.Rectangle,System.Drawing.Rectangle)">
+            <summary>
+            Centers rectangle r in rectangle and returns it.
+            </summary>
+            <param name="r"></param>
+            <param name="at"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Cache.LruCacheBackground`2.Contains(`0)">
+            <summary>
+            Returns true if the item specified by key is in the cache. 
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="E:Sidi.Cache.LruCacheBackground`2.EntryUpdated">
+            <summary>
+            Fires when an entry in the cache was updated.
+            </summary>
+            Warning: this event will be fired by a background thread.
+        </member>
+        <member name="P:Sidi.Cache.LruCacheBackground`2.Item(`0)">
+            <summary>
+            Indexer to get a cached item. 
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.UnixTime.#ctor">
+            <summary>
+            Private constructor to prevent the class from being instantiated.
+            </summary>
+        </member>
+        <member name="T:Sidi.Util.Tokenizer">
+            <summary>
+            Simple text tokenizer. Separates strings at whitespace. Understands # comments, and quoted strings.
+            </summary>
+        </member>
+        <member name="F:Sidi.Util.Dump.MaxLevel">
+            <summary>
+            Maximal tree levels to be output
+            </summary>
+        </member>
+        <member name="F:Sidi.Util.Dump.Indent">
+            <summary>
+            Prefix for indentation
+            </summary>
+        </member>
+        <member name="M:Sidi.Net.HtmlGenerator.Write(System.IO.TextWriter,System.Func{System.Object})">
+            <summary>
+            Exception-safe way to render the html object to a TextWriter
+            </summary>
+            <param name="o"></param>
+            <param name="htmlGenerator"></param>
+        </member>
+        <member name="T:Sidi.IO.Long.EnumConfig">
+            <summary>
+            Command line parser interface for Sidi.IO.Long.Enum
+            </summary>
+        </member>
+        <member name="F:Sidi.Util.UpdateForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Sidi.Util.UpdateForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Sidi.Util.UpdateForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:Sidi.IO.FileUtil.Sibling(System.String,System.String)">
+            <summary>
+            Constructs the path for a sibling of a file, i.e. of a file in the same directory.
+            </summary>
+            <param name="path"></param>
+            <param name="siblingName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.FileUtil.SearchUp(System.String,System.String)">
+            <summary>
+            Searches fileName in directory first, then in all parent directories
+            </summary>
+            <param name="directory"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.FileUtil.BinFile(System.String)">
+            <summary>
+            Returns a file in the same directory as the assembly.
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.FileUtil.ForceDelete(System.String)">
+            <summary>
+            Deletes also write-protected files
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:Sidi.IO.FileUtil.ReplaceExtension(System.String,System.String)">
+            <summary>
+            Replaces the file extension of a path. 
+            </summary>
+            <param name="path"></param>
+            <param name="newExtension">New extension (without dot)</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.FileUtil.FilesAreEqual(System.String,System.String)">
+            <summary>
+            Compares two files bytewise
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Sidi.Collections.LruCache`2">
+            <summary>
+            Least Recently Used Cache.
+            </summary>
+            <typeparam name="Key"></typeparam>
+            <typeparam name="Value"></typeparam>
+        </member>
+        <member name="M:Sidi.Collections.LruCache`2.#ctor(System.Int32,Sidi.Collections.LruCache{`0,`1}.ProvideValue)">
             <summary>
             
             </summary>
-            <param name="s"></param>
-            <param name="destinationDir"></param>
-            <returns>The destination path of the file</returns>
+            <param name="maxCount">Maximal number of items the cache can hold.</param>
+            <param name="provideValue">Delegate to create a cache item if it is not in the cache.</param>
         </member>
-        <member name="M:Sidi.IO.Copy.CanSkipCopy(System.String,System.String)">
+        <member name="M:Sidi.Collections.LruCache`2.Update(`0,`1)">
             <summary>
-            Used by FastCopy to decide if a file must be copied or can be skipped
+            Updates a cache entry without changing the least-recently-used position.
             </summary>
-            <param name="source"></param>
-            <param name="dest"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Sidi.Collections.LruCache`2.ShrinkTo(System.Int32)">
+            <summary>
+            Removes cached items if there are more than newCount.
+            </summary>
+            <param name="newCount"></param>
+        </member>
+        <member name="P:Sidi.Collections.LruCache`2.Item(`0)">
+            <summary>
+            Indexer to get a cached item. 
+            </summary>
+            <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.Copy.DeleteAllFilesIn(System.String)">
+        <member name="T:Sidi.Collections.LruCache`2.ProvideValue">
             <summary>
-            Delete all files in directory dir. Does not recurse into sub directories.
+            Delegate to create a cache item if it is not in the cache.
             </summary>
-            <param name="dir"></param>
+            <param name="key"></param>
+            <returns>The newly created item.</returns>
         </member>
         <member name="T:Sidi.Forms.BROWSEINFO">
             <summary>Contains parameters for the SHBrowseForFolder function and receives information about the folder selected by the user.</summary>
@@ -375,9 +467,26 @@
             <summary>Gets or sets the type of items to browse for.</summary>
             <value>One of the BrowseForTypes values.</value>
         </member>
-        <member name="T:Sidi.Forms.MouseWheelSupport">
+        <member name="F:Sidi.Net.Abnf.Match.Types">
             <summary>
-            Mouse Wheel Support.
+            Used for Create
+            </summary>
+        </member>
+        <member name="P:Sidi.Net.Abnf.Match.Item(System.String)">
+            <summary>
+            Returns the first child rule with name
+            </summary>
+            <param name="name"></param>
+            <returns>null, if rule not present</returns>
+        </member>
+        <member name="T:Sidi.CommandLine.PersistentAttribute">
+            <summary>
+            Properties marked with this attribute will be stored in the registry
+            </summary>
+        </member>
+        <member name="T:Sidi.CommandLine.PasswordAttribute">
+            <summary>
+            Properties marked with this attribute will not be displayed to the user
             </summary>
         </member>
         <member name="F:Sidi.Forms.TextPrompt.components">
@@ -397,130 +506,135 @@
             the contents of this method with the code editor.
             </summary>
         </member>
-        <member name="T:Sidi.Util.StringEncrypt">
-            <summary>
-            encrypt and decrypt strings
-            </summary>
-        </member>
-        <member name="M:Sidi.Util.StringEncrypt.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
-            <summary>
-            Encrypts the string.
-            </summary>
-            <param name="clearText">The clear text.</param>
-            <param name="Key">The key.</param>
-            <param name="IV">The IV.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.StringEncrypt.Encrypt(System.String,System.String)">
-            <summary>
-            Encrypts the string.
-            </summary>
-            <param name="clearText">The clear text.</param>
-            <param name="Password">The password.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.StringEncrypt.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
-            <summary>
-            Decrypts the string.
-            </summary>
-            <param name="cipherData">The cipher data.</param>
-            <param name="Key">The key.</param>
-            <param name="IV">The IV.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.StringEncrypt.Decrypt(System.String,System.String)">
-            <summary>
-            Decrypts the string.
-            </summary>
-            <param name="cipherText">The cipher text.</param>
-            <param name="Password">The password.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.GraMath.CalcTransform(System.Drawing.Rectangle,System.Drawing.Rectangle)">
-            <summary>
-            Calculates the 2D transform to required convert rectangle src to rectangle dst
-            </summary>
-            <param name="src"></param>
-            <param name="dst"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.GraMath.Center(System.Drawing.Rectangle)">
-            <summary>
-            Returns the center point of the rectangle.
-            </summary>
-            <param name="r"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.GraMath.Area(System.Drawing.Size)">
-            <summary>
-            returns the area for a size.
-            </summary>
-            <param name="s"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.GraMath.Center(System.Drawing.Rectangle,System.Drawing.Rectangle)">
-            <summary>
-            Centers rectangle r in rectangle and returns it.
-            </summary>
-            <param name="r"></param>
-            <param name="at"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.PathEx.IsChild(System.String,System.String)">
-            <summary>
-            Returns true if path is inside of directory or its sub-directories
-            </summary>
-            <param name="path"></param>
-            <param name="directory"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.PathEx.CopyTo(System.IO.Stream,System.IO.Stream)">
-            <summary>
-            Copies to another stream
-            </summary>
-            <param name="source">Source stream</param>
-            <param name="dest">Destination stream</param>
-        </member>
-        <member name="T:Sidi.Collections.LruCache`2">
+        <member name="T:Sidi.Cache.LruCache`2">
             <summary>
             Least Recently Used Cache.
             </summary>
             <typeparam name="Key"></typeparam>
             <typeparam name="Value"></typeparam>
         </member>
-        <member name="M:Sidi.Collections.LruCache`2.#ctor(System.Int32,Sidi.Collections.LruCache{`0,`1}.ProvideValue)">
+        <member name="M:Sidi.Cache.LruCache`2.#ctor(System.Int32,System.Func{`0,`1})">
             <summary>
             
             </summary>
             <param name="maxCount">Maximal number of items the cache can hold.</param>
             <param name="provideValue">Delegate to create a cache item if it is not in the cache.</param>
         </member>
-        <member name="M:Sidi.Collections.LruCache`2.Update(`0,`1)">
+        <member name="M:Sidi.Cache.LruCache`2.Update(`0,`1)">
             <summary>
             Updates a cache entry without changing the least-recently-used position.
             </summary>
             <param name="key"></param>
             <param name="value"></param>
         </member>
-        <member name="M:Sidi.Collections.LruCache`2.ShrinkTo(System.Int32)">
+        <member name="M:Sidi.Cache.LruCache`2.ShrinkTo(System.Int32)">
             <summary>
             Removes cached items if there are more than newCount.
             </summary>
             <param name="newCount"></param>
         </member>
-        <member name="P:Sidi.Collections.LruCache`2.Item(`0)">
+        <member name="P:Sidi.Cache.LruCache`2.Item(`0)">
             <summary>
             Indexer to get a cached item. 
             </summary>
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="T:Sidi.Collections.LruCache`2.ProvideValue">
+        <member name="P:Sidi.Visualization.Tree`1.ChildSize">
             <summary>
-            Delegate to create a cache item if it is not in the cache.
+            calculates the sum of the sizes of all children
             </summary>
-            <param name="key"></param>
-            <returns>The newly created item.</returns>
+        </member>
+        <member name="M:Sidi.Persistence.Collection`1.Select(System.String)">
+            <summary>
+            Selects a subset of items from the collection
+            </summary>
+            <param name="query">Part of an SQL statement after the "where" keyword.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Persistence.Collection`1.Query(System.String)">
+            <summary>
+            Selects a subset of items from the collection.
+            </summary>
+            <param name="query">complete SQL select statement returning row ids</param>
+            <returns>List of found items</returns>
+        </member>
+        <member name="M:Sidi.Persistence.Collection`1.Flush">
+            <summary>
+            Flushes the internal cache
+            </summary>
+        </member>
+        <member name="M:Sidi.IO.Long.FileType.#ctor(System.String[])">
+            <summary>
+            Specify all extensions you want to match
+            </summary>
+            <param name="extensions">list of extensions without "."</param>
+        </member>
+        <member name="M:Sidi.IO.Long.FileEnum.AddRoot(Sidi.IO.Long.Path)">
+            <summary>
+            Adds a start root for Depth() and Breath(). Multiple start roots are supported.
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:Sidi.IO.Long.FileEnum.Depth">
+            <summary>
+            Recurses all start roots depth-first
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.Long.FileEnum.Breadth">
+            <summary>
+            Recurses all start roots breadth-first
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.Long.FileEnum.OnlyFiles(Sidi.IO.Long.FileSystemInfo)">
+            <summary>
+            Follows files only
+            </summary>
+            <param name="i"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.Long.FileEnum.NoDotNoHidden(Sidi.IO.Long.FileSystemInfo)">
+            <summary>
+            Only follows elements which do not start with . and are not hidden
+            </summary>
+            <param name="i"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Sidi.IO.Long.FileEnum.Output">
+            <summary>
+            Set this function to decide which files should be returned.
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Long.FileEnum.Follow">
+            <summary>
+            Set this function to decide which directories should be followed.
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Long.FileEnum.Visit">
+            <summary>
+            Set this function to see every file, not matter if output or not.
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Long.FileEnum.Count">
+            <summary>
+            Counts the visited files
+            </summary>
+        </member>
+        <member name="M:Sidi.IO.Long.Directory.FindFileRaw(Sidi.IO.Long.Path)">
+            <summary>
+            Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
+            </summary>
+            <param name="searchPath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.Long.Directory.FindFile(Sidi.IO.Long.Path)">
+            <summary>
+            Enumerates found files. Make sure that the Enumerator is closed properly to free the Find handle.
+            </summary>
+            <param name="searchPath">File search path complete with wildcards, e.g. C:\temp\*.doc</param>
+            <returns></returns>
         </member>
         <member name="M:Sidi.Collections.LruCacheBackground`2.Contains(`0)">
             <summary>
@@ -540,6 +654,35 @@
             Indexer to get a cached item. 
             </summary>
             <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.StringEx.ToString(System.Action{System.IO.TextWriter})">
+            <summary>
+            Converts a action that writes to a TextWriter to a string
+            </summary>
+            <param name="generator">Function that writes something to a TextWriter</param>
+            <returns>Output string</returns>
+        </member>
+        <member name="M:Sidi.Util.StringEx.F(System.String,System.Object[])">
+            <summary>
+            A shorter way to write String.Format
+            </summary>
+            <param name="formatString"></param>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.StringEx.Printable(System.String)">
+            <summary>
+            Replace the annoying "beep" unicode character
+            </summary>
+            <param name="text"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.Util.StringEx.SafeToString(System.Object)">
+            <summary>
+            Converts to a string, even if ToString() raises an exception or x is null.
+            </summary>
+            <param name="x"></param>
             <returns></returns>
         </member>
         <member name="T:Sidi.CommandLine.TypeEx">
@@ -647,152 +790,27 @@
             All options
             </summary>
         </member>
-        <member name="M:Sidi.IO.FileUtil.Sibling(System.String,System.String)">
+        <member name="M:Sidi.IO.Copy.CopyToDir(System.String,System.String)">
             <summary>
-            Constructs the path for a sibling of a file, i.e. of a file in the same directory.
+            
             </summary>
-            <param name="path"></param>
-            <param name="siblingName"></param>
+            <param name="s"></param>
+            <param name="destinationDir"></param>
+            <returns>The destination path of the file</returns>
+        </member>
+        <member name="M:Sidi.IO.Copy.CanSkipCopy(System.String,System.String)">
+            <summary>
+            Used by FastCopy to decide if a file must be copied or can be skipped
+            </summary>
+            <param name="source"></param>
+            <param name="dest"></param>
             <returns></returns>
         </member>
-        <member name="M:Sidi.IO.FileUtil.SearchUp(System.String,System.String)">
+        <member name="M:Sidi.IO.Copy.DeleteAllFilesIn(System.String)">
             <summary>
-            Searches fileName in directory first, then in all parent directories
+            Delete all files in directory dir. Does not recurse into sub directories.
             </summary>
-            <param name="directory"></param>
-            <param name="fileName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.FileUtil.BinFile(System.String)">
-            <summary>
-            Returns a file in the same directory as the assembly.
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.FileUtil.ForceDelete(System.String)">
-            <summary>
-            Deletes also write-protected files
-            </summary>
-            <param name="path"></param>
-        </member>
-        <member name="M:Sidi.IO.FileUtil.ReplaceExtension(System.String,System.String)">
-            <summary>
-            Replaces the file extension of a path. 
-            </summary>
-            <param name="path"></param>
-            <param name="newExtension">New extension (without dot)</param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.IO.FileUtil.FilesAreEqual(System.String,System.String)">
-            <summary>
-            Compares two files bytewise
-            </summary>
-            <param name="a"></param>
-            <param name="b"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Persistence.Collection`1.Select(System.String)">
-            <summary>
-            Selects a subset of items from the collection
-            </summary>
-            <param name="query">Part of an SQL statement after the "where" keyword.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Persistence.Collection`1.Query(System.String)">
-            <summary>
-            Selects a subset of items from the collection.
-            </summary>
-            <param name="query">complete SQL select statement returning row ids</param>
-            <returns>List of found items</returns>
-        </member>
-        <member name="M:Sidi.Persistence.Collection`1.Flush">
-            <summary>
-            Flushes the internal cache
-            </summary>
-        </member>
-        <member name="T:Sidi.Net.Pop3.Server">
-            <summary>
-            Implements a POP3 server as specified in http://tools.ietf.org/html/rfc1939
-            </summary>
-        </member>
-        <member name="M:Sidi.Util.StringEx.ToString(System.Action{System.IO.TextWriter})">
-            <summary>
-            Converts a action that writes to a TextWriter to a string
-            </summary>
-            <param name="generator">Function that writes something to a TextWriter</param>
-            <returns>Output string</returns>
-        </member>
-        <member name="M:Sidi.Util.StringEx.F(System.String,System.Object[])">
-            <summary>
-            A shorter way to write String.Format
-            </summary>
-            <param name="formatString"></param>
-            <param name="args"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.StringEx.Printable(System.String)">
-            <summary>
-            Replace the annoying "beep" unicode character
-            </summary>
-            <param name="text"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Sidi.Util.StringEx.SafeToString(System.Object)">
-            <summary>
-            Converts to a string, even if ToString() raises an exception or x is null.
-            </summary>
-            <param name="x"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Sidi.Util.Tokenizer">
-            <summary>
-            Simple text tokenizer. Separates strings at whitespace. Understands # comments, and quoted strings.
-            </summary>
-        </member>
-        <member name="M:Sidi.Util.UnixTime.#ctor">
-            <summary>
-            Private constructor to prevent the class from being instantiated.
-            </summary>
-        </member>
-        <member name="F:Sidi.Util.UpdateForm.components">
-            <summary>
-            Required designer variable.
-            </summary>
-        </member>
-        <member name="M:Sidi.Util.UpdateForm.Dispose(System.Boolean)">
-            <summary>
-            Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        </member>
-        <member name="M:Sidi.Util.UpdateForm.InitializeComponent">
-            <summary>
-            Required method for Designer support - do not modify
-            the contents of this method with the code editor.
-            </summary>
-        </member>
-        <member name="T:Sidi.Visualization.ColorMap">
-            <summary>
-            Interpolates a scalar to a color
-            </summary>
-        </member>
-        <member name="P:Sidi.Visualization.Tree`1.ChildSize">
-            <summary>
-            calculates the sum of the sizes of all children
-            </summary>
-        </member>
-        <member name="T:Sidi.Visualization.TreeMapLayout">
-            <summary>
-            http://www.win.tue.nl/~vanwijk/ctm.pdf
-            </summary>
-        </member>
-        <member name="M:Sidi.Visualization.TreeMapControl`1.Track(System.Windows.Forms.PaintEventArgs,Sidi.Visualization.Tree{Sidi.Visualization.TreeMapLayout.Layout})">
-            <summary>
-            Outlines specified layout item and all its parents
-            </summary>
-            <param name="e"></param>
-            <param name="tree"></param>
+            <param name="dir"></param>
         </member>
     </members>
 </doc>

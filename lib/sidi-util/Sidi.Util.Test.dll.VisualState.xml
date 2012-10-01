@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
-  <TopNode>[0-1169]C:\build\sidi-util_Release\Sidi.Util.Test.dll</TopNode>
-  <SelectedNode>[0-1169]C:\build\sidi-util_Release\Sidi.Util.Test.dll</SelectedNode>
+  <TopNode>[0-1218]C:\build\sidi-util_Debug\Sidi.Util.Test.dll</TopNode>
+  <SelectedNode>[0-1200]Sidi.IO.Long.EnumTest.FileType</SelectedNode>
   <ExcludeCategories>false</ExcludeCategories>
   <Nodes>
-    <Node UniqueName="[0-1169]C:\build\sidi-util_Release\Sidi.Util.Test.dll" Expanded="true" />
-    <Node UniqueName="[0-1170]Sidi" Expanded="true" />
-    <Node UniqueName="[0-1172]Sidi.Cache" Expanded="true" />
-    <Node UniqueName="[0-1173]Sidi.CommandLine" Expanded="true" />
-    <Node UniqueName="[0-1174]Sidi.CommandLine.Test" Expanded="true" />
-    <Node UniqueName="[0-1175]Sidi.Extensions" Expanded="true" />
-    <Node UniqueName="[0-1176]Sidi.Forms" Expanded="true" />
-    <Node UniqueName="[0-1177]Sidi.IMAP" Expanded="true" />
-    <Node UniqueName="[0-1178]Sidi.IO" Expanded="true" />
-    <Node UniqueName="[0-1179]Sidi.IO.Long" Expanded="true" />
-    <Node UniqueName="[0-1180]Sidi.Net" Expanded="true" />
-    <Node UniqueName="[0-1122]Sidi.Persistence.CollectionTest" Expanded="true" />
-    <Node UniqueName="[0-1182]Sidi.Visualization" Expanded="true" />
+    <Node UniqueName="[0-1218]C:\build\sidi-util_Debug\Sidi.Util.Test.dll" Expanded="true" />
+    <Node UniqueName="[0-1219]Sidi" Expanded="true" />
+    <Node UniqueName="[0-1233]Sidi.Cache" Expanded="true" />
+    <Node UniqueName="[0-1232]Sidi.Collections" Expanded="true" />
+    <Node UniqueName="[0-1225]Sidi.CommandLine" Expanded="true" />
+    <Node UniqueName="[0-1226]Sidi.CommandLine.Test" Expanded="true" />
+    <Node UniqueName="[0-1222]Sidi.Extensions" Expanded="true" />
+    <Node UniqueName="[0-1229]Sidi.Forms" Expanded="true" />
+    <Node UniqueName="[0-1228]Sidi.IMAP" Expanded="true" />
+    <Node UniqueName="[0-1220]Sidi.IO" Expanded="true" />
+    <Node UniqueName="[0-1221]Sidi.IO.Long" Expanded="true" />
+    <Node UniqueName="[0-1120]Sidi.IO.Long.DirectoryTest" Expanded="true" />
+    <Node UniqueName="[0-1196]Sidi.IO.Long.EnumTest" Expanded="true" />
+    <Node UniqueName="[0-1159]Sidi.IO.Long.FileSystemInfoTest" Expanded="true" />
+    <Node UniqueName="[0-1223]Sidi.Net" Expanded="true" />
+    <Node UniqueName="[0-1231]Sidi.Persistence" Expanded="true" />
+    <Node UniqueName="[0-1227]Sidi.Tool" Expanded="true" />
+    <Node UniqueName="[0-1224]Sidi.Util" Expanded="true" />
+    <Node UniqueName="[0-1230]Sidi.Visualization" Expanded="true" />
   </Nodes>
 </VisualState>
