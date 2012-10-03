@@ -13,8 +13,7 @@ namespace Sidi.Net
     {
         public HtmlGenerator()
         {
-            ErrorMessage = e => 
-            html(head(), body(Verbose(o => o.WriteLine(e.ToString()))));
+            Catch = e => { throw e; };
         }
 
         public Action<TextWriter> Tag(string tag, params object[] childs)
@@ -92,7 +91,7 @@ namespace Sidi.Net
             }
             catch (Exception e)
             {
-                ErrorMessage(e)(o);
+                Catch(e)(o);
             }
         }
 
@@ -101,7 +100,7 @@ namespace Sidi.Net
             return e.Select(r => tr(format.Select(c => td(c(r)))));
         }
 
-        public Func<Exception, Action<TextWriter>> ErrorMessage;
+        public Func<Exception, Action<TextWriter>> Catch;
 
         public Action<TextWriter> html(params object[] childs)
         {

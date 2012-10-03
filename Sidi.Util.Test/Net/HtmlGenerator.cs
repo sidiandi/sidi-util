@@ -30,13 +30,24 @@ namespace Sidi.Net
             page(Console.Out);
         }
 
-        [Test]
+        [Test, ExpectedException(typeof(NullReferenceException))]
         public void ExceptionHandling()
         {
             string name = null;
             var o = new StringWriter();
-            this.Write(o, () => html(head(), body(name.Length)));
-            Assert.IsTrue(o.ToString().Contains(typeof(NullReferenceException).Name));
+            html(head(), body(name.Length))(o);
+        }
+
+        [Test]
+        public void CatchException()
+        {
+            this.Catch = e => div(e);
+            string name = null;
+            var o = new StringWriter();
+            html(head(), body(new Action<TextWriter>(tw => div(name.Length)(tw))))
+                (o);
+
+            Assert.IsTrue(o.ToString().Contains("NullReferenceException"));
         }
 
         [Test]
