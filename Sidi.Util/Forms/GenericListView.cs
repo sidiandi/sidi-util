@@ -10,7 +10,7 @@ namespace Sidi.Forms
 {
     public class GenericListView : System.Windows.Forms.ListView
     {
-        public System.Collections.IList Items
+        public new System.Collections.IList Items
         {
             get { return items; }
             set { items = value; UpdateDisplay(); }

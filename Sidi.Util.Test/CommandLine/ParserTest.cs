@@ -650,7 +650,7 @@ namespace Sidi.CommandLine.Test
         class MyApp
         {
             [SubCommand]
-            public MySubCommand Sub;
+            public MySubCommand Sub = null;
         }
 
         [Test]
