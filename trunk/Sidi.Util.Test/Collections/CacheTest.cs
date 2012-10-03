@@ -59,7 +59,7 @@ namespace Sidi.Collections
             }
             catch (Exception e)
             {
-                Assert.AreEqual(typeof(System.DivideByZeroException), e.GetType());
+                Assert.IsTrue(e is System.DivideByZeroException);
             }
         }
     }

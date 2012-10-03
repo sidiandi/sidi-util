@@ -126,9 +126,11 @@ namespace Sidi.IMAP
             get
             {
                 var rootLength = directory.NoPrefix.Length;
-                var e = new Sidi.IO.Long.FileEnum();
-                e.AddRoot(directory);
-                e.Output = x => x.IsDirectory;
+                var e = new Sidi.IO.Long.FileEnum()
+                {
+                    Root = directory,
+                    Output = x => x.IsDirectory,
+                };
                 return e.Depth()
                     .Select(x => x.FullName.NoPrefix.Substring(rootLength).Replace(@"\", Delimiter))
                     .Where(x => !String.IsNullOrEmpty(x))

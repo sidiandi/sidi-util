@@ -7,7 +7,6 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Sidi.Util;
-using Sidi.Util;
 using Sidi.Extensions;
 using System.Globalization;
 
@@ -605,7 +604,7 @@ namespace Sidi.IMAP
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
                 log.WarnFormat("connection {0} terminated with exception", connection.Client.RemoteEndPoint);
             }

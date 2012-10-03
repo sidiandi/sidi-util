@@ -13,9 +13,12 @@ namespace Sidi.Collections
 {
     public class Cache
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public Cache(string storeDirectory)
         {
-            this.storeDirectory = storeDirectory.Long();
+            this.storeDirectory = storeDirectory;
+            this.MaxAge = TimeSpan.MaxValue;
         }
 
         Path storeDirectory;
@@ -61,8 +64,9 @@ namespace Sidi.Collections
         public T GetCached<T>(object key, Func<T> provider, Func<Path, object> reader, Action<Path, object> writer)
         {
             var p = CachePath(key);
-            if (p.Exists)
+            if (p.Exists && (DateTime.UtcNow - p.Info.LastWriteTimeUtc) < MaxAge)
             {
+                log.InfoFormat("Cache hit: {0} = {1}", key, p);
                 var cachedValue = reader(p);
                 if (cachedValue is Exception)
                 {
@@ -117,10 +121,13 @@ namespace Sidi.Collections
             }
         }
 
-        static Cache s_Local;
         public static Cache Local(object id)
         {
             return new Cache(typeof(Cache).UserSetting("cache").CatDir(Digest(id)));
         }
+
+        public TimeSpan MaxAge { set; get; }
+
+
     }
 }

@@ -63,8 +63,9 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\lib\log4net\bin\net\2.0\debug\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SharpDom">
@@ -72,8 +73,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>..\lib\SQLite.NET\bin\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.80.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Data.SQLite.1.0.80.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.1.0.80.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -267,6 +272,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Sidi.Util.snk" />
   </ItemGroup>
   <ItemGroup>

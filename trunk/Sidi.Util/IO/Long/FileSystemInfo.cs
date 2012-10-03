@@ -8,33 +8,26 @@ namespace Sidi.IO.Long
 {
     public class FileSystemInfo : IEquatable<FileSystemInfo>
     {
-        public Path FullName
-        {
-            get
-            {
-                if (parentDirectory == null)
-                {
-                    return new Path(Name);
-                }
-                else
-                {
-                    return parentDirectory.CatDir(Name);
-                }
-            }
-        }
-
         public FileSystemInfo(Path path)
         {
-            path = path.GetFullPath();
-            parentDirectory = path.ParentDirectory;
-            _findData.Name = path.Name;
-            _findDataValid = false;
+            this.path = path.GetFullPath();
+            _findDataValid = this.path.GetFindData(out _findData);
         }
+
+        public Path FullName
+        {
+            get { return path; }
+        }
+        
+        Path path;
+        FindData _findData;
+        bool _findDataValid = false;
 
         internal FileSystemInfo(Path directory, FindData findData)
         {
             _findData = findData;
-            parentDirectory = directory;
+            _findDataValid = true;
+            path = directory.CatDir(findData.Name).GetFullPath();
         }
 
         public System.IO.FileAttributes Attributes
@@ -105,7 +98,7 @@ namespace Sidi.IO.Long
 
         public IList<FileSystemInfo> GetFileSystemInfos()
         {
-            return Directory.GetChilds(FullName);
+            return Directory.GetChilds(path);
         }
 
         public IList<FileSystemInfo> GetDirectories()
@@ -152,8 +145,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                FindData fd;
-                return FullName.GetFindData(out fd);
+                return _findDataValid;
             }
         }
 
@@ -217,7 +209,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return _findData.Name;
+                return FindData.Name;
             }
         }
 
@@ -225,7 +217,7 @@ namespace Sidi.IO.Long
         {
             get
             {
-                return System.IO.Path.GetFileNameWithoutExtension(_findData.Name);
+                return System.IO.Path.GetFileNameWithoutExtension(FindData.Name);
             }
         }
 
@@ -234,27 +226,13 @@ namespace Sidi.IO.Long
             FullName.EnsureNotExists();
         }
 
-        public void Refresh()
-        {
-            _findData = FullName.FindData;
-            _findDataValid = true;
-        }
-
         FindData FindData
         {
             get
             {
-                if (!_findDataValid)
-                {
-                    Refresh();
-                }
                 return _findData;
             }
         }
-        FindData _findData;
-        bool _findDataValid = false;
-
-        Path parentDirectory;
 
         public override string ToString()
         {

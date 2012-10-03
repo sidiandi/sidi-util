@@ -41,9 +41,12 @@ namespace Sidi.IO.Long
 
         public void CopyRooted(Path source, Path sourceRoot, Path destinationRoot)
         {
-            var e = new FileEnum();
-            e.AddRoot(source);
-            e.Output = FileEnum.OnlyFiles;
+            var e = new FileEnum()
+            {
+                Root = source,
+                Output = FileEnum.OnlyFiles,
+            };
+
             foreach (var s in e.Depth())
             {
                 var d = destinationRoot.CatDir(s.FullName.RelativeTo(sourceRoot));
