@@ -538,7 +538,7 @@ namespace Sidi.Persistence
         class IndexedData
         {
             [RowId]
-            public long oid;
+            public long oid = 0;
 
             [Data]
             public string A;
