@@ -58,6 +58,8 @@ namespace Sidi
             return new Sidi.IO.Long.Path(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath)
                 .ParentDirectory
                 .ParentDirectory
+                .ParentDirectory
+                .ParentDirectory
                 .CatDir("sidi-util_test", relPath)
                 .NoPrefix;
         }
