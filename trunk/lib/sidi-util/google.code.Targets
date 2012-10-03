@@ -13,8 +13,11 @@
     <SvnBin>$(RootDir)\lib\SlikSvn\bin</SvnBin>
     <NUnitBin>$(RootDir)\lib\NUnit\bin\net-2.0</NUnitBin>
 	<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
-    <OutputDir>$(RootDir)\..\..\build\$(ProjectName)_Release</OutputDir>
-    <PackageDir>$(RootDir)\..\..\build\$(ProjectName)_pack</PackageDir>
+    <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
+    <OutputDir>$(OutputRoot)\Release</OutputDir>
+    <TestDir>$(OutputRoot)\test</TestDir>
+    <PackageDir>$(OutputRoot)\pack</PackageDir>
+    <PublishDir>$(OutputRoot)\publish</PublishDir>
     <DocDir>$(RootDir)\doc</DocDir>
     <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
     <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
@@ -77,7 +80,7 @@
 
 <Target Name="UnitTest" DependsOnTargets="Build">
 	<Exec Command="$(NUnitConsole) /labels @(Targets, ' ')" />
-	<RemoveDir Directories="$(OutputDir)\unit-test" />
+	<RemoveDir Directories="$(TestDir)" />
 </Target>
 
   <Target Name="Documentation" DependsOnTargets="Build">
@@ -105,4 +108,11 @@
 
   <Target Name="Release" DependsOnTargets="Upload" />
 
+  <Target Name="Nuget" DependsOnTargets="Build" >
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\$(ProjectName).nuspec" DestinationFolder="$(PackageDir)" />
+    <Copy SourceFiles="@(Targets)" DestinationFolder="$(PackageDir)\lib\net40" />
+	
+	<Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
+  </Target>
+  
 </Project>

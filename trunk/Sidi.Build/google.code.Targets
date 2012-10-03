@@ -13,7 +13,7 @@
     <SvnBin>$(RootDir)\lib\SlikSvn\bin</SvnBin>
     <NUnitBin>$(RootDir)\lib\NUnit\bin\net-2.0</NUnitBin>
 	<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
-    <OutputDir>$(RootDir)\..\..\build\$(ProjectName)_Release</OutputDir>
+    <OutputDir>$(RootDir)\..\..\build\$(ProjectName)_Release\lib</OutputDir>
     <PackageDir>$(RootDir)\..\..\build\$(ProjectName)_pack</PackageDir>
     <DocDir>$(RootDir)\doc</DocDir>
     <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
@@ -94,6 +94,10 @@
         ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
   </Target>
 
+  <Target Name="PackNuPkg" DependsOnTargets="Build">
+	
+  </Target>
+  
   <Target Name="Upload" DependsOnTargets="Package">
     <GoogleCode.Upload
         ProjectName="$(ProjectName)"
