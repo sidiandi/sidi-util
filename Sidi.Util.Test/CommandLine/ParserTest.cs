@@ -307,8 +307,11 @@ namespace Sidi.CommandLine.Test
             [Usage("Directory list")]
             public void Files(string dir)
             {
-                var e = new Sidi.IO.Long.FileEnum();
-                e.AddRoot(new Sidi.IO.Long.Path(dir));
+                var e = new Sidi.IO.Long.FileEnum()
+                {
+                    Root = new Sidi.IO.Long.Path(dir)
+                };
+
                 foreach (var f in e.Depth())
                 {
                     Console.WriteLine(f.FullName.NoPrefix);

@@ -716,6 +716,11 @@ namespace Sidi.Net
                 return r != null && r.Text == Text && r.Begin == Begin && r.End == End;
             }
 
+            public override int GetHashCode()
+            {
+                return ToString().GetHashCode();
+            }
+
             public char FirstChar
             {
                 get

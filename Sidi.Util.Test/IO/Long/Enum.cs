@@ -18,8 +18,11 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Depth()
             {
-                var e = new FileEnum();
-                e.AddRoot(TestTree);
+                var e = new FileEnum()
+                {
+                    Root = TestTree,
+                };
+
                 foreach (var i in e.Depth())
                 {
                     log.Info(i);
@@ -29,8 +32,11 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Breadth()
             {
-                var e = new FileEnum();
-                e.AddRoot(TestTree);
+                var e = new FileEnum()
+                {
+                    Root = TestTree
+                };
+
                 var d = e.Depth();
                 var b = e.Depth();
                 Assert.IsFalse(d.Except(b).Any());
@@ -41,23 +47,48 @@ namespace Sidi.IO.Long
             [Test]
             public void Output()
             {
-                var e = new FileEnum();
-                e.Output = FileEnum.OnlyFiles;
-                e.AddRoot(TestTree);
+                var e = new FileEnum()
+                {
+                    Output = FileEnum.OnlyFiles,
+                    Root = TestTree
+                };
                 var files = e.Depth().ToList();
                 Assert.IsTrue(files.Any());
                 Assert.IsTrue(files.All(x => !x.IsDirectory));
             }
 
             [Test]
+            public void NotExists()
+            {
+                var files = FileEnum.AllFiles(new Path(@"C:\does_not_exist_4352345234234")).ToList();
+                Assert.AreEqual(0, files.Count);
+            }
+
+            [Test]
+            public void Dump()
+            {
+                var e = new FileEnum()
+                {
+                    Root = TestFile("."),
+                };
+
+                foreach (var i in e.Depth())
+                {
+                    log.Info(i.Name);
+                }
+            }
+
+            [Test]
             public void FileType()
             {
-                var e = new FileEnum();
                 var fileType = new FileType("exe");
-                e.Output = x => FileEnum.OnlyFiles(x) && fileType.Is(x.Name);
-                e.Follow = x => FileEnum.NoDotNoHidden(x) && x.Name != "test";
-
-                e.AddRoot(TestTree);
+                var e = new FileEnum()
+                {
+                    Output = x => FileEnum.OnlyFiles(x) && fileType.Is(x.Name),
+                    Follow = x => FileEnum.NoDotNoHidden(x) && x.Name != "test",
+                    Root = TestTree
+                };
+                
                 var files = e.Depth().ToList();
                 Assert.IsTrue(files.Any());
                 Assert.IsTrue(files.All(x => x.Extension == ".exe"));
@@ -66,9 +97,12 @@ namespace Sidi.IO.Long
             [Test]
             public void Unique()
             {
-                var e = new FileEnum();
-                e.Output = FileEnum.OnlyFiles;
-                e.AddRoot(TestTree);
+                var e = new FileEnum()
+                {
+                    Output = FileEnum.OnlyFiles,
+                    Root = TestTree,
+                };
+
                 var maybeIdentical = e.Depth()
                     .GroupBy(x => x.Length)
                     .Where(x => x.Count() >= 2)

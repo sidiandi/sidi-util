@@ -71,8 +71,6 @@ namespace Sidi.Extensions
             list.PrintTable(o, i => i.Key, i => i.Value());
         }
 
-        static int MaxColumnWidth = 40;
-
         public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e)
         {
             return new ListFormat<T>(e);

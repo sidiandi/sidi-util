@@ -29,7 +29,7 @@ namespace Sidi.IO.Long
         [Usage("Include a path")]
         public void Include(string p)
         {
-            Enumerator.AddRoot(p.Long());
+            Enumerator.Roots.Add(p);
         }
 
         [Usage("Exclude a file name pattern")]

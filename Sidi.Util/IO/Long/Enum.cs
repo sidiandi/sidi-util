@@ -21,9 +21,9 @@ namespace Sidi.IO.Long
 
         HashSet<string> e;
 
-        public bool Is(string fileName)
+        public bool Is(Path fileName)
         {
-            return e.Contains(new Path(fileName).Extension.ToLower());
+            return e.Contains(fileName.Extension.ToLower());
         }
     }
 
@@ -40,9 +40,11 @@ namespace Sidi.IO.Long
 
         public static IEnumerable<FileSystemInfo> AllFiles(Path root)
         {
-            var e = new FileEnum();
-            e.AddRoot(root);
-            e.Output = FileEnum.OnlyFiles;
+            var e = new FileEnum()
+            {
+                Root = root,
+                Output = FileEnum.OnlyFiles,
+            };
             return e.Depth();
         }
         
@@ -66,16 +68,20 @@ namespace Sidi.IO.Long
         /// </summary>
         public int Count { private set; get; }
         
-        List<FileSystemInfo> root = new List<FileSystemInfo>();
+        /// <summary>
+        /// List of start paths for Depth() and Breath(). Multiple start roots are supported.
+        /// </summary>
+        public IList<Path> Roots = new List<Path>();
 
         /// <summary>
-        /// Adds a start root for Depth() and Breath(). Multiple start roots are supported.
+        /// Sets a single root path. Roots will then have exactly one element.
         /// </summary>
-        /// <param name="path"></param>
-        public void AddRoot(Path path)
+        public Path Root
         {
-            var startItem = new FileSystemInfo(path);
-            root.Add(startItem);
+            set
+            {
+                Roots = new List<Path>() { value };
+            }
         }
 
         /// <summary>
@@ -85,7 +91,7 @@ namespace Sidi.IO.Long
         public IEnumerable<FileSystemInfo> Depth()
         {
             Count = 0;
-            var stack = new List<FileSystemInfo>(root);
+            var stack = new List<FileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
 
             for (; stack.Count > 0; )
             {
@@ -113,7 +119,7 @@ namespace Sidi.IO.Long
         public IEnumerable<FileSystemInfo> Breadth()
         {
             Count = 0;
-            var stack = new List<FileSystemInfo>(root);
+            var stack = new List<FileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
 
             for (; stack.Count > 0; )
             {

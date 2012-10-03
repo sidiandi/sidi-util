@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Sidi.Util;
 
 namespace Sidi.IO.Long
 {
@@ -34,6 +35,11 @@ namespace Sidi.IO.Long
             }
 
             return new FileList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.Long.Path(x)));
+        }
+
+        public override string ToString()
+        {
+            return this.Join(";");
         }
     }
 }

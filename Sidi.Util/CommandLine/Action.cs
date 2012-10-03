@@ -119,7 +119,7 @@ namespace Sidi.CommandLine
                     return r;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 throw new InvalidParameterException(parameter);
             }
