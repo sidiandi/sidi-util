@@ -122,15 +122,5 @@ namespace Sidi.IO.Long
 
                 log.Info(sc);
             }
-
-            [Test]
-            public void Network()
-            {
-                var r = new Path(@"\\cala\video");
-                Assert.IsTrue(r.Exists);
-
-                r = new Path(@"\\cala\video_");
-                Assert.IsFalse(r.Exists);
-            }
         }
 }
