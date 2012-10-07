@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Sidi.Util;
+using Sidi.Extensions;
 
 namespace Sidi.IMAP
 {

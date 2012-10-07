@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Excel = Microsoft.Office.Interop.Excel;
+using Sidi.Extensions;
 
 namespace Sidi.Util
 {

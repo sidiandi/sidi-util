@@ -7,6 +7,7 @@ using System.IO;
 using NUnit.Framework;
 using Sidi.CommandLine;
 using Sidi.IO.Long.Extensions;
+using Sidi.Extensions;
 
 namespace Sidi.IO.Long
 {
@@ -42,7 +43,7 @@ namespace Sidi.IO.Long
                 Assert.IsFalse(d.Except(b).Any());
             }
 
-            Path TestTree = Sidi.IO.FileUtil.BinFile(".").Long();
+            Path TestTree = Sidi.IO.FileUtil.BinFile(".");
 
             [Test]
             public void Output()
@@ -120,6 +121,16 @@ namespace Sidi.IO.Long
                 }
 
                 log.Info(sc);
+            }
+
+            [Test]
+            public void Network()
+            {
+                var r = new Path(@"\\cala\video");
+                Assert.IsTrue(r.Exists);
+
+                r = new Path(@"\\cala\video_");
+                Assert.IsFalse(r.Exists);
             }
         }
 }

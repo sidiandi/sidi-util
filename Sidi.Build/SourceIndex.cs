@@ -91,7 +91,7 @@ namespace Sidi.Build
 
             foreach (var i in Modules)
             {
-                string pdbFile = i.ItemSpec.ReplaceExtension("pdb");
+                var pdbFile = new Sidi.IO.Long.Path(i.ItemSpec).ReplaceExtension("pdb");
                 AddSourceIndex(pdbFile);
             }
             return true;

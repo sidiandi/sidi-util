@@ -16,6 +16,7 @@ using System.Web;
 using System.Web.UI;
 using Sidi.IO;
 using Sidi.Net;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine
 {

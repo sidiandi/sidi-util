@@ -26,6 +26,8 @@ using System.IO;
 using System.Linq;
 using Sidi.Util;
 using System.Linq.Expressions;
+using System.Threading;
+using Sidi.Extensions;
 
 namespace Sidi.Persistence
 {
@@ -80,14 +82,25 @@ namespace Sidi.Persistence
         }
     }
     
-    public class Collection<T> : ICollection<T>, IDisposable where T : new()
+    public class CollectionBase
+    {
+        protected SharedConnection connection;
+
+        public SharedConnection SharedConnection
+        {
+            get
+            {
+                return connection;
+            }
+        }
+    }
+    
+    public class Collection<T> : CollectionBase, ICollection<T>, IDisposable where T : new()
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         string path;
         string table;
-        SQLiteConnection ownConnection;
-        SQLiteConnection connection;
         SQLiteCommand insert;
         SQLiteCommand select;
         SQLiteCommand getDataByRowId;
@@ -101,24 +114,14 @@ namespace Sidi.Persistence
 
         Sidi.Collections.LruCache<long, T> cache;
 
-        public DbConnection Connection
+        public SQLiteConnection Connection
         {
-            get { return connection; }
+            get { return connection.Connection; }
         }
 
         public string Table
         {
             get { return table; }
-        }
-
-        public void Close()
-        {
-            if (ownConnection != null)
-            {
-                ownConnection.Close();
-                ownConnection = null;
-            }
-            connection = null;
         }
 
         bool IsRowId(MemberInfo f)
@@ -161,26 +164,25 @@ namespace Sidi.Persistence
             Init(a_path, a_table);
         }
 
-        public Collection(DbConnection connection)
+        public Collection(SharedConnection connection)
         {
-            Init((SQLiteConnection) connection, typeof(T).Name);
+            Init(connection, typeof(T).Name);
         }
 
-        public Collection(DbConnection connection, string a_table)
+        public Collection(SharedConnection connection, string a_table)
         {
-            Init((SQLiteConnection) connection, a_table);
+            Init(connection, a_table);
         }
 
-        public void SetParameters(DbCommand dbCommand, T parameters)
+        public void SetParameters(SQLiteCommand command, T parameters)
         {
-            SQLiteCommand command = (SQLiteCommand)dbCommand;
             SetFieldParams(command, parameters);
             SetRowIdParam(command, GetRowId(parameters));
         }
 
         public SQLiteCommand CreateCommand(string sql)
         {
-            var command = connection.CreateCommand();
+            var command = Connection.CreateCommand();
             AddFieldParams(command);
             AddRowIdParam(command);
             sql = sql.Replace("@table", table);
@@ -190,7 +192,7 @@ namespace Sidi.Persistence
 
         public SQLiteCommand CreateCommand(string sql, params object[] parameters)
         {
-            var command = connection.CreateCommand();
+            var command = Connection.CreateCommand();
             for (int i = 0; i < parameters.Length; ++i)
             {
                 var p = command.CreateParameter();
@@ -218,15 +220,18 @@ namespace Sidi.Persistence
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
             }
-            SQLiteConnection connection = new SQLiteConnection(b.ToString());
-            ownConnection = connection;
-            connection.Open();
-            Init(connection, a_table);
+
+            var c = new SQLiteConnection(b.ToString());
+            c.Open();
+            using (var sc = new SharedConnection(c))
+            {
+                Init(sc, a_table);
+            }
         }
 
-        void Init(SQLiteConnection a_connection, string a_table)
+        void Init(SharedConnection connection, string a_table)
         {
-            connection = a_connection;
+            this.connection = new SharedConnection(connection);
 
             rowIdMember = typeof(T).GetMembers().FirstOrDefault(x => IsRowId(x));
             if (rowIdMember == null)
@@ -257,7 +262,7 @@ namespace Sidi.Persistence
                 t.Commit();
             }
 
-            insert = connection.CreateCommand();
+            this.insert = Connection.CreateCommand();
             insert.CommandText = String.Format("insert or replace into {0} ({1}) values({2})",
                 table,
                 Members.Select(x => x.Name).Join(", "),
@@ -265,24 +270,24 @@ namespace Sidi.Persistence
                 );
             AddFieldParams(insert);
 
-            select = connection.CreateCommand();
+            this.select = Connection.CreateCommand();
             select.CommandText = String.Format("select {0} from {1} where @query", rowIdColumn, table);
             select.Parameters.Add(new SQLiteParameter("query"));
 
-            containsQuery = connection.CreateCommand();
+            this.containsQuery = Connection.CreateCommand();
             containsQuery.CommandText = String.Format("select {0} from {1} where {2}",
                 rowIdColumn, table,
                 String.Join(" AND ", Members.Select(x => String.Format("{0} = @{0}", x.Name)).ToArray())
                 );
             AddFieldParams(containsQuery);
 
-            getDataByRowId = connection.CreateCommand();
+            this.getDataByRowId = Connection.CreateCommand();
             getDataByRowId.CommandText =
                 String.Format("select {0} from {1} where {2} = @{2}",
                 SelectFieldList, table, rowIdColumn);
             AddRowIdParam(getDataByRowId);
 
-            updateDataByRowId = connection.CreateCommand();
+            this.updateDataByRowId = Connection.CreateCommand();
             updateDataByRowId.CommandText = String.Format(
                 "update {0} set {1} where {2} = @{2}",
                 table,
@@ -291,7 +296,7 @@ namespace Sidi.Persistence
             AddFieldParams(updateDataByRowId);
             AddRowIdParam(updateDataByRowId);
 
-            deleteByRowId = connection.CreateCommand();
+            this.deleteByRowId = Connection.CreateCommand();
             deleteByRowId.CommandText = String.Format(
                 "delete from {0} where {1} = @{1}",
                 table,
@@ -307,9 +312,11 @@ namespace Sidi.Persistence
         void CreateTable()
         {
             string sql = String.Format("create table {0} ({1})", table, FieldDefinition);
-            SQLiteCommand c = connection.CreateCommand();
-            c.CommandText = sql;
-            ExecuteNonQuery(c);
+            using (var c = Connection.CreateCommand())
+            {
+                c.CommandText = sql;
+                ExecuteNonQuery(c);
+            }
             CreateIndex();
         }
 
@@ -337,14 +344,16 @@ namespace Sidi.Persistence
 
         void CreateIndex(string[] fields, bool unique)
         {
-            SQLiteCommand c = connection.CreateCommand();
-            c.CommandText = String.Format(
-                "create {2} index if not exists {0}_{1} on {0} ({3})",
-                table,
-                fields.Join("_"),
-                unique ? "unique" : String.Empty,
-                fields.Join(", "));
-            ExecuteNonQuery(c);
+            using (var c = Connection.CreateCommand())
+            {
+                c.CommandText = String.Format(
+                    "create {2} index if not exists {0}_{1} on {0} ({3})",
+                    table,
+                    fields.Join("_"),
+                    unique ? "unique" : String.Empty,
+                    fields.Join(", "));
+                ExecuteNonQuery(c);
+            }
         }
 
         void ExecuteNonQuery(SQLiteCommand c)
@@ -357,10 +366,12 @@ namespace Sidi.Persistence
         {
             try
             {
-                SQLiteCommand c = connection.CreateCommand();
-                c.CommandText = String.Format("select * from {0} limit 1", table);
-                c.ExecuteScalar();
-                return true;
+                using (var c = Connection.CreateCommand())
+                {
+                    c.CommandText = String.Format("select * from {0} limit 1", table);
+                    c.ExecuteScalar();
+                    return true;
+                }
             }
             catch (SQLiteException)
             {
@@ -372,26 +383,28 @@ namespace Sidi.Persistence
         {
             foreach (MemberInfo i in Members)
             {
-                SQLiteCommand c = connection.CreateCommand();
-                c.CommandText = String.Format("select {0} from {1} limit 1", i.Name, table);
-                try
+                using (var c = Connection.CreateCommand())
                 {
-                    c.ExecuteScalar();
-                }
-                catch (SQLiteException)
-                {
-                    log.WarnFormat("{0} not found in table {1}. Trying to alter table.", i.Name, table);
-                    c.CommandText = "alter table {0} add column {1}".F(
-                        table, i.Name);
+                    c.CommandText = String.Format("select {0} from {1} limit 1", i.Name, table);
                     try
                     {
-                        c.ExecuteNonQuery();
+                        c.ExecuteScalar();
                     }
                     catch (SQLiteException)
                     {
-                        return false;
+                        log.WarnFormat("{0} not found in table {1}. Trying to alter table.", i.Name, table);
+                        c.CommandText = "alter table {0} add column {1}".F(
+                            table, i.Name);
+                        try
+                        {
+                            c.ExecuteNonQuery();
+                        }
+                        catch (SQLiteException)
+                        {
+                            return false;
+                        }
+                        log.InfoFormat("Column {0} added to table {1}", i.Name, table);
                     }
-                    log.InfoFormat("Column {0} added to table {1}", i.Name, table);
                 }
             }
             return true;
@@ -457,9 +470,9 @@ namespace Sidi.Persistence
             }
         }
 
-        public DbTransaction BeginTransaction()
+        public SQLiteTransaction BeginTransaction()
         {
-            return connection.BeginTransaction();
+            return Connection.BeginTransaction();
         }
 
         /// <summary>
@@ -479,9 +492,11 @@ namespace Sidi.Persistence
         /// <returns>List of found items</returns>
         public IList<T> Query(string query)
         {
-            SQLiteCommand command = connection.CreateCommand();
-            command.CommandText = query;
-            return Query(command);
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = query;
+                return Query(command);
+            }
         }
 
         static string GetOperator(ExpressionType nodeType)
@@ -568,23 +583,29 @@ namespace Sidi.Persistence
 
         public IList<T> Query(Expression<Func<T, bool>> predicate)
         {
-            var command = CreateCommand("select {0} from {1} where {2}".F(rowIdColumn, table, SqlPredicate(predicate.Body)));
-            log.Info(command);
-            return Query(command);
+            using (var command = CreateCommand("select {0} from {1} where {2}".F(rowIdColumn, table, SqlPredicate(predicate.Body))))
+            {
+                log.Info(command);
+                return Query(command);
+            }
         }
 
         public T Find(Expression<Func<T, bool>> predicate)
         {
-            var command = CreateCommand("select {0} from {1} where {2} limit 1".F(rowIdColumn, table, SqlPredicate(predicate.Body)));
-            return Find(command);
+            using (var command = CreateCommand("select {0} from {1} where {2} limit 1".F(rowIdColumn, table, SqlPredicate(predicate.Body))))
+            {
+                return Find(command);
+            }
         }
 
         public T Find(string query)
         {
             List<long> ids = new List<long>();
-            select = connection.CreateCommand();
-            select.CommandText = String.Format("select {0} from {1} where {2}", rowIdColumn, table, query);
-            return Find(select);
+            using (var select = Connection.CreateCommand())
+            {
+                select.CommandText = String.Format("select {0} from {1} where {2}", rowIdColumn, table, query);
+                return Find(select);
+            }
         }
 
         T Find(SQLiteCommand select)
@@ -601,18 +622,22 @@ namespace Sidi.Persistence
 
         public T Find(string query, string paramName, object param)
         {
-            var select = CreateCommand(String.Format("select {0} from @table where {1}", rowIdColumn, query));
-            SQLiteParameter p = new SQLiteParameter(paramName);
-            select.Parameters.Add(p);
-            select.Parameters[paramName].Value = param;
-            return Find(select);
+            using (var select = CreateCommand(String.Format("select {0} from @table where {1}", rowIdColumn, query)))
+            {
+                SQLiteParameter p = new SQLiteParameter(paramName);
+                select.Parameters.Add(p);
+                select.Parameters[paramName].Value = param;
+                return Find(select);
+            }
         }
 
         IList<T> DoSelect(string query)
         {
-            select = connection.CreateCommand();
-            select.CommandText = String.Format("select {0} from {1} where {2}", "oid", table, query);
-            return Query(select);
+            using (var select = Connection.CreateCommand())
+            {
+                select.CommandText = String.Format("select {0} from {1} where {2}", "oid", table, query);
+                return Query(select);
+            }
         }
 
         public IList<T> Query(SQLiteCommand select)
@@ -800,9 +825,11 @@ namespace Sidi.Persistence
 
         public void Clear()
         {
-            DbCommand clear = connection.CreateCommand();
-            clear.CommandText = String.Format("delete from {0}", table);
-            clear.ExecuteNonQuery();
+            using (var clear = Connection.CreateCommand())
+            {
+                clear.CommandText = String.Format("delete from {0}", table);
+                clear.ExecuteNonQuery();
+            }
         }
 
         public bool Contains(T item)
@@ -824,10 +851,12 @@ namespace Sidi.Persistence
         {
             get
             {
-                DbCommand c = connection.CreateCommand();
-                c.CommandText = String.Format("select count(*) from {0}", table);
-                object result = c.ExecuteScalar();
-                return (int)(long)result;
+                using (var c = Connection.CreateCommand())
+                {
+                    c.CommandText = String.Format("select count(*) from {0}", table);
+                    object result = c.ExecuteScalar();
+                    return (int)(long)result;
+                }
             }
         }
 
@@ -859,9 +888,11 @@ namespace Sidi.Persistence
 
         public IEnumerator<T> GetEnumerator()
         {
-            SQLiteCommand all = connection.CreateCommand();
-            all.CommandText = String.Format("select {0} from {1};", this.rowIdColumn, this.table);
-            return Query(all).GetEnumerator();
+            using (var all = Connection.CreateCommand())
+            {
+                all.CommandText = String.Format("select {0} from {1};", this.rowIdColumn, this.table);
+                return Query(all).GetEnumerator();
+            }
         }
 
         #endregion
@@ -886,9 +917,11 @@ namespace Sidi.Persistence
 
         private void Sql(string sql)
         {
-            DbCommand c = connection.CreateCommand();
-            c.CommandText = sql;
-            c.ExecuteNonQuery();
+            using (var c = Connection.CreateCommand())
+            {
+                c.CommandText = sql;
+                c.ExecuteNonQuery();
+            }
         }
 
         class ResultProxy<TItem> : IList<TItem> where TItem : new()
@@ -1002,7 +1035,13 @@ namespace Sidi.Persistence
 
         public void Dispose()
         {
-            Close();
+            insert.Dispose();
+            select.Dispose();
+            getDataByRowId.Dispose();
+            updateDataByRowId.Dispose();
+            deleteByRowId.Dispose();
+            containsQuery.Dispose();
+            connection.Dispose();
         }
     }
 }

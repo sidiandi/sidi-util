@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Sidi.IO;
 using Sidi.Util;
+using Sidi.Extensions;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using Sidi.IO.Long;

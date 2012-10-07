@@ -6,6 +6,7 @@ using Sidi.Util;
 using NUnit.Framework;
 using Sidi.IO.Long.Extensions;
 using System.Xml.Serialization;
+using Sidi.Extensions;
 
 namespace Sidi.IO.Long
 {
@@ -29,6 +30,13 @@ namespace Sidi.IO.Long
         public void Check2()
         {
             var ln = new Path(new string('0', 256));
+        }
+
+        [Test]
+        public void UseAsString()
+        {
+            var cd = new Path(System.Environment.CurrentDirectory);
+            Assert.AreEqual(cd.ToString(), new System.IO.DirectoryInfo(cd).FullName);
         }
 
         [Test]
@@ -59,7 +67,7 @@ namespace Sidi.IO.Long
         [Test]
         public void SpecialPaths()
         {
-            for (var p = System.Environment.SystemDirectory.Long(); p != null; p = p.ParentDirectory)
+            for (var p = System.Environment.SystemDirectory.Long(); p != null; p = p.Parent)
             {
                 Console.WriteLine(p);
                 Assert.IsTrue(Directory.Exists(p));
@@ -83,7 +91,7 @@ namespace Sidi.IO.Long
             tempDir = longNameUnc.NoPrefix;
             Assert.IsTrue(System.IO.Directory.Exists(tempDir));
 
-            for (var i = longNameUnc; i != null; i = i.ParentDirectory)
+            for (var i = longNameUnc; i != null; i = i.Parent)
             {
                 Console.WriteLine(i);
                 Console.WriteLine(i.Parts.Join("|"));
@@ -165,6 +173,24 @@ namespace Sidi.IO.Long
             var stringPath = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             Path p = stringPath;
             Assert.AreEqual(new Path(stringPath), p);
+        }
+
+        [Test]
+        public void ParentChildren()
+        {
+            Path p = TestFile(".");
+            p = p.Canonic;
+            Assert.IsTrue(p.Children.Any());
+            foreach (var c in p.Children)
+            {
+                Assert.AreEqual(p, c.Parent);
+            }
+        }
+
+        [Test]
+        public void Sibling()
+        {
+            Assert.IsTrue(new Sidi.IO.Long.Path(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
         }
     }
 }

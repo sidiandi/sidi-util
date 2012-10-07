@@ -108,7 +108,7 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")] 
         public void Simple2()
         {
-            var file = new Sidi.IO.Long.Path(TestFile(@".")).ParentDirectory.ParentDirectory;
+            var file = new Sidi.IO.Long.Path(TestFile(@".")).Parent.Parent;
             var files = Sidi.IO.Long.FileEnum.AllFiles(file);
 
             var data = files.Select(x => new SimpleTreeMap.ColorMapItem()

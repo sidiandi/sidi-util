@@ -8,6 +8,7 @@ using NUnit.Framework;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using Sidi.Util;
+using Sidi.Extensions;
 
 namespace Sidi.Net
 {

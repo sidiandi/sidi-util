@@ -84,7 +84,7 @@ namespace Sidi.IO.Long
         {
             return FindFileRaw(searchPath)
                 .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
-                .Select(x => new FileSystemInfo(searchPath.ParentDirectory, x));
+                .Select(x => new FileSystemInfo(searchPath.Parent, x));
         }
 
         public static void Create(Path path)
@@ -113,7 +113,7 @@ namespace Sidi.IO.Long
                         return;
                     case ERROR_PATH_NOT_FOUND:
                         {
-                            var p = path.ParentDirectory;
+                            var p = path.Parent;
                             CreateDirectoryInternal(p);
                             Kernel32.CreateDirectory(path.Param, IntPtr.Zero).CheckApiCall(path);
                         }

@@ -27,6 +27,7 @@ using Sidi.IO;
 using System.Threading;
 using System.Net.Cache;
 using System.Windows.Forms;
+using Sidi.Extensions;
 
 namespace Sidi.Util
 {

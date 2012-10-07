@@ -22,6 +22,7 @@ using System.Text;
 using Sidi.IO;
 using System.Diagnostics;
 using Sidi.Util;
+using Sidi.Extensions;
 using System.IO;
 
 namespace Sidi.Build
@@ -37,12 +38,9 @@ namespace Sidi.Build
         {
             get
             {
-                string f = FileUtil.CatDir(
-                    DebuggingToolsForWindows.Directory,
-                    "srcsrv",
-                    "pdbstr.exe");
+                var f = new Sidi.IO.Long.Path(DebuggingToolsForWindows.Directory).CatDir("srcsrv", "pdbstr.exe");
 
-                if (!File.Exists(f))
+                if (!f.Exists)
                 {
                     throw new FileNotFoundException(String.Format(
                         "pdbstr.exe must be installed at {0}. See {1}",

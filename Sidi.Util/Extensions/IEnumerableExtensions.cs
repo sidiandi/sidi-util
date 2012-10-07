@@ -42,7 +42,7 @@ namespace Sidi.Extensions
                 }
                 catch (Exception e)
                 {
-                    log.Warn(Sidi.Util.StringEx.SafeToString(i), e);
+                    log.Warn(Sidi.Extensions.StringEx.SafeToString(i), e);
                 }
 
                 if (ok)

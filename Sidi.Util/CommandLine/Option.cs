@@ -6,6 +6,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.IO;
 using Sidi.Util;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine
 {

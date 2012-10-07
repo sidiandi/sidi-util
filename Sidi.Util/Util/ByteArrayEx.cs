@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Sidi.Util
+namespace Sidi.Extensions
 {
     public static class ByteArrayEx
     {

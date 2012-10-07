@@ -114,9 +114,9 @@ namespace Sidi.IMAP
 
     public class EmlDirectory : IRepository
     {
-        public EmlDirectory(string directory)
+        public EmlDirectory(Path directory)
         {
-            this.directory = directory.Long();
+            this.directory = directory;
         }
 
         Path directory;

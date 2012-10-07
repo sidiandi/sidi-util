@@ -23,6 +23,7 @@ using Sidi.IO;
 using System.Diagnostics;
 using Sidi.Util;
 using System.IO;
+using Sidi.Extensions;
 
 namespace Sidi.Build
 {
@@ -41,14 +42,11 @@ namespace Sidi.Build
         {
         }
 
-        string Program
+        Sidi.IO.Long.Path Program
         {
             get
             {
-                return FileUtil.CatDir(
-                    DebuggingToolsForWindows.Directory,
-                    "srcsrv",
-                    "srctool.exe");
+                return DebuggingToolsForWindows.Directory.CatDir("srcsrv", "srctool.exe");
             }
         }
 

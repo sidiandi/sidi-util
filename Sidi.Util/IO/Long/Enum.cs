@@ -8,25 +8,6 @@ using Sidi.CommandLine;
 
 namespace Sidi.IO.Long
 {
-    public class FileType
-    {
-        /// <summary>
-        /// Specify all extensions you want to match
-        /// </summary>
-        /// <param name="extensions">list of extensions without "."</param>
-        public FileType(params string[] extensions)
-        {
-            e = new HashSet<string>(extensions.Select(x => "." + x.ToLower()));
-        }
-
-        HashSet<string> e;
-
-        public bool Is(Path fileName)
-        {
-            return e.Contains(fileName.Extension.ToLower());
-        }
-    }
-
     public class FileEnum
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -46,6 +27,16 @@ namespace Sidi.IO.Long
                 Output = FileEnum.OnlyFiles,
             };
             return e.Depth();
+        }
+
+        public static FileEnum Parse(string text)
+        {
+            var list = FileList.Parse(text);
+            return new FileEnum()
+            {
+                Output = OnlyFiles,
+                Roots = list
+            };
         }
         
         /// <summary>

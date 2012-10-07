@@ -22,6 +22,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.IO;
 using Sidi.Util;
+using Sidi.Extensions;
 using log4net;
 
 namespace Sidi.Net.Pop3

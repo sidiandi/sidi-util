@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using Sidi.Util;
 using System.Drawing;
+using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
