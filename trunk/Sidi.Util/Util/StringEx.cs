@@ -122,12 +122,7 @@ namespace Sidi.Extensions
 
         public static string Join<T>(this IEnumerable<T> e)
         {
-            StringWriter w = new StringWriter();
-            foreach (var i in e)
-            {
-                w.WriteLine(i);
-            }
-            return w.ToString();
+            return e.Join(@"\r\n");
         }
 
         /// <summary>
