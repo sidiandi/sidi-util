@@ -332,7 +332,6 @@ namespace Sidi.IO.Long
         /// <summary>
         /// Replaces the file extension of a path. 
         /// </summary>
-        /// <param name="path"></param>
         /// <param name="newExtension">New extension (without dot)</param>
         /// <returns></returns>
         public Path ReplaceExtension(string newExtension)
