@@ -13,13 +13,14 @@ namespace Sidi.Visualization
     {
         public class ItemBase
         {
+            public object Tag = null;
             public IEnumerable<object> Lineage;
-            public float Size;
+            public float Size = 1.0f;
         }
 
         public class Item : ItemBase
         {
-            public Color Color;
+            public Color Color = Color.White;
         }
 
         static void Add(Tree<Data> tree, object[] lineage, Item data, int level)
