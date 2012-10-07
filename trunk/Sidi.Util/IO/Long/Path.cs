@@ -38,6 +38,33 @@ namespace Sidi.IO.Long
             return path.path;
         }
 
+        void RemoveEmptyDirectories()
+        {
+            Path path = this;
+
+            if (Directory.Exists(path))
+            {
+                var thumbs = path.CatDir("Thumbs.db");
+                if (thumbs.Exists)
+                {
+                    File.Delete(thumbs);
+                }
+                foreach (var d in Directory.GetChilds(path).Where(x => x.IsDirectory))
+                {
+                    d.FullName.RemoveEmptyDirectories();
+                }
+
+                try
+                {
+                    Directory.Delete(path);
+                    log.InfoFormat("Delete {0}", path);
+                }
+                catch
+                {
+                }
+            }
+        }
+
         public static string GetValidFilename(string x)
         {
             return Truncate(invalidFilenameRegex.Replace(x, "_"), Path.MaxFilenameLength);
