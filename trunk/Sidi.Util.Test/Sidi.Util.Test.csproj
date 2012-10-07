@@ -203,7 +203,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>robocopy /s $(ProjectDir)unit-test $(TargetDir)..\sidi-util_test
+    <PostBuildEvent>robocopy /s $(ProjectDir)unit-test $(TargetDir)..\test
 exit 0</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

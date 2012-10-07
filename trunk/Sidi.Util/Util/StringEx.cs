@@ -23,10 +23,11 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Sidi.IO;
+using Sidi.Extensions;
 using Microsoft.CSharp;
 using System.CodeDom;
 
-namespace Sidi.Util
+namespace Sidi.Extensions
 {
     public static class StringEx
     {
@@ -112,11 +113,6 @@ namespace Sidi.Util
         public static string Quote(this string s)
         {
             return "\"" + s + "\"";
-        }
-
-        public static string CatDir(this string dir0, params string[] dirs)
-        {
-            return FileUtil.CatDir(new string[] { dir0 }.Concat(dirs).ToArray());
         }
 
         public static string Join<T>(this IEnumerable<T> enumerable, string separator)

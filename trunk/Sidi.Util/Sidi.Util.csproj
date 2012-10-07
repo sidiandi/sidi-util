@@ -128,6 +128,7 @@
     <Compile Include="IO\Long\FileEnum.cs" />
     <Compile Include="IO\Long\FileList.cs" />
     <Compile Include="IO\Long\FileSystemInfo.cs" />
+    <Compile Include="IO\Long\FileType.cs" />
     <Compile Include="IO\Long\FindData.cs" />
     <Compile Include="IO\Long\Kernel32.cs" />
     <Compile Include="IO\Long\Path.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServer.cs" />
+    <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Util\ArchiveHandler.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
@@ -190,7 +192,7 @@
     <Compile Include="Util\Interval.cs" />
     <Compile Include="Collections\IntSet.cs" />
     <Compile Include="IO\PathEx.cs" />
-    <Compile Include="IO\SearchPath.cs" />
+    <Compile Include="IO\Long\SearchPath.cs" />
     <Compile Include="Util\ListEx.cs" />
     <Compile Include="Collections\LruCache.cs" />
     <Compile Include="Collections\LruCacheBackground.cs" />

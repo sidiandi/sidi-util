@@ -20,7 +20,7 @@ namespace Sidi.IO.Long
             [SetUp]
             public void Setup()
             {
-                root = Sidi.IO.FileUtil.BinFile(@"test\LongNameTest").Long();
+                root = Sidi.IO.FileUtil.BinFile(@"test\LongNameTest");
 
                 root.EnsureNotExists();
 
@@ -77,7 +77,7 @@ namespace Sidi.IO.Long
                 File.Copy(lp, lpCopy);
                 Assert.IsTrue(File.Exists(lpCopy));
 
-                log.Info(Directory.GetChilds(lp.ParentDirectory));
+                log.Info(Directory.GetChilds(lp.Parent));
 
                 log.Info(lp);
             }
@@ -114,7 +114,7 @@ namespace Sidi.IO.Long
                 var lpCopy = (lp.ToString() + ".link").Long();
                 File.CreateHardLink(lpCopy, lp);
                 Assert.IsTrue(File.Exists(lpCopy));
-                log.Info(Directory.GetChilds(lp.ParentDirectory));
+                log.Info(Directory.GetChilds(lp.Parent));
                 log.Info(lp);
                 Assert.IsTrue(File.EqualByTime(lp, lpCopy));
             }
@@ -162,7 +162,7 @@ namespace Sidi.IO.Long
             [Test]
             public void WriteAllText()
             {
-                var d = this.TestFile("Long").Long().CatDir("blablabla");
+                var d = this.TestFile("Long").CatDir("blablabla");
                 d.EnsureNotExists();
                 var p = d.CatDir(".moviesidi");
                 File.WriteAllText(p, "hello");
@@ -174,7 +174,7 @@ namespace Sidi.IO.Long
             public void Open()
             {
                 var text = "world";
-                var d = this.TestFile("Long").Long().CatDir("234234", "23443", "blablabla");
+                var d = this.TestFile("Long").CatDir("234234", "23443", "blablabla");
                 using (var s = File.StreamWriter(d))
                 {
                     s.WriteLine("hello");

@@ -57,7 +57,7 @@ namespace Sidi.Util
 
         public static bool IsAlreadyRunning(this Process p)
         {
-            SearchPath sp = SearchPath.Parse(p.StartInfo.EnvironmentVariables["PATH"]);
+            var sp = Sidi.IO.Long.SearchPath.PATH;
             sp.Paths.Insert(0, p.StartInfo.WorkingDirectory);
             string pFilename = Path.GetFullPath(sp.Find(p.StartInfo.FileName)).ToLower();
 

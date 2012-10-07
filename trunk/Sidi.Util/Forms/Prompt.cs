@@ -8,6 +8,7 @@ using System.Reflection;
 using Sidi.Util;
 using System.Diagnostics;
 using Sidi.IO;
+using Sidi.Extensions;
 
 namespace Sidi.Forms
 {
@@ -92,8 +93,8 @@ namespace Sidi.Forms
 
                 Process p = new Process();
 
-                p.StartInfo.FileName = FileUtil.CatDir(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                p.StartInfo.FileName = new Sidi.IO.Long.Path(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)).CatDir(
                     "Notepad++", "notepad++.exe");
                 p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
 

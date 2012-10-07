@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Sidi.Util;
+using Sidi.Extensions;
+using L = Sidi.IO.Long;
 
 namespace Sidi.IO
 {
@@ -56,7 +58,7 @@ namespace Sidi.IO
 
         public bool FastCopy(string source, string dest)
         {
-            dest.EnsureParentDirectoryExists();
+            new L.Path(dest).EnsureParentDirectoryExists();
             return FastCopyNoCreateDir(source, dest);
         }
 
@@ -191,15 +193,16 @@ namespace Sidi.IO
             }
         }
 
-        public void IncrementalCopy(string source, string dest, string existingCopy)
+        public void IncrementalCopy(L.Path source, L.Path dest, L.Path existingCopy)
         {
-            foreach (var i in FileUtil.Recurse(source))
+            foreach (var sInfo in L.FileEnum.AllFiles(source))
             {
-                string s = source.CatDir(i);
-                string d = dest.CatDir(i);
-                string e = existingCopy.CatDir(i);
+                var s = sInfo.FullName;
+                var relativePath = s.GetRelative(source);
+                var d = dest.CatDir(relativePath);
+                var e = existingCopy.CatDir(relativePath);
 
-                if (Directory.Exists(s))
+                if (sInfo.IsDirectory)
                 {
                     Directory.CreateDirectory(d);
                 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using NUnit.Framework;
 using Sidi.Util;
+using Sidi.Extensions;
 
 namespace Sidi.IMAP
 {

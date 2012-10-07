@@ -407,17 +407,22 @@ namespace Sidi.CommandLine
             return GetPreferencesKey(o.Application.GetType());
         }
 
+        string CatReg(params string[] parts)
+        {
+            return parts.Join(@"\");
+        }
+
         public string GetPreferencesKey(Type at)
         {
             var k = PreferencesKey;
             if (k == null)
             {
-                k = Registry.CurrentUser.ToString().CatDir("Software");
+                k = CatReg(Registry.CurrentUser.ToString(), "Software");
                 var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(at).Company;
                 var product = GetAssemblyAttribute<AssemblyProductAttribute>(at).Product;
-                k = k.CatDir(company, product, at.FullName);
+                k = CatReg(k, company, product, at.FullName);
             }
-            k = k.CatDir(at.FullName);
+            k = CatReg(k, at.FullName);
             return k;
         }
 

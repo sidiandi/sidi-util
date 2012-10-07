@@ -7,6 +7,7 @@ using Sidi.Util;
 using Sidi.IO.Long;
 using Sidi.IO.Long.Extensions;
 using System.IO;
+using Sidi.Extensions;
 
 namespace Sidi.IMAP
 {
@@ -34,7 +35,7 @@ namespace Sidi.IMAP
         [Test, Explicit("unstable")]
         public void RetrieveDataItem()
         {
-            var mailbox = new EmlMailbox(this.TestFile(@"mail").Long());
+            var mailbox = new EmlMailbox(this.TestFile(@"mail"));
             var mail = mailbox.Items.First();
             var dataItems = new string[] { "UID", "FLAGS", "RFC822.SIZE", "BODY.PEEK[HEADER]", "INTERNALDATE" };
             foreach (var i in dataItems.Select(x => (string)x))

@@ -23,8 +23,6 @@ using System.Diagnostics;
 using NUnit.Framework;
 #endregion
 
-//Test Specific Imports
-//TODO - Add imports your going to test here
 using Sidi.CommandLine;
 using cm = System.ComponentModel;
 using Sidi.Util;
@@ -32,6 +30,7 @@ using System.Linq;
 using System.Threading;
 using System.Net;
 using Sidi.IO.Long;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine.Test
 {

@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Sidi.Util;
+using Sidi.Extensions;
 
 namespace Sidi.IO.Long
 {
     public class FileList : List<Path>
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public FileList(IEnumerable<Path> paths)
         : base(paths)
         {

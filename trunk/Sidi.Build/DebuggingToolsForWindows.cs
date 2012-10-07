@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using Sidi.IO;
 using System.IO;
+using L = Sidi.IO.Long;
 
 namespace Sidi.Build
 {
@@ -34,14 +35,14 @@ namespace Sidi.Build
             }
         }
         
-        public static string Directory
+        public static L.Path Directory
         {
             get
             {
                 string[] searchPath = new string[]
                 {
-                    FileUtil.CatDir(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
-                    FileUtil.CatDir(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
+                    L.Path.FromParts(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
+                    L.Path.FromParts(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
                 };
 
                 foreach (string d in searchPath)

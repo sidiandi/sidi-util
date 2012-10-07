@@ -8,6 +8,7 @@ using Sidi.Util;
 using Sidi.Forms;
 using System.Reflection;
 using System.ComponentModel;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine
 {

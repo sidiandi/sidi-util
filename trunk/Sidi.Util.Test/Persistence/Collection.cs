@@ -28,9 +28,40 @@ using Sidi.IO;
 using System.Linq;
 using L = Sidi.IO.Long;
 using System.Linq.Expressions;
+using System.Data.SQLite;
 
 namespace Sidi.Persistence
 {
+    [TestFixture]
+    public class SqliteTest : TestBase
+    {
+        [Test]
+        public void OpenClose()
+        {
+            var dbFile = new L.Path(TestFile(@"test.sqlite"));
+            dbFile.EnsureNotExists();
+            var cs = new SQLiteConnectionStringBuilder();
+            cs.DataSource = dbFile;
+            var c = new SQLiteConnection(cs.ConnectionString);
+            c.Close();
+            dbFile.EnsureNotExists();
+        }
+
+        [Test]
+        public void OpenCloseCollection()
+        {
+            for (int i = 0; i < 20; ++i)
+            {
+                var dbFile = new L.Path(TestFile(@"test.sqlite"));
+                dbFile.EnsureNotExists();
+                using (var c = new Collection<CollectionTest.Address>(dbFile))
+                {
+                }
+                dbFile.EnsureNotExists();
+            }
+        }
+    }
+    
     [TestFixture]
     public class CollectionTest : TestBase
     {
@@ -51,7 +82,7 @@ namespace Sidi.Persistence
             public string DateOfBirth = null;
         }
 
-        class Address
+        public class Address
         {
             [RowId]
             public long Id = 0;
@@ -116,7 +147,7 @@ namespace Sidi.Persistence
             public byte[] aByteArray = System.Text.ASCIIEncoding.ASCII.GetBytes("Hello, World!");
         }
 
-        string testFile;
+        L.Path testFile;
         string table = "a";
         int count = 10;
 
@@ -125,10 +156,7 @@ namespace Sidi.Persistence
         [SetUp]
         public void Init()
         {
-            if (File.Exists(testFile))
-            {
-                File.Delete(testFile);
-            }
+            testFile.EnsureNotExists();
             addressBook = new Sidi.Persistence.Collection<Address>(testFile, table);
             Write();
         }
@@ -136,24 +164,29 @@ namespace Sidi.Persistence
         [TearDown]
         public void Deinit()
         {
-            if (addressBook != null)
-            {
-                addressBook.Dispose();
-                addressBook = null;
-            }
+            addressBook.Dispose();
+            addressBook = null;
+        }
+
+        [Test]
+        public void Get()
+        {
+            var c = addressBook.ToList();
         }
 
         [Test]
         public void AlterTable()
         {
             string tableName = "alter_table_test";
-            var a = new Sidi.Persistence.Collection<AddressSubset>(addressBook.Connection, tableName);
+            using (var a = new Collection<AddressSubset>(addressBook.SharedConnection, tableName))
+            {
+                a.Add(new AddressSubset());
+            }
 
-            a.Add(new AddressSubset());
-
-            var b = new Sidi.Persistence.Collection<Address>(addressBook.Connection, tableName);
-
-            b.Add(new Address());
+            using (var b = new Collection<Address>(addressBook.SharedConnection, tableName))
+            {
+                b.Add(new Address());
+            }
         }
         
         [Test]
@@ -265,7 +298,7 @@ namespace Sidi.Persistence
         [Test]
         public void AutoTableName()
         {
-            using (Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(addressBook.Connection))
+            using (Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(addressBook.SharedConnection))
             {
             }
         }
@@ -273,17 +306,23 @@ namespace Sidi.Persistence
         [Test]
         public void Schema()
         {
-            Sidi.Persistence.Collection<OtherData> otherData = new Sidi.Persistence.Collection<OtherData>(addressBook.Connection);
-            DbCommand c = otherData.Connection.CreateCommand();
-            c.CommandText = "select * from sqlite_master;";
-            DbDataReader reader = c.ExecuteReader();
-            while (reader.Read())
+            using (var otherData = new Sidi.Persistence.Collection<OtherData>(addressBook.SharedConnection))
             {
-                for (int i = 0; i < reader.FieldCount; ++i)
+                using (var c = otherData.Connection.CreateCommand())
                 {
-                    Console.WriteLine(String.Format("{0}: {1}",
-                        reader.GetName(i),
-                        reader[i]));
+                    c.CommandText = "select * from sqlite_master;";
+                    using (var reader = c.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            for (int i = 0; i < reader.FieldCount; ++i)
+                            {
+                                Console.WriteLine(String.Format("{0}: {1}",
+                                    reader.GetName(i),
+                                    reader[i]));
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -291,42 +330,45 @@ namespace Sidi.Persistence
         [Test]
         public void Subset()
         {
-            Sidi.Persistence.Collection<AddressSubset> subset = new Sidi.Persistence.Collection<AddressSubset>(addressBook.Connection, table);
-            foreach (AddressSubset i in subset)
+            using (var subset = new Sidi.Persistence.Collection<AddressSubset>(addressBook.SharedConnection, table))
             {
-                Console.WriteLine(i);
+                foreach (AddressSubset i in subset)
+                {
+                    Console.WriteLine(i);
+                }
             }
         }
 
         [Test]
         public void DataTypes()
         {
-            Sidi.Persistence.Collection<AllDataTypes> c = new Sidi.Persistence.Collection<AllDataTypes>(addressBook.Connection);
-            c.Clear();
-            using (DbTransaction t = c.BeginTransaction())
+            using (Sidi.Persistence.Collection<AllDataTypes> c = new Sidi.Persistence.Collection<AllDataTypes>(addressBook.SharedConnection))
             {
-                for (int i = 0; i < count; ++i)
+                c.Clear();
+                using (DbTransaction t = c.BeginTransaction())
                 {
-                    AllDataTypes newItem = new AllDataTypes();
-                    c.Add(newItem);
+                    for (int i = 0; i < count; ++i)
+                    {
+                        AllDataTypes newItem = new AllDataTypes();
+                        c.Add(newItem);
+                    }
+                    t.Commit();
                 }
-                t.Commit();
+
+                AllDataTypes def = new AllDataTypes();
+                foreach (AllDataTypes item in c)
+                {
+                    Assert.That(item.aDecimal == def.aDecimal);
+
+                    Assert.That(item.aBool == def.aBool);
+                    Assert.That(item.aDecimal == def.aDecimal);
+                    Assert.That(item.aShort == def.aShort);
+                    Assert.That(item.aInt == def.aInt);
+                    Assert.That(item.aLong == def.aLong);
+                    Assert.That(item.aDouble == def.aDouble);
+                    Assert.AreEqual(item.aString, def.aString);
+                }
             }
-
-            AllDataTypes def = new AllDataTypes();
-            foreach (AllDataTypes item in c)
-            {
-                Assert.That(item.aDecimal == def.aDecimal);
-
-                Assert.That(item.aBool == def.aBool);
-                Assert.That(item.aDecimal == def.aDecimal);
-                Assert.That(item.aShort == def.aShort);
-                Assert.That(item.aInt == def.aInt);
-                Assert.That(item.aLong == def.aLong);
-                Assert.That(item.aDouble == def.aDouble);
-                Assert.AreEqual(item.aString, def.aString);
-            }
-
         }
 
         [Test]
@@ -340,9 +382,11 @@ namespace Sidi.Persistence
         {
             Address a = new Address();
             a.Zip = 123456;
-            DbCommand c = addressBook.CreateCommand("update @table set Zip = @Zip");
-            addressBook.SetParameters(c, a);
-            c.ExecuteNonQuery();
+            using (var c = addressBook.CreateCommand("update @table set Zip = @Zip"))
+            {
+                addressBook.SetParameters(c, a);
+                c.ExecuteNonQuery();
+            }
             IList<Address> s = addressBook.Select("Zip = " + a.Zip);
             Assert.AreEqual(s.Count, count);
         }
@@ -368,7 +412,7 @@ namespace Sidi.Persistence
         public void PrimaryKeyData()
         {
             var path = TestFile(@"test-data\primarykey.sqlite");
-            path.EnsureFileSystemEntryNotExists();
+            path.EnsureNotExists();
             var c = new Collection<WithPrimaryKey>(path);
 
             var d = new WithPrimaryKey();
@@ -402,7 +446,7 @@ namespace Sidi.Persistence
         public void ThreadSafety()
         {
             var p = TestFile("thread_safety.sqlite");
-            p.EnsureFileSystemEntryNotExists();
+            p.EnsureNotExists();
             using (var addresses = new Collection<Address>(p))
             {
                 var threadCount = 10;
@@ -438,7 +482,7 @@ namespace Sidi.Persistence
         public void ThreadSafety2()
         {
             var p = TestFile("thread_safety.sqlite");
-            p.EnsureFileSystemEntryNotExists();
+            p.EnsureNotExists();
 
             var threadCount = 10;
             var insertCount = 10;

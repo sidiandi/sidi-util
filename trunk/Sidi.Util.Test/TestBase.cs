@@ -53,15 +53,14 @@ namespace Sidi
         {
         }
 
-        protected string TestFile(string relPath)
+        protected Sidi.IO.Long.Path TestFile(string relPath)
         {
-            return new Sidi.IO.Long.Path(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath)
-                .ParentDirectory
-                .ParentDirectory
-                .ParentDirectory
-                .ParentDirectory
-                .CatDir("sidi-util_test", relPath)
-                .NoPrefix;
+            var testFile = 
+                new Sidi.IO.Long.Path(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath)
+                .Parent
+                .Parent
+                .CatDir("test", relPath);
+            return testFile;
         }
     }
 }

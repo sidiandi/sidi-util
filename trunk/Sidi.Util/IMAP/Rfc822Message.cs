@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using Sidi.Util;
+using Sidi.Extensions;
 
 namespace Sidi.IMAP
 {

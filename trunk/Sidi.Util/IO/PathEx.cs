@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using Sidi.Extensions;
 
 namespace Sidi.IO
 {
@@ -128,47 +129,6 @@ namespace Sidi.IO
             return path.ToLower().StartsWith(directory.ToLower());
         }
 
-        public static void EnsureParentDirectoryExists(this string path)
-        {
-            Directory.GetParent(path).FullName.EnsureDirectoryExists();
-        }
-
-        public static void EnsureDirectoryExists(this string path)
-        {
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-        }
-
-        public static void EnsureFileSystemEntryNotExists(this String path)
-        {
-            try
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                    log.InfoFormat("Deleted {0}", path);
-                }
-                else if (Directory.Exists(path))
-                {
-                    Directory.Delete(path, true);
-                    log.InfoFormat("Deleted {0}", path);
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Problem while deleting {0}".F(path), ex);
-                throw;
-            }
-        }
-
-        public static void WriteAllText(string path, string text)
-        {
-            path.EnsureParentDirectoryExists();
-            File.WriteAllText(path, text);
-        }
-
         public static string GetRelativePath(string path, string basePath)
         {
             path = Path.GetFullPath(path);
@@ -200,43 +160,14 @@ namespace Sidi.IO
             return String.Join(new String(Path.DirectorySeparatorChar, 1), result.ToArray());
         }
 
-        public static string Bin(string relPath)
+        public static Sidi.IO.Long.Path Bin(string relPath)
         {
-            var uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
-            return FileUtil.CatDir(uri.LocalPath, "..", relPath); ;
-        }
-
-        public static IEnumerable<string> SplitDir(this string path)
-        {
-            return path.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
-        }
-
-        public static string CatDir(this IEnumerable<string> parts)
-        {
-            return FileUtil.CatDir(parts.ToArray());
+            return Assembly.GetExecutingAssembly().LocalPath().CatDir("..", relPath).Canonic;
         }
 
         public static string[] SplitCommaSeparatedList(this string list)
         {
             return list.Split(new char[] { ',' }).Select(x => x.Trim()).ToArray();
-        }
-
-        public static bool IsReadOnly(this string path)
-        {
-            return (new FileInfo(path).Attributes & FileAttributes.ReadOnly) != 0;
-        }
-
-        public static void SetReadOnly(this string path, bool readOnly)
-        {
-            FileInfo f = new FileInfo(path);
-            if (readOnly)
-            {
-                f.Attributes = f.Attributes | FileAttributes.ReadOnly;
-            }
-            else
-            {
-                f.Attributes = f.Attributes & ~FileAttributes.ReadOnly;
-            }
         }
 
         public static void WriteXml(this string path, object x)

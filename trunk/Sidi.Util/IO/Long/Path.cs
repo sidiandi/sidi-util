@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sidi.Util;
+using Sidi.Extensions;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -30,6 +31,11 @@ namespace Sidi.IO.Long
         public static implicit operator Path(string text)
         {
             return new Path(text);
+        }
+
+        public static implicit operator string(Path path)
+        {
+            return path.path;
         }
 
         public static string GetValidFilename(string x)
@@ -97,6 +103,11 @@ namespace Sidi.IO.Long
         {
         }
 
+        public static Path FromParts(params string[] parts)
+        {
+            return new Path(parts);
+        }
+
         public Path Canonic
         {
             get
@@ -156,6 +167,26 @@ namespace Sidi.IO.Long
                     Name = this.NoPrefix,
                 };
                 return true;
+            }
+
+            if (IsUnc && Parts.Length == 4)
+            {
+                if (System.IO.Directory.Exists(NoPrefix))
+                {
+                    fd = new FindData()
+                    {
+                        Attributes = System.IO.FileAttributes.Directory,
+                        nFileSizeHigh = 0,
+                        nFileSizeLow = 0,
+                        Name = this.NoPrefix,
+                    };
+                    return true;
+                }
+                else
+                {
+                    fd = default(FindData);
+                    return false;
+                }
             }
 
             using (var f = Directory.FindFileRaw(this).GetEnumerator())
@@ -298,7 +329,28 @@ namespace Sidi.IO.Long
 
         string path;
 
-        public Path ParentDirectory
+        /// <summary>
+        /// Replaces the file extension of a path. 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="newExtension">New extension (without dot)</param>
+        /// <returns></returns>
+        public Path ReplaceExtension(string newExtension)
+        {
+            return Parent.CatDir(FileNameWithoutExtension + "." + newExtension);
+        }
+
+        public Path Sibling(string siblingName)
+        {
+            return Parent.CatDir(siblingName);
+        }
+
+        public Path GetRelative(Path basePath)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public Path Parent
         {
             get
             {
@@ -317,6 +369,16 @@ namespace Sidi.IO.Long
                     return null;
                 }
                 return new Path(p.Take(p.Length - 1));
+            }
+        }
+
+        public IList<Path> Children
+        {
+            get
+            {
+                return this.Info.GetFileSystemInfos()
+                    .Select(x => x.FullName)
+                    .ToList();
             }
         }
 
@@ -475,7 +537,7 @@ namespace Sidi.IO.Long
 
         public void EnsureParentDirectoryExists()
         {
-            ParentDirectory.EnsureDirectoryExists();
+            Parent.EnsureDirectoryExists();
         }
 
         public void EnsureDirectoryExists()
@@ -516,16 +578,5 @@ namespace Sidi.IO.Long
         {
             writer.WriteString(path);
         }
-
-        /// <summary>
-        /// Replaces the extension of a path
-        /// </summary>
-        /// <param name="newExtension">new extension including the ".", e.g. ".txt"</param>
-        /// <returns></returns>
-        public Path ReplaceExtension(string newExtension)
-        {
-            return ParentDirectory.CatDir(FileNameWithoutExtension + newExtension);
-        }
-
     }
 }

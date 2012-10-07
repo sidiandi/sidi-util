@@ -21,51 +21,42 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using Sidi.Util;
+using Sidi.Extensions;
 using System.Runtime.InteropServices;
 using System.Linq;
+using L = Sidi.IO.Long;
 
 namespace Sidi.IO
 {
     public static class FileUtil
     {
         /// <summary>
-        /// Constructs the path for a sibling of a file, i.e. of a file in the same directory.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="siblingName"></param>
-        /// <returns></returns>
-        public static string Sibling(this string path, string siblingName)
-        {
-            DirectoryInfo parent = System.IO.Directory.GetParent(path);
-            return parent.FullName.CatDir(siblingName);
-        }
-
-        /// <summary>
         /// Searches fileName in directory first, then in all parent directories
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string SearchUp(string directory, string fileName)
+        public static string SearchUp(L.Path directory, string fileName)
         {
             if (directory == null)
             {
                 return null;
             }
 
-            string p = FileUtil.CatDir(directory, fileName);
-            if (File.Exists(p))
+            for (var p = directory; p != null; p = p.Parent)
             {
-                return p;
+                var file = p.CatDir(fileName);
+                if (File.Exists(file))
+                {
+                    return file;
+                }
             }
-
-            return FileUtil.SearchUp(Path.GetDirectoryName(directory), fileName);
+            return null;
         }
 
-
-        public static string Sibling(this Assembly assembly, string siblingName)
+        public static L.Path LocalPath(this Assembly assembly)
         {
-            return Sibling(new Uri(assembly.CodeBase).LocalPath, siblingName);
+            return new L.Path(new Uri(assembly.CodeBase).LocalPath);
         }
 
         /// <summary>
@@ -73,33 +64,16 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string BinFile(string path)
+        public static L.Path BinFile(string path)
         {
-            return Assembly.GetExecutingAssembly().Sibling(path);
+            return Assembly.GetExecutingAssembly().LocalPath().Sibling(path);
         }
 
-        /// <summary>
-        /// Deletes also write-protected files
-        /// </summary>
-        /// <param name="path"></param>
-        public static void ForceDelete(string path)
+        public static L.Path UserSetting(this Type type, string name)
         {
-            try
-            {
-                File.Delete(path);
-            }
-            catch (System.UnauthorizedAccessException)
-            {
-                path.SetReadOnly(false);
-                File.Delete(path);
-            }
-        }
-
-        public static string UserSetting(this Type type, string name)
-        {
-            string root = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-            string assemblyName = type.Assembly.GetName().Name;
-            string path = CatDir(root, assemblyName, name);
+            var root = new L.Path(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData));
+            var assemblyName = type.Assembly.GetName().Name;
+            var path = root.CatDir(assemblyName, name);
             return path;
         }
 
@@ -147,46 +121,6 @@ namespace Sidi.IO
             }
 
             return rel.Join(new String(System.IO.Path.DirectorySeparatorChar, 1));
-        }
-
-        public static string CatDir(params string[] dirs)
-        {
-            string r = null;
-            foreach (string i in dirs)
-            {
-                if (String.IsNullOrEmpty(r))
-                {
-                    r = i;
-                }
-                else if (!String.IsNullOrEmpty(i))
-                {
-                    r = System.IO.Path.Combine(r, i);
-                }
-            }
-            return r;
-        }
-
-        public static string CatDir(IEnumerable<string> dirs)
-        {
-            string r = String.Empty;
-            foreach (string i in dirs)
-            {
-                r = System.IO.Path.Combine(r, i);
-            }
-            return r;
-        }
-
-        /// <summary>
-        /// Replaces the file extension of a path. 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="newExtension">New extension (without dot)</param>
-        /// <returns></returns>
-        public static string ReplaceExtension(this string path, string newExtension)
-        {
-            string d = Path.GetDirectoryName(path);
-            string n = Path.GetFileNameWithoutExtension(path);
-            return FileUtil.CatDir(d, n + "." + newExtension);
         }
 
         /// <summary>
@@ -294,41 +228,5 @@ namespace Sidi.IO
                 string ExistingFileName,
                 IntPtr lpSecurityAttributes
             );
-
-        public static IEnumerable<string> Recurse(string path)
-        {
-            return Recurse(path, null);
-        }
-
-        public static IEnumerable<string> Recurse(string root, string relPath)
-        {
-            List<string> r = new List<string>();
-            r.Add(relPath);
-
-            string i;
-            while (r.Pop(out i))
-            {
-                string p = root.CatDir(i);
-                if (File.Exists(p))
-                {
-                    yield return i;
-                }
-                if (Directory.Exists(p))
-                {
-                    yield return i;
-                    foreach (var c in new DirectoryInfo(p).GetFileSystemInfos())
-                    {
-                        if (i == null)
-                        {
-                            r.Add(c.Name);
-                        }
-                        else
-                        {
-                            r.Add(i.CatDir(c.Name));
-                        }
-                    }
-                }
-            }
-        }
     }
 }

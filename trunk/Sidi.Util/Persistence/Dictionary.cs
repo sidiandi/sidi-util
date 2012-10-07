@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.Common;
 using System.Linq;
+using System.Data.SQLite;
 
 namespace Sidi.Persistence
 {
@@ -61,14 +62,9 @@ namespace Sidi.Persistence
             collection = new Collection<Record>(a_path, a_table);
         }
 
-        public Dictionary(DbConnection connection, string a_table)
+        public Dictionary(SharedConnection connection, string a_table)
         {
             collection = new Collection<Record>(connection, a_table);
-        }
-
-        public void Close()
-        {
-            collection.Close();
         }
 
         public DbTransaction BeginTransaction()
@@ -206,7 +202,7 @@ namespace Sidi.Persistence
 
         public void Dispose()
         {
-            Close();
+            collection.Dispose();
         }
     }
 }
