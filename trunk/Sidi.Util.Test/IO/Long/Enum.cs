@@ -43,7 +43,7 @@ namespace Sidi.IO.Long
                 Assert.IsFalse(d.Except(b).Any());
             }
 
-            Path TestTree = Sidi.IO.FileUtil.BinFile(".");
+            Path TestTree = Paths.BinDir.CatDir(".");
 
             [Test]
             public void Output()

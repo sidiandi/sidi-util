@@ -20,14 +20,13 @@ namespace Sidi.IO.Long
             [SetUp]
             public void Setup()
             {
-                root = Sidi.IO.FileUtil.BinFile(@"test\LongNameTest");
+                root = Paths.BinDir.CatDir(@"test\LongNameTest");
 
                 root.EnsureNotExists();
 
                 lp = root.CatDir(
                     Enumerable.Range(0, 100)
-                        .Select(x => String.Format("PathPart{0}", x))
-                        .ToArray());
+                        .Select(x => String.Format("PathPart{0}", x)));
 
                 lp.EnsureParentDirectoryExists();
             }

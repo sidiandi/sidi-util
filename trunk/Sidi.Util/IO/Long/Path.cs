@@ -6,6 +6,7 @@ using Sidi.Util;
 using Sidi.Extensions;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using System.Reflection;
 
 namespace Sidi.IO.Long
 {
@@ -38,7 +39,7 @@ namespace Sidi.IO.Long
             return path.path;
         }
 
-        void RemoveEmptyDirectories()
+        public void RemoveEmptyDirectories()
         {
             Path path = this;
 
@@ -130,9 +131,25 @@ namespace Sidi.IO.Long
         {
         }
 
-        public static Path FromParts(params string[] parts)
+        public static Path Join(params object[] parts)
         {
-            return new Path(parts);
+            return new Path(
+                parts
+                .SafeSelect(p =>
+                {
+                    if (p is Path)
+                    {
+                        return ((Path)p).NoPrefix;
+                    }
+                    else if (p is string)
+                    {
+                        return (string)p;
+                    }
+                    else
+                    {
+                        return Path.GetValidFilename(p.ToString());
+                    }
+                }));
         }
 
         public Path Canonic
@@ -295,14 +312,26 @@ namespace Sidi.IO.Long
             return new Path((new string[] { this.path }.Concat(parts)).Join(DirectorySeparator));
         }
 
-        public Path CatDir(params string[] parts)
+        public Path CatDir(params object[] parts)
         {
-            return CatDir(parts.Cast<string>());
-        }
-
-        public Path CatDir(params Path[] parts)
-        {
-            return CatDir(parts.Select(x => x.NoPrefix).ToArray());
+            return new Path(
+                new string[] { this.NoPrefix }.Concat(
+                parts
+                .SafeSelect(p =>
+                {
+                    if (p is Path)
+                    {
+                        return ((Path)p).NoPrefix;
+                    }
+                    else if (p is string)
+                    {
+                        return (string)p;
+                    }
+                    else
+                    {
+                        return Path.GetValidFilename(p.ToString());
+                    }
+                })));
         }
 
         public Path CatName(string namePostfix)

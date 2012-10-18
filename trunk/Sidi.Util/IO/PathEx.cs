@@ -45,19 +45,6 @@ namespace Sidi.IO
             }
         }
 
-        public static string CatDir(params string[] dirs)
-        {
-            string p = String.Empty;
-            foreach (string i in dirs)
-            {
-                if (!String.IsNullOrEmpty(i))
-                {
-                    p = Path.Combine(p, i);
-                }
-            }
-            return p;
-        }
-
         public const int MAX_PATH = 260;
         public const int MAX_ALTERNATE = 14;
 
@@ -158,11 +145,6 @@ namespace Sidi.IO
             }
 
             return String.Join(new String(Path.DirectorySeparatorChar, 1), result.ToArray());
-        }
-
-        public static Sidi.IO.Long.Path Bin(string relPath)
-        {
-            return Assembly.GetExecutingAssembly().LocalPath().CatDir("..", relPath).Canonic;
         }
 
         public static string[] SplitCommaSeparatedList(this string list)

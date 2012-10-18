@@ -119,6 +119,7 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\Long\Paths.cs" />
     <Compile Include="IO\Long\CopyOp.cs" />
     <Compile Include="IO\Long\CopyProgress.cs" />
     <Compile Include="IO\Long\Directory.cs" />

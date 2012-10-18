@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Sidi.IO;
+using L = Sidi.IO.Long;
 using System.IO;
 using Sidi.Util;
 
@@ -36,7 +37,7 @@ namespace Sidi.Build.Test
 
         public PdbstrTest()
         {
-            pdbFile = FileUtil.BinFile("Sidi.Util.pdb");
+            pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
         }
 
         [SetUp]

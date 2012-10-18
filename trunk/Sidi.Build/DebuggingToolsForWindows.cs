@@ -41,8 +41,8 @@ namespace Sidi.Build
             {
                 string[] searchPath = new string[]
                 {
-                    L.Path.FromParts(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
-                    L.Path.FromParts(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
+                    L.Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
+                    L.Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
                 };
 
                 foreach (string d in searchPath)

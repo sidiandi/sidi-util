@@ -192,5 +192,14 @@ namespace Sidi.IO.Long
         {
             Assert.IsTrue(new Sidi.IO.Long.Path(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
         }
+
+        [Test]
+        public void CatDir()
+        {
+            int someNum = 123;
+            var p = Path.Join(@"C:\temp", someNum);
+            Assert.AreEqual(new Path(@"C:\temp\123"), p);
+            Assert.AreEqual(new Path(@"C:\temp\123\dir"), Path.Join(p, "dir"));
+        }
     }
 }

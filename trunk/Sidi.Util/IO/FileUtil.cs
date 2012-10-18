@@ -54,29 +54,6 @@ namespace Sidi.IO
             return null;
         }
 
-        public static L.Path LocalPath(this Assembly assembly)
-        {
-            return new L.Path(new Uri(assembly.CodeBase).LocalPath);
-        }
-
-        /// <summary>
-        /// Returns a file in the same directory as the assembly.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static L.Path BinFile(string path)
-        {
-            return Assembly.GetExecutingAssembly().LocalPath().Sibling(path);
-        }
-
-        public static L.Path UserSetting(this Type type, string name)
-        {
-            var root = new L.Path(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData));
-            var assemblyName = type.Assembly.GetName().Name;
-            var path = root.CatDir(assemblyName, name);
-            return path;
-        }
-
         public static System.IO.FileSystemInfo GetFileSystemInfo(this string path)
         {
             FileInfo f = new FileInfo(path);
