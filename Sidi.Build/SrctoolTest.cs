@@ -23,6 +23,7 @@ using NUnit.Framework;
 using Sidi.IO;
 using System.IO;
 using Sidi.Build;
+using L = Sidi.IO.Long;
 
 namespace Sidi.Build.Test
 {
@@ -53,7 +54,7 @@ namespace Sidi.Build.Test
             instance = new Srctool();
         }
 
-        string pdbFile = FileUtil.BinFile("Sidi.Util.pdb");
+        string pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
 
         /// <summary>
         /// Dump source information of a PDB file
