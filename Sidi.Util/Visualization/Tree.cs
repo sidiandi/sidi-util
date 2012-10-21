@@ -5,35 +5,36 @@ using System.Text;
 
 namespace Sidi.Visualization
 {
-    public interface ITree
+    public class Tree : ITree
     {
-        float Size { get; }
-        ITree Parent { get; }
-        IEnumerable<ITree> Children { get; }
-    }
-
-    public class Tree<T> : ITree
-    {
-        public Tree(Tree<T> parent)
+        public Tree(Tree parent)
         {
             this.Parent = parent;
+            if (Parent != null)
+            {
+                if (parent.children == null)
+                {
+                    parent.children = new List<Tree>();
+                }
+                parent.children.Add(this);
+            }
         }
 
-        public IList<T> Lineage
+        public IList<object> Lineage
         {
             get
             {
-                var lineage = new List<T>();
+                var lineage = new List<object>();
                 for (var i = this; i != null; i = i.Parent)
                 {
-                    lineage.Add(i.Data);
+                    lineage.Add(i.Object);
                 }
                 lineage.Reverse();
                 return lineage;
             }
         }
 
-        public T Data { get; set; }
+        public object Object { get; set; }
         public float Size { get; set; }
 
         ITree ITree.Parent
@@ -44,7 +45,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public Tree<T> Parent { get; set; }
+        public Tree Parent { get; set; }
         
         IEnumerable<ITree> ITree.Children
         {
@@ -54,23 +55,22 @@ namespace Sidi.Visualization
             }
         }
 
-        public List<Tree<T>> Children
+        public IEnumerable<Tree> Children
         {
             get
             {
                 if (children == null)
                 {
-                    children = new List<Tree<T>>();
+                    return new Tree[] { };
                 }
-                return children;
-            }
-            set
-            {
-                children = value;
+                else
+                {
+                    return children;
+                }
             }
         }
 
-        List<Tree<T>> children;
+        List<Tree> children;
 
         /// <summary>
         /// calculates the sum of the sizes of all children
@@ -92,20 +92,20 @@ namespace Sidi.Visualization
                     i.UpdateSize();
                 }
                 Size = ChildSize;
-                Children = Children.OrderByDescending(x => x.Size).ToList();
+                children = children.OrderByDescending(x => x.Size).ToList();
             }
         }
 
         public override string ToString()
         {
-            return Data.ToString();
+            return Object.ToString();
         }
 
-        public IEnumerable<Tree<T>> AllNodes
+        public IEnumerable<Tree> AllNodes
         {
             get
             {
-                return new Tree<T>[] { this }.Concat(this.Children.SelectMany(c => c.AllNodes));
+                return new Tree[] { this }.Concat(this.Children.SelectMany(c => c.AllNodes));
             }
         }
     }

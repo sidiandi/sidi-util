@@ -12,7 +12,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
-    public class CushionPainter<T> where T : ITree
+    public class CushionPainter
     {
         float h = 0.75f;
         float f = 0.75f;
@@ -20,7 +20,7 @@ namespace Sidi.Visualization
         const float Is = 215;
         float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
 
-        public CushionPainter(TreeMapControl<T> control)
+        public CushionPainter(TreeMapControl control)
         {
             this.control = control;
 
@@ -44,7 +44,7 @@ namespace Sidi.Visualization
 
         }
 
-        TreeMapControl<T> control;
+        TreeMapControl control;
 
         public Bitmap Render(Size bitmapSize, RectangleF rect)
         {
@@ -76,9 +76,8 @@ namespace Sidi.Visualization
             return bitmap;
         }
 
-        void Render(BitmapData bitmap, Tree<TreeMapLayout.Layout> t, float h, float f, float[,] s)
+        void Render(BitmapData bitmap, TreeMapLayout.Layout layout, float h, float f, float[,] s)
         {
-            var layout = (TreeMapLayout.Layout)t.Data;
             var r = layout.Rectangle;
 
             if (!r.Intersects(rect))
@@ -88,7 +87,7 @@ namespace Sidi.Visualization
 
             s = s.Copy();
 
-            if (t.Parent != null)
+            if (layout.Parent != null)
             {
                 for (int d = 0; d < 2; ++d)
                 {
@@ -97,15 +96,15 @@ namespace Sidi.Visualization
                 }
             }
 
-            if (!t.Children.Any())
+            if (!layout.Children.Any())
             {
                 var bitmapR = r.Copy();
                 transform.Transform(bitmapR);
-                RenderCushion(bitmap, bitmapR, r, s, NodeColor((T)t.Data.TreeNode).ToArray());
+                RenderCushion(bitmap, bitmapR, r, s, NodeColor(layout.TreeNode.Object).ToArray());
             }
             else
             {
-                foreach (var i in t.Children)
+                foreach (var i in layout.Children)
                 {
                     Render(bitmap, i, h * f, f, s);
                 }
@@ -151,7 +150,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public Func<T, Color> NodeColor
+        public Func<object, Color> NodeColor
         {
             set
             {
@@ -166,7 +165,7 @@ namespace Sidi.Visualization
             }
         }
 
-        Func<T, Color> nodeColor = n => Color.White;
+        Func<object, Color> nodeColor = n => Color.White;
 
         object treeLayout;
 

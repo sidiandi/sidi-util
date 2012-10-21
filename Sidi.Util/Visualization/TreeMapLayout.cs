@@ -14,45 +14,60 @@ namespace Sidi.Visualization
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public TreeMapLayout(ITree root)
+        public TreeMapLayout(Tree root)
         {
-            this.root = root;
-            DoLayout = 
+            this.tree = root;
+            DoLayout =
                 // Stripes
                 Squares
                 ;
         }
 
-        ITree root;
-        Tree<Layout> layoutTree;
+        public class Layout : Tree
+        {
+            public Layout(Layout parent)
+                : base(parent)
+            {
+                Rectangle = new float[2, 2];
+            }
 
-        public ITree Tree
+            public IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
+
+            public float[,] Rectangle;
+            public Tree TreeNode;
+        }
+
+        Tree tree;
+        Layout layout;
+
+        public Tree Tree
         {
             get
             {
-                return root;
+                return tree;
             }
 
             set
             {
-                root = value;
+                tree = value;
             }
         }
 
-        public Tree<Layout> LayoutTree
+        public Layout LayoutTree
         {
             get
             {
-                if (layoutTree == null || (ITree)layoutTree.Data.TreeNode != (ITree)Tree || !layoutTree.Data.Rectangle.Equals(rect))
+                if (layout == null || (ITree)layout.TreeNode != (ITree)Tree || !layout.Rectangle.Equals(rect))
                 {
-                    layoutTree = UpdateLayoutTreeRecursive(null, root, rect);
+                    layout = new Layout(null) { TreeNode = Tree, Rectangle = rect.Copy() };
+                    Update(layout);
                 }
-                return layoutTree;
+                return layout;
             }
         }
 
         float[,] rect;
-        float[,] margin = new float[,] { { 0,0 }, { 0, 0 } };
+        float[,] margin = new float[,] { { 0, 0 }, { 0, 0 } };
 
         public RectangleF Bounds
         {
@@ -67,44 +82,43 @@ namespace Sidi.Visualization
             }
         }
 
-        Tree<Layout> UpdateLayoutTreeRecursive(Tree<Layout> parent, ITree tree, float[,] rect)
+        /// <summary>
+        /// Recursively updates a layout tree.
+        /// </summary>
+        /// <param name="layout">Layout tree node to be updated. Rectangle and TreeNode must be initialized.</param>
+        /// <returns></returns>
+        void Update(Layout layout)
         {
-            var layoutTree = new Tree<Layout>(parent)
+            if (layout.TreeNode.Children.Any() && layout.TreeNode.Size > 0)
             {
-                Data = new Layout(tree)
+                var lc = new LayoutContext()
                 {
-                    Rectangle = (float[,])rect.Clone(),
-                },
-                Size = tree.Size,
-            };
-
-            if (tree.Children.Any() && tree.Size > 0 && layoutTree.Data.Rectangle.CoversPixel())
-            {
-                var lc = new LayoutContext();
-                lc.Layout = tree.Children.Select(x => new Layout(x)).ToArray();
-                lc.Rectangle = (float[,])rect.Clone();
+                    Layout = layout.TreeNode.Children.Select(x => new Layout(layout) { TreeNode = x }).ToArray(),
+                    Rectangle = layout.Rectangle.Copy()
+                };
                 lc.Rectangle.Add(margin);
+                
                 DoLayout(lc);
-                layoutTree.Children = lc.Layout
-                    .Select(x => UpdateLayoutTreeRecursive(layoutTree, x.TreeNode, x.Rectangle))
-                    .ToList();
+
+                foreach (var i in layout.Children)
+                {
+                    Update(i);
+                }
             }
-
-            return layoutTree;
         }
 
-        public Tree<Layout> GetLayoutAt(float[] p, int levels)
+        public Layout GetLayoutAt(float[] p, int levels)
         {
-            return GetLayoutAt(layoutTree, p, levels);
+            return GetLayoutAt(layout, p, levels);
         }
 
-        Tree<Layout> GetLayoutAt(Tree<Layout> t, float[] p, int levels)
+        Layout GetLayoutAt(Layout t, float[] p, int levels)
         {
-            if (t != null && t.Data.Rectangle.Contains(p))
+            if (t != null && t.Rectangle.Contains(p))
             {
                 if (levels > 0)
                 {
-                    foreach (var i in t.Children)
+                    foreach (var i in t.Children.Cast<Layout>())
                     {
                         var il = GetLayoutAt(i, p, levels - 1);
                         if (il != null)
@@ -126,18 +140,6 @@ namespace Sidi.Visualization
             public float[,] Rectangle;
             public Dir Direction;
             public Layout[] Layout;
-        }
-
-        public class Layout
-        {
-            public Layout(ITree tree)
-            {
-                TreeNode = tree;
-                Rectangle = new float[2, 2];
-            }
-
-            public float[,] Rectangle;
-            public ITree TreeNode;
         }
 
         public Action<LayoutContext> DoLayout;
@@ -162,7 +164,7 @@ namespace Sidi.Visualization
                 var r = tc.Rectangle;
                 r[(int)d, (int)Bound.Min] = x;
                 x += tc.TreeNode.Size * m;
-                r[(int)d, (int)Bound.Max] = 
+                r[(int)d, (int)Bound.Max] =
                 r[(int)od, (int)Bound.Min] = c.Rectangle[(int)od, (int)Bound.Min];
                 r[(int)od, (int)Bound.Max] = c.Rectangle[(int)od, (int)Bound.Max];
             }
@@ -187,7 +189,7 @@ namespace Sidi.Visualization
                 throw new ArgumentException("h");
             }
 
-            for (int i= b; i< e; ++i)
+            for (int i = b; i < e; ++i)
             {
                 var w = layout[i].TreeNode.Size * sizeToPix / h;
                 var ar = (w == 0.0f) ? 1.0f : (w > h ? (w / h) : (h / w));
@@ -227,7 +229,7 @@ namespace Sidi.Visualization
             {
                 for (int i = b; i < e; ++i)
                 {
-                    layout[i].Rectangle = (float[,]) r.Clone();
+                    layout[i].Rectangle = (float[,])r.Clone();
                 }
                 return;
             }
