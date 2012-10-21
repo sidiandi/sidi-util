@@ -148,18 +148,6 @@ namespace Sidi.Visualization
                 }
             };
 
-            tm.MouseWheel += (s, e) =>
-                {
-                    if (e.Delta > 0)
-                    {
-                        tm.ZoomIn(e.Location, 1);
-                    }
-                    else if (e.Delta < 0)
-                    {
-                        tm.ZoomOut(1);
-                    }
-                };
-
             return tm;
         }
 
