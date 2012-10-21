@@ -16,25 +16,25 @@ namespace Sidi.Visualization
         {
         }
 
-        public static Tree<int> GetTestTree()
+        public static Tree GetTestTree()
         {
             var t = GetTestTree(null, 10, 5);
+            t.UpdateSize();
             return t;
         }
 
         static Random rnd = new Random();
 
-        public static Tree<int> GetSimpleTestTree()
+        public static Tree GetSimpleTestTree()
         {
-            var t = new Tree<int>(null);
+            var t = new Tree(null);
             var count = 3;
-            t.Children = Enumerable.Range(1, count).Select(i =>
-                {
-                    var c = new Tree<int>(t);
-                    c.Size = i;
-                    c.Data = i;
-                    return c;
-                }).ToList();
+            foreach (var i in Enumerable.Range(1, count))
+            {
+                var c = new Tree(t);
+                c.Size = i;
+                c.Object = i;
+            }
 
             if (t.Children.Any())
             {
@@ -48,20 +48,16 @@ namespace Sidi.Visualization
             return t;
         }
 
-        static Tree<int> GetTestTree(Tree<int> parent, int childCount, int levels)
+        static Tree GetTestTree(Tree parent, int childCount, int levels)
         {
-            var t = new Tree<int>(parent);
+            var t = new Tree(parent);
             if (levels > 0)
             {
-                t.Children = Enumerable.Range(0, rnd.Next(0, childCount))
-                    .Select(c =>
-                        {
-                            var ct = GetTestTree(t, childCount, levels - 1);
-                            ct.Data = c;
-                            return ct;
-                        })
-                    .ToList();
-
+                foreach (var c in Enumerable.Range(0, rnd.Next(0, childCount)))
+                {
+                    var ct = GetTestTree(t, childCount, levels - 1);
+                    ct.Object = c;
+                }
                 t.Size = t.Children.Aggregate(0.0f, (s, x) => s + x.Size);
             }
             else

@@ -11,45 +11,20 @@ namespace Sidi.Visualization
 {
     public class SimpleTreeMap
     {
-        public class ItemBase
-        {
-            public object Tag = null;
-            public IEnumerable<object> Lineage;
-            public float Size = 1.0f;
-        }
-
-        public class Item : ItemBase
-        {
-            public Color Color = Color.White;
-        }
-
-        static void Add(Tree<Data> tree, object[] lineage, Item data, int level)
+        static void Add(Tree tree, object[] lineage, int level)
         {
             if (level < lineage.Length)
             {
                 var value = lineage[level];
-                var c = tree.Children.FirstOrDefault(i => i.Data.Value.Equals(value));
+                var c = tree.Children.FirstOrDefault(i => i.Object.Equals(value));
                 if (c == null)
                 {
-                    c = new Tree<Data>(tree);
-                    tree.Children.Add(c);
-                    c.Data = new Data() { Value = value, Item = data };
+                    c = new Tree(tree) { Object = value };
                 }
-                Add(c, lineage, data, level + 1);
+                Add(c, lineage, level + 1);
             }
             else
             {
-                tree.Size += data.Size;
-            }
-        }
-
-        public class Data
-        {
-            public object Value;
-            public Item Item;
-            public override string ToString()
-            {
-                return Value.SafeToString();
             }
         }
 
@@ -101,10 +76,10 @@ namespace Sidi.Visualization
 
         public string LineageSeparator = "/";
         
-        public TreeMapControl<Tree<Data>> CreateControl()
+        public TreeMapControl CreateControl()
         {
             var tree = MakeTree(Items);
-            var tm = tree.CreateTreemapControl();
+            var tm = TreeMapControl.FromTree(tree);
 
             tm.CushionPainter.NodeColor = t => t.Data.Item.Color;
 

@@ -235,15 +235,15 @@
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\FloatArrayEx.cs" />
     <Compile Include="Visualization\HSLColor.cs" />
+    <Compile Include="Visualization\ITree.cs" />
     <Compile Include="Visualization\LabelPainter.cs" />
-    <Compile Include="Visualization\SimpleTreeMap.cs" />
     <Compile Include="Visualization\Tile.cs" />
     <Compile Include="Visualization\Tiles.cs" />
     <Compile Include="Visualization\Tree.cs" />
-    <Compile Include="Visualization\TreeMap.cs" />
     <Compile Include="Visualization\TreeMapControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Visualization\TreeMapLayout.cs" />
     <Compile Include="Visualization\Util.cs" />
     <Compile Include="Visualization\ZoomPanController.cs" />
   </ItemGroup>
