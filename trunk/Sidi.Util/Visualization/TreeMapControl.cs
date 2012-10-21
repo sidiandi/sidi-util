@@ -27,6 +27,8 @@ namespace Sidi.Visualization
             c.TreeLayout = new TreeMapLayout(tree);
             return c;
         }
+
+        ZoomPanController zoomPanController;
         
         public TreeMapControl()
         {
@@ -45,6 +47,8 @@ namespace Sidi.Visualization
                         ItemActivate(this, new ItemEventEventArgs(l));
                     }
                 };
+
+            zoomPanController = new ZoomPanController(this);
 
             this.ContextMenu = new ContextMenu(new[]{
                 new MenuItem("Zoom In", (s,e) => { ZoomIn(ClickLocation, 1); }),
@@ -164,8 +168,11 @@ namespace Sidi.Visualization
             }
         }
 
+        Matrix worldTransform = new Matrix();
+        
         protected override void OnPaint(PaintEventArgs e)
         {
+            e.Graphics.Transform = zoomPanController.Transform;
             CushionPainter.Paint(e);
             base.OnPaint(e);
         }

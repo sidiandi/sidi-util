@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Sidi.Visualization
 {
@@ -99,5 +100,77 @@ namespace Sidi.Visualization
             return ((int)r[0, 0] != (int)r[0, 1])
                 && ((int)r[1, 0] != (int)r[1, 1]);
         }
+
+        public static float[,] Copy(this float[,] x)
+        {
+            return (float[,])x.Clone();
+        }
+
+        public static float[,] Create(PointF p0, PointF p1)
+        {
+            var r = new float[2, 2];
+            r[(int)Dir.X, (int)Bound.Min] = p0.X;
+            r[(int)Dir.X, (int)Bound.Max] = p1.X;
+            r[(int)Dir.Y, (int)Bound.Min] = p0.Y;
+            r[(int)Dir.Y, (int)Bound.Max] = p1.Y;
+            return r;
+        }
+
+        public static RectangleF ToRect(float[,] f)
+        {
+            return new RectangleF(
+                f[(int)Dir.X, (int)Bound.Min],
+                f[(int)Dir.Y, (int)Bound.Min],
+                f.Width(),
+                f.Height());
+        }
+
+        public static float Width(this float[,] f)
+        {
+            return f[(int)Dir.X, (int)Bound.Max] - f[(int)Dir.X, (int)Bound.Min];
+        }
+
+        public static float Height(this float[,] f)
+        {
+            return f[(int)Dir.Y, (int)Bound.Max] - f[(int)Dir.Y, (int)Bound.Min];
+        }
+
+        public static bool Intersects(this float[,] a, float[,] b)
+        {
+            return ToRect(a).IntersectsWith(ToRect(b));
+        }
+
+        public static float[,] Create(float x0, float y0, float x1, float y1)
+        {
+            var r = new float[2, 2];
+            r[(int)Dir.X, (int)Bound.Min] = x0;
+            r[(int)Dir.X, (int)Bound.Max] = x1;
+            r[(int)Dir.Y, (int)Bound.Min] = y0;
+            r[(int)Dir.Y, (int)Bound.Max] = y1;
+            return r;
+        }
+
+        public static float[,] Create(RectangleF rect)
+        {
+            var r = new float[2, 2];
+            r[(int)Dir.X, (int)Bound.Min] = rect.Left;
+            r[(int)Dir.X, (int)Bound.Max] = rect.Right;
+            r[(int)Dir.Y, (int)Bound.Min] = rect.Top;
+            r[(int)Dir.Y, (int)Bound.Max] = rect.Bottom;
+            return r;
+        }
+
+        public static void Transform(this Matrix m, float[,] x)
+        {
+            var p = new PointF[]{ new PointF(x[(int)Dir.X, (int)Bound.Min], x[(int)Dir.Y, (int)Bound.Min]),
+                new PointF(x[(int)Dir.X, (int)Bound.Max], x[(int)Dir.Y, (int)Bound.Max])};
+
+            m.TransformPoints(p);
+            x[(int)Dir.X, (int)Bound.Min] = p[0].X;
+            x[(int)Dir.X, (int)Bound.Max] = p[1].X;
+            x[(int)Dir.Y, (int)Bound.Min] = p[0].Y;
+            x[(int)Dir.Y, (int)Bound.Max] = p[1].Y;
+        }
+
     }
 }
