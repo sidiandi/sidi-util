@@ -13,22 +13,20 @@ namespace Sidi.Visualization
         private double saturation = 1.0;
         private double luminosity = 1.0;
 
-        private const double scale = 240.0;
-
         public double Hue
         {
-            get { return hue * scale; }
-            set { hue = CheckRange(value / scale); }
+            get { return hue; }
+            set { hue = CheckRange(value); }
         }
         public double Saturation
         {
-            get { return saturation * scale; }
-            set { saturation = CheckRange(value / scale); }
+            get { return saturation; }
+            set { saturation = CheckRange(value); }
         }
         public double Luminosity
         {
-            get { return luminosity * scale; }
-            set { luminosity = CheckRange(value / scale); }
+            get { return luminosity; }
+            set { luminosity = CheckRange(value); }
         }
 
         private double CheckRange(double value)

@@ -237,6 +237,9 @@
     <Compile Include="Visualization\HSLColor.cs" />
     <Compile Include="Visualization\ITree.cs" />
     <Compile Include="Visualization\LabelPainter.cs" />
+    <Compile Include="Visualization\SimpleTreeMap.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Visualization\Tile.cs" />
     <Compile Include="Visualization\Tiles.cs" />
     <Compile Include="Visualization\Tree.cs" />

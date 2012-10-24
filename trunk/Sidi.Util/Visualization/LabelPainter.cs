@@ -67,7 +67,7 @@ namespace Sidi.Visualization
 
         public void Paint(PaintEventArgs e)
         {
-            var layout = treeMapControl.TreeLayout;
+            var layout = treeMapControl.Layout;
             float maxArea = layout.LayoutTree.Rectangle.Area();
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             if (focusPointEnabled)
@@ -98,7 +98,7 @@ namespace Sidi.Visualization
             if (LevelVisible[level])
             {
                 var rect = n.Rectangle.ToRectangleF();
-                var text = Text(n.TreeNode);
+                var text = Text(n.Tree);
                 var textSize = e.Graphics.MeasureString(text, Font);
                 var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
                 if ((scale * textSize.Height * 8) < rect.Height)
@@ -187,14 +187,14 @@ namespace Sidi.Visualization
                 }
                 else
                 {
-                    var text = Text(n.TreeNode);
+                    var text = Text(n.Tree);
                     DrawLabel(e.Graphics, text, rect);
                 }
                 return true;
             }
             else
             {
-                var text = Text(n.TreeNode);
+                var text = Text(n.Tree);
                 DrawLabel(e.Graphics, text, rect);
                 return true;
             }

@@ -24,7 +24,10 @@ namespace Sidi.Visualization
         {
             this.control = control;
 
-            tileBitmaps = new Collections.LruCacheBackground<Tile, Bitmap>(300, tile =>
+            var sb = Screen.PrimaryScreen.Bounds;
+            var cachedTiles = sb.Width * sb.Height / tiles.Size.Width / tiles.Size.Height * 2;
+            
+            tileBitmaps = new Collections.LruCacheBackground<Tile, Bitmap>(cachedTiles, tile =>
                 {
                     return Render(tiles.Size, RectangleF.FromLTRB(tile.P0.X, tile.P0.Y, tile.P1.X, tile.P1.Y));
                 });
@@ -40,7 +43,7 @@ namespace Sidi.Visualization
                 g.FillRectangle(new SolidBrush(Color.Black), 0,0, d.Width, d.Height);
             }
 
-            tileBitmaps.DefaultValueWhileLoading = d;
+            tileBitmaps.DefaultValueWhileLoading = null;
 
         }
 
@@ -66,7 +69,7 @@ namespace Sidi.Visualization
             {
                 var surface = new float[4];
                 var s = new float[2, 2];
-                Render(data, control.TreeLayout.LayoutTree, h, f, s);
+                Render(data, control.Layout.LayoutTree, h, f, s);
             }
             finally
             {
@@ -100,7 +103,7 @@ namespace Sidi.Visualization
             {
                 var bitmapR = r.Copy();
                 transform.Transform(bitmapR);
-                RenderCushion(bitmap, bitmapR, r, s, NodeColor(layout.TreeNode.Object).ToArray());
+                RenderCushion(bitmap, bitmapR, r, s, NodeColor(layout.Tree.Object).ToArray());
             }
             else
             {
@@ -156,7 +159,6 @@ namespace Sidi.Visualization
             {
                 nodeColor = value;
                 Invalidate();
-                control.Invalidate();
             }
 
             get
@@ -167,32 +169,59 @@ namespace Sidi.Visualization
 
         Func<object, Color> nodeColor = n => Color.White;
 
-        object treeLayout;
+        TreeMapLayout layout;
 
         void Invalidate()
         {
             tileBitmaps.Clear();
+            layout = control.Layout;
+            control.Invalidate();
         }
 
         public void Paint(PaintEventArgs e)
         {
+            if (control.Layout != layout)
+            {
+                Invalidate();
+            }
+            
             var transform = e.Graphics.Transform.Clone();
             e.Graphics.Transform = new Matrix();
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+            e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
             
             foreach (var i in tiles.Get(transform, control.ClientRectangle))
             {
-                var pts = new[] { i.P0, new PointF(i.P1.X, i.P0.Y), new PointF(i.P0.X, i.P1.Y) };
+                var pts = new[] { i.P0, i.P1 };
                 transform.TransformPoints(pts);
                 var intPts = pts.Select(x => new Point((int)x.X, (int)x.Y)).ToArray();
+                // var destRect = Rectangle.FromLTRB(intPts[0].X, intPts[0].Y, intPts[1].X, intPts[1].Y);
+                var destRect = RectangleF.FromLTRB(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
 
                 var t = tileBitmaps[i];
                 if (t != null)
                 {
-                    e.Graphics.DrawImage(t, intPts);
-                    // e.Graphics.DrawString((intPts[1].X - intPts[0].X).ToString(), control.Font, new SolidBrush(Color.Red), intPts[0]);
-                    // e.Graphics.DrawString(intPts.Join(), control.Font, new SolidBrush(Color.Red), intPts[0]);
+                    e.Graphics.DrawImage(t, destRect);
                 }
+                else
+                {
+                    var sourceRect = new Rectangle(0, 0, tiles.Size.Width, tiles.Size.Height);
+                    for (var coarseTile = tiles.GetNextLevel(i, ref sourceRect); coarseTile != null; coarseTile = tiles.GetNextLevel(coarseTile, ref sourceRect))
+                    {
+                        if (tileBitmaps.Contains(coarseTile))
+                        {
+                            t = tileBitmaps[coarseTile];
+                            if (t != null)
+                            {
+                                e.Graphics.DrawImage(t, destRect, sourceRect, GraphicsUnit.Pixel);
+                                break;
+                            }
+                        }
+                    }
+                }
+                // e.Graphics.DrawString((intPts[1].X - intPts[0].X).ToString(), control.Font, new SolidBrush(Color.Red), intPts[0]);
+                // e.Graphics.DrawString(intPts.Join(), control.Font, new SolidBrush(Color.Red), intPts[0]);
+
             }
 
             e.Graphics.Transform = transform;

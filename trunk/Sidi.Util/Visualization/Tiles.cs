@@ -73,5 +73,27 @@ namespace Sidi.Visualization
         {
             return (int)Math.Ceiling(Math.Log(x) / Math.Log(2));
         }
+
+        internal Tile GetNextLevel(Tile i, ref Rectangle sourceRect)
+        {
+            sourceRect = new Rectangle(
+                sourceRect.X + (i.X & 1) * sourceRect.Width / 2,
+                sourceRect.Y + (i.Y & 1) * sourceRect.Height / 2,
+                sourceRect.Width / 2,
+                sourceRect.Height / 2
+                );
+
+            if (sourceRect.Width < 32)
+            {
+                return null;
+            }
+
+            return new Tile()
+            {
+                Level = i.Level + 1,
+                X = i.X / 2,
+                Y = i.Y / 2
+            };
+        }
     }
 }

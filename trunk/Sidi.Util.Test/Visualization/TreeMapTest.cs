@@ -18,7 +18,7 @@ namespace Sidi.Visualization
 
         public static Tree GetTestTree()
         {
-            var t = GetTestTree(null, 10, 5);
+            var t = GetTestTree(null, 10, 7);
             t.UpdateSize();
             return t;
         }
@@ -54,6 +54,7 @@ namespace Sidi.Visualization
             if (levels > 0)
             {
                 foreach (var c in Enumerable.Range(0, rnd.Next(0, childCount)))
+                // foreach (var c in Enumerable.Range(0, childCount))
                 {
                     var ct = GetTestTree(t, childCount, levels - 1);
                     ct.Object = c;

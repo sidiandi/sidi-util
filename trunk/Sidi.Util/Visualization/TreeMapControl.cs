@@ -13,9 +13,7 @@ namespace Sidi.Visualization
     {
         public static TreeMapControl FromTree(Tree tree)
         {
-            var c = new TreeMapControl();
-            c.TreeLayout = new TreeMapLayout(tree);
-            return c;
+            return new TreeMapControl() { Tree = tree };
         }
 
         ZoomPanController zoomPanController;
@@ -91,47 +89,45 @@ namespace Sidi.Visualization
         /// <param name="orderBy"></param>
         public void SetBinnedNodeColor(Func<object, IComparable> orderBy)
         {
-            var bins = new Bins(TreeLayout.Tree.GetAllNodes().Cast<object>().Select(orderBy));
+            var bins = new Bins(Tree.GetAllNodes().Cast<object>().Select(orderBy));
             var colorMap = ColorMap.BlueRed(0.0, 1.0);
             CushionPainter.NodeColor = n => colorMap.ToColor(bins.Percentile(orderBy(n)));
         }
 
         TreeMapLayout.Layout GetLayoutAt(Point p)
         {
-            return TreeLayout.GetLayoutAt(p.ToArray(), Int32.MaxValue);
+            return Layout.GetLayoutAt(p.ToArray(), Int32.MaxValue);
         }
 
         public object GetObjectAt(Point p)
         {
-            return ((Tree)GetLayoutAt(p).TreeNode).Object;
+            return ((Tree)GetLayoutAt(p).Tree).Object;
         }
 
         TreeMapLayout.Layout GetLayoutAt(Point p, int levels)
         {
-            return TreeLayout.GetLayoutAt(p.ToArray(), levels);
+            return Layout.GetLayoutAt(p.ToArray(), levels);
         }
 
         TreeMapLayout.Layout hoveredNode;
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
         {
-            TreeLayout.Bounds = this.Bounds;
+            this.Layout = new TreeMapLayout(Layout.LayoutTree.Tree, this.Bounds);
         }
 
-        public TreeMapLayout TreeLayout { set; get; }
+        public TreeMapLayout Layout { get; private set; }
 
         public Tree Tree
         {
             get
             {
-                return TreeLayout.Tree;
+                return Layout.LayoutTree.Tree;
             }
 
             set
             {
-                TreeLayout = new TreeMapLayout(value);
-                TreeLayout.Bounds = this.Bounds;
-                Invalidate();
+                Layout = new TreeMapLayout(value, this.Bounds);
             }
         }
 
@@ -150,10 +146,10 @@ namespace Sidi.Visualization
         {
             if (MouseHoverNode != null)
             {
-                var hovered = MouseHoverNode.TreeNode;
+                var hovered = MouseHoverNode.Tree;
                 ForEachLeaf(n =>
                 {
-                    if (f(hovered, (Tree) n.TreeNode))
+                    if (f(hovered, (Tree) n.Tree))
                     {
                         Highlight(e, n, color);
                     }
@@ -208,12 +204,12 @@ namespace Sidi.Visualization
 
         public void ForEachNode(Action<TreeMapLayout.Layout> a)
         {
-            ForEachNode(TreeLayout.LayoutTree, a);
+            ForEachNode(Layout.LayoutTree, a);
         }
 
         public void ForEachLeaf(Action<TreeMapLayout.Layout> a)
         {
-            ForEachLeaf(TreeLayout.LayoutTree, a);
+            ForEachLeaf(Layout.LayoutTree, a);
         }
 
         void ForEachNode(TreeMapLayout.Layout layoutTree, Action<TreeMapLayout.Layout> a)
@@ -259,7 +255,7 @@ namespace Sidi.Visualization
             {
                 get
                 {
-                    return layout.TreeNode;
+                    return layout.Tree;
                 }
             }
         }
@@ -282,12 +278,12 @@ namespace Sidi.Visualization
 
         public void ZoomIn(Point p, int levels)
         {
-            Tree = GetLayoutAt(p, levels).TreeNode;
+            Tree = GetLayoutAt(p, levels).Tree;
         }
 
         public void ZoomOut(int levels)
         {
-            var t = TreeLayout.Tree;
+            var t = Tree;
             for (int i = 0; i < levels; ++i)
             {
                 if (t.Parent != null)
