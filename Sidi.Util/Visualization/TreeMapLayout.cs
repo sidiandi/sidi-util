@@ -14,13 +14,11 @@ namespace Sidi.Visualization
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public TreeMapLayout(Tree root)
+        public TreeMapLayout(Tree root, RectangleF bounds)
         {
-            this.tree = root;
-            DoLayout =
-                // Stripes
-                Squares
-                ;
+            layout = new Layout(null) { Tree = root, Rectangle = bounds.ToArray() };
+            DoLayout = Squares;
+            Update(layout);
         }
 
         public class Layout : Tree
@@ -34,53 +32,20 @@ namespace Sidi.Visualization
             public IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
 
             public float[,] Rectangle;
-            public Tree TreeNode;
+            public Tree Tree;
         }
 
-        Tree tree;
         Layout layout;
-
-        public Tree Tree
-        {
-            get
-            {
-                return tree;
-            }
-
-            set
-            {
-                tree = value;
-            }
-        }
 
         public Layout LayoutTree
         {
             get
             {
-                if (layout == null || (ITree)layout.TreeNode != (ITree)Tree || !layout.Rectangle.Equals(rect))
-                {
-                    layout = new Layout(null) { TreeNode = Tree, Rectangle = rect.Copy() };
-                    Update(layout);
-                }
                 return layout;
             }
         }
 
-        float[,] rect;
         float[,] margin = new float[,] { { 0, 0 }, { 0, 0 } };
-
-        public RectangleF Bounds
-        {
-            set
-            {
-                rect = value.ToArray();
-            }
-
-            get
-            {
-                return rect.ToRectangleF();
-            }
-        }
 
         /// <summary>
         /// Recursively updates a layout tree.
@@ -89,11 +54,11 @@ namespace Sidi.Visualization
         /// <returns></returns>
         void Update(Layout layout)
         {
-            if (layout.TreeNode.Children.Any() && layout.TreeNode.Size > 0)
+            if (layout.Tree != null && layout.Tree.Children.Any() && layout.Tree.Size > 0)
             {
                 var lc = new LayoutContext()
                 {
-                    Layout = layout.TreeNode.Children.Select(x => new Layout(layout) { TreeNode = x }).ToArray(),
+                    Layout = layout.Tree.Children.Select(x => new Layout(layout) { Tree = x }).ToArray(),
                     Rectangle = layout.Rectangle.Copy()
                 };
                 lc.Rectangle.Add(margin);
@@ -157,13 +122,13 @@ namespace Sidi.Visualization
                 od = Dir.X;
             }
 
-            float m = c.Rectangle.Width(d) / c.Layout.First().TreeNode.Parent.Size;
+            float m = c.Rectangle.Width(d) / c.Layout.First().Tree.Parent.Size;
             float x = c.Rectangle[(int)d, (int)Bound.Min];
             foreach (var tc in c.Layout)
             {
                 var r = tc.Rectangle;
                 r[(int)d, (int)Bound.Min] = x;
-                x += tc.TreeNode.Size * m;
+                x += tc.Tree.Size * m;
                 r[(int)d, (int)Bound.Max] =
                 r[(int)od, (int)Bound.Min] = c.Rectangle[(int)od, (int)Bound.Min];
                 r[(int)od, (int)Bound.Max] = c.Rectangle[(int)od, (int)Bound.Max];
@@ -175,7 +140,7 @@ namespace Sidi.Visualization
             var s = 0.0f;
             for (int i = b; i < e; ++i)
             {
-                s += c[i].TreeNode.Size;
+                s += c[i].Tree.Size;
             }
             return s;
         }
@@ -191,7 +156,7 @@ namespace Sidi.Visualization
 
             for (int i = b; i < e; ++i)
             {
-                var w = layout[i].TreeNode.Size * sizeToPix / h;
+                var w = layout[i].Tree.Size * sizeToPix / h;
                 var ar = (w == 0.0f) ? 1.0f : (w > h ? (w / h) : (h / w));
                 if (ar > war)
                 {
@@ -243,7 +208,7 @@ namespace Sidi.Visualization
             float newAspectRatio;
             for (rowEnd = b + 1; rowEnd <= e; ++rowEnd)
             {
-                newRowSize = rowSize + layout[rowEnd - 1].TreeNode.Size;
+                newRowSize = rowSize + layout[rowEnd - 1].Tree.Size;
                 if (newRowSize == 0.0f)
                 {
                     continue;
@@ -277,7 +242,7 @@ namespace Sidi.Visualization
             for (int i = b; i < rowEnd; ++i)
             {
                 layout[i].Rectangle[(int)d, (int)Bound.Min] = x;
-                var w = layout[i].TreeNode.Size * widthPerSize;
+                var w = layout[i].Tree.Size * widthPerSize;
                 x = Math.Min(x + w, r[(int)d, (int)Bound.Max]);
                 if (float.IsNaN(x))
                 {

@@ -1,72 +1,147 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Sidi.Util;
 using System.Drawing;
 using Sidi.Extensions;
+using System.Text.RegularExpressions;
 
 namespace Sidi.Visualization
 {
-    public class SimpleTreeMap
+    public class SimpleTreeMap : TreeMapControl
     {
-        static void Add(Tree tree, object[] lineage, int level)
+        public SimpleTreeMap()
+        {
+            PathSeparator = new Regex(@"(\||\\|\/)");
+            Color = x => System.Drawing.Color.White;
+        }
+
+        public IList Items
+        {
+            get
+            {
+                return items;
+            }
+
+            set
+            {
+                items = value;
+                UpdateTree();
+            }
+        }
+
+        IList items;
+
+        void UpdateTree()
+        {
+            this.Tree = BuildTree(Items, Lineage, Size);
+        }
+
+        public static Tree BuildTree(IList items, Func<object, IEnumerable<object>> lineage, Func<object, float> size)
+        {
+            var tree = new Tree(null);
+            foreach (var i in items)
+            {
+                var lin = lineage(i).ToArray();
+                Add(tree, i, lin, size(i), 0);
+            }
+            tree.UpdateSize();
+            for (; tree.Children.Count() == 1; tree = tree.Children.First())
+            {
+            }
+
+            return tree;
+        }
+
+        static void Add(Tree tree, object item, object[] lineage, float size, int level)
         {
             if (level < lineage.Length)
             {
-                var value = lineage[level];
-                var c = tree.Children.FirstOrDefault(i => i.Object.Equals(value));
+                var pathPart = lineage[level];
+                var c = tree.Children.FirstOrDefault(i => i.Object.Equals(pathPart));
                 if (c == null)
                 {
-                    c = new Tree(tree) { Object = value };
+                    c = new Tree(tree);
+                    c.Object = pathPart;
                 }
-                Add(c, lineage, level + 1);
+                Add(c, item, lineage, size, level + 1);
             }
             else
             {
+                tree.Size += size;
             }
         }
 
-        public class ColorMapItem : ItemBase
+        public Func<object, Color> Color
         {
-            public object Color;
-        }
-
-        public static IEnumerable<Item> ToItems(IEnumerable<ColorMapItem> data)
-        {
-            return null;
-        }
-
-        public class LinearColorMapItem : ItemBase
-        {
-            public double Color;
-        }
-
-        public static IEnumerable<Item> ToItems(IEnumerable<LinearColorMapItem> data)
-        {
-            var min = Double.MaxValue;
-            var max = Double.MinValue;
-            foreach (var i in data)
+            set
             {
-                min = Math.Min(i.Color, min);
-                max = Math.Max(i.Color, max);
+                base.CushionPainter.NodeColor = value;
             }
-            var scale = ColorMap.BlueRed(min, max);
-            return data.Select(i => new Item() { Lineage = i.Lineage, Size = i.Size, Color = scale.ToColor(i.Color) });
+        }
+        public Func<object, float> Size = x => 1.0f;
+        public Func<object, IEnumerable<object>> Lineage;
+        public Regex PathSeparator
+        {
+            get
+            {
+                return pathSeparator;
+            }
+            
+            set 
+            {
+                pathSeparator = value;
+                Lineage = x => pathSeparator.Split(x.SafeToString()).Cast<object>();
+            }
         }
 
-        public static Tree<Data> MakeTree(IEnumerable<Item> data)
+        public Func<object, object> DistinctColor
         {
-            var t = new Tree<Data>(null);
-            t.Data = new Data();
+            set
+            {
+                var bins = new DistinctColor(Items.Cast<object>().Select(x => value(x)));
+                /*
+                Color = x =>
+                    {
+                        var c = bins.ToColor(value(x));
+                        return c;
+                    };
+                 */
+
+                Color = x => System.Drawing.Color.Blue;
+            }
+        }
+
+        Regex pathSeparator;
+
+        /*
+        static Item GetItem(Tree t)
+        {
+            return GetData(t).Item;
+        }
+
+        static Data GetData(Tree t)
+        {
+            return (Data)t.Object;
+        }
+
+        public static Tree MakeTree(IEnumerable<Item> data)
+        {
+            var t = new Tree(null)
+            {
+                Object = new Data(),
+            };
+
             foreach (var i in data)
             {
                 Add(t, i.Lineage.ToArray(), i, 0);
             }
             t.UpdateSize();
 
-            while (t.Children.Count == 1)
+            while (t.Children.Count() == 1)
             {
                 t = t.Children.First();
             }
@@ -74,14 +149,12 @@ namespace Sidi.Visualization
             return t;
         }
 
-        public string LineageSeparator = "/";
-        
         public TreeMapControl CreateControl()
         {
             var tree = MakeTree(Items);
-            var tm = TreeMapControl.FromTree(tree);
+            var tm = new TreeMapControl() { Tree = tree };
 
-            tm.CushionPainter.NodeColor = t => t.Data.Item.Color;
+            tm.CushionPainter.NodeColor = t => ((Data)t).Item.Color;
 
             var lp = tm.CreateLabelPainter();
             
@@ -90,7 +163,7 @@ namespace Sidi.Visualization
             {
                 if (Control.ModifierKeys == Keys.Shift)
                 {
-                    ti.SetToolTip(tm, e.Item.Lineage.Where(i => i != null).Join(LineageSeparator).ToString());
+                    ti.SetToolTip(tm, GetItem(e.Layout.TreeNode).Lineage.Where(i => i != null).Join(LineageSeparator).ToString());
                     lp.Focus(tm.PointToClient(Control.MousePosition));
                     tm.Invalidate();
                 }
@@ -140,5 +213,6 @@ namespace Sidi.Visualization
             st.Items = items;
             st.Show();
         }
+         */
     }
 }
