@@ -126,7 +126,7 @@ namespace Sidi.IMAP
             get
             {
                 var rootLength = directory.NoPrefix.Length;
-                var e = new Sidi.IO.Long.FileEnum()
+                var e = new Sidi.IO.Long.FileEnumerator()
                 {
                     Root = directory,
                     Output = x => x.IsDirectory,

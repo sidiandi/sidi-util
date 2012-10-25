@@ -306,7 +306,7 @@ namespace Sidi.CommandLine.Test
             [Usage("Directory list")]
             public void Files(string dir)
             {
-                var e = new Sidi.IO.Long.FileEnum()
+                var e = new Sidi.IO.Long.FileEnumerator()
                 {
                     Root = new Sidi.IO.Long.Path(dir)
                 };

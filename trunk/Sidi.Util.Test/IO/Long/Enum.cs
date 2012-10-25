@@ -19,7 +19,7 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Depth()
             {
-                var e = new FileEnum()
+                var e = new FileEnumerator()
                 {
                     Root = TestTree,
                 };
@@ -33,7 +33,7 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Breadth()
             {
-                var e = new FileEnum()
+                var e = new FileEnumerator()
                 {
                     Root = TestTree
                 };
@@ -48,9 +48,9 @@ namespace Sidi.IO.Long
             [Test]
             public void Output()
             {
-                var e = new FileEnum()
+                var e = new FileEnumerator()
                 {
-                    Output = FileEnum.OnlyFiles,
+                    Output = FileEnumerator.OnlyFiles,
                     Root = TestTree
                 };
                 var files = e.Depth().ToList();
@@ -61,14 +61,14 @@ namespace Sidi.IO.Long
             [Test]
             public void NotExists()
             {
-                var files = FileEnum.AllFiles(new Path(@"C:\does_not_exist_4352345234234")).ToList();
+                var files = FileEnumerator.AllFiles(new Path(@"C:\does_not_exist_4352345234234")).ToList();
                 Assert.AreEqual(0, files.Count);
             }
 
             [Test]
             public void Dump()
             {
-                var e = new FileEnum()
+                var e = new FileEnumerator()
                 {
                     Root = TestFile("."),
                 };
@@ -83,10 +83,10 @@ namespace Sidi.IO.Long
             public void FileType()
             {
                 var fileType = new FileType("exe");
-                var e = new FileEnum()
+                var e = new FileEnumerator()
                 {
-                    Output = x => FileEnum.OnlyFiles(x) && fileType.Is(x.Name),
-                    Follow = x => FileEnum.NoDotNoHidden(x) && x.Name != "test",
+                    Output = x => FileEnumerator.OnlyFiles(x) && fileType.Is(x.Name),
+                    Follow = x => FileEnumerator.NoDotNoHidden(x) && x.Name != "test",
                     Root = TestTree
                 };
                 
@@ -98,9 +98,9 @@ namespace Sidi.IO.Long
             [Test]
             public void Unique()
             {
-                var e = new FileEnum()
+                var e = new FileEnumerator()
                 {
-                    Output = FileEnum.OnlyFiles,
+                    Output = FileEnumerator.OnlyFiles,
                     Root = TestTree,
                 };
 

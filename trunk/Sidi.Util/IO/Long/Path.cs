@@ -60,7 +60,7 @@ namespace Sidi.IO.Long
                     Directory.Delete(path);
                     log.InfoFormat("Delete {0}", path);
                 }
-                catch
+                catch (System.IO.IOException)
                 {
                 }
             }
@@ -350,7 +350,7 @@ namespace Sidi.IO.Long
                 new Path(path);
                 return true;
             }
-            catch
+            catch (System.IO.PathTooLongException)
             {
                 return false;
             }
