@@ -11,29 +11,22 @@ namespace Sidi.Visualization
 {
     public class TreeMapControl : Control
     {
-        public static TreeMapControl FromTree(Tree tree)
-        {
-            return new TreeMapControl() { Tree = tree };
-        }
-
-        ZoomPanController zoomPanController;
-        
         public TreeMapControl()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer , true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.UserPaint, true);
 
             this.SizeChanged += new EventHandler(CushionTreeMapControl_SizeChanged);
             this.MouseMove += new MouseEventHandler(CushionTreeMapControl_MouseMove);
 
             this.MouseDoubleClick += (s, e) =>
+            {
+                if (ItemActivate != null)
                 {
-                    if (ItemActivate != null)
-                    {
-                        ItemActivate(this, new ItemEventEventArgs(GetLayoutAt(e.Location)));
-                    }
-                };
+                    ItemActivate(this, new ItemEventEventArgs(GetLayoutAt(e.Location)));
+                }
+            };
 
             zoomPanController = new ZoomPanController(this);
 
@@ -49,20 +42,45 @@ namespace Sidi.Visualization
             };
 
             this.KeyPress += (s, e) =>
+            {
+                switch (e.KeyChar)
                 {
-                    switch (e.KeyChar)
-                    {
-                        case '+':
-                            ZoomIn(PointToClient(Control.MousePosition), 1);
-                            break;
-                        case '-':
-                            ZoomOut(1);
-                            break;
-                    }
-                };
+                    case '+':
+                        ZoomIn(PointToClient(Control.MousePosition), 1);
+                        break;
+                    case '-':
+                        ZoomOut(1);
+                        break;
+                }
+            };
 
             CushionPainter = new CushionPainter(this);
         }
+
+        public static TreeMapControl FromTree(Tree tree)
+        {
+            return new TreeMapControl() { Tree = tree };
+        }
+
+        public TreeMapLayout Layout
+        {
+            get
+            {
+                return _layout;
+            }
+
+            private set
+            {
+                _layout = value;
+                WorldTransform = new Matrix();
+                Invalidate();
+            }
+        }
+
+        TreeMapLayout _layout;
+        ZoomPanController zoomPanController;
+        public CushionPainter CushionPainter;
+        TreeMapLayout.Layout hoveredNode;
 
         public object SelectedObject { set; get; }
         public Point ClickLocation { private set; get; }
@@ -81,8 +99,6 @@ namespace Sidi.Visualization
             }
         }
 
-        public CushionPainter CushionPainter;
-
         /// <summary>
         /// Orders all tree objects by orderBy and assigns a color based on the percentile
         /// </summary>
@@ -96,38 +112,69 @@ namespace Sidi.Visualization
 
         TreeMapLayout.Layout GetLayoutAt(Point p)
         {
-            return Layout.GetLayoutAt(p.ToArray(), Int32.MaxValue);
+            if (Layout == null)
+            {
+                return null;
+            }
+
+            return Layout.GetLayoutAt(GetWorldPoint(p), Int32.MaxValue);
+        }
+
+        Matrix WorldTransform
+        {
+            get
+            {
+                return zoomPanController.Transform;
+            }
+
+            set
+            {
+                zoomPanController.Transform = new Matrix();
+            }
+        }
+
+        float[] GetWorldPoint(Point p)
+        {
+            var fp = p.ToArray();
+            var inverse = WorldTransform.Clone();
+            inverse.Invert();
+            inverse.Transform(fp);
+            return fp;
         }
 
         public object GetObjectAt(Point p)
         {
-            return ((Tree)GetLayoutAt(p).Tree).Object;
+            var l = GetLayoutAt(p);
+            return l == null ? null : l.Tree.Object;
         }
 
         TreeMapLayout.Layout GetLayoutAt(Point p, int levels)
         {
-            return Layout.GetLayoutAt(p.ToArray(), levels);
+            return Layout.GetLayoutAt(GetWorldPoint(p), levels);
         }
-
-        TreeMapLayout.Layout hoveredNode;
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
         {
-            this.Layout = new TreeMapLayout(Layout.LayoutTree.Tree, this.Bounds);
+            Tree = Tree;
         }
-
-        public TreeMapLayout Layout { get; private set; }
 
         public Tree Tree
         {
             get
             {
-                return Layout.LayoutTree.Tree;
+                return Layout == null ? null : Layout.Root.Tree;
             }
 
             set
             {
-                Layout = new TreeMapLayout(value, this.Bounds);
+                if (value == null || value.Size == 0.0)
+                {
+                    Layout = null;
+                }
+                else
+                {
+                    Layout = new TreeMapLayout(value, this.Bounds);
+                }
             }
         }
 
@@ -204,12 +251,12 @@ namespace Sidi.Visualization
 
         public void ForEachNode(Action<TreeMapLayout.Layout> a)
         {
-            ForEachNode(Layout.LayoutTree, a);
+            ForEachNode(Layout.Root, a);
         }
 
         public void ForEachLeaf(Action<TreeMapLayout.Layout> a)
         {
-            ForEachLeaf(Layout.LayoutTree, a);
+            ForEachLeaf(Layout.Root, a);
         }
 
         void ForEachNode(TreeMapLayout.Layout layoutTree, Action<TreeMapLayout.Layout> a)

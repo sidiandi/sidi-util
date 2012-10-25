@@ -10,26 +10,44 @@ namespace Sidi.Visualization
     {
         Dictionary<object, Color> valueToColor;
 
-        public DistinctColor(IEnumerable<object> values)
+        public DistinctColor()
         {
-            var distinct = values.Distinct().ToList();
-            distinct.Sort();
+            valueToColor = new Dictionary<object, Color>();
+        }
 
+        Color GetColor(int n)
+        {
             var hsl = new HSLColor(Color.Red);
-            int n= 0;
-            double m = 360.0 / (double) distinct.Count;
-            valueToColor = new Dictionary<object, Color>(distinct.Count);
-            foreach (var i in distinct)
+            hsl.Hue += Fill(n);
+            return hsl;
+        }
+
+        double Fill(int n)
+        {
+            double x = 0.0;
+            double increment = 1.0;
+
+            for (; n > 0; n = n >> 1)
             {
-                hsl.Hue = (double)n * m;
-                valueToColor[i] = hsl;
-                ++n;
+                increment /= 2;
+                if ((n & 1) != 0)
+                {
+                    x += increment;
+                }
             }
+            return x;
         }
 
         public Color ToColor(object value)
         {
-            return valueToColor[value];
+            Color color;
+            if (!valueToColor.TryGetValue(value, out color))
+            {
+                var n = valueToColor.Count + 1;
+                color = GetColor(n);
+                valueToColor[value] = color;
+            }
+            return color;
         }
     }
 }

@@ -68,15 +68,15 @@ namespace Sidi.Visualization
         public void Paint(PaintEventArgs e)
         {
             var layout = treeMapControl.Layout;
-            float maxArea = layout.LayoutTree.Rectangle.Area();
+            float maxArea = layout.Root.Rectangle.Area();
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             if (focusPointEnabled)
             {
-                PaintRecursiveFocusPoint(e, layout.LayoutTree, 0);
+                PaintRecursiveFocusPoint(e, layout.Root, 0);
             }
             else
             {
-                PaintRecursive(e, layout.LayoutTree, 0);
+                PaintRecursive(e, layout.Root, 0);
             }
         }
 
