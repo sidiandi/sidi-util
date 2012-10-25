@@ -265,7 +265,14 @@ namespace Sidi.Collections
         {
             lock (m_shared)
             {
-                return m_shared.m_cache.IsCached(key);
+                if (m_shared.m_cache.IsCached(key))
+                {
+                    return m_shared.m_cache[key].m_state == State.Complete;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
