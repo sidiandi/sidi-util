@@ -41,10 +41,10 @@ namespace Sidi.IO.Long
 
         public void CopyRooted(Path source, Path sourceRoot, Path destinationRoot)
         {
-            var e = new FileEnum()
+            var e = new FileEnumerator()
             {
                 Root = source,
-                Output = FileEnum.OnlyFiles,
+                Output = FileEnumerator.OnlyFiles,
             };
 
             foreach (var s in e.Depth())
@@ -91,7 +91,7 @@ namespace Sidi.IO.Long
                             {
                                 File.CreateHardLink(d, s);
                             }
-                            catch
+                            catch (System.IO.IOException)
                             {
                                 File.Copy(s, d);
                             }
@@ -114,7 +114,7 @@ namespace Sidi.IO.Long
                         case SkipMode.TargetExists:
                             return !d.Exists;
                         default:
-                            throw new ArgumentOutOfRangeException("Skip");
+                            throw new System.InvalidOperationException();
                     }
                 };
         }

@@ -195,7 +195,7 @@ namespace Sidi.IO
 
         public void IncrementalCopy(L.Path source, L.Path dest, L.Path existingCopy)
         {
-            foreach (var sInfo in L.FileEnum.AllFiles(source))
+            foreach (var sInfo in L.FileEnumerator.AllFiles(source))
             {
                 var s = sInfo.FullName;
                 var relativePath = s.GetRelative(source);

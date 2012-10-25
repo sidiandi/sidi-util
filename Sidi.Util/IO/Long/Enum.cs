@@ -8,11 +8,11 @@ using Sidi.CommandLine;
 
 namespace Sidi.IO.Long
 {
-    public class FileEnum
+    public class FileEnumerator
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public FileEnum()
+        public FileEnumerator()
         {
             Visit = x => { };
             Follow = x => true;
@@ -21,18 +21,18 @@ namespace Sidi.IO.Long
 
         public static IEnumerable<FileSystemInfo> AllFiles(Path root)
         {
-            var e = new FileEnum()
+            var e = new FileEnumerator()
             {
                 Root = root,
-                Output = FileEnum.OnlyFiles,
+                Output = FileEnumerator.OnlyFiles,
             };
             return e.Depth();
         }
 
-        public static FileEnum Parse(string text)
+        public static FileEnumerator Parse(string text)
         {
             var list = FileList.Parse(text);
-            return new FileEnum()
+            return new FileEnumerator()
             {
                 Output = OnlyFiles,
                 Roots = list

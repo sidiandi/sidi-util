@@ -17,7 +17,7 @@ namespace Sidi.IO.Long
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public FileEnum Enumerator = new FileEnum();
+        public FileEnumerator Enumerator = new FileEnumerator();
         List<Regex> exclude = new List<Regex>();
         
         public EnumConfig()

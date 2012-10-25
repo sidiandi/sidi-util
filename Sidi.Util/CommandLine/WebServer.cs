@@ -17,6 +17,7 @@ using System.Web.UI;
 using Sidi.IO;
 using Sidi.Net;
 using Sidi.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.CommandLine
 {
@@ -121,15 +122,8 @@ namespace Sidi.CommandLine
             
             for (; ; )
             {
-                try
-                {
-                    var context = httpListener.GetContext();
-                    Handle(context);
-                }
-                catch
-                {
-                    break;
-                }
+                var context = httpListener.GetContext();
+                Handle(context);
             }
         }
 
@@ -385,6 +379,7 @@ namespace Sidi.CommandLine
             }
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1031:DoNotCatchGeneralExceptionTypes")]
         void Handle(Context c)
         {
             try

@@ -35,7 +35,7 @@ namespace Sidi.CommandLine
     /// <summary>
     /// Extension methods for Type
     /// </summary>
-    public static class TypeEx
+    public static class TypeExtensions
     {
         public static string GetInfo(this Type type)
         {
