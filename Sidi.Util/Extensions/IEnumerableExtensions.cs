@@ -21,6 +21,14 @@ namespace Sidi.Extensions
             return e.Select(i => new KeyValuePair<int, T>(index++, i));
         }
 
+        public static IEnumerable<T> Chain<T>(T i, Func<T, T> transform)
+        {
+            for (; i != null; i = transform(i))
+            {
+                yield return i;
+            }
+        }
+
         /// <summary>
         /// Like Select, but silently ignores exceptions in f
         /// </summary>

@@ -97,6 +97,15 @@ namespace Sidi.Visualization
         }
         public Func<object, float> Size = x => 1.0f;
         public Func<object, IEnumerable<object>> Lineage;
+        public Func<object, object> ParentSelector
+        {
+            set
+            {
+                Lineage = x => IEnumerableExtensions
+                    .Chain(x, value)
+                    .Reverse();
+            }
+        }
         public Regex PathSeparator
         {
             get
