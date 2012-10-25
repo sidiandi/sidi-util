@@ -35,9 +35,28 @@ namespace Sidi.Visualization
         {
             var files = System.IO.File.ReadAllLines(TestFile("dir.txt"));
             var tm = new SimpleTreeMap();
-            // tm.DistinctColor = x => System.IO.Path.GetExtension((string)x);
             tm.Items = files.ToList();
-            tm.Color = x => System.Drawing.Color.Blue;
+            tm.DistinctColor = x => System.IO.Path.GetExtension((string)x);
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void Simple2ReverseOrder()
+        {
+            var files = System.IO.File.ReadAllLines(TestFile("dir.txt"));
+            var tm = new SimpleTreeMap();
+            tm.DistinctColor = x => System.IO.Path.GetExtension((string)x);
+            tm.Items = files.ToList();
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void Empty()
+        {
+            var files = new string[] { };
+            var tm = new SimpleTreeMap();
+            tm.DistinctColor = x => System.IO.Path.GetExtension((string)x);
+            tm.Items = files.ToList();
             tm.RunFullScreen();
         }
     }

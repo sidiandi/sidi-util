@@ -172,5 +172,12 @@ namespace Sidi.Visualization
             x[(int)Dir.Y, (int)Bound.Max] = p[1].Y;
         }
 
+        public static void Transform(this Matrix m, float[] x)
+        {
+            var p = new PointF[]{ new PointF(x[(int)Dir.X], x[(int)Dir.Y]) };
+            m.TransformPoints(p);
+            x[(int)Dir.X] = p[0].X;
+            x[(int)Dir.Y] = p[0].Y;
+        }
     }
 }

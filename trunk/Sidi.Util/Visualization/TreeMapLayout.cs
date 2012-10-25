@@ -16,6 +16,11 @@ namespace Sidi.Visualization
 
         public TreeMapLayout(Tree root, RectangleF bounds)
         {
+            if (root == null)
+            {
+                throw new ArgumentNullException("root");
+            }
+
             layout = new Layout(null) { Tree = root, Rectangle = bounds.ToArray() };
             DoLayout = Squares;
             Update(layout);
@@ -37,7 +42,7 @@ namespace Sidi.Visualization
 
         Layout layout;
 
-        public Layout LayoutTree
+        public Layout Root
         {
             get
             {

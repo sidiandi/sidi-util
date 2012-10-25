@@ -26,7 +26,7 @@ namespace Sidi.Visualization
 
             var sb = Screen.PrimaryScreen.Bounds;
             var cachedTiles = sb.Width * sb.Height / tiles.Size.Width / tiles.Size.Height * 2;
-            
+
             tileBitmaps = new Collections.LruCacheBackground<Tile, Bitmap>(cachedTiles, tile =>
                 {
                     return Render(tiles.Size, RectangleF.FromLTRB(tile.P0.X, tile.P0.Y, tile.P1.X, tile.P1.Y));
@@ -37,13 +37,14 @@ namespace Sidi.Visualization
                     control.BeginInvoke(new Action(() => control.Invalidate()));
                 };
 
-            var d = new Bitmap(tiles.Size.Width, tiles.Size.Height);
-            using (var g = Graphics.FromImage(d))
             {
-                g.FillRectangle(new SolidBrush(Color.Black), 0,0, d.Width, d.Height);
+                var emptyTile = new Bitmap(tiles.Size.Width, tiles.Size.Height);
+                using (var g = Graphics.FromImage(emptyTile))
+                {
+                    g.FillRectangle(new SolidBrush(Color.Black), 0, 0, emptyTile.Width, emptyTile.Height);
+                }
+                tileBitmaps.DefaultValueWhileLoading = emptyTile;
             }
-
-            tileBitmaps.DefaultValueWhileLoading = null;
 
         }
 
@@ -67,9 +68,12 @@ namespace Sidi.Visualization
             
             try
             {
-                var surface = new float[4];
-                var s = new float[2, 2];
-                Render(data, control.Layout.LayoutTree, h, f, s);
+                if (this.layout != null)
+                {
+                    var surface = new float[4];
+                    var s = new float[2, 2];
+                    Render(data, layout.Root, h, f, s);
+                }
             }
             finally
             {

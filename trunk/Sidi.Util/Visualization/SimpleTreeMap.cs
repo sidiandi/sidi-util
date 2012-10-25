@@ -15,9 +15,17 @@ namespace Sidi.Visualization
     {
         public SimpleTreeMap()
         {
-            PathSeparator = new Regex(@"(\||\\|\/)");
+            PathSeparator = new Regex(@"\\");
             Color = x => System.Drawing.Color.White;
+
+            this.ItemMouseHover += (s,e) =>
+                {
+                    toolTip.SetToolTip(this,
+                        e.Layout.Tree.Up.Select(x => String.Format("{0}: {1}", x.Size, x.Object)).Join());
+                };
         }
+
+        ToolTip toolTip = new ToolTip();
 
         public IList Items
         {
@@ -42,6 +50,11 @@ namespace Sidi.Visualization
 
         public static Tree BuildTree(IList items, Func<object, IEnumerable<object>> lineage, Func<object, float> size)
         {
+            if (items == null)
+            {
+                return null;
+            }
+
             var tree = new Tree(null);
             foreach (var i in items)
             {
@@ -102,16 +115,8 @@ namespace Sidi.Visualization
         {
             set
             {
-                var bins = new DistinctColor(Items.Cast<object>().Select(x => value(x)));
-                /*
-                Color = x =>
-                    {
-                        var c = bins.ToColor(value(x));
-                        return c;
-                    };
-                 */
-
-                Color = x => System.Drawing.Color.Blue;
+                var dc = new DistinctColor();
+                Color = x => dc.ToColor(value(x));
             }
         }
 

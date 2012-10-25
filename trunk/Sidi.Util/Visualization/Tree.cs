@@ -20,17 +20,22 @@ namespace Sidi.Visualization
             }
         }
 
-        public IList<object> Lineage
+        public IEnumerable<Tree> Up
         {
             get
             {
-                var lineage = new List<object>();
                 for (var i = this; i != null; i = i.Parent)
                 {
-                    lineage.Add(i.Object);
+                    yield return i;
                 }
-                lineage.Reverse();
-                return lineage;
+            }
+        }
+        
+        public IEnumerable<object> Lineage
+        {
+            get
+            {
+                return Up.Select(x => x.Object).Reverse();
             }
         }
 
