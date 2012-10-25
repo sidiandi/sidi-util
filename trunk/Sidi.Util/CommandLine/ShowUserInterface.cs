@@ -312,7 +312,7 @@ namespace Sidi.CommandLine
             public Action Action { get; private set; }
             public Button Button { get; set; }
 
-            [SuppressMessage("Microsoft.Usage", "CA1031:DoNotCatchGeneralExceptionTypes")]
+            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
             public bool Execute()
             {
                 try

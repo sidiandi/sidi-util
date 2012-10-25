@@ -21,28 +21,28 @@ namespace Sidi.Visualization
 
     public static class ArrayRectEx
     {
-        public static float Area(this float[,] r)
+        public static float Area(this float[,] rectangle)
         {
-            var w = r[0, 1] - r[0, 0];
-            var h = r[1, 1] - r[1, 0];
+            var w = rectangle[0, 1] - rectangle[0, 0];
+            var h = rectangle[1, 1] - rectangle[1, 0];
             return w * h;
         }
 
         const float cf = 1.0f / 256.0f;
 
-        public static float[] ToArray(this Color c)
+        public static float[] ToArray(this Color color)
         {
             return new float[]
             {
-                c.B * cf,
-                c.G * cf,
-                c.R * cf
+                color.B * cf,
+                color.G * cf,
+                color.R * cf
             };
         }
 
-        public static float Width(this float[,] r, Dir d)
+        public static float Width(this float[,] r, Dir direction)
         {
-            return r[(int)d, (int)Bound.Max] - r[(int)d, (int)Bound.Min];
+            return r[(int)direction, (int)Bound.Max] - r[(int)direction, (int)Bound.Min];
         }
 
         public static float[,] ToArray(this RectangleF r)

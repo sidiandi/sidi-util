@@ -313,18 +313,18 @@ namespace Sidi.IO.Long
                 .CheckApiCall(String.Format("{0} -> {1}", fileName, existingFileName));
         }
 
-        public static void CopyOrHardLink(Path source, Path dest)
+        public static void CopyOrHardLink(Path source, Path destination)
         {
-            if (!dest.Exists)
+            if (!destination.Exists)
             {
-                dest.EnsureParentDirectoryExists();
-                if (source.PathRoot.Equals(dest.PathRoot))
+                destination.EnsureParentDirectoryExists();
+                if (source.PathRoot.Equals(destination.PathRoot))
                 {
-                    CreateHardLink(dest, source);
+                    CreateHardLink(destination, source);
                 }
                 else
                 {
-                    File.Copy(source, dest);
+                    File.Copy(source, destination);
                 }
             }
         }
