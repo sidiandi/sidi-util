@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Sidi.IO.Long.Extensions;
 using System.Text.RegularExpressions;
 using Sidi.Forms;
+using L = Sidi.IO.Long;
 
 namespace Sidi.Visualization
 {
@@ -47,6 +48,32 @@ namespace Sidi.Visualization
             var tm = new SimpleTreeMap();
             tm.DistinctColor = x => System.IO.Path.GetExtension((string)x);
             tm.Items = files.ToList();
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void Generic()
+        {
+            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
+            var tm = new GenericSimpleTreeMap<L.Path>();
+            tm.ParentSelector = x => x.Parent;
+            tm.DistinctColor = x => x.Extension;
+            tm.Size = x => x.Info.Length;
+            tm.Activate = x => MessageBox.Show(x.ToString());
+            tm.Items = files;
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void ColorMap()
+        {
+            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
+            var tm = new GenericSimpleTreeMap<L.Path>();
+            tm.ParentSelector = x => x.Parent;
+            tm.Size = x => x.Info.Length;
+            tm.Activate = x => MessageBox.Show(x.ToString());
+            tm.Items = files;
+            tm.PercentileColorMap = x => x.Info.LastWriteTimeUtc;
             tm.RunFullScreen();
         }
 

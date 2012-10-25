@@ -234,9 +234,13 @@
     <Compile Include="Visualization\DistinctColor.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\FloatArrayEx.cs" />
+    <Compile Include="Visualization\GenericSimpleTreeMap.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Visualization\HSLColor.cs" />
     <Compile Include="Visualization\ITree.cs" />
     <Compile Include="Visualization\LabelPainter.cs" />
+    <Compile Include="Visualization\PercentileColorMap.cs" />
     <Compile Include="Visualization\SimpleTreeMap.cs">
       <SubType>Component</SubType>
     </Compile>
