@@ -202,19 +202,20 @@ namespace Sidi.Visualization
                 // var destRect = Rectangle.FromLTRB(intPts[0].X, intPts[0].Y, intPts[1].X, intPts[1].Y);
                 var destRect = RectangleF.FromLTRB(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
 
-                var t = tileBitmaps[i];
-                if (t != null)
+                if (tileBitmaps.Contains(i))
                 {
+                    var t = tileBitmaps[i];
                     e.Graphics.DrawImage(t, destRect);
                 }
                 else
                 {
+                    tileBitmaps.Load(i);
                     var sourceRect = new Rectangle(0, 0, tiles.Size.Width, tiles.Size.Height);
                     for (var coarseTile = tiles.GetNextLevel(i, ref sourceRect); coarseTile != null; coarseTile = tiles.GetNextLevel(coarseTile, ref sourceRect))
                     {
                         if (tileBitmaps.Contains(coarseTile))
                         {
-                            t = tileBitmaps[coarseTile];
+                            var t = tileBitmaps[coarseTile];
                             if (t != null)
                             {
                                 e.Graphics.DrawImage(t, destRect, sourceRect, GraphicsUnit.Pixel);
