@@ -25,9 +25,6 @@ using Sidi.IO;
 using System.IO;
 #endregion
 
-//Test Specific Imports
-//TODO - Add imports your going to test here
-
 namespace Sidi.Util
 {
 
@@ -61,8 +58,6 @@ namespace Sidi.Util
             {
                 Trace.Listeners.Add(listener);
             }
-
-            //TODO - Setup your test objects here
         }
 
         [TearDown()]
@@ -73,8 +68,6 @@ namespace Sidi.Util
             {
                 Trace.Listeners.Remove(listener);
             }
-
-            //TODO - Tidy up your test objects here
         }
 
         [Test()]
