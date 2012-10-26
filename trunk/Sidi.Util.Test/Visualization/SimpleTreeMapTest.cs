@@ -17,7 +17,7 @@ using L = Sidi.IO.Long;
 namespace Sidi.Visualization
 {
     [TestFixture]
-    public class SimpleTreeMapControlTest : TestBase
+    public class SimpleTreeMapTest : TestBase
     {
         [Test, Explicit("interactive")]
         public void Simple()
@@ -55,7 +55,7 @@ namespace Sidi.Visualization
         public void Generic()
         {
             var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
-            var tm = new GenericSimpleTreeMap<L.Path>();
+            var tm = new TypedTreeMap<L.Path>();
             tm.ParentSelector = x => x.Parent;
             tm.DistinctColor = x => x.Extension;
             tm.Size = x => x.Info.Length;
@@ -69,7 +69,7 @@ namespace Sidi.Visualization
         public void ColorMap()
         {
             var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
-            var tm = new GenericSimpleTreeMap<L.Path>();
+            var tm = new TypedTreeMap<L.Path>();
             tm.ParentSelector = x => x.Parent;
             tm.Size = x => x.Info.Length;
             tm.Activate = x => MessageBox.Show(x.ToString());

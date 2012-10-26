@@ -234,7 +234,7 @@
     <Compile Include="Visualization\DistinctColor.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\FloatArrayEx.cs" />
-    <Compile Include="Visualization\GenericSimpleTreeMap.cs">
+    <Compile Include="Visualization\TypedTreeMap.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Visualization\HSLColor.cs" />
@@ -247,7 +247,7 @@
     <Compile Include="Visualization\Tile.cs" />
     <Compile Include="Visualization\Tiles.cs" />
     <Compile Include="Visualization\Tree.cs" />
-    <Compile Include="Visualization\TreeMapControl.cs">
+    <Compile Include="Visualization\TreeMap.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Visualization\TreeMapLayout.cs" />

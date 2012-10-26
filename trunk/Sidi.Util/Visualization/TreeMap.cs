@@ -10,9 +10,9 @@ using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
-    public class TreeMapControl : Control
+    public class TreeMap : Control
     {
-        public TreeMapControl()
+        public TreeMap()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
@@ -87,9 +87,9 @@ namespace Sidi.Visualization
             }
         }
 
-        public static TreeMapControl FromTree(Tree tree)
+        public static TreeMap FromTree(Tree tree)
         {
-            return new TreeMapControl() { Tree = tree };
+            return new TreeMap() { Tree = tree };
         }
 
         public TreeMapLayout Layout

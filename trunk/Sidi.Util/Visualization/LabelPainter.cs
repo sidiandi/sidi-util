@@ -21,11 +21,11 @@ namespace Sidi.Visualization
 
         public StringFormat StringFormat;
 
-        TreeMapControl treeMapControl;
+        TreeMap treeMapControl;
 
         public bool[] LevelVisible = new bool[0x100];
 
-        public LabelPainter(TreeMapControl treeMapControl)
+        public LabelPainter(TreeMap treeMapControl)
         {
             this.treeMapControl = treeMapControl;
             StringFormat = new StringFormat()
