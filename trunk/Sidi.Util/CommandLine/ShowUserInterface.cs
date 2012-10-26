@@ -312,7 +312,7 @@ namespace Sidi.CommandLine
             public Action Action { get; private set; }
             public Button Button { get; set; }
 
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+            [SuppressMessage("Microsoft.Design", "CA1031")]
             public bool Execute()
             {
                 try
@@ -426,7 +426,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [SuppressMessage("Microsoft.Design", "CA1031")]
         void paramInput_TextChanged(object sender, EventArgs e)
         {
             var textBox = (TextBox)sender;
@@ -473,7 +473,7 @@ namespace Sidi.CommandLine
         static ToolTip tooltip = new ToolTip();
         static Color errorColor = Color.Pink;
 
-        [SuppressMessage("Microsoft.Usage", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [SuppressMessage("Microsoft.Design", "CA1031")]
         void paramInput_Leave(object sender, EventArgs e)
         {
             var textBox = (TextBox) sender;

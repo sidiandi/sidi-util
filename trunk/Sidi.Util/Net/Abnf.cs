@@ -729,13 +729,13 @@ namespace Sidi.Net
                 }
             }
 
-            public Range Remove(Range r)
+            public Range Remove(Range range)
             {
-                if (r.Begin != this.Begin)
+                if (range.Begin != this.Begin)
                 {
-                    throw new ArgumentOutOfRangeException("r.Begin");
+                    throw new ArgumentOutOfRangeException("range");
                 }
-                return Part(r.End, this.End);
+                return Part(range.End, this.End);
             }
         }
 

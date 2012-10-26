@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Sidi.CommandLine
 {
     [Usage("Stand-alone web server")]
-    public class WebServer : Sidi.Net.HtmlGenerator
+    public class WebServer : Sidi.Net.HtmlGenerator, IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -275,6 +275,7 @@ namespace Sidi.CommandLine
                 .ToList();
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031")]
         void Run(IParserItem item, HttpListenerContext c, TextWriter cw)
         {
             TextWriter oldOut = Console.Out;
@@ -379,7 +380,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [SuppressMessage("Microsoft.Design", "CA1031")]
         void Handle(Context c)
         {
             try
@@ -457,9 +458,13 @@ namespace Sidi.CommandLine
             }
             c.Http.Response.Close();
         }
+
+        public void Dispose()
+        {
+        }
     }
 
-    public class ShowWebServer
+    public class ShowWebServer : IDisposable
     {
         public ShowWebServer(Parser parser)
         {
@@ -469,5 +474,14 @@ namespace Sidi.CommandLine
         [Category(Parser.categoryUserInterface)]
         [SubCommand]
         public WebServer WebServer;
+
+        public void Dispose()
+        {
+            if (WebServer != null)
+            {
+                WebServer.Dispose();
+                WebServer = null;
+            }
+        }
     }
 }

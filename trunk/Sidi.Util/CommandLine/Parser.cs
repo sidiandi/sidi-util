@@ -29,6 +29,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using Sidi.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.CommandLine
 {
@@ -334,6 +335,7 @@ namespace Sidi.CommandLine
             throw new CommandLineException("Argument " + args[0] + " is unknown.");
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031")]
         public void LoadPreferences()
         {
             foreach (var o in Options.Where(x => x.IsPersistent))
@@ -351,8 +353,9 @@ namespace Sidi.CommandLine
                         o.Handle(new string[] { valueString }.ToList(), true);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    log.Warn("Could not load preferences", ex);
                 }
             }
 

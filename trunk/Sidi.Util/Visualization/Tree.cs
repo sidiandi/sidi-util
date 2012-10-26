@@ -115,7 +115,7 @@ namespace Sidi.Visualization
         }
     }
 
-    public static class ITreeEx
+    public static class ITreeExtensions
     {
         public static IEnumerable<ITree> GetAllNodes(this ITree tree)
         {
