@@ -219,10 +219,12 @@ namespace Sidi.Visualization
                             if (t != null)
                             {
                                 e.Graphics.DrawImage(t, destRect, sourceRect, GraphicsUnit.Pixel);
-                                break;
+                                goto end;
                             }
                         }
                     }
+                    e.Graphics.DrawImage(tileBitmaps.DefaultValueWhileLoading, destRect);
+                end: ;
                 }
             }
 

@@ -89,6 +89,7 @@ namespace Sidi.Visualization
             tm.Size = x => x.Info.Length;
             tm.Activate = x => MessageBox.Show(x.ToString());
             tm.Items = files;
+            tm.Text = x => x.Name;
             tm.PercentileColorMap = x => x.Info.LastWriteTimeUtc;
             tm.RunFullScreen();
         }
