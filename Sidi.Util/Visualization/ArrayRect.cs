@@ -19,7 +19,7 @@ namespace Sidi.Visualization
         Max
     };
 
-    public static class ArrayRectEx
+    public static class ArrayRectExtensions
     {
         public static float Area(this float[,] rectangle)
         {

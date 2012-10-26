@@ -25,7 +25,7 @@ using System.Net.Sockets;
 
 namespace Sidi.Net
 {
-    public static class TcpClientEx
+    public static class TcpClientExtensions
     {
         public static EndPoint GetRemoteEndPoint(this TcpClient c)
         {

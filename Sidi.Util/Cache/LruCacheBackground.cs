@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading;
 using System.Linq;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Cache
 {
@@ -217,6 +218,7 @@ namespace Sidi.Cache
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031")]
         public void Worker()
         {
             lock (this)

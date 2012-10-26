@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 
 namespace Sidi.Visualization
 {
-    public class LabelPainter
+    public class LabelPainter : IDisposable
     {
         public enum Mode
         {
@@ -269,6 +269,15 @@ namespace Sidi.Visualization
                 var text = Text(layout.Tree);
                 DrawLabel(e.Graphics, text, layout.Rectangle.ToRectangleF());
                 return true;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (Font != null)
+            {
+                Font.Dispose();
+                Font = null;
             }
         }
     }

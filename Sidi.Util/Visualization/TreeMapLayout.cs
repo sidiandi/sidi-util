@@ -156,7 +156,7 @@ namespace Sidi.Visualization
 
             if (h == 0.0f)
             {
-                throw new ArgumentException("h");
+                throw new ArgumentException("Cannot be 0", "h");
             }
 
             for (int i = b; i < e; ++i)

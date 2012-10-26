@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Sidi.Visualization
 {
-    public class ZoomPanController
+    public class ZoomPanController : IDisposable
     {
         public ZoomPanController(Control control)
         {
@@ -43,6 +43,11 @@ namespace Sidi.Visualization
         public void Reset()
         {
             Transform = new Matrix();
+        }
+
+        public void Dispose()
+        {
+            Transform.Dispose();
         }
     }
 }
