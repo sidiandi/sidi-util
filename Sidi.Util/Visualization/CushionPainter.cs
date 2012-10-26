@@ -20,7 +20,7 @@ namespace Sidi.Visualization
         const float Is = 215;
         float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
 
-        public CushionPainter(TreeMapControl control)
+        public CushionPainter(TreeMap control)
         {
             this.control = control;
 
@@ -48,7 +48,7 @@ namespace Sidi.Visualization
 
         }
 
-        TreeMapControl control;
+        TreeMap control;
 
         public Bitmap Render(Size bitmapSize, RectangleF rect)
         {

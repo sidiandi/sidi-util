@@ -3,70 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Sidi.Forms;
+using System.Windows.Forms;
+using System.Drawing;
+using Sidi.IO;
+using Sidi.IO.Long;
+using System.Diagnostics;
+using Sidi.IO.Long.Extensions;
+using System.Text.RegularExpressions;
 
 namespace Sidi.Visualization
 {
     [TestFixture]
     public class TreeMapTest : TestBase
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        [Test]
-        public void Render()
+        [Test, Explicit("interactive")]
+        public void TestTreeDisplay()
         {
+            var t = TreeMapTestData.GetTestTree();
+            var tm = TreeMap.FromTree(t);
+            tm.RunFullScreen();
         }
 
-        public static Tree GetTestTree()
+        [Test, Explicit("interactive")]
+        public void TestTreeWithColorDisplay()
         {
-            var t = GetTestTree(null, 10, 7);
-            t.UpdateSize();
-            return t;
-        }
-
-        static Random rnd = new Random();
-
-        public static Tree GetSimpleTestTree()
-        {
-            var t = new Tree(null);
-            var count = 3;
-            foreach (var i in Enumerable.Range(1, count))
-            {
-                var c = new Tree(t);
-                c.Size = i;
-                c.Object = i;
-            }
-
-            if (t.Children.Any())
-            {
-                t.Size = 1.0f;
-            }
-            else
-            {
-                t.Size = t.ChildSize;
-            }
+            var hsv = new HSLColor(Color.Red);
             
-            return t;
+            var t = TreeMapTestData.GetTestTree();
+            var tm = new TreeMap() { Tree = t };
+            tm.CushionPainter.NodeColor = n => new HSLColor(hsv.Hue + ((int)n)*0.02, 1.0, 0.5);
+            var lp = tm.CreateLabelPainter();
+            tm.Paint += (s, e) => lp.Paint(e);
+            lp.InteractMode = LabelPainter.Mode.MouseFocus;
+            tm.RunFullScreen();
         }
 
-        static Tree GetTestTree(Tree parent, int childCount, int levels)
+        public void Display(Tree tree)
         {
-            var t = new Tree(parent);
-            if (levels > 0)
-            {
-                foreach (var c in Enumerable.Range(0, rnd.Next(0, childCount)))
-                // foreach (var c in Enumerable.Range(0, childCount))
-                {
-                    var ct = GetTestTree(t, childCount, levels - 1);
-                    ct.Object = c;
-                }
-                t.Size = t.Children.Aggregate(0.0f, (s, x) => s + x.Size);
-            }
-            else
-            {
-                t.Size = rnd.Next(10, 100);
-            }
-
-            return t;
+            var c = new TreeMap() { Tree = tree };
+            var f = c.AsForm("test Cushion Tree Map");
+            System.Windows.Forms.Application.Run(f);
         }
     }
 }
+    

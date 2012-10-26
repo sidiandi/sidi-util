@@ -11,12 +11,13 @@ using System.Text.RegularExpressions;
 
 namespace Sidi.Visualization
 {
-    public class SimpleTreeMap : TreeMapControl
+    public class SimpleTreeMap : TreeMap
     {
         public SimpleTreeMap()
         {
             PathSeparator = new Regex(@"\\");
             Color = x => System.Drawing.Color.White;
+            Text = x => x.ToString();
 
             LabelPainter = new LabelPainter(this);
             LabelPainter.HotkeysEnabled = true;

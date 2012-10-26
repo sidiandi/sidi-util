@@ -8,15 +8,15 @@ using System.Drawing;
 
 namespace Sidi.Visualization
 {
-    public class GenericSimpleTreeMap<T> : SimpleTreeMap
+    public class TypedTreeMap<T> : SimpleTreeMap
     {
-        public GenericSimpleTreeMap()
+        public TypedTreeMap()
         {
             Activate = x => MessageBox.Show(x.ToString());
             ItemActivate += new ItemEventHandler(GenericSimpleTreeMap_ItemActivate);
         }
 
-        void GenericSimpleTreeMap_ItemActivate(object sender, TreeMapControl.ItemEventEventArgs e)
+        void GenericSimpleTreeMap_ItemActivate(object sender, TreeMap.ItemEventEventArgs e)
         {
             Activate((T)e.Tree.Object);
         }
