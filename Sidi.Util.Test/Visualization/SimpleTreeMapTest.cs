@@ -7,6 +7,7 @@ using Sidi.Forms;
 using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO;
+using Sidi.Extensions;
 using Sidi.IO.Long;
 using System.Diagnostics;
 using Sidi.IO.Long.Extensions;
@@ -25,8 +26,13 @@ namespace Sidi.Visualization
             var file = TestFile(@"mail\message-1-1456.eml");
             var words = Regex.Split(File.ReadAllText(new Sidi.IO.Long.Path(file)), @"\s+");
             var st = new SimpleTreeMap();
-            st.Lineage = x => ((string)x).Cast<object>();
-            st.Color = x => new HSLColor((double)(char)x/100.0, 1.0, 0.5);
+            st.Lineage = x =>
+                {
+                    var word = ((string)x);
+                    var wordEnum = word.AggregateSelect(String.Empty, (s, c) => s + c);
+                    return wordEnum.Cast<object>();
+                };
+            st.Color = x => Color.White;
             st.Items = words;
             st.RunFullScreen();
         }
@@ -48,6 +54,15 @@ namespace Sidi.Visualization
             var tm = new SimpleTreeMap();
             tm.DistinctColor = x => System.IO.Path.GetExtension((string)x);
             tm.Items = files.ToList();
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void TypedVerySimple()
+        {
+            var files = System.IO.File.ReadAllLines(TestFile("dir.txt"));
+            var tm = new TypedTreeMap<string>();
+            tm.Items = files;
             tm.RunFullScreen();
         }
 

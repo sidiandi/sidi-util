@@ -15,7 +15,7 @@ namespace Sidi.Visualization
     {
         public SimpleTreeMap()
         {
-            PathSeparator = new Regex(@"\\");
+            PathSeparator = @"\";
             Color = x => System.Drawing.Color.White;
             Text = x => x.ToString();
 
@@ -114,7 +114,7 @@ namespace Sidi.Visualization
                     .Reverse();
             }
         }
-        public Regex PathSeparator
+        public string PathSeparator
         {
             get
             {
@@ -124,7 +124,10 @@ namespace Sidi.Visualization
             set 
             {
                 pathSeparator = value;
-                Lineage = x => pathSeparator.Split(x.SafeToString()).Cast<object>();
+                Lineage = x => x.SafeToString()
+                    .Split(new string[] { pathSeparator }, StringSplitOptions.RemoveEmptyEntries)
+                    .JoinSelect(pathSeparator)
+                    .Cast<object>();
             }
         }
         public Func<object, string> Text { set; private get; }
@@ -138,6 +141,6 @@ namespace Sidi.Visualization
             }
         }
 
-        Regex pathSeparator;
+        string pathSeparator;
     }
 }

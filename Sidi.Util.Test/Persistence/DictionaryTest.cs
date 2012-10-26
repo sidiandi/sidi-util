@@ -23,8 +23,6 @@ using System.Diagnostics;
 using NUnit.Framework;
 #endregion
 
-//Test Specific Imports
-//TODO - Add imports your going to test here
 using Sidi.Persistence;
 using System.IO;
 using System.Data.Common;

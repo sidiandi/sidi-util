@@ -29,6 +29,24 @@ namespace Sidi.Extensions
             }
         }
 
+        public static IEnumerable<Y> AggregateSelect<Y, X>(this IEnumerable<X> sequence, Y initialResult, Func<Y, X, Y> selector)
+        {
+            foreach (var i in sequence)
+            {
+                initialResult = selector(initialResult, i);
+                yield return initialResult;
+            }
+        }
+
+        public static IEnumerable<string> JoinSelect<X>(this IEnumerable<X> sequence, string separator)
+        {
+            var iEnd = sequence.Count();
+            for (int i=0; i<iEnd; ++i)
+            {
+                yield return sequence.Take(i).Join(separator);
+            }
+        }
+
         /// <summary>
         /// Like Select, but silently ignores exceptions in f
         /// </summary>
