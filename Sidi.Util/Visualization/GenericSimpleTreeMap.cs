@@ -68,6 +68,18 @@ namespace Sidi.Visualization
 
         public Action<T> Activate;
 
+        new public Func<T, string> Text
+        {
+            set
+            {
+                base.Text = x =>
+                {
+                    var t = (T)x;
+                    return t == null ? String.Empty : value(t);
+                };
+            }
+        }
+
         public Func<T, IComparable> PercentileColorMap
         {
             set

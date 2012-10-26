@@ -10,6 +10,15 @@ namespace Sidi.Visualization
 {
     public class LabelPainter
     {
+        public enum Mode
+        {
+            Static,
+            MouseFocus,
+            Max
+        };
+
+        public Mode InteractMode { set; get; }
+
         public StringFormat StringFormat;
 
         TreeMapControl treeMapControl;
@@ -27,7 +36,66 @@ namespace Sidi.Visualization
 
             Font = new Font(FontFamily.GenericSansSerif, 10.0f);
 
+            treeMapControl.MouseMove += new MouseEventHandler(treeMapControl_MouseMove);
+            treeMapControl.KeyDown += new KeyEventHandler(treeMapControl_KeyDown);
+            treeMapControl.Paint += new PaintEventHandler(treeMapControl_Paint);
+
             ShowLevels(2);
+        }
+
+        void treeMapControl_Paint(object sender, PaintEventArgs e)
+        {
+            Paint(e);
+        }
+
+        void treeMapControl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (HotkeysEnabled)
+            {
+                HandleHotKey(e);
+            }
+        }
+
+        public bool HotkeysEnabled = false;
+
+        void treeMapControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            switch (InteractMode)
+            {
+                case Mode.MouseFocus:
+                    Focus(e.Location);
+                    treeMapControl.Invalidate();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void HandleHotKey(KeyEventArgs e)
+        {
+            if (e.KeyCode >= Keys.D1 && e.KeyCode <= Keys.D9)
+            {
+                int index = e.KeyCode - Keys.D1;
+                if (e.Modifiers == Keys.Control)
+                {
+                    ShowLevels(index);
+                }
+                else
+                {
+                    ToggleLevelVisibility(index);
+                }
+                treeMapControl.Invalidate();
+            }
+            else if (e.KeyCode == Keys.Space)
+            {
+                ++InteractMode;
+                if (InteractMode >= Mode.Max)
+                {
+                    InteractMode = (Mode)0;
+                }
+
+                treeMapControl.Invalidate();
+            }
         }
 
         public float MinArea = 100.0f;
@@ -44,7 +112,7 @@ namespace Sidi.Visualization
             {
                 LevelVisible[i] = true;
             }
-            for (; i < LevelVisible.Length;  ++i)
+            for (; i < LevelVisible.Length; ++i)
             {
                 LevelVisible[i] = false;
             }
@@ -55,7 +123,7 @@ namespace Sidi.Visualization
             focusPointEnabled = false;
             LevelVisible[index] = !LevelVisible[index];
         }
-        
+
         public void Focus(Point focusPoint)
         {
             this.focusPoint = focusPoint;
@@ -64,6 +132,7 @@ namespace Sidi.Visualization
 
         bool focusPointEnabled = false;
         Point focusPoint;
+        float[] worldFocusPoint;
 
         public void Paint(PaintEventArgs e)
         {
@@ -72,6 +141,7 @@ namespace Sidi.Visualization
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             if (focusPointEnabled)
             {
+                worldFocusPoint = treeMapControl.GetWorldPoint(focusPoint);
                 PaintRecursiveFocusPoint(e, layout.Root, 0);
             }
             else
@@ -83,7 +153,7 @@ namespace Sidi.Visualization
         public Font Font;
         public float MinFontSize = 5.0f;
         public bool LeafsOnly = false;
-        public Func<object, string> Text = t => t.ToString();
+        public Func<Tree, string> Text = t => t == null ? String.Empty : t.ToString();
 
         double alphaF;
 
@@ -148,10 +218,12 @@ namespace Sidi.Visualization
             var white = new SolidBrush(Color.FromArgb(a, Color.White));
             float fontSize = Math.Max(Font.Size * scale, 1.0f);
 
+            /*
             if (fontSize < MinFontSize)
             {
                 return false;
             }
+             */
 
             var font = new Font(FontFamily.GenericSansSerif, fontSize);
 
@@ -166,36 +238,36 @@ namespace Sidi.Visualization
 
         }
 
-        bool PaintRecursiveFocusPoint(PaintEventArgs e, TreeMapLayout.Layout n, int level)
+        bool PaintRecursiveFocusPoint(PaintEventArgs e, TreeMapLayout.Layout layout, int level)
         {
-            var rectArea = n.Rectangle.Area();
-            if (!e.ClipRectangle.IntersectsWith(n.Rectangle.ToRectangle()))
+            // var rectArea = n.Rectangle.Area();
+            /*
+            if (!e.ClipRectangle.IntersectsWith(layout.Rectangle.ToRectangle()))
             {
                 return false;
             }
+             */
 
-            var rect = n.Rectangle.ToRectangleF();
-
-            if (rect.Contains(focusPoint))
+            if (layout.Rectangle.Contains(worldFocusPoint))
             {
-                if (n.Children.Any())
+                if (layout.Children.Any())
                 {
-                    foreach (var c in n.Children)
+                    foreach (var c in layout.Children)
                     {
-                        PaintRecursiveFocusPoint(e, c, level+1);
+                        PaintRecursiveFocusPoint(e, c, level + 1);
                     }
                 }
                 else
                 {
-                    var text = Text(n.Tree);
-                    DrawLabel(e.Graphics, text, rect);
+                    var text = Text(layout.Tree);
+                    DrawLabel(e.Graphics, text, layout.Rectangle.ToRectangleF());
                 }
                 return true;
             }
             else
             {
-                var text = Text(n.Tree);
-                DrawLabel(e.Graphics, text, rect);
+                var text = Text(layout.Tree);
+                DrawLabel(e.Graphics, text, layout.Rectangle.ToRectangleF());
                 return true;
             }
         }

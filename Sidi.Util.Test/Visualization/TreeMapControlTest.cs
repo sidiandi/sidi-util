@@ -33,7 +33,9 @@ namespace Sidi.Visualization
             var t = TreeMapTest.GetTestTree();
             var tm = new TreeMapControl() { Tree = t };
             tm.CushionPainter.NodeColor = n => new HSLColor(hsv.Hue + ((int)n)*0.02, 1.0, 0.5);
-            // tm.CushionPainter.NodeColor = n => Color.Red;
+            var lp = tm.CreateLabelPainter();
+            tm.Paint += (s, e) => lp.Paint(e);
+            lp.InteractMode = LabelPainter.Mode.MouseFocus;
             tm.RunFullScreen();
         }
 

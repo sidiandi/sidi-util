@@ -60,6 +60,7 @@ namespace Sidi.Visualization
             tm.DistinctColor = x => x.Extension;
             tm.Size = x => x.Info.Length;
             tm.Activate = x => MessageBox.Show(x.ToString());
+            tm.Text = x => x.Name;
             tm.Items = files;
             tm.RunFullScreen();
         }
