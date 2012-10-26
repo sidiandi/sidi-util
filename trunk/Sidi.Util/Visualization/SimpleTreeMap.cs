@@ -18,6 +18,11 @@ namespace Sidi.Visualization
             PathSeparator = new Regex(@"\\");
             Color = x => System.Drawing.Color.White;
 
+            LabelPainter = new LabelPainter(this);
+            LabelPainter.HotkeysEnabled = true;
+            LabelPainter.InteractMode = Visualization.LabelPainter.Mode.MouseFocus;
+            LabelPainter.Text = x => Text(x.Object);
+
             this.ItemMouseHover += (s,e) =>
                 {
                     toolTip.SetToolTip(this,
@@ -47,6 +52,8 @@ namespace Sidi.Visualization
         {
             this.Tree = BuildTree(Items, Lineage, Size);
         }
+
+        public LabelPainter LabelPainter;
 
         public static Tree BuildTree(IList items, Func<object, IEnumerable<object>> lineage, Func<object, float> size)
         {
@@ -96,7 +103,7 @@ namespace Sidi.Visualization
             }
         }
         public Func<object, float> Size = x => 1.0f;
-        public Func<object, IEnumerable<object>> Lineage;
+        public Func<object, IEnumerable<object>> Lineage { set; private get; }
         public Func<object, object> ParentSelector
         {
             set
@@ -119,6 +126,7 @@ namespace Sidi.Visualization
                 Lineage = x => pathSeparator.Split(x.SafeToString()).Cast<object>();
             }
         }
+        public Func<object, string> Text { set; private get; }
 
         public Func<object, object> DistinctColor
         {
@@ -130,103 +138,5 @@ namespace Sidi.Visualization
         }
 
         Regex pathSeparator;
-
-        /*
-        static Item GetItem(Tree t)
-        {
-            return GetData(t).Item;
-        }
-
-        static Data GetData(Tree t)
-        {
-            return (Data)t.Object;
-        }
-
-        public static Tree MakeTree(IEnumerable<Item> data)
-        {
-            var t = new Tree(null)
-            {
-                Object = new Data(),
-            };
-
-            foreach (var i in data)
-            {
-                Add(t, i.Lineage.ToArray(), i, 0);
-            }
-            t.UpdateSize();
-
-            while (t.Children.Count() == 1)
-            {
-                t = t.Children.First();
-            }
-
-            return t;
-        }
-
-        public TreeMapControl CreateControl()
-        {
-            var tree = MakeTree(Items);
-            var tm = new TreeMapControl() { Tree = tree };
-
-            tm.CushionPainter.NodeColor = t => ((Data)t).Item.Color;
-
-            var lp = tm.CreateLabelPainter();
-            
-            var ti = new ToolTip();
-            tm.ItemMouseHover += (s, e) =>
-            {
-                if (Control.ModifierKeys == Keys.Shift)
-                {
-                    ti.SetToolTip(tm, GetItem(e.Layout.TreeNode).Lineage.Where(i => i != null).Join(LineageSeparator).ToString());
-                    lp.Focus(tm.PointToClient(Control.MousePosition));
-                    tm.Invalidate();
-                }
-            };
-
-            tm.Paint += (s, e) =>
-                {
-                    lp.Paint(e);
-                };
-
-            tm.KeyDown += (s, e) =>
-            {
-                if (e.KeyCode >= Keys.D1 && e.KeyCode <= Keys.D9)
-                {
-                    int index = e.KeyCode - Keys.D1;
-                    if (e.Modifiers == Keys.Control)
-                    {
-                        lp.ShowLevels(index);
-                    }
-                    else
-                    {
-                        lp.ToggleLevelVisibility(index);
-                    }
-                    tm.Invalidate();
-                }
-                else if (e.KeyCode == Keys.Space)
-                {
-                    lp.Focus(tm.PointToClient(Control.MousePosition));
-                    tm.Invalidate(); 
-                }
-            };
-
-            return tm;
-        }
-
-        public IEnumerable<Item> Items { get; set; }
-
-        public void Show()
-        {
-            var c = CreateControl();
-            Sidi.Forms.Util.RunFullScreen(c);
-        }
-
-        public static void Show(IEnumerable<Item> items )
-        {
-            var st = new SimpleTreeMap();
-            st.Items = items;
-            st.Show();
-        }
-         */
     }
 }

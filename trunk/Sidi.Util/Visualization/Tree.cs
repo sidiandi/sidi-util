@@ -103,7 +103,7 @@ namespace Sidi.Visualization
 
         public override string ToString()
         {
-            return Object.ToString();
+            return Object == null ? String.Empty : Object.ToString();
         }
 
         public IEnumerable<Tree> AllNodes

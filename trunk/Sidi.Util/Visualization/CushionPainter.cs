@@ -224,9 +224,6 @@ namespace Sidi.Visualization
                         }
                     }
                 }
-                // e.Graphics.DrawString((intPts[1].X - intPts[0].X).ToString(), control.Font, new SolidBrush(Color.Red), intPts[0]);
-                // e.Graphics.DrawString(intPts.Join(), control.Font, new SolidBrush(Color.Red), intPts[0]);
-
             }
 
             e.Graphics.Transform = transform;

@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO.Long;
 using System.Drawing.Drawing2D;
+using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
@@ -30,11 +31,10 @@ namespace Sidi.Visualization
 
             zoomPanController = new ZoomPanController(this);
 
-            this.ContextMenu = new ContextMenu(new[]{
-                new MenuItem("Zoom In", (s,e) => { ZoomIn(ClickLocation, 1); }),
-                new MenuItem("Zoom Out", (s,e) => { ZoomOut(1); })
-            });
+            this.ContextMenuStrip = new ContextMenuStrip();
 
+            this.ContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(ContextMenuStrip_Opening);
+                
             this.MouseClick += (s, e) =>
             {
                 ClickLocation = e.Location;
@@ -55,6 +55,36 @@ namespace Sidi.Visualization
             };
 
             CushionPainter = new CushionPainter(this);
+        }
+
+        void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs ce)
+        {
+            var strip = this.ContextMenuStrip;
+
+            strip.Items.Clear();
+
+            strip.Items.Add(
+                "View All", null, (s, e) =>
+                {
+                    ZoomOut(Int32.MaxValue);
+                    zoomPanController.Reset();
+                });
+
+            strip.Items.Add(
+                "Zoom In", null, (s, e) => { ZoomIn(ClickLocation, 1); });
+            strip.Items.Add(
+                "Zoom Out", null, (s, e) => { ZoomOut(1); });
+
+            var layout = this.GetLayoutAt(PointToClient(Control.MousePosition));
+            foreach (var i in layout.Up.Cast<Sidi.Visualization.TreeMapLayout.Layout>())
+            {
+                var tree = i.Tree;
+                strip.Items.Add(
+                    String.Format("View {0}", i.Tree.SafeToString()), null, (s, e) =>
+                        {
+                            Tree = tree;
+                        });
+            }
         }
 
         public static TreeMapControl FromTree(Tree tree)
@@ -133,7 +163,7 @@ namespace Sidi.Visualization
             }
         }
 
-        float[] GetWorldPoint(Point p)
+        public float[] GetWorldPoint(Point p)
         {
             var fp = p.ToArray();
             var inverse = WorldTransform.Clone();

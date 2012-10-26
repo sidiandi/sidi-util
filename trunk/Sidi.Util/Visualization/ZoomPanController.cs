@@ -39,5 +39,10 @@ namespace Sidi.Visualization
         }
 
         public Matrix Transform = new Matrix();
+
+        public void Reset()
+        {
+            Transform = new Matrix();
+        }
     }
 }
