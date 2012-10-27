@@ -8,6 +8,7 @@ using Sidi.Extensions;
 
 namespace Sidi.IMAP
 {
+    [CLSCompliant(false)]
     public interface IRepository
     {
         IList<string> MailboxNames { get; }
@@ -16,6 +17,7 @@ namespace Sidi.IMAP
         IMailbox GetMailbox(string name);
     }
 
+    [CLSCompliant(false)]
     public interface IMailbox
     {
         IList<IMail> Items { get; }
@@ -39,6 +41,7 @@ namespace Sidi.IMAP
         Recent
     };
 
+    [CLSCompliant(false)]
     public interface IMail
     {
         string BODY { get; }
@@ -50,6 +53,7 @@ namespace Sidi.IMAP
         System.UInt32 UID { get; }
     }
 
+    [CLSCompliant(false)]
     public static class IMailExtensions
     {
         public static IMail BySequenceNumber(this IMailbox mailbox, UInt32 sequenceNumber)

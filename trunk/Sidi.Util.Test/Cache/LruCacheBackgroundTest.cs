@@ -42,10 +42,10 @@ namespace Sidi.Cache
             int updateCount = 0;
             using (var c = new LruCacheBackground<int, int>(maxCount, x => x * 2, 5))
             {
-                c.EntryUpdated += new LruCacheBackground<int, int>.EntryUpdatedHandler((o, e) =>
-                    {
-                        ++updateCount;
-                    });
+                c.EntryUpdated += (o, e) =>
+                {
+                    ++updateCount;
+                };
 
                 c.DefaultValueWhileLoading = x => -1;
                 for (int i = 0; i < maxCount; ++i)

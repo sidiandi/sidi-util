@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Sidi.IMAP
 {
+    [CLSCompliant(false)]
     public class ArgParser
     {
         public ArgParser(string argString)

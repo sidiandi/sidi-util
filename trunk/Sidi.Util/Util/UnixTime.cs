@@ -21,6 +21,7 @@ using System.Text;
 
 namespace Sidi.Util
 {
+    [CLSCompliant(false)]
     public sealed class UnixTime
     {
         /// <summary>

@@ -9,6 +9,7 @@ using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IMAP
 {
+    [CLSCompliant(false)]
     public class EmlMailbox : IMailbox
     {
         public EmlMailbox(Path directory)
@@ -47,6 +48,7 @@ namespace Sidi.IMAP
         public uint NextUid { get { return 10000; } }
     }
 
+    [CLSCompliant(false)]
     public class EmlFile : IMail
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -112,6 +114,7 @@ namespace Sidi.IMAP
         }
     }
 
+    [CLSCompliant(false)]
     public class EmlDirectory : IRepository
     {
         public EmlDirectory(Path directory)

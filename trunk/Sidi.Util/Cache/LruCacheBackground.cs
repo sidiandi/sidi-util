@@ -25,7 +25,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Cache
 {
-
     public class LruCacheBackground<Key, Value> : IDisposable, ICache<Key, Value>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -129,13 +128,11 @@ namespace Sidi.Cache
             public Key Key { get; private set; } 
         }
 
-        public delegate void EntryUpdatedHandler(object sender, EntryUpdatedEventArgs arg);
-        
         /// <summary>
         /// Fires when an entry in the cache was updated.
         /// </summary>
         /// Warning: this event will be fired by a background thread.
-        public event EntryUpdatedHandler EntryUpdated;
+        public event EventHandler<EntryUpdatedEventArgs> EntryUpdated;
 
         enum State
         {
@@ -176,7 +173,20 @@ namespace Sidi.Cache
 
             #region IDisposable Members
 
-            public void Dispose()
+        private bool disposed = false;
+            
+        //Implement IDisposable.
+        public void Dispose()
+        {
+          Dispose(true);
+          GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
             {
                 IDisposable disposeValue = m_value as IDisposable;
                 if (disposeValue != null)
@@ -185,6 +195,19 @@ namespace Sidi.Cache
                 }
                 m_value = default(Value);
             }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~CacheEntry()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
 
             #endregion
         }
@@ -363,11 +386,39 @@ namespace Sidi.Cache
             workers.ForEach(x => x.Join());
         }
 
+        
+
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            StopWorkers();
-            cache.Dispose();
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                          StopWorkers();
+            cache.Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~LruCacheBackground()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
 
         public void Clear()
         {

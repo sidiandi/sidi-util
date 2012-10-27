@@ -256,9 +256,11 @@ namespace Sidi.Util
 
         void Parse(byte[] data)
         {
-            MemoryStream m = new MemoryStream(data);
-            XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
-            UpdateInfo = (UpdateInfo)s.Deserialize(m);
+            using (var m = new MemoryStream(data))
+            {
+                XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
+                UpdateInfo = (UpdateInfo)s.Deserialize(m);
+            }
         }
 
         protected virtual void OnUpdateInfoChanged()
