@@ -44,6 +44,7 @@ namespace Sidi.CommandLine
             y = child.Bottom + margin;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public Form ToDialog(Action action)
         {
             var at = new ActionTag(action);
@@ -148,6 +149,7 @@ namespace Sidi.CommandLine
             return control;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public Control ToControl3(Action action)
         {
             var at = new ActionTag(action);
@@ -163,6 +165,7 @@ namespace Sidi.CommandLine
             return link;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public Control ToControl(Action action)
         {
             var at = new ActionTag(action);
@@ -183,6 +186,7 @@ namespace Sidi.CommandLine
             return link;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public Control ToControl(SubCommand subcommand)
         {
             var link = new LinkLabel()
@@ -204,6 +208,7 @@ namespace Sidi.CommandLine
             return link;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         Control ToControl(Option option)
         {
             var panel = new TableLayoutPanel()
@@ -267,6 +272,7 @@ namespace Sidi.CommandLine
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         Form ToDialog(Parser parser)
         {
             Form main = new Form();
@@ -279,6 +285,7 @@ namespace Sidi.CommandLine
             return main;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         Control ToControl(Parser parser)
         {
             var t = new TabControl()
