@@ -117,6 +117,7 @@ namespace Sidi.CommandLine
         }
     }
 
+    [Serializable]
     public class CommandLineException : Exception
     {
         public CommandLineException(string reason)
@@ -125,6 +126,7 @@ namespace Sidi.CommandLine
         }
     }
 
+    [Serializable]
     public class InvalidParameterException : Exception
     {
         public InvalidParameterException(ParameterInfo parameter)

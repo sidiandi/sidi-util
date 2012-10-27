@@ -241,7 +241,7 @@ namespace Sidi.Cache
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1031")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope"), SuppressMessage("Microsoft.Design", "CA1031")]
         public void Worker()
         {
             lock (this)
@@ -312,6 +312,7 @@ namespace Sidi.Cache
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public Value this[Key key]
         {
             get

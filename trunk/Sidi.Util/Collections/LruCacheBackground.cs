@@ -22,7 +22,6 @@ using System.Threading;
 
 namespace Sidi.Collections
 {
-
     public class LruCacheBackground<Key, Value> : IDisposable
     {
         public class EntryUpdatedEventArgs : EventArgs
@@ -30,13 +29,11 @@ namespace Sidi.Collections
             public Key key;
         }
 
-        public delegate void EntryUpdatedHandler(object sender, EntryUpdatedEventArgs arg);
-        
         /// <summary>
         /// Fires when an entry in the cache was updated.
         /// </summary>
         /// Warning: this event will be fired by a background thread.
-        public event EntryUpdatedHandler EntryUpdated;
+        public event EventHandler<EntryUpdatedEventArgs> EntryUpdated;
 
         enum State
         {
@@ -88,6 +85,7 @@ namespace Sidi.Collections
             public bool m_workerStarted = false;
             public List<LruCacheBackground<Key, Value>> m_instances = new List<LruCacheBackground<Key, Value>>();
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
             public void Worker(object state)
             {
                 lock (this)
@@ -185,14 +183,6 @@ namespace Sidi.Collections
             m_shared.m_instances.Add(this);
         }
 
-        ~LruCacheBackground()
-        {
-            lock (this)
-            {
-                m_provideValueRequestQueue = null;
-            }
-        }
-
         protected virtual void OnEntryUpdated(Key key)
         {
             EntryUpdatedEventArgs a = new EntryUpdatedEventArgs();
@@ -276,6 +266,7 @@ namespace Sidi.Collections
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public void Load(Key key)
         {
             lock (m_shared)
@@ -338,13 +329,39 @@ namespace Sidi.Collections
 
         #region IDisposable Members
 
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            lock (this)
-            {
-                m_provideValueRequestQueue = null;
-            }
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                lock (this)
+                {
+                    m_provideValueRequestQueue = null;
+                }
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~LruCacheBackground()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
 
         #endregion
 
