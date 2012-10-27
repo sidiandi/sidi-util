@@ -622,17 +622,6 @@ namespace Sidi.CommandLine.Test
         }
 
         [Test]
-        public void SubParser()
-        {
-            var a = new TestAppWithStringList();
-            var p = new Parser(a);
-            p.Parse(new string[] { "Action", "1", "2", "3", ";", "AddList", "1", "2", "3", ";" });
-            p.AddSubParser(new Parser(a));
-            p.Parse(new string[] { "TestAppWithStringList", "Action", "1", "2", "3", ";", ";", "AddList", "1", "2", "3", ";" });
-            p.WriteUsage(Console.Out);
-        }
-
-        [Test]
         public void ParseValues()
         {
             var ln = (Path) Parser.ParseValue(@"C:\temp", typeof(Path));

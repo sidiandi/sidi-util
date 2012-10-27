@@ -19,6 +19,7 @@ namespace Sidi.Forms
         public IList<IColumnInfo> ColumnDefinition { get { return columnDefinition; } set { columnDefinition = value; UpdateDisplay(); } }
         IList<IColumnInfo> columnDefinition;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public void UpdateDisplay()
         {
             this.Columns.Clear();

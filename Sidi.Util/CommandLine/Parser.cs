@@ -59,64 +59,6 @@ namespace Sidi.CommandLine
         void UnknownArgument(IList<string> args);
     }
 
-    public class SubParser : IParserItem
-    {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        Parser parser;
-
-        public SubParser(Parser p)
-        {
-            parser = p;
-        }
-        
-        public string Usage
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string UsageText
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string Name
-        {
-            get { return parser.ApplicationName; }
-        }
-
-        public object Application
-        {
-            get { throw new N(); }
-        }
-
-        public IEnumerable<string> Categories
-        {
-            get { return new string[]{}; }
-        }
-
-        public object Handle(IList<string> args, bool execute)
-        {
-            using (log4net.NDC.Push(this.Name))
-            {
-                while (args.Any())
-                {
-                    if (args.First().Equals(Parser.ListTerminator))
-                    {
-                        args.RemoveAt(0);
-                        break;
-                    }
-
-                    if (execute)
-                    {
-                        parser.ParseSingleCommand(args);
-                    }
-                }
-                return null;
-            }
-        }
-    }
-
     [Serializable]
     public class CommandLineException : Exception
     {
@@ -1019,11 +961,6 @@ namespace Sidi.CommandLine
             {
                 Marshal.FreeHGlobal(argv);
             }
-        }
-
-        public void AddSubParser(Parser parser)
-        {
-            this.SubParsers.Add(new SubParser(parser));
         }
     }
 }

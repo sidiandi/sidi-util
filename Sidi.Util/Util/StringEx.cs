@@ -33,6 +33,8 @@ namespace Sidi.Extensions
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        static System.Security.Cryptography.MD5CryptoServiceProvider serviceProvider = new System.Security.Cryptography.MD5CryptoServiceProvider();
+        
         public static string ShortenMd5(this string text, int maxLength)
         {
             int md5StringLength = 16 * 2 + 1;
@@ -42,16 +44,15 @@ namespace Sidi.Extensions
                 throw new ArgumentOutOfRangeException(String.Format("maxLength must be > {0}", md5StringLength));
             }
 
-            var x = new System.Security.Cryptography.MD5CryptoServiceProvider();
-            if (text.Length <= maxLength)
-            {
-                return text;
-            }
+                if (text.Length <= maxLength)
+                {
+                    return text;
+                }
 
-            string toEncode = text.Substring(maxLength - md5StringLength);
-            return
-                text.Substring(0, maxLength) + "." +
-                x.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode)).HexString();
+                string toEncode = text.Substring(maxLength - md5StringLength);
+                return
+                    text.Substring(0, maxLength) + "." +
+                    serviceProvider.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode)).HexString();
         }
 
         public static string Unquote(this string text)
@@ -68,26 +69,28 @@ namespace Sidi.Extensions
 
         public static string OneLine(this string text, int maxLen)
         {
-            StringReader r = new StringReader(text);
-            StringWriter w = new StringWriter();
-            for (string line = r.ReadLine(); ; )
+            using (var r = new StringReader(text))
+            using (var w = new StringWriter())
             {
-                w.Write(line);
-                line = r.ReadLine();
-                if (line == null)
+                for (string line = r.ReadLine(); ; )
                 {
-                    break;
+                    w.Write(line);
+                    line = r.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
+                    w.Write(" ");
                 }
-                w.Write(" ");
-            }
-            string result = w.ToString();
-            if (result.Length > maxLen)
-            {
-                return result.Substring(0, maxLen);
-            }
-            else
-            {
-                return result;
+                string result = w.ToString();
+                if (result.Length > maxLen)
+                {
+                    return result.Substring(0, maxLen);
+                }
+                else
+                {
+                    return result;
+                }
             }
         }
 
@@ -132,9 +135,11 @@ namespace Sidi.Extensions
         /// <returns>Output string</returns>
         public static string ToString(this Action<TextWriter> generator)
         {
-            TextWriter w = new StringWriter();
-            generator(w);
-            return w.ToString();
+            using (var w = new StringWriter())
+            {
+                generator(w);
+                return w.ToString();
+            }
         }
 
         /// <summary>
@@ -163,69 +168,73 @@ namespace Sidi.Extensions
 
         public static string Wrap(this string text, int columns)
         {
-            StringWriter w = new StringWriter();
-            StringReader r = new StringReader(text);
-            bool first = true;
-            foreach (string i in r.ReadLines())
+            using (var w = new StringWriter())
+            using (var r = new StringReader(text))
             {
-                if (first)
+                bool first = true;
+                foreach (string i in r.ReadLines())
                 {
-                    first = false;
-                }
-                else
-                {
-                    w.WriteLine();
-                }
-
-                int s = 0;
-                var prefix = Regex.Match(i, @"^\s*").Value;
-                while ((i.Length - s) > columns)
-                {
-                    int s1 = i.LastIndexOf(" ", s + columns, columns);
-                    if (s1 < 0)
+                    if (first)
                     {
-                        s1 = s + columns;
-                    }
-                    if (s == 0)
-                    {
-                        w.WriteLine(i.Substring(s, s1 - s));
+                        first = false;
                     }
                     else
                     {
-                        w.WriteLine(prefix + i.Substring(s, s1 - s));
+                        w.WriteLine();
                     }
-                    s = s1 + 1;
+
+                    int s = 0;
+                    var prefix = Regex.Match(i, @"^\s*").Value;
+                    while ((i.Length - s) > columns)
+                    {
+                        int s1 = i.LastIndexOf(" ", s + columns, columns);
+                        if (s1 < 0)
+                        {
+                            s1 = s + columns;
+                        }
+                        if (s == 0)
+                        {
+                            w.WriteLine(i.Substring(s, s1 - s));
+                        }
+                        else
+                        {
+                            w.WriteLine(prefix + i.Substring(s, s1 - s));
+                        }
+                        s = s1 + 1;
+                    }
+                    if (s == 0)
+                    {
+                        w.Write(i.Substring(s));
+                    }
+                    else
+                    {
+                        w.Write(prefix + i.Substring(s));
+                    }
                 }
-                if (s == 0)
-                {
-                    w.Write(i.Substring(s));
-                }
-                else
-                {
-                    w.Write(prefix + i.Substring(s));
-                }
+                return w.ToString();
             }
-            return w.ToString();
         }
 
         public static string Indent(this string text, string prefix)
         {
-            StringWriter w = new StringWriter();
-            StringReader r = new StringReader(text);
-            bool first = true;
-            foreach (string i in r.ReadLines())
+            using (var w = new StringWriter())
+            using (var r = new StringReader(text))
             {
-                if (first)
+                bool first = true;
+                foreach (string i in r.ReadLines())
                 {
-                    first = false;
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        w.WriteLine();
+                    }
+                    w.Write(prefix + i);
                 }
-                else
-                {
-                    w.WriteLine();
-                }
-                w.Write(prefix + i);
+                return w.ToString();
             }
-            return w.ToString();
         }
 
         /// <summary>
@@ -240,8 +249,10 @@ namespace Sidi.Extensions
 
         public static IEnumerable<string> Lines(this string text)
         {
-            StringReader r = new StringReader(text);
-            return r.ReadLines();
+            using (var r = new StringReader(text))
+            {
+                return r.ReadLines();
+            }
         }
 
         public static string GetSection(this string text, string sectionName)
@@ -255,10 +266,12 @@ namespace Sidi.Extensions
 
         public static string ToLiteral(this string input)
         {
-            var writer = new StringWriter();
-            CSharpCodeProvider provider = new CSharpCodeProvider();
-            provider.GenerateCodeFromExpression(new CodePrimitiveExpression(input), writer, null);
-            return writer.GetStringBuilder().ToString();
+            using (var writer = new StringWriter())
+            using (var provider = new CSharpCodeProvider())
+            {
+                provider.GenerateCodeFromExpression(new CodePrimitiveExpression(input), writer, null);
+                return writer.GetStringBuilder().ToString();
+            }
         }
 
         /// <summary>
