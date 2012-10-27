@@ -27,12 +27,14 @@ namespace Sidi.Extensions
     {
         public static string HexString(this byte[] x)
         {
-            StringWriter w = new StringWriter();
-            foreach (byte i in x)
+            using (var w = new StringWriter())
             {
-                w.Write(String.Format("{0:x2}", i));
+                foreach (byte i in x)
+                {
+                    w.Write(String.Format("{0:x2}", i));
+                }
+                return w.ToString();
             }
-            return w.ToString();
         }
     }
 }

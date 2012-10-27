@@ -477,11 +477,13 @@ namespace Sidi.Forms
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         static public ItemView<Item> Create(IList<Item> list)
         {
-            ItemView<Item> view = new ItemView<Item>();
-            view.List = list;
-            return view;
+            return new ItemView<Item>()
+            {
+                List = list
+            };
         }
 
         IList<Item> m_list = null;
@@ -772,12 +774,17 @@ namespace Sidi.Forms
             }
         }
 
+        Brush controlTextBrush = new SolidBrush(Color.FromKnownColor(KnownColor.ControlText));
+
         protected override void  OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             Rectangle c = ClientRectangle;
 
-            g.FillRectangle(new SolidBrush(this.BackColor), c);
+            using (var backColorBrush = new SolidBrush(this.BackColor))
+            {
+                g.FillRectangle(backColorBrush, c);
+            }
 
             if (List == null || List.Count == 0)
             {
@@ -787,7 +794,7 @@ namespace Sidi.Forms
 
                 g.DrawString("This list is empty.",
                     this.Font,
-                    new SolidBrush(Color.FromKnownColor(KnownColor.ControlText)),
+                    controlTextBrush,
                     c,
                     sf);
             }

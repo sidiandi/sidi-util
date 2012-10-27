@@ -35,11 +35,13 @@ namespace Sidi.Forms
             return x.ToString();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public virtual ColumnHeader Header()
         {
-            ColumnHeader c = new ColumnHeader();
-            c.Text = HeaderText;
-            return c;
+            return new ColumnHeader()
+            {
+                Text = HeaderText
+            };
         }
 
         protected virtual string HeaderText

@@ -108,6 +108,7 @@
     <Compile Include="Forms\GenericListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\NativeMethods.cs" />
     <Compile Include="Forms\PanZoomController.cs" />
     <Compile Include="Forms\Prompt.cs" />
     <Compile Include="Forms\SelectObjectsDialog.cs">
