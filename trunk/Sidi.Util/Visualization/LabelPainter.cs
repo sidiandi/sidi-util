@@ -137,7 +137,7 @@ namespace Sidi.Visualization
         public void Paint(PaintEventArgs e)
         {
             var layout = treeMapControl.Layout;
-            float maxArea = layout.Root.Rectangle.Area();
+            float maxArea = layout.Root.Bounds.Area();
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             if (focusPointEnabled)
             {
@@ -159,15 +159,15 @@ namespace Sidi.Visualization
 
         bool PaintRecursive(PaintEventArgs e, TreeMapLayout.Layout n, int level)
         {
-            var rectArea = n.Rectangle.Area();
-            if (!e.ClipRectangle.IntersectsWith(n.Rectangle.ToRectangle()))
+            var rectArea = n.Bounds.Area();
+            if (!e.ClipRectangle.IntersectsWith(n.Bounds.ToRectangle()))
             {
                 return false;
             }
 
             if (LevelVisible[level])
             {
-                var rect = n.Rectangle.ToRectangleF();
+                var rect = n.Bounds.ToRectangleF();
                 var text = Text(n.Tree);
                 var textSize = e.Graphics.MeasureString(text, Font);
                 var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
@@ -248,7 +248,7 @@ namespace Sidi.Visualization
             }
              */
 
-            if (layout.Rectangle.Contains(worldFocusPoint))
+            if (layout.Bounds.Contains(worldFocusPoint))
             {
                 if (layout.Children.Any())
                 {
@@ -260,14 +260,14 @@ namespace Sidi.Visualization
                 else
                 {
                     var text = Text(layout.Tree);
-                    DrawLabel(e.Graphics, text, layout.Rectangle.ToRectangleF());
+                    DrawLabel(e.Graphics, text, layout.Bounds.ToRectangleF());
                 }
                 return true;
             }
             else
             {
                 var text = Text(layout.Tree);
-                DrawLabel(e.Graphics, text, layout.Rectangle.ToRectangleF());
+                DrawLabel(e.Graphics, text, layout.Bounds.ToRectangleF());
                 return true;
             }
         }
