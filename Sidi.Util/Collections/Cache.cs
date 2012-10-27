@@ -90,7 +90,7 @@ namespace Sidi.Collections
                 catch (Exception e)
                 {
                     writer(p, e);
-                    throw e;
+                    throw;
                 }
             }
         }

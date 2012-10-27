@@ -30,7 +30,7 @@ namespace Sidi.Collections
         public CacheAutoInvalidate(LruCacheBackground<Key, Value> a_cache)
         {
             cache = a_cache;
-            cache.EntryUpdated += new LruCacheBackground<Key, Value>.EntryUpdatedHandler(cache_EntryUpdated);
+            cache.EntryUpdated += new EventHandler<LruCacheBackground<Key, Value>.EntryUpdatedEventArgs>(cache_EntryUpdated);
         }
 
         void cache_EntryUpdated(object sender, LruCacheBackground<Key, Value>.EntryUpdatedEventArgs arg)
