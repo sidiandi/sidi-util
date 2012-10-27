@@ -87,7 +87,7 @@ namespace Sidi.CommandLine
 
         public object Application
         {
-            get { throw new NotImplementedException(); }
+            get { throw new N(); }
         }
 
         public IEnumerable<string> Categories
@@ -123,6 +123,11 @@ namespace Sidi.CommandLine
         public CommandLineException(string reason)
             : base(reason)
         {
+        }
+
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+            base.GetObjectData(info, context);
         }
     }
 
@@ -764,28 +769,30 @@ namespace Sidi.CommandLine
         {
             get
             {
-                StringWriter w = new StringWriter();
-                w.WriteLine(
-                    String.Format("{0} - {1}",
-                    ApplicationName,
-                    Usage.Get(MainApplication.GetType()))
-                    );
-
-                Assembly assembly = MainApplication.GetType().Assembly;
-
-                List<string> infos = new List<string>();
-
-                infos.Add(String.Format("Version {0}", assembly.GetName().Version));
-
-                object[] a = assembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
-                a = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-                if (a.Length > 0)
+                using (var w = new StringWriter())
                 {
-                    infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
-                }
+                    w.WriteLine(
+                        String.Format("{0} - {1}",
+                        ApplicationName,
+                        Usage.Get(MainApplication.GetType()))
+                        );
 
-                w.WriteLine(infos.Join(", "));
-                return w.ToString();
+                    Assembly assembly = MainApplication.GetType().Assembly;
+
+                    List<string> infos = new List<string>();
+
+                    infos.Add(String.Format("Version {0}", assembly.GetName().Version));
+
+                    object[] a = assembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
+                    a = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+                    if (a.Length > 0)
+                    {
+                        infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
+                    }
+
+                    w.WriteLine(infos.Join(", "));
+                    return w.ToString();
+                }
             }
         }
 
@@ -796,28 +803,30 @@ namespace Sidi.CommandLine
                 var app = Applications.Last();
                 var appType = app.GetType();
 
-                StringWriter i = new StringWriter();
-                i.WriteLine(
-                String.Format("{0} - {1}",
-                    ApplicationName,
-                    Usage.Get(app.GetType()))
-                );
-
-                Assembly assembly = appType.Assembly;
-
-                List<string> infos = new List<string>();
-
-                infos.Add(String.Format("Version {0}", assembly.GetName().Version));
-
-                object[] a = assembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
-                a = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-                if (a.Length > 0)
+                using (var i = new StringWriter())
                 {
-                    infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
-                }
+                    i.WriteLine(
+                    String.Format("{0} - {1}",
+                        ApplicationName,
+                        Usage.Get(app.GetType()))
+                    );
 
-                i.Write(infos.Join(", "));
-                return i.ToString();
+                    Assembly assembly = appType.Assembly;
+
+                    List<string> infos = new List<string>();
+
+                    infos.Add(String.Format("Version {0}", assembly.GetName().Version));
+
+                    object[] a = assembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
+                    a = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+                    if (a.Length > 0)
+                    {
+                        infos.Add(((AssemblyCopyrightAttribute)a[0]).Copyright);
+                    }
+
+                    i.Write(infos.Join(", "));
+                    return i.ToString();
+                }
             }
         }
 
@@ -989,14 +998,10 @@ namespace Sidi.CommandLine
             }
         }
 
-        [DllImport("shell32.dll", SetLastError = true)]
-        static extern IntPtr CommandLineToArgvW(
-            [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
-
         public static string[] CommandLineToArgs(string commandLine)
         {
             int argc;
-            var argv = CommandLineToArgvW(commandLine, out argc);
+            var argv = NativeMethods.CommandLineToArgvW(commandLine, out argc);
             if (argv == IntPtr.Zero)
                 throw new System.ComponentModel.Win32Exception();
             try

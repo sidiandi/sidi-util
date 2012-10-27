@@ -96,7 +96,7 @@ namespace Sidi.CommandLine
                     PropertyInfo propertyInfo = (PropertyInfo)i;
                     return propertyInfo.PropertyType;
                 }
-                throw new InvalidDataException(i.MemberType.ToString());
+                throw new InvalidOperationException(i.MemberType.ToString());
             }
         }
 

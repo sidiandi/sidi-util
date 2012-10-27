@@ -77,7 +77,7 @@ namespace Sidi.CommandLine
                         propertyInfo.PropertyType.GetInfo()
                         );
                 }
-                throw new InvalidDataException(i.GetType().ToString());
+                throw new InvalidOperationException(i.GetType().ToString());
             }
         }
 
@@ -112,7 +112,7 @@ namespace Sidi.CommandLine
                     PropertyInfo propertyInfo = (PropertyInfo)i;
                     return propertyInfo.PropertyType;
                 }
-                throw new InvalidDataException(i.MemberType.ToString());
+                throw new InvalidOperationException(i.MemberType.ToString());
             }
         }
 

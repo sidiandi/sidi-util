@@ -265,7 +265,10 @@ namespace Sidi.CommandLine
                         }
                         if (p.ParameterType == typeof(List<string>))
                         {
-                            return new Tokenizer(new StringReader(pv)).Tokens.ToArray();
+                            using (var reader = new StringReader(pv))
+                            {
+                                return new Tokenizer(reader).Tokens.ToArray();
+                            }
                         }
                         else
                         {
