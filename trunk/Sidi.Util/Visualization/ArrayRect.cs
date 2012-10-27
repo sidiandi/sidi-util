@@ -19,7 +19,7 @@ namespace Sidi.Visualization
         Max
     };
 
-    public static class ArrayRectExtensions
+    static class ArrayRectExtensions
     {
         public static float Area(this float[,] rectangle)
         {
@@ -40,9 +40,9 @@ namespace Sidi.Visualization
             };
         }
 
-        public static float Width(this float[,] r, Dir direction)
+        public static float Width(this float[,] rectangle, Dir direction)
         {
-            return r[(int)direction, (int)Bound.Max] - r[(int)direction, (int)Bound.Min];
+            return rectangle[(int)direction, (int)Bound.Max] - rectangle[(int)direction, (int)Bound.Min];
         }
 
         public static float[,] ToArray(this RectangleF r)
@@ -95,10 +95,10 @@ namespace Sidi.Visualization
                 r[1, 1] > p[1];
         }
 
-        public static bool CoversPixel(this float[,] r)
+        public static bool CoversPixel(this float[,] rectangle)
         {
-            return ((int)r[0, 0] != (int)r[0, 1])
-                && ((int)r[1, 0] != (int)r[1, 1]);
+            return ((int)rectangle[0, 0] != (int)rectangle[0, 1])
+                && ((int)rectangle[1, 0] != (int)rectangle[1, 1]);
         }
 
         public static float[,] Copy(this float[,] x)

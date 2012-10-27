@@ -229,7 +229,6 @@
     <Compile Include="Visualization\ArrayRect.cs" />
     <Compile Include="Visualization\Bins.cs" />
     <Compile Include="Visualization\ColorMap.cs" />
-    <Compile Include="Visualization\ColorScale.cs" />
     <Compile Include="Visualization\CushionPainter.cs" />
     <Compile Include="Visualization\DistinctColor.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
