@@ -22,8 +22,6 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.ComponentModel;
 
-#pragma warning disable 649
-
 namespace Sidi.Forms
 {
     public class MouseDeltaEventArgs : EventArgs
@@ -74,13 +72,13 @@ namespace Sidi.Forms
             {
                 try
                 {
-                    RAWINPUTDEVICE myRawDevice = new RAWINPUTDEVICE();
+                    NativeMethods.RAWINPUTDEVICE myRawDevice = new NativeMethods.RAWINPUTDEVICE();
                     myRawDevice.usUsagePage = 0x01;
                     myRawDevice.usUsage = 0x02;
                     myRawDevice.dwFlags = 0;
                     myRawDevice.hwndTarget = (void*) 0;
 
-                    if (RegisterRawInputDevices(&myRawDevice, 1, (uint)sizeof(RAWINPUTDEVICE)) == false)
+                    if (NativeMethods.RegisterRawInputDevices(&myRawDevice, 1, (uint)sizeof(NativeMethods.RAWINPUTDEVICE)) == false)
                     {
                         int err = Marshal.GetLastWin32Error();
                         throw new Win32Exception(err, "ListeningWindow::RegisterRawInputDevices");
@@ -93,7 +91,7 @@ namespace Sidi.Forms
 
         #region IMessageFilter Members
 
-        bool IMessageFilter.PreFilterMessage(ref Message m)
+        public bool PreFilterMessage(ref Message m)
         {
             // Listen for operating system messages
             switch (m.Msg)
@@ -105,10 +103,10 @@ namespace Sidi.Forms
 							unsafe
 							{
 								uint dwSize, receivedBytes;
-								uint sizeof_RAWINPUTHEADER = (uint)(sizeof(RAWINPUTHEADER));
+                                uint sizeof_RAWINPUTHEADER = (uint)(sizeof(NativeMethods.RAWINPUTHEADER));
 
 								// Find out the size of the buffer we have to provide
-								int res = GetRawInputData(m.LParam.ToPointer(), RID_INPUT, null, &dwSize, sizeof_RAWINPUTHEADER);
+                                int res = NativeMethods.GetRawInputData(m.LParam.ToPointer(), RID_INPUT, null, &dwSize, sizeof_RAWINPUTHEADER);
 						
 								if(res == 0)
 								{
@@ -116,10 +114,10 @@ namespace Sidi.Forms
 									byte* lpb = stackalloc byte[(int)dwSize];
 
 									// ... get the data
-									receivedBytes = (uint)GetRawInputData((RAWINPUTMOUSE*)(m.LParam.ToPointer()), RID_INPUT, lpb, &dwSize, sizeof_RAWINPUTHEADER);
+                                    receivedBytes = (uint)NativeMethods.GetRawInputData((NativeMethods.RAWINPUTMOUSE*)(m.LParam.ToPointer()), RID_INPUT, lpb, &dwSize, sizeof_RAWINPUTHEADER);
 									if ( receivedBytes == dwSize )
 									{
-										RAWINPUTMOUSE* mouseData = (RAWINPUTMOUSE*)lpb;
+                                        NativeMethods.RAWINPUTMOUSE* mouseData = (NativeMethods.RAWINPUTMOUSE*)lpb;
 
 										// Finally, analyze the data
 										if(mouseData->header.dwType == RIM_TYPEMOUSE)
@@ -161,19 +159,6 @@ namespace Sidi.Forms
         // In case you want to have a comprehensive overview of calling conventions follow the next link:
         // http://www.codeproject.com/cpp/calling_conventions_demystified.asp
 
-        [DllImport("User32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern unsafe bool RegisterRawInputDevices(RAWINPUTDEVICE* rawInputDevices, uint numDevices, uint size);
-
-        [DllImport("User32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        internal static extern unsafe int GetRawInputData(void* hRawInput,
-            uint uiCommand,
-            byte* pData,
-            uint* pcbSize,
-            uint cbSizeHeader
-            );
-
         #endregion
 
         #region Declarations
@@ -188,57 +173,39 @@ namespace Sidi.Forms
 
         #endregion
 
-        #region Unsafe types
-        internal unsafe struct RAWINPUTDEVICE
-        {
-            public ushort usUsagePage;
-            public ushort usUsage;
-            public uint dwFlags;
-            public void* hwndTarget;
-        };
 
-        internal unsafe struct RAWINPUTHEADER
-        {
-            public uint dwType;
-            public uint dwSize;
-            public void* hDevice;
-            public void* wParam;
-        };
 
-        internal unsafe struct RAWINPUTHKEYBOARD
-        {
-            public RAWINPUTHEADER header;
-            public ushort MakeCode;
-            public ushort Flags;
-            public ushort Reserved;
-            public ushort VKey;
-            public uint Message;
-            public uint ExtraInformation;
-        };
 
-        internal unsafe struct RAWINPUTMOUSE 
-        {
-            public RAWINPUTHEADER header;
-            public ushort usFlags;
-            public ushort usButtonFlags;
-            public ushort usButtonData;
-            public uint ulRawButtons;
-            public int lLastX;
-            public int lLastY;
-            public uint ulExtraInformation;
-        };
-
-        #endregion
-
-        #region IDisposable Members
-
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            Application.RemoveMessageFilter(this);
-            Cursor.Show();
-            Cursor.Position = m_initialCursorPosition;
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
 
-        #endregion
-    }
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                Application.RemoveMessageFilter(this);
+                Cursor.Show();
+                Cursor.Position = m_initialCursorPosition;
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~MouseDelta()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+        }
 }

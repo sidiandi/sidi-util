@@ -286,7 +286,10 @@ namespace Sidi.Forms
             Rectangle cr = e.ClipRectangle;
             cr.Offset(m_offset);
             g.TranslateTransform(-m_offset.X, -m_offset.Y);
-            OnPaint(new PaintEventArgs(g, cr));
+            using (var pea = new PaintEventArgs(g, cr))
+            {
+                OnPaint(pea);
+            }
         }
 
         protected override void  OnPaint(PaintEventArgs e)

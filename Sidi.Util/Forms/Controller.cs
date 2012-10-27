@@ -99,8 +99,8 @@ namespace Sidi.Forms
                 }
                 
                 if (!(
-                    (Win32Messages.WM_MOUSEFIRST <= m.Msg && m.Msg <= Win32Messages.WM_MOUSELAST) ||
-                    (Win32Messages.WM_KEYFIRST <= m.Msg && m.Msg <= Win32Messages.WM_KEYLAST)
+                    (NativeMethods.WM_MOUSEFIRST <= m.Msg && m.Msg <= NativeMethods.WM_MOUSELAST) ||
+                    (NativeMethods.WM_KEYFIRST <= m.Msg && m.Msg <= NativeMethods.WM_KEYLAST)
                 ))
                 {
                     return false;
@@ -114,7 +114,7 @@ namespace Sidi.Forms
                 if (m_controller.m_handles.Contains(m.HWnd))
                 {
                     m_controller.Consumed = false;
-                    Win32Messages.SendMessage(m_controller.Handle, m.Msg, m.WParam, m.LParam);
+                    NativeMethods.SendMessage(m_controller.Handle, m.Msg, m.WParam, m.LParam);
                     return m_controller.Consumed;
                 }
                 return false;

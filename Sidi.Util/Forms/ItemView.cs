@@ -169,15 +169,17 @@ namespace Sidi.Forms
 
             public virtual void Paint(PaintArgs e)
             {
-                StringFormat sf = new StringFormat();
-                sf.FormatFlags = 
-                    StringFormatFlags.NoWrap | 
-                    StringFormatFlags.FitBlackBox |
-                    0;
-                sf.Trimming = StringTrimming.None;
-                e.Graphics.FillRectangle(e.BackgroundBrush, e.Rect);
-                e.Graphics.DrawString(ToString(e), e.View.Font, e.ForegroundBrush, e.Rect,sf);
-            }
+                using (var sf = new StringFormat())
+                {
+                    sf.FormatFlags =
+                        StringFormatFlags.NoWrap |
+                        StringFormatFlags.FitBlackBox |
+                        0;
+                    sf.Trimming = StringTrimming.None;
+                    e.Graphics.FillRectangle(e.BackgroundBrush, e.Rect);
+                    e.Graphics.DrawString(ToString(e), e.View.Font, e.ForegroundBrush, e.Rect, sf);
+                }
+                }
 
             #endregion
 
@@ -788,15 +790,17 @@ namespace Sidi.Forms
 
             if (List == null || List.Count == 0)
             {
-                StringFormat sf = new StringFormat();
-                sf.Alignment = StringAlignment.Center;
-                sf.LineAlignment = StringAlignment.Center;
+                using (var sf = new StringFormat())
+                {
+                    sf.Alignment = StringAlignment.Center;
+                    sf.LineAlignment = StringAlignment.Center;
 
-                g.DrawString("This list is empty.",
-                    this.Font,
-                    controlTextBrush,
-                    c,
-                    sf);
+                    g.DrawString("This list is empty.",
+                        this.Font,
+                        controlTextBrush,
+                        c,
+                        sf);
+                }
             }
             else
             {
@@ -811,17 +815,19 @@ namespace Sidi.Forms
         void PaintItem(Graphics g, int index)
         {
             Rectangle r = ItemRect(index);
-            Matrix t = new Matrix();
-            t.Translate(r.Left, r.Top);
-            g.Transform = t;
-
-            PaintArgs paintArgs = new PaintArgs(g, index, new Rectangle(0, 0, r.Width, r.Height), this);
-
-            m_itemFormat.Paint(paintArgs);
-            
-            if (paintArgs.Focused)
+            using (var t = new Matrix())
             {
-                ControlPaint.DrawFocusRectangle(paintArgs.Graphics, paintArgs.Rect);
+                t.Translate(r.Left, r.Top);
+                g.Transform = t;
+
+                PaintArgs paintArgs = new PaintArgs(g, index, new Rectangle(0, 0, r.Width, r.Height), this);
+
+                m_itemFormat.Paint(paintArgs);
+
+                if (paintArgs.Focused)
+                {
+                    ControlPaint.DrawFocusRectangle(paintArgs.Graphics, paintArgs.Rect);
+                }
             }
         }
 

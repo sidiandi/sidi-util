@@ -117,6 +117,7 @@
     <Compile Include="Forms\SelectObjectsDialog.designer.cs">
       <DependentUpon>SelectObjectsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IMAP\ArgParser.cs" />
     <Compile Include="IMAP\EmlDirectory.cs" />
     <Compile Include="IMAP\IMailbox.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="IO\Long\Kernel32.cs" />
     <Compile Include="IO\Long\Path.cs" />
     <Compile Include="IO\Long\PathTypeConverter.cs" />
+    <Compile Include="IO\NativeMethods.cs" />
     <Compile Include="Net\Abnf.cs" />
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
@@ -196,7 +198,7 @@
     <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\Interval.cs" />
     <Compile Include="Collections\IntSet.cs" />
-    <Compile Include="IO\PathEx.cs" />
+    <Compile Include="IO\PathExtensions.cs" />
     <Compile Include="IO\Long\SearchPath.cs" />
     <Compile Include="Util\ListEx.cs" />
     <Compile Include="Collections\LruCache.cs" />

@@ -29,7 +29,8 @@ namespace Sidi.Forms
         {
             return AsForm(c, c.ToString());
         }
-        
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         static public Form AsForm(this Control c, string caption)
         {
             Form f = new Form();
@@ -63,6 +64,7 @@ namespace Sidi.Forms
             parent.Controls.Add(CreateSplitter(childs));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         static public Control CreateSplitter(Control[] childs)
         {
             foreach (Control c in childs)
@@ -135,25 +137,29 @@ namespace Sidi.Forms
 
         public static bool Prompt(string question, string defaultValue, out string answer)
         {
-            TextPrompt dlg = new TextPrompt();
-            dlg.Prompt = question;
-            dlg.Value = defaultValue;
-            bool result = dlg.ShowDialog() == DialogResult.OK;
-            answer = dlg.Value;
-            return result;
+            using (var dlg = new TextPrompt())
+            {
+                dlg.Prompt = question;
+                dlg.Value = defaultValue;
+                bool result = dlg.ShowDialog() == DialogResult.OK;
+                answer = dlg.Value;
+                return result;
+            }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static void RunFullScreen(this Control c)
         {
-            var f = c.AsForm(c.GetType().Name);
-            f.Visible = false;
-            var cancelButton = new Button();
-            cancelButton.DialogResult = DialogResult.Cancel;
-            f.Controls.Add(cancelButton);
-            f.CancelButton = cancelButton;
-            var fsm = new FullscreenManager(f);
-            fsm.Fullscreen = true;
-            f.ShowDialog();
+            using (var f = c.AsForm(c.GetType().Name))
+            {
+                f.Visible = false;
+                var cancelButton = new Button() { DialogResult = DialogResult.Cancel };
+                f.Controls.Add(cancelButton);
+                f.CancelButton = cancelButton;
+                var fsm = new FullscreenManager(f);
+                fsm.Fullscreen = true;
+                f.ShowDialog();
+            }
         }
     }
 }

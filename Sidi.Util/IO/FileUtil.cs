@@ -191,19 +191,12 @@ namespace Sidi.IO
                 string fileName,
                 string existingFileName)
         {
-            bool result = CreateHardLink(fileName, existingFileName, IntPtr.Zero);
+            bool result = NativeMethods.CreateHardLink(fileName, existingFileName, IntPtr.Zero);
             if (!result)
             {
                 throw new System.IO.IOException(String.Format("Cannot create hard link: {0} -> {1}", fileName, existingFileName));
             }
         }
 
-        [DllImport("Kernel32.dll")]
-        private static extern
-            bool CreateHardLink(
-                string FileName,
-                string ExistingFileName,
-                IntPtr lpSecurityAttributes
-            );
     }
 }

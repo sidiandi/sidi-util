@@ -159,16 +159,18 @@ namespace Sidi.IMAP
             var key = p.Get(new Regex(@"[\w-]+"));
             p.Get(new Regex(@"\s*"));
             p.Consume(@":");
-            var value = new StringWriter();
-            value.Write(p.Rest);
-            p.NextLine();
-            while (p.IsNext(new Regex(@"\s+")))
+            using (var value = new StringWriter())
             {
-                value.WriteLine();
                 value.Write(p.Rest);
                 p.NextLine();
+                while (p.IsNext(new Regex(@"\s+")))
+                {
+                    value.WriteLine();
+                    value.Write(p.Rest);
+                    p.NextLine();
+                }
+                return new KeyValuePair<string, string>(key, value.ToString().Trim());
             }
-            return new KeyValuePair<string, string>(key, value.ToString().Trim());
         }
 
         public List<KeyValuePair<string, string>> Headers { get; set; }
