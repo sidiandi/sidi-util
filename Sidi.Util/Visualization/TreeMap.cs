@@ -216,7 +216,7 @@ namespace Sidi.Visualization
         public void Highlight(PaintEventArgs e, TreeMapLayout.Layout layoutNode, Color color)
         {
             var b = new SolidBrush(Color.FromArgb(128, color));
-            e.Graphics.FillRectangle(b, layoutNode.Rectangle.ToRectangleF());
+            e.Graphics.FillRectangle(b, layoutNode.Bounds.ToRectangleF());
         }
 
         public void Highlight(PaintEventArgs e, Color color, Func<Tree, Tree, bool> f)
@@ -263,7 +263,7 @@ namespace Sidi.Visualization
         {
             for (; tree != null; tree = (TreeMapLayout.Layout) tree.Parent)
             {
-                e.Graphics.DrawRectangle(redPen, tree.Rectangle.ToRectangle());
+                e.Graphics.DrawRectangle(redPen, tree.Bounds.ToRectangle());
             }
         }
 
@@ -272,7 +272,7 @@ namespace Sidi.Visualization
         void DrawOutlines(PaintEventArgs e, TreeMapLayout.Layout layoutTree)
         {
             var layout = layoutTree;
-            e.Graphics.DrawRectangle(redPen, layout.Rectangle.ToRectangle());
+            e.Graphics.DrawRectangle(redPen, layout.Bounds.ToRectangle());
             foreach (var i in layoutTree.Children)
             {
                 DrawOutlines(e, i);

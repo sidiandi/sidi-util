@@ -21,7 +21,7 @@ namespace Sidi.Visualization
                 throw new ArgumentNullException("root");
             }
 
-            layout = new Layout(null) { Tree = root, Rectangle = bounds.ToArray() };
+            layout = new Layout(null) { Tree = root, Bounds = bounds.ToArray() };
             DoLayout = Squares;
             Update(layout);
         }
@@ -31,12 +31,12 @@ namespace Sidi.Visualization
             public Layout(Layout parent)
                 : base(parent)
             {
-                Rectangle = new float[2, 2];
+                Bounds = new float[2, 2];
             }
 
             public IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
 
-            public float[,] Rectangle;
+            public float[,] Bounds;
             public Tree Tree;
         }
 
@@ -64,7 +64,7 @@ namespace Sidi.Visualization
                 var lc = new LayoutContext()
                 {
                     Layout = layout.Tree.Children.Select(x => new Layout(layout) { Tree = x }).ToArray(),
-                    Rectangle = layout.Rectangle.Copy()
+                    Rectangle = layout.Bounds.Copy()
                 };
                 lc.Rectangle.Add(margin);
                 
@@ -84,7 +84,7 @@ namespace Sidi.Visualization
 
         Layout GetLayoutAt(Layout t, float[] p, int levels)
         {
-            if (t != null && t.Rectangle.Contains(p))
+            if (t != null && t.Bounds.Contains(p))
             {
                 if (levels > 0)
                 {
@@ -131,7 +131,7 @@ namespace Sidi.Visualization
             float x = c.Rectangle[(int)d, (int)Bound.Min];
             foreach (var tc in c.Layout)
             {
-                var r = tc.Rectangle;
+                var r = tc.Bounds;
                 r[(int)d, (int)Bound.Min] = x;
                 x += tc.Tree.Size * m;
                 r[(int)d, (int)Bound.Max] =
@@ -199,7 +199,7 @@ namespace Sidi.Visualization
             {
                 for (int i = b; i < e; ++i)
                 {
-                    layout[i].Rectangle = (float[,])r.Clone();
+                    layout[i].Bounds = (float[,])r.Clone();
                 }
                 return;
             }
@@ -246,22 +246,22 @@ namespace Sidi.Visualization
             }
             for (int i = b; i < rowEnd; ++i)
             {
-                layout[i].Rectangle[(int)d, (int)Bound.Min] = x;
+                layout[i].Bounds[(int)d, (int)Bound.Min] = x;
                 var w = layout[i].Tree.Size * widthPerSize;
                 x = Math.Min(x + w, r[(int)d, (int)Bound.Max]);
                 if (float.IsNaN(x))
                 {
                     throw new Exception();
                 }
-                layout[i].Rectangle[(int)d, (int)Bound.Max] = x;
-                layout[i].Rectangle[(int)od, (int)Bound.Min] = rowRect[(int)od, (int)Bound.Min];
-                layout[i].Rectangle[(int)od, (int)Bound.Max] = rowRect[(int)od, (int)Bound.Max];
+                layout[i].Bounds[(int)d, (int)Bound.Max] = x;
+                layout[i].Bounds[(int)od, (int)Bound.Min] = rowRect[(int)od, (int)Bound.Min];
+                layout[i].Bounds[(int)od, (int)Bound.Max] = rowRect[(int)od, (int)Bound.Max];
             }
 
             // check results
             for (int i = b; i < rowEnd; ++i)
             {
-                var re = layout[i].Rectangle;
+                var re = layout[i].Bounds;
                 foreach (Dir id in Enum.GetValues(typeof(Dir)))
                 {
                     foreach (Bound ib in Enum.GetValues(typeof(Bound)))

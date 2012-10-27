@@ -85,7 +85,7 @@ namespace Sidi.Visualization
 
         void Render(BitmapData bitmap, TreeMapLayout.Layout layout, float h, float f, float[,] s)
         {
-            var r = layout.Rectangle;
+            var r = layout.Bounds;
 
             if (!r.Intersects(rect))
             {
