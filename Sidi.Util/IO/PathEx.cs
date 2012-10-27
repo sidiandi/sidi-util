@@ -29,7 +29,7 @@ using Sidi.Extensions;
 
 namespace Sidi.IO
 {
-    public static class PathEx
+    public static class PathExtensions
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

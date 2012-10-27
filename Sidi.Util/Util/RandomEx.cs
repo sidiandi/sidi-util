@@ -22,7 +22,7 @@ using System.Text.RegularExpressions;
 
 namespace Sidi.Util
 {
-    public static class RandomEx
+    public static class RandomExtensions
     {
         public static string String(this Random random, int length)
         {

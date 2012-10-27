@@ -183,20 +183,20 @@ namespace Sidi.CommandLine
             return link;
         }
 
-        public Control ToControl(SubCommand subCommand)
+        public Control ToControl(SubCommand subcommand)
         {
             var link = new LinkLabel()
             {
-                Text = subCommand.Name + " - " + subCommand.Usage,
+                Text = subcommand.Name + " - " + subcommand.Usage,
                 AutoSize = true,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Dock = DockStyle.Fill,
             };
-            link.LinkArea = new LinkArea(0, subCommand.Name.Length);
+            link.LinkArea = new LinkArea(0, subcommand.Name.Length);
 
             link.Click += new EventHandler((s, e) =>
             {
-                var p = new Parser(subCommand.CommandInstance);
+                var p = new Parser(subcommand.CommandInstance);
                 var subCommandDialog = ToDialog(p);
                 subCommandDialog.ShowDialog();
             });

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Extensions
 {
@@ -15,6 +16,7 @@ namespace Sidi.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="e"></param>
         /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IEnumerable<KeyValuePair<int, T>> Counted<T>(this IEnumerable<T> e)
         {
             int index = 0;
@@ -68,7 +70,7 @@ namespace Sidi.Extensions
                 }
                 catch (Exception e)
                 {
-                    log.Warn(Sidi.Extensions.StringEx.SafeToString(i), e);
+                    log.Warn(Sidi.Extensions.StringExtensions.SafeToString(i), e);
                 }
 
                 if (ok)

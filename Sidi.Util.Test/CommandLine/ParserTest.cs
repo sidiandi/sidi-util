@@ -136,7 +136,7 @@ namespace Sidi.CommandLine.Test
             Parser.Run(t, new string[] { "--Fruit", "Pear" });
             Assert.AreEqual(t.Fruit, Fruit.Pear);
 
-            var usage = StringEx.ToString(new Parser(t).WriteUsage);
+            var usage = StringExtensions.ToString(new Parser(t).WriteUsage);
             Assert.IsTrue(usage.Contains(Fruit.Apple.ToString()));
         }
 
@@ -144,7 +144,7 @@ namespace Sidi.CommandLine.Test
         public void ShowUsage()
         {
             Parser p = new Parser(new TestApp());
-            var usage = StringEx.ToString(x => p.WriteUsage(x));
+            var usage = StringExtensions.ToString(x => p.WriteUsage(x));
             log.Info(usage);
             Assert.IsTrue(usage.Contains("Options"));
             Assert.IsTrue(usage.Contains("Actions"));
@@ -418,7 +418,7 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void ShowMultiLineUsage()
         {
-            string u = StringEx.ToString(new Parser(new TestMultiLineUsage()).WriteUsage);
+            string u = StringExtensions.ToString(new Parser(new TestMultiLineUsage()).WriteUsage);
             Console.WriteLine(u);
         }
 

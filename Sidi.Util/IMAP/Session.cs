@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace Sidi.IMAP
 {
-    public class Session
+    public class Session : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -335,7 +335,7 @@ namespace Sidi.IMAP
                                 return new KeyValuePair<UInt32, IMail>(sequenceNumber, currentMailbox.BySequenceNumber(sequenceNumber));
                             });
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidDataException("unknown mode");
             }
         }
 
@@ -669,5 +669,36 @@ namespace Sidi.IMAP
             log.InfoFormat("S: {0}", r);
             Out.WriteLine(r);
         }
+
+        private bool disposed = false;
+            
+        //Implement IDisposable.
+        public void Dispose()
+        {
+          Dispose(true);
+          GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~Session()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
     }
 }

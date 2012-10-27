@@ -47,7 +47,20 @@ namespace Sidi.Visualization
 
         public void Dispose()
         {
-            Transform.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (Transform != null)
+                {
+                    Transform.Dispose();
+                    Transform = null;
+                }
+            }
         }
     }
 }

@@ -106,6 +106,7 @@
     <Compile Include="Forms\GenericListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\PanZoomController.cs" />
     <Compile Include="Forms\Prompt.cs" />
     <Compile Include="Forms\SelectObjectsDialog.cs">
       <SubType>Form</SubType>
@@ -228,10 +229,12 @@
     <Compile Include="Util\Zip.cs" />
     <Compile Include="Visualization\ArrayRect.cs" />
     <Compile Include="Visualization\Bins.cs" />
-    <Compile Include="Visualization\ColorMap.cs" />
+    <Compile Include="Visualization\ColorScale.cs" />
     <Compile Include="Visualization\CushionPainter.cs" />
     <Compile Include="Visualization\DistinctColor.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
+    <Compile Include="Visualization\Layout.cs" />
+    <Compile Include="Visualization\TreeEventArgs.cs" />
     <Compile Include="Visualization\TypedTreeMap.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -248,7 +251,7 @@
     <Compile Include="Visualization\TreeMap.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Visualization\TreeMapLayout.cs" />
+    <Compile Include="Visualization\LayoutManager.cs" />
     <Compile Include="Visualization\Util.cs" />
     <Compile Include="Visualization\ZoomPanController.cs" />
   </ItemGroup>

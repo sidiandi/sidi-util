@@ -223,11 +223,11 @@ namespace Sidi.CommandLine
             return control;
         }
 
-        public Control ToControl(SubCommand subCommand)
+        public Control ToControl(SubCommand subcommand)
         {
             var control = new GroupBox()
             {
-                Text = subCommand.Name,
+                Text = subcommand.Name,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
@@ -242,7 +242,7 @@ namespace Sidi.CommandLine
 
             var usage = new Label()
             {
-                Text = subCommand.Usage,
+                Text = subcommand.Usage,
                 Dock = DockStyle.Top,
                 AutoSize = true,
             };
@@ -251,13 +251,13 @@ namespace Sidi.CommandLine
 
             var button = new Button()
             {
-                Text = subCommand.Name,
+                Text = subcommand.Name,
                 AutoSize = true,
             };
 
             button.Click += new EventHandler((s, e) =>
             {
-                var p = new Parser(subCommand.CommandInstance);
+                var p = new Parser(subcommand.CommandInstance);
                 var subCommandDialog = ToDialog(p);
                 subCommandDialog.ShowDialog();
             });

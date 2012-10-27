@@ -25,7 +25,7 @@ namespace Sidi.Visualization
             {
                 if (ItemActivate != null)
                 {
-                    ItemActivate(this, new ItemEventEventArgs(GetLayoutAt(e.Location)));
+                    ItemActivate(this, new TreeEventArgs(GetLayoutAt(e.Location)));
                 }
             };
 
@@ -76,7 +76,7 @@ namespace Sidi.Visualization
                 "Zoom Out", null, (s, e) => { ZoomOut(1); });
 
             var layout = this.GetLayoutAt(PointToClient(Control.MousePosition));
-            foreach (var i in layout.Up.Cast<Sidi.Visualization.TreeMapLayout.Layout>())
+            foreach (var i in layout.Up.Cast<Sidi.Visualization.Layout>())
             {
                 var tree = i.Tree;
                 strip.Items.Add(
@@ -92,7 +92,7 @@ namespace Sidi.Visualization
             return new TreeMap() { Tree = tree };
         }
 
-        public TreeMapLayout Layout
+        public LayoutManager Layout
         {
             get
             {
@@ -107,10 +107,10 @@ namespace Sidi.Visualization
             }
         }
 
-        TreeMapLayout _layout;
+        LayoutManager _layout;
         ZoomPanController zoomPanController;
         public CushionPainter CushionPainter;
-        TreeMapLayout.Layout hoveredNode;
+        Layout hoveredNode;
 
         public object SelectedObject { set; get; }
         public Point ClickLocation { private set; get; }
@@ -124,7 +124,7 @@ namespace Sidi.Visualization
 
                 if (ItemMouseHover != null && hoveredNode != null)
                 {
-                    ItemMouseHover(this, new ItemEventEventArgs(hoveredNode));
+                    ItemMouseHover(this, new TreeEventArgs(hoveredNode));
                 }
             }
         }
@@ -136,11 +136,11 @@ namespace Sidi.Visualization
         public void SetBinnedNodeColor(Func<object, IComparable> orderBy)
         {
             var bins = new Bins(Tree.GetAllNodes().Cast<object>().Select(orderBy));
-            var colorMap = ColorMap.BlueRed(0.0, 1.0);
+            var colorMap = ColorScale.BlueRed(0.0, 1.0);
             CushionPainter.NodeColor = n => colorMap.ToColor(bins.Percentile(orderBy(n)));
         }
 
-        TreeMapLayout.Layout GetLayoutAt(Point p)
+        Layout GetLayoutAt(Point p)
         {
             if (Layout == null)
             {
@@ -178,7 +178,7 @@ namespace Sidi.Visualization
             return l == null ? null : l.Tree.Object;
         }
 
-        TreeMapLayout.Layout GetLayoutAt(Point p, int levels)
+        Layout GetLayoutAt(Point p, int levels)
         {
             return Layout.GetLayoutAt(GetWorldPoint(p), levels);
         }
@@ -203,7 +203,7 @@ namespace Sidi.Visualization
                 }
                 else
                 {
-                    Layout = new TreeMapLayout(value, this.Bounds);
+                    Layout = new LayoutManager(value, this.Bounds);
                 }
             }
         }
@@ -213,7 +213,7 @@ namespace Sidi.Visualization
             return new LabelPainter(this);
         }
 
-        public void Highlight(PaintEventArgs e, TreeMapLayout.Layout layoutNode, Color color)
+        public void Highlight(PaintEventArgs e, Layout layoutNode, Color color)
         {
             var b = new SolidBrush(Color.FromArgb(128, color));
             e.Graphics.FillRectangle(b, layoutNode.Bounds.ToRectangleF());
@@ -243,7 +243,7 @@ namespace Sidi.Visualization
             base.OnPaint(e);
         }
 
-        public TreeMapLayout.Layout MouseHoverNode
+        public Layout MouseHoverNode
         {
             get
             {
@@ -259,9 +259,9 @@ namespace Sidi.Visualization
         /// </summary>
         /// <param name="e"></param>
         /// <param name="tree"></param>
-        public void Track(PaintEventArgs e, TreeMapLayout.Layout tree)
+        public void Track(PaintEventArgs e, Layout tree)
         {
-            for (; tree != null; tree = (TreeMapLayout.Layout) tree.Parent)
+            for (; tree != null; tree = (Layout) tree.Parent)
             {
                 e.Graphics.DrawRectangle(redPen, tree.Bounds.ToRectangle());
             }
@@ -269,7 +269,7 @@ namespace Sidi.Visualization
 
         Pen redPen = new Pen(Color.Red);
 
-        void DrawOutlines(PaintEventArgs e, TreeMapLayout.Layout layoutTree)
+        void DrawOutlines(PaintEventArgs e, Layout layoutTree)
         {
             var layout = layoutTree;
             e.Graphics.DrawRectangle(redPen, layout.Bounds.ToRectangle());
@@ -279,68 +279,39 @@ namespace Sidi.Visualization
             }
         }
 
-        public void ForEachNode(Action<TreeMapLayout.Layout> a)
+        public void ForEachNode(Action<Layout> a)
         {
             ForEachNode(Layout.Root, a);
         }
 
-        public void ForEachLeaf(Action<TreeMapLayout.Layout> a)
+        public void ForEachLeaf(Action<Layout> a)
         {
             ForEachLeaf(Layout.Root, a);
         }
 
-        void ForEachNode(TreeMapLayout.Layout layoutTree, Action<TreeMapLayout.Layout> a)
+        void ForEachNode(Layout layoutTree, Action<Layout> a)
         {
             a(layoutTree);
-            foreach (var i in layoutTree.Children.Cast<TreeMapLayout.Layout>())
+            foreach (var i in layoutTree.Children.Cast<Layout>())
             {
                 ForEachNode(i, a);
             }
         }
 
-        void ForEachLeaf(TreeMapLayout.Layout layoutTree, Action<TreeMapLayout.Layout> a)
+        void ForEachLeaf(Layout layoutTree, Action<Layout> a)
         {
             if (!layoutTree.Children.Any())
             {
                 a(layoutTree);
             }
-            foreach (var i in layoutTree.Children.Cast<TreeMapLayout.Layout>())
+            foreach (var i in layoutTree.Children.Cast<Layout>())
             {
                 ForEachLeaf(i, a);
             }
         }
 
-        public class ItemEventEventArgs : EventArgs
-        {
-            public ItemEventEventArgs(TreeMapLayout.Layout layout)
-            {
-                this.layout = layout;
-
-
-            }
-
-            public TreeMapLayout.Layout Layout
-            {
-                get
-                {
-                    return layout;
-                }
-            }
-            TreeMapLayout.Layout layout;
-
-            public Tree Tree
-            {
-                get
-                {
-                    return layout.Tree;
-                }
-            }
-        }
-        
-        public delegate void ItemEventHandler(object sender, ItemEventEventArgs e);
-
-        public event ItemEventHandler ItemMouseHover;
-        public event ItemEventHandler ItemActivate;
+        public event EventHandler<TreeEventArgs> ItemMouseHover;
+        public event EventHandler<TreeEventArgs> ItemActivate;
 
         static IList<ITree> GetLineage(ITree t)
         {

@@ -20,7 +20,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Net
 {
-    public class WebServer : Sidi.Net.HtmlGenerator
+    public class WebServer : Sidi.Net.HtmlGenerator, IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -174,5 +174,38 @@ namespace Sidi.Net
                 http.Response.Close();
             }
         }
+
+        
+
+        private bool disposed = false;
+            
+        //Implement IDisposable.
+        public void Dispose()
+        {
+          Dispose(true);
+          GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                this.httpListener.Close();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~WebServer()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
     }
 }

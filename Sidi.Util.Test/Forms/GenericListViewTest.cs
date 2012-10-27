@@ -27,7 +27,7 @@ namespace Sidi.Forms
             var v = new GenericListView();
             v.Items = Enumerable.Range(1, 100).ToList();
             v.UpdateDisplay();
-            v.DragDropOnItem += new GenericListView.DragDropOnItemHandler((s, e) =>
+            v.DragDropOnItem += new EventHandler<GenericListView.DragDropOnItemHandlerEventArgs>((s, e) =>
                 {
                     Console.WriteLine(e.Item.ToString());
                 });

@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Collections
 {
@@ -101,6 +102,7 @@ namespace Sidi.Collections
         }
     }
 
+    [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     public class LimitedQueue<T> : List<T>
     {
         private int m_maxCount = 100;

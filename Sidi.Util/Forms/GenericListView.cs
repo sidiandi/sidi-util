@@ -81,14 +81,13 @@ namespace Sidi.Forms
             }
         }
 
-        public class DragDropOnItemHandlerEventArgs
+        public class DragDropOnItemHandlerEventArgs : EventArgs
         {
             public IDataObject Data;
             public object Item;
         }
 
-        public delegate void DragDropOnItemHandler(object sender, DragDropOnItemHandlerEventArgs e);
-        public event DragDropOnItemHandler DragDropOnItem;
+        public event EventHandler<DragDropOnItemHandlerEventArgs> DragDropOnItem;
 
         void GenericListView_DragEnter(object sender, System.Windows.Forms.DragEventArgs e)
         {

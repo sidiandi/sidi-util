@@ -33,14 +33,14 @@ namespace Sidi.IO
         [Test]
         public void GetRelativePath()
         {
-            Assert.AreEqual("a.txt", PathEx.GetRelativePath(@"d:\temp\a.txt", @"d:\temp"));
-            Assert.AreEqual("..", PathEx.GetRelativePath(@"d:\temp", @"d:\temp\a.txt"));
+            Assert.AreEqual("a.txt", PathExtensions.GetRelativePath(@"d:\temp\a.txt", @"d:\temp"));
+            Assert.AreEqual("..", PathExtensions.GetRelativePath(@"d:\temp", @"d:\temp\a.txt"));
         }
 
         [Test]
         public void Find()
         {
-            foreach (var i in PathEx.Find(TestFile(".")))
+            foreach (var i in PathExtensions.Find(TestFile(".")))
             {
                 log.Info(i);
                 Assert.IsTrue(File.Exists(i) || Directory.Exists(i));

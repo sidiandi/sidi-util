@@ -171,7 +171,7 @@ namespace Sidi.IMAP
             return new KeyValuePair<string, string>(key, value.ToString().Trim());
         }
 
-        public List<KeyValuePair<string, string>> Headers;
-        public string Text;
+        public List<KeyValuePair<string, string>> Headers { get; set; }
+        public string Text { get; set; }
     }
 }

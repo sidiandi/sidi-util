@@ -23,7 +23,7 @@ using System.IO;
 
 namespace Sidi.Extensions
 {
-    public static class ByteArrayEx
+    public static class ByteArrayExtensions
     {
         public static string HexString(this byte[] x)
         {
