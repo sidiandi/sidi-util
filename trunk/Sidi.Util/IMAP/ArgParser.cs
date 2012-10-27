@@ -196,6 +196,7 @@ namespace Sidi.IMAP
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
         public class ParseException : Exception
         {
             public ParseException(ArgParser p)

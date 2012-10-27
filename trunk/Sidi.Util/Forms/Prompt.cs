@@ -91,23 +91,25 @@ namespace Sidi.Forms
                 tf = Path.GetTempFileName();
                 File.WriteAllText(tf, text);
 
-                Process p = new Process();
-
-                p.StartInfo.FileName = new Sidi.IO.Long.Path(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)).CatDir(
-                    "Notepad++", "notepad++.exe");
-                p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
-
-                if (!File.Exists(p.StartInfo.FileName))
+                using (var p = new Process())
                 {
-                    p.StartInfo.FileName = "notepad.exe";
-                    p.StartInfo.Arguments = tf.Quote();
-                }
 
-                p.Start();
-                log.Info(p.DetailedInfo());
-                p.WaitForExit();
-                return File.ReadAllText(tf);
+                    p.StartInfo.FileName = new Sidi.IO.Long.Path(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)).CatDir(
+                        "Notepad++", "notepad++.exe");
+                    p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
+
+                    if (!File.Exists(p.StartInfo.FileName))
+                    {
+                        p.StartInfo.FileName = "notepad.exe";
+                        p.StartInfo.Arguments = tf.Quote();
+                    }
+
+                    p.Start();
+                    log.Info(p.DetailedInfo());
+                    p.WaitForExit();
+                    return File.ReadAllText(tf);
+                }
             }
             finally
             {
@@ -123,36 +125,41 @@ namespace Sidi.Forms
 
         public static T ChooseOne<T>(IEnumerable<T> list)
         {
-            var d = new ChooseOneDialog();
-            d.Objects = list.Cast<object>();
-            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (var d = new ChooseOneDialog())
             {
-                return (T) d.SelectedObject;
-            }
-            else
-            {
-                return default(T);
+                d.Objects = list.Cast<object>();
+                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    return (T)d.SelectedObject;
+                }
+                else
+                {
+                    return default(T);
+                }
             }
         }
 
         public static T ChooseOne<T>(ListFormat<T> list)
         {
-            var d = new ChooseOneDialog();
-            d.Objects = list.Data.Cast<object>();
-            d.Columns = list.Columns.Select(c => new ColumnInfo<T>(c.Name, c.GetText)).ToList();
-            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (var d = new ChooseOneDialog())
             {
-                return (T)d.SelectedObject;
-            }
-            else
-            {
-                return default(T);
+                d.Objects = list.Data.Cast<object>();
+                d.Columns = list.Columns.Select(c => new ColumnInfo<T>(c.Name, c.GetText)).ToList();
+                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    return (T)d.SelectedObject;
+                }
+                else
+                {
+                    return default(T);
+                }
             }
         }
 
         public static void Choose<T>(IEnumerable<T> list, IEnumerable<IColumnInfo> columns, Action<T> action)
         {
-            var d = new ChooseOneDialog();
+            using (var d = new ChooseOneDialog())
+            {
             d.Columns = columns;
             d.Objects = list.Cast<object>();
             d.ObjectSelected += new EventHandler((o, e) =>
@@ -161,20 +168,23 @@ namespace Sidi.Forms
                 action(item);
             });
             d.ShowDialog();
+            }
         }
         
         public static T ChooseOne<T>(IEnumerable<T> list, IEnumerable<IColumnInfo> columns)
         {
-            var d = new ChooseOneDialog();
-            d.Columns = columns;
-            d.Objects = list.Cast<object>();
-            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (var d = new ChooseOneDialog())
             {
-                return (T)d.SelectedObject;
-            }
-            else
-            {
-                return default(T);
+                d.Columns = columns;
+                d.Objects = list.Cast<object>();
+                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    return (T)d.SelectedObject;
+                }
+                else
+                {
+                    return default(T);
+                }
             }
         }
 
@@ -185,17 +195,19 @@ namespace Sidi.Forms
         
         public static IEnumerable<object> SelectObjects(IEnumerable<object> objects, string caption, Func<object, string> stringifier)
         {
-            SelectObjectsDialog d = new SelectObjectsDialog();
-            d.Text = caption;
-            d.Columns = new[] { new ColumnInfo<object>("Item", x => Sidi.Forms.Support.SafeToString(x)) };
-            d.Objects = objects;
-            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (var d = new SelectObjectsDialog())
             {
-                return d.SelectedObjects;
-            }
-            else
-            {
-                return new List<object>();
+                d.Text = caption;
+                d.Columns = new[] { new ColumnInfo<object>("Item", x => Sidi.Forms.Support.SafeToString(x)) };
+                d.Objects = objects;
+                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    return d.SelectedObjects;
+                }
+                else
+                {
+                    return new List<object>();
+                }
             }
         }
 

@@ -92,7 +92,7 @@ namespace Sidi.IMAP
 
         public string ENVELOPE
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException(); }
         }
 
         public Flags[] FLAGS

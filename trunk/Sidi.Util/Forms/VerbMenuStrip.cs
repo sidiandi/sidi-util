@@ -39,6 +39,7 @@ namespace Sidi.Forms
             CreateItems();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public void CreateItems()
         {
             if (!m_itemsCreated)

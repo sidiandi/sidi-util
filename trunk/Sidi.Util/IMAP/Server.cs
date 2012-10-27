@@ -74,8 +74,10 @@ namespace Sidi.IMAP
 
         protected virtual void Session(TcpClient tcpClient)
         {
-            Session session = new Session(tcpClient);
-            session.Run();
+            using (var session = new Session(tcpClient))
+            {
+                session.Run();
+            }
         }
     }
 }

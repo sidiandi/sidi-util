@@ -82,6 +82,7 @@ namespace Sidi.Forms
             return "-";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public override ColumnHeader Header()
         {
             ColumnHeader c = new ColumnHeader();

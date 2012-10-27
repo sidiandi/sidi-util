@@ -194,18 +194,20 @@ namespace Sidi.IMAP
 
         void Respond(string tag, string command, params object[] args)
         {
-            var w = new StringWriter();
-            w.Write(tag == null ? noTag : tag);
-            w.Write(argSep);
-            w.Write(command);
-            foreach (var i in args)
+            using (var w = new StringWriter())
             {
+                w.Write(tag == null ? noTag : tag);
                 w.Write(argSep);
-                w.Write(ArgString(i));
-            }
+                w.Write(command);
+                foreach (var i in args)
+                {
+                    w.Write(argSep);
+                    w.Write(ArgString(i));
+                }
 
-            log.InfoFormat("S: {0}", w.ToString());
-            Out.WriteLine(w.ToString());
+                log.InfoFormat("S: {0}", w.ToString());
+                Out.WriteLine(w.ToString());
+            }
         }
 
         static readonly char[] quoteSpecials = new char[] { '\\', '/', '"' };
@@ -529,10 +531,12 @@ namespace Sidi.IMAP
 
             public string Encode()
             {
-                var w = new StringWriter();
-                w.WriteLine("{" + value.Length.ToString() + "}");
-                w.Write(value);
-                return w.ToString();
+                using (var w = new StringWriter())
+                {
+                    w.WriteLine("{" + value.Length.ToString() + "}");
+                    w.Write(value);
+                    return w.ToString();
+                }
             }
         }
 
@@ -686,6 +690,8 @@ namespace Sidi.IMAP
           {
             if (disposing)
             {
+                this.In.Dispose();
+                this.Out.Dispose();
                 this.stream.Dispose();
             }
             // Free your own state (unmanaged objects).
