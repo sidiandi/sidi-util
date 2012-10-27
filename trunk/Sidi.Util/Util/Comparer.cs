@@ -52,7 +52,7 @@ namespace Sidi.Util
         public PropertyComparer(Func<T, F> fieldgetter)
         {
             if (fieldgetter == null)
-                throw new ArgumentNullException("comparer");
+                throw new ArgumentNullException("fieldgetter");
 
             _fieldgetter = fieldgetter;
         }
@@ -77,7 +77,7 @@ namespace Sidi.Util
         #endregion
     }
 
-    public static class ComparerEx
+    public static class ComparerExtensions
     {
         public static PropertyComparer<T, F> Comparer<T, F>(this IEnumerable<T> e, Func<T, F> f)
         {

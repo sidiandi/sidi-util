@@ -25,7 +25,7 @@ using System.Linq;
 
 namespace Sidi.Util
 {
-    public static class ProcessEx
+    public static class ProcessExtensions
     {
         public static IEnumerable<string> ReadLines(this Process process)
         {

@@ -458,10 +458,39 @@ namespace Sidi.CommandLine
             }
             c.Http.Response.Close();
         }
+        
+        
 
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                this.httpListener.Close();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~WebServer()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
     }
 
     public class ShowWebServer : IDisposable
@@ -475,13 +504,34 @@ namespace Sidi.CommandLine
         [SubCommand]
         public WebServer WebServer;
 
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            if (WebServer != null)
+          Dispose(true);
+          GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
             {
                 WebServer.Dispose();
-                WebServer = null;
             }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
         }
+
+        // Use C# destructor syntax for finalization code.
+        ~ShowWebServer()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
     }
 }

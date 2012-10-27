@@ -78,7 +78,8 @@ namespace Sidi.Forms {
 	}
 
 	///<summary>Specifies the type of items to browse for.</summary>
-	public enum BrowseForTypes {
+	[Flags]
+    public enum BrowseForTypes {
 		///<summary>Browse for computers.</summary>
 		Computers = 0x1000,
 		///<summary>Browse for directories.</summary>
@@ -155,13 +156,17 @@ namespace Sidi.Forms {
 		///<summary>Gets or sets the title of the dialog.</summary>
 		///<value>A String representing the title of the dialog.</value>
 		///<exceptions cref="ArgumentNullException">The specified value is null (VB.NET: Nothing)</exceptions>
-		public string Title {
-			get {
+		public string Title
+        {
+			get
+            {
 				return m_Title;
 			}
-			set {
+
+			set 
+            {
 				if (value == null)
-					throw new ArgumentNullException();
+					throw new ArgumentNullException("value");
 				m_Title = value;
 			}
 		}

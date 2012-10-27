@@ -9,12 +9,12 @@ namespace Sidi.Visualization
     public class PercentileColorMap
     {
         Bins bins;
-        ColorMap colorMap;
+        ColorScale colorMap;
 
         public PercentileColorMap(IEnumerable<IComparable> list)
         {
             bins = new Bins(list);
-            colorMap = ColorMap.BlueRed(0.0, 1.0);
+            colorMap = ColorScale.BlueRed(0.0, 1.0);
         }
 
         public Color GetColor(IComparable item)

@@ -12,7 +12,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
-    public class CushionPainter
+    public class CushionPainter : IDisposable
     {
         float h = 0.75f;
         float f = 0.75f;
@@ -83,7 +83,7 @@ namespace Sidi.Visualization
             return bitmap;
         }
 
-        void Render(BitmapData bitmap, TreeMapLayout.Layout layout, float h, float f, float[,] s)
+        void Render(BitmapData bitmap, Layout layout, float h, float f, float[,] s)
         {
             var r = layout.Bounds;
 
@@ -173,7 +173,7 @@ namespace Sidi.Visualization
 
         Func<object, Color> nodeColor = n => Color.White;
 
-        TreeMapLayout layout;
+        LayoutManager layout;
 
         void Invalidate()
         {
@@ -239,5 +239,37 @@ namespace Sidi.Visualization
             s1 = s1 + 4 * h * (x2 + x1) / (x2 - x1);
             s2 = s2 - 4 * h / (x2 - x1);
         }
+
+        private bool disposed = false;
+            
+        //Implement IDisposable.
+        public void Dispose()
+        {
+          Dispose(true);
+          GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+               tileBitmaps.Dispose();
+               this.transform.Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~CushionPainter()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
     }
 }

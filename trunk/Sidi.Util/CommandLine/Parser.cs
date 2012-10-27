@@ -285,9 +285,9 @@ namespace Sidi.CommandLine
 
         bool execute = true;
 
-        public void Parse(string[] a_args)
+        public void Parse(string[] args)
         {
-            Parse(a_args.ToList());
+            Parse(args.ToList());
         }
 
         public void Parse(IList<string> args)

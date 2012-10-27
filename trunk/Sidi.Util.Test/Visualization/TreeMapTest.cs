@@ -35,7 +35,7 @@ namespace Sidi.Visualization
             tm.CushionPainter.NodeColor = n => new HSLColor(hsv.Hue + ((int)n)*0.02, 1.0, 0.5);
             var lp = tm.CreateLabelPainter();
             tm.Paint += (s, e) => lp.Paint(e);
-            lp.InteractMode = LabelPainter.Mode.MouseFocus;
+            lp.InteractMode = InteractionMode.MouseFocus;
             tm.RunFullScreen();
         }
 

@@ -65,10 +65,5 @@ namespace Sidi.Visualization
             }
             return t;
         }
-
-        public static Color ExtensionToColor(Sidi.IO.Long.FileSystemInfo i)
-        {
-            return ColorScale.ToColor(i.Extension);
-        }
     }
 }

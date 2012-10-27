@@ -13,10 +13,10 @@ namespace Sidi.Visualization
         public TypedTreeMap()
         {
             Activate = x => MessageBox.Show(x.ToString());
-            ItemActivate += new ItemEventHandler(GenericSimpleTreeMap_ItemActivate);
+            ItemActivate += new EventHandler<TreeEventArgs>(GenericSimpleTreeMap_ItemActivate);
         }
 
-        void GenericSimpleTreeMap_ItemActivate(object sender, TreeMap.ItemEventEventArgs e)
+        void GenericSimpleTreeMap_ItemActivate(object sender, TreeEventArgs e)
         {
             Activate((T)e.Tree.Object);
         }

@@ -10,11 +10,11 @@ namespace Sidi.Visualization
     /// <summary>
     /// http://www.win.tue.nl/~vanwijk/ctm.pdf
     /// </summary>
-    public class TreeMapLayout
+    public class LayoutManager
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public TreeMapLayout(Tree root, RectangleF bounds)
+        public LayoutManager(Tree root, RectangleF bounds)
         {
             if (root == null)
             {
@@ -24,20 +24,6 @@ namespace Sidi.Visualization
             layout = new Layout(null) { Tree = root, Bounds = bounds.ToArray() };
             DoLayout = Squares;
             Update(layout);
-        }
-
-        public class Layout : Tree
-        {
-            public Layout(Layout parent)
-                : base(parent)
-            {
-                Bounds = new float[2, 2];
-            }
-
-            public IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
-
-            public float[,] Bounds;
-            public Tree Tree;
         }
 
         Layout layout;
@@ -251,7 +237,7 @@ namespace Sidi.Visualization
                 x = Math.Min(x + w, r[(int)d, (int)Bound.Max]);
                 if (float.IsNaN(x))
                 {
-                    throw new Exception();
+                    throw new InvalidOperationException();
                 }
                 layout[i].Bounds[(int)d, (int)Bound.Max] = x;
                 layout[i].Bounds[(int)od, (int)Bound.Min] = rowRect[(int)od, (int)Bound.Min];

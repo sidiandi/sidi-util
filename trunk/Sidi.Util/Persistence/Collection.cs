@@ -31,7 +31,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Persistence
 {
-    public static class MemberInfoEx
+    public static class MemberInfoExtensions
     {
         public static void SetValue(this MemberInfo member, object target, object value)
         {

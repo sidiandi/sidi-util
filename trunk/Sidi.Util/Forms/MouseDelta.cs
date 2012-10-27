@@ -177,7 +177,6 @@ namespace Sidi.Forms
         #endregion
 
         #region Declarations
-        public delegate void KeyDelegate(ushort key, uint msg);
 
         private const int
             WS_CLIPCHILDREN = 0x02000000,

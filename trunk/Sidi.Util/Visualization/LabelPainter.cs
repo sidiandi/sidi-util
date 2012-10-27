@@ -8,26 +8,33 @@ using System.Drawing.Drawing2D;
 
 namespace Sidi.Visualization
 {
+    public enum InteractionMode
+    {
+        Static,
+        MouseFocus,
+        Max
+    };
+
     public class LabelPainter : IDisposable
     {
-        public enum Mode
-        {
-            Static,
-            MouseFocus,
-            Max
-        };
+        public InteractionMode InteractMode { set; get; }
 
-        public Mode InteractMode { set; get; }
-
-        public StringFormat StringFormat;
+        public StringFormat StringFormat { set; get; }
 
         TreeMap treeMapControl;
 
-        public bool[] LevelVisible = new bool[0x100];
+        public bool[] LevelVisible { get; set;  }
 
         public LabelPainter(TreeMap treeMapControl)
         {
             this.treeMapControl = treeMapControl;
+
+            LevelVisible = new bool[0x100];
+            MinArea = 100.0f;
+            MinFontSize = 5.0f;
+            LeafsOnly = false;
+            Text = t => t == null ? String.Empty : t.ToString();
+
             StringFormat = new StringFormat()
             {
                 Alignment = StringAlignment.Center,
@@ -56,13 +63,13 @@ namespace Sidi.Visualization
             }
         }
 
-        public bool HotkeysEnabled = false;
+        public bool HotkeysEnabled { get; set; }
 
         void treeMapControl_MouseMove(object sender, MouseEventArgs e)
         {
             switch (InteractMode)
             {
-                case Mode.MouseFocus:
+                case InteractionMode.MouseFocus:
                     Focus(e.Location);
                     treeMapControl.Invalidate();
                     break;
@@ -89,16 +96,16 @@ namespace Sidi.Visualization
             else if (e.KeyCode == Keys.Space)
             {
                 ++InteractMode;
-                if (InteractMode >= Mode.Max)
+                if (InteractMode >= InteractionMode.Max)
                 {
-                    InteractMode = (Mode)0;
+                    InteractMode = (InteractionMode)0;
                 }
 
                 treeMapControl.Invalidate();
             }
         }
 
-        public float MinArea = 100.0f;
+        public float MinArea { get; set; }
 
         public void ShowLevels(int index)
         {
@@ -150,14 +157,14 @@ namespace Sidi.Visualization
             }
         }
 
-        public Font Font;
-        public float MinFontSize = 5.0f;
-        public bool LeafsOnly = false;
-        public Func<Tree, string> Text = t => t == null ? String.Empty : t.ToString();
+        public Font Font { set; get; }
+        public float MinFontSize { set; get; }
+        public bool LeafsOnly { get; set; }
+        public Func<Tree, string> Text { set; get; }
 
         double alphaF;
 
-        bool PaintRecursive(PaintEventArgs e, TreeMapLayout.Layout n, int level)
+        bool PaintRecursive(PaintEventArgs e, Layout n, int level)
         {
             var rectArea = n.Bounds.Area();
             if (!e.ClipRectangle.IntersectsWith(n.Bounds.ToRectangle()))
@@ -197,7 +204,7 @@ namespace Sidi.Visualization
                 );
             }
 
-            foreach (var c in n.Children.Cast<TreeMapLayout.Layout>())
+            foreach (var c in n.Children.Cast<Layout>())
             {
                 PaintRecursive(e, c, level + 1);
             }
@@ -205,9 +212,9 @@ namespace Sidi.Visualization
             return true;
         }
 
-        public bool DrawLabel(Graphics g, string text, RectangleF rect)
+        public bool DrawLabel(Graphics graphics, string text, RectangleF rect)
         {
-            var textSize = g.MeasureString(text, Font);
+            var textSize = graphics.MeasureString(text, Font);
             var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
             if ((scale * textSize.Height * 8) < rect.Height)
             {
@@ -227,7 +234,7 @@ namespace Sidi.Visualization
 
             var font = new Font(FontFamily.GenericSansSerif, fontSize);
 
-            g.DrawString(
+            graphics.DrawString(
             text,
             font,
             white,
@@ -238,7 +245,7 @@ namespace Sidi.Visualization
 
         }
 
-        bool PaintRecursiveFocusPoint(PaintEventArgs e, TreeMapLayout.Layout layout, int level)
+        bool PaintRecursiveFocusPoint(PaintEventArgs e, Layout layout, int level)
         {
             // var rectArea = n.Rectangle.Area();
             /*
@@ -274,10 +281,19 @@ namespace Sidi.Visualization
 
         public void Dispose()
         {
-            if (Font != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                Font.Dispose();
-                Font = null;
+                if (Font != null)
+                {
+                    Font.Dispose();
+                    Font = null;
+                }
             }
         }
     }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sidi.Util
 {
-    public static class ListEx
+    public static class ListExtensions
     {
         public static bool Pop<T>(this IList<T> list, out T result)
         {

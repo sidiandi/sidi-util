@@ -55,7 +55,7 @@ namespace Sidi.Forms
         }
     }
 
-    public static class ColumnInfoEx
+    public static class ColumnInfoExtensions
     {
         public static IEnumerable<IColumnInfo> AllProperties<T>(this IEnumerable<T> e)
         {

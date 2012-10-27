@@ -8,6 +8,7 @@ using Sidi.Util;
 using System.Drawing;
 using Sidi.Extensions;
 using System.Text.RegularExpressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Visualization
 {
@@ -21,7 +22,7 @@ namespace Sidi.Visualization
 
             LabelPainter = new LabelPainter(this);
             LabelPainter.HotkeysEnabled = true;
-            LabelPainter.InteractMode = Visualization.LabelPainter.Mode.MouseFocus;
+            LabelPainter.InteractMode = Visualization.InteractionMode.MouseFocus;
             LabelPainter.Text = x => Text(x.Object);
 
             this.ItemMouseHover += (s,e) =>
@@ -56,7 +57,8 @@ namespace Sidi.Visualization
 
         public LabelPainter LabelPainter;
 
-        public static Tree BuildTree(IList items, Func<object, IEnumerable<object>> lineage, Func<object, float> size)
+        [SuppressMessage("Microsoft.Design", "CA1006")]
+        public static Tree BuildTree(IList items, Func<object, IEnumerable> lineage, Func<object, float> size)
         {
             if (items == null)
             {
@@ -66,7 +68,7 @@ namespace Sidi.Visualization
             var tree = new Tree(null);
             foreach (var i in items)
             {
-                var lin = lineage(i).ToArray();
+                var lin = lineage(i).Cast<object>().ToArray();
                 Add(tree, i, lin, size(i), 0);
             }
             tree.UpdateSize();
@@ -104,7 +106,7 @@ namespace Sidi.Visualization
             }
         }
         public Func<object, float> Size = x => 1.0f;
-        public Func<object, IEnumerable<object>> Lineage { set; private get; }
+        public Func<object, IEnumerable> Lineage { set; private get; }
         public Func<object, object> ParentSelector
         {
             set

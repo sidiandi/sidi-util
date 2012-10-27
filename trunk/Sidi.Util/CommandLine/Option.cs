@@ -61,7 +61,7 @@ namespace Sidi.CommandLine
                         propertyInfo.PropertyType.GetInfo()
                         );
                 }
-                throw new InvalidDataException(i.GetType().ToString());
+                throw new InvalidOperationException(i.GetType().ToString());
             }
         }
 

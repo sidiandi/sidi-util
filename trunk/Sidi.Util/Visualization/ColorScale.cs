@@ -9,12 +9,12 @@ namespace Sidi.Visualization
     /// <summary>
     /// Interpolates a scalar to a color
     /// </summary>
-    public class ColorMap
+    public class ColorScale
     {
-        public static ColorMap BlueRed(double x0, double x1)
+        public static ColorScale BlueRed(double x0, double x1)
         {
             int lutLength = 256;
-            return new ColorMap(x0, x1, GetColorScale(lutLength, Color.Blue, Color.Red));
+            return new ColorScale(x0, x1, GetColorScale(lutLength, Color.Blue, Color.Red));
         }
 
         public static Color[] GetColorScale(int length, Color c0, Color c1)
@@ -28,7 +28,7 @@ namespace Sidi.Visualization
                 .ToArray();
         }
 
-        public ColorMap(double x0, double x1, Color[] colors)
+        public ColorScale(double x0, double x1, Color[] colors)
         {
             Lut = colors;
             m = (double)Lut.Length / (x1 - x0);
@@ -36,17 +36,6 @@ namespace Sidi.Visualization
         }
 
         Color[] Lut;
-
-        public class ControlPoint
-        {
-            public ControlPoint(double value, Color color)
-            {
-                Value = value;
-                Color = color;
-            }
-            public double Value;
-            public Color Color;
-        }
 
         double m;
         double x0;
