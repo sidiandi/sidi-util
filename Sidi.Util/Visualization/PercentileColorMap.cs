@@ -17,9 +17,9 @@ namespace Sidi.Visualization
             colorMap = ColorMap.BlueRed(0.0, 1.0);
         }
 
-        public Color GetColor(IComparable x)
+        public Color GetColor(IComparable item)
         {
-            var p = bins.Percentile(x);
+            var p = bins.Percentile(item);
             return colorMap.ToColor(p);
         }
     }

@@ -14,10 +14,10 @@ namespace Sidi.Visualization
         public static ColorMap BlueRed(double x0, double x1)
         {
             int lutLength = 256;
-            return new ColorMap(x0, x1, ColorRange(lutLength, Color.Blue, Color.Red));
+            return new ColorMap(x0, x1, GetColorScale(lutLength, Color.Blue, Color.Red));
         }
 
-        public static Color[] ColorRange(int length, Color c0, Color c1)
+        public static Color[] GetColorScale(int length, Color c0, Color c1)
         {
             return Enumerable
                 .Range(0, length)

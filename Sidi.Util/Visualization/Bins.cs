@@ -16,9 +16,9 @@ namespace Sidi.Visualization
 
         IComparable[] Lut;
 
-        public double Percentile(IComparable x)
+        public double Percentile(IComparable item)
         {
-            return (double) Lut.BinarySearch(i => i.CompareTo(x) > 0) / (double)Lut.Length;
+            return (double) Lut.BinarySearch(i => i.CompareTo(item) > 0) / (double)Lut.Length;
         }
     }
 }
