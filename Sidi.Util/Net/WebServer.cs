@@ -20,6 +20,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Net
 {
+    [CLSCompliant(false)]
     public class WebServer : Sidi.Net.HtmlGenerator, IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

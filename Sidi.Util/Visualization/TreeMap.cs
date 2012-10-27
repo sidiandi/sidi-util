@@ -92,7 +92,7 @@ namespace Sidi.Visualization
             return new TreeMap() { Tree = tree };
         }
 
-        public LayoutManager Layout
+        public LayoutManager LayoutManager
         {
             get
             {
@@ -142,12 +142,12 @@ namespace Sidi.Visualization
 
         Layout GetLayoutAt(Point p)
         {
-            if (Layout == null)
+            if (LayoutManager == null)
             {
                 return null;
             }
 
-            return Layout.GetLayoutAt(GetWorldPoint(p), Int32.MaxValue);
+            return LayoutManager.GetLayoutAt(GetWorldPoint(p), Int32.MaxValue);
         }
 
         Matrix WorldTransform
@@ -180,7 +180,7 @@ namespace Sidi.Visualization
 
         Layout GetLayoutAt(Point p, int levels)
         {
-            return Layout.GetLayoutAt(GetWorldPoint(p), levels);
+            return LayoutManager.GetLayoutAt(GetWorldPoint(p), levels);
         }
 
         void CushionTreeMapControl_SizeChanged(object sender, EventArgs e)
@@ -192,18 +192,18 @@ namespace Sidi.Visualization
         {
             get
             {
-                return Layout == null ? null : Layout.Root.Tree;
+                return LayoutManager == null ? null : LayoutManager.Root.Tree;
             }
 
             set
             {
                 if (value == null || value.Size == 0.0)
                 {
-                    Layout = null;
+                    LayoutManager = null;
                 }
                 else
                 {
-                    Layout = new LayoutManager(value, this.Bounds);
+                    LayoutManager = new LayoutManager(value, this.Bounds);
                 }
             }
         }
@@ -281,12 +281,12 @@ namespace Sidi.Visualization
 
         public void ForEachNode(Action<Layout> a)
         {
-            ForEachNode(Layout.Root, a);
+            ForEachNode(LayoutManager.Root, a);
         }
 
         public void ForEachLeaf(Action<Layout> a)
         {
-            ForEachLeaf(Layout.Root, a);
+            ForEachLeaf(LayoutManager.Root, a);
         }
 
         void ForEachNode(Layout layoutTree, Action<Layout> a)

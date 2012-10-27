@@ -201,10 +201,38 @@ namespace Sidi.Cache
         {
             lock (this) { return dictionary.ContainsKey(key); }
         }
+        
+        
 
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            Clear();
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                Clear();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~LruCache()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
     }
 }

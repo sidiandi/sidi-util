@@ -49,6 +49,7 @@ namespace Sidi.IO
         public const int MAX_ALTERNATE = 14;
 
         [StructLayout(LayoutKind.Sequential)]
+        [CLSCompliant(false)]
         public struct FILETIME
         {
             public uint dwLowDateTime;

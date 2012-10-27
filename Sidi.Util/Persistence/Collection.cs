@@ -84,13 +84,13 @@ namespace Sidi.Persistence
     
     public class CollectionBase
     {
-        protected SharedConnection connection;
+        protected SharedConnection m_connection;
 
         public SharedConnection SharedConnection
         {
             get
             {
-                return connection;
+                return m_connection;
             }
         }
     }
@@ -116,7 +116,7 @@ namespace Sidi.Persistence
 
         public SQLiteConnection Connection
         {
-            get { return connection.Connection; }
+            get { return m_connection.Connection; }
         }
 
         public string Table
@@ -231,7 +231,7 @@ namespace Sidi.Persistence
 
         void Init(SharedConnection connection, string a_table)
         {
-            this.connection = new SharedConnection(connection);
+            this.m_connection = new SharedConnection(connection);
 
             rowIdMember = typeof(T).GetMembers().FirstOrDefault(x => IsRowId(x));
             if (rowIdMember == null)
@@ -1041,7 +1041,7 @@ namespace Sidi.Persistence
             updateDataByRowId.Dispose();
             deleteByRowId.Dispose();
             containsQuery.Dispose();
-            connection.Dispose();
+            m_connection.Dispose();
         }
     }
 }

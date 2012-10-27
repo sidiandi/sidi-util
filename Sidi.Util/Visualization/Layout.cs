@@ -13,10 +13,10 @@ namespace Sidi.Visualization
             Bounds = new float[2, 2];
         }
 
-        public IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
+        public new IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
 
-        public float[,] Bounds;
-        public Tree Tree;
+        public float[,] Bounds { get; set; }
+        public Tree Tree { get; set; }
     }
 
 }

@@ -12,6 +12,7 @@ using System.Globalization;
 
 namespace Sidi.IMAP
 {
+    [CLSCompliant(false)]
     public class Session : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

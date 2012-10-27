@@ -178,13 +178,13 @@ namespace Sidi.Visualization
         void Invalidate()
         {
             tileBitmaps.Clear();
-            layout = control.Layout;
+            layout = control.LayoutManager;
             control.Invalidate();
         }
 
         public void Paint(PaintEventArgs e)
         {
-            if (control.Layout != layout)
+            if (control.LayoutManager != layout)
             {
                 Invalidate();
             }

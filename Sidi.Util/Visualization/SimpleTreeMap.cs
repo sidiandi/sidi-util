@@ -17,13 +17,13 @@ namespace Sidi.Visualization
         public SimpleTreeMap()
         {
             PathSeparator = @"\";
-            Color = x => System.Drawing.Color.White;
-            Text = x => x.ToString();
+            GetColor = x => System.Drawing.Color.White;
+            GetText = x => x.ToString();
 
             LabelPainter = new LabelPainter(this);
             LabelPainter.HotkeysEnabled = true;
             LabelPainter.InteractMode = Visualization.InteractionMode.MouseFocus;
-            LabelPainter.Text = x => Text(x.Object);
+            LabelPainter.Text = x => GetText(x.Object);
 
             this.ItemMouseHover += (s,e) =>
                 {
@@ -52,7 +52,7 @@ namespace Sidi.Visualization
 
         void UpdateTree()
         {
-            this.Tree = BuildTree(Items, Lineage, Size);
+            this.Tree = BuildTree(Items, GetLineage, GetSize);
         }
 
         public LabelPainter LabelPainter;
@@ -98,20 +98,20 @@ namespace Sidi.Visualization
             }
         }
 
-        public Func<object, Color> Color
+        public Func<object, Color> GetColor
         {
             set
             {
                 base.CushionPainter.NodeColor = value;
             }
         }
-        public Func<object, float> Size = x => 1.0f;
-        public Func<object, IEnumerable> Lineage { set; private get; }
-        public Func<object, object> ParentSelector
+        public Func<object, float> GetSize = x => 1.0f;
+        public Func<object, IEnumerable> GetLineage { set; private get; }
+        public Func<object, object> GetParent
         {
             set
             {
-                Lineage = x => IEnumerableExtensions
+                GetLineage = x => IEnumerableExtensions
                     .Chain(x, value)
                     .Reverse();
             }
@@ -126,20 +126,20 @@ namespace Sidi.Visualization
             set 
             {
                 pathSeparator = value;
-                Lineage = x => x.SafeToString()
+                GetLineage = x => x.SafeToString()
                     .Split(new string[] { pathSeparator }, StringSplitOptions.RemoveEmptyEntries)
                     .JoinSelect(pathSeparator)
                     .Cast<object>();
             }
         }
-        public Func<object, string> Text { set; private get; }
+        public Func<object, string> GetText { set; private get; }
 
-        public Func<object, object> DistinctColor
+        public Func<object, object> GetDistinctColor
         {
             set
             {
                 var dc = new DistinctColor();
-                Color = x => dc.ToColor(value(x));
+                GetColor = x => dc.ToColor(value(x));
             }
         }
 

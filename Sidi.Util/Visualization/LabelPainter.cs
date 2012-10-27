@@ -143,7 +143,7 @@ namespace Sidi.Visualization
 
         public void Paint(PaintEventArgs e)
         {
-            var layout = treeMapControl.Layout;
+            var layout = treeMapControl.LayoutManager;
             float maxArea = layout.Root.Bounds.Area();
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             if (focusPointEnabled)

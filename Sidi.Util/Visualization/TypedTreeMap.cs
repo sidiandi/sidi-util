@@ -21,35 +21,47 @@ namespace Sidi.Visualization
             Activate((T)e.Tree.Object);
         }
 
-        new public Func<T, T> ParentSelector
+        new public Func<T, T> GetParent
         {
             set
             {
-                base.ParentSelector = x => value((T)x);
+                base.GetParent = x => value((T)x);
             }
         }
 
-        public Func<T, Color> Color
+        new public Func<T, Color> GetColor
         {
             set
             {
-                base.Color = x => value((T)x);
+                base.GetColor = x => value((T)x);
             }
         }
 
-        new public Func<T, object> DistinctColor
+        new public Func<T, object> GetDistinctColor
         {
             set
             {
-                base.DistinctColor = x => value((T)x);
+                base.GetDistinctColor = x => value((T)x);
             }
         }
 
-        new public Func<T, float> Size
+        new public Func<T, float> GetSize
         {
             set
             {
-                base.Size = x => value((T)x);
+                base.GetSize = x => value((T)x);
+            }
+        }
+
+        new public Func<T, string> GetText
+        {
+            set
+            {
+                base.GetText = x =>
+                {
+                    var t = (T)x;
+                    return t == null ? String.Empty : value(t);
+                };
             }
         }
 
@@ -68,24 +80,12 @@ namespace Sidi.Visualization
 
         public Action<T> Activate;
 
-        new public Func<T, string> Text
-        {
-            set
-            {
-                base.Text = x =>
-                {
-                    var t = (T)x;
-                    return t == null ? String.Empty : value(t);
-                };
-            }
-        }
-
         public Func<T, IComparable> PercentileColorMap
         {
             set
             {
                 var pcm = new PercentileColorMap(Items.Select(value));
-                Color = x => pcm.GetColor(value(x));
+                GetColor = x => pcm.GetColor(value(x));
             }
         }
     }
