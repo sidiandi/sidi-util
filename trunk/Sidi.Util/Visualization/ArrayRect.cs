@@ -21,18 +21,18 @@ namespace Sidi.Visualization
 
     static class ArrayRectExtensions
     {
-        public static float Area(this float[,] rectangle)
+        public static double Area(this double[,] rectangle)
         {
             var w = rectangle[0, 1] - rectangle[0, 0];
             var h = rectangle[1, 1] - rectangle[1, 0];
             return w * h;
         }
 
-        const float cf = 1.0f / 256.0f;
+        const double cf = 1.0 / 256.0;
 
-        public static float[] ToArray(this Color color)
+        public static double[] ToArray(this Color color)
         {
-            return new float[]
+            return new double[]
             {
                 color.B * cf,
                 color.G * cf,
@@ -40,14 +40,14 @@ namespace Sidi.Visualization
             };
         }
 
-        public static float Width(this float[,] rectangle, Dir direction)
+        public static double Width(this double[,] rectangle, Dir direction)
         {
             return rectangle[(int)direction, (int)Bound.Max] - rectangle[(int)direction, (int)Bound.Min];
         }
 
-        public static float[,] ToArray(this RectangleF r)
+        public static double[,] ToArray(this RectangleF r)
         {
-            var ar = new float[2, 2];
+            var ar = new double[2, 2];
             ar[(int)Dir.X, (int)Bound.Min] = r.Left;
             ar[(int)Dir.X, (int)Bound.Max] = r.Right;
             ar[(int)Dir.Y, (int)Bound.Min] = r.Top;
@@ -55,12 +55,12 @@ namespace Sidi.Visualization
             return ar;
         }
 
-        public static float[] ToArray(this Point p)
+        public static double[] ToArray(this Point p)
         {
-            return new float[] { p.X, p.Y };
+            return new double[] { p.X, p.Y };
         }
 
-        public static void Add(this float[,] a, float[,] b)
+        public static void Add(this double[,] a, double[,] b)
         {
             a[0, 0] += b[0, 0];
             a[0, 1] += b[0, 1];
@@ -68,7 +68,7 @@ namespace Sidi.Visualization
             a[1, 1] += b[1, 1];
         }
 
-        public static Rectangle ToRectangle(this float[,] r)
+        public static Rectangle ToRectangle(this double[,] r)
         {
             return Rectangle.FromLTRB(
                 (int)r[(int)Dir.X, (int)Bound.Min],
@@ -77,16 +77,16 @@ namespace Sidi.Visualization
                 (int)r[(int)Dir.Y, (int)Bound.Max]);
         }
 
-        public static RectangleF ToRectangleF(this float[,] r)
+        public static RectangleF ToRectangleF(this double[,] r)
         {
             return RectangleF.FromLTRB(
-                r[(int)Dir.X, (int)Bound.Min],
-                r[(int)Dir.Y, (int)Bound.Min],
-                r[(int)Dir.X, (int)Bound.Max],
-                r[(int)Dir.Y, (int)Bound.Max]);
+                (float) r[(int)Dir.X, (int)Bound.Min],
+                (float) r[(int)Dir.Y, (int)Bound.Min],
+                (float) r[(int)Dir.X, (int)Bound.Max],
+                (float) r[(int)Dir.Y, (int)Bound.Max]);
         }
 
-        public static bool Contains(this float[,] r, float[] p)
+        public static bool Contains(this double[,] r, double[] p)
         {
             return
                 r[0, 0] <= p[0] &&
@@ -95,20 +95,20 @@ namespace Sidi.Visualization
                 r[1, 1] > p[1];
         }
 
-        public static bool CoversPixel(this float[,] rectangle)
+        public static bool CoversPixel(this double[,] rectangle)
         {
             return ((int)rectangle[0, 0] != (int)rectangle[0, 1])
                 && ((int)rectangle[1, 0] != (int)rectangle[1, 1]);
         }
 
-        public static float[,] Copy(this float[,] x)
+        public static double[,] Copy(this double[,] x)
         {
-            return (float[,])x.Clone();
+            return (double[,])x.Clone();
         }
 
-        public static float[,] Create(PointF p0, PointF p1)
+        public static double[,] Create(PointF p0, PointF p1)
         {
-            var r = new float[2, 2];
+            var r = new double[2, 2];
             r[(int)Dir.X, (int)Bound.Min] = p0.X;
             r[(int)Dir.X, (int)Bound.Max] = p1.X;
             r[(int)Dir.Y, (int)Bound.Min] = p0.Y;
@@ -116,33 +116,24 @@ namespace Sidi.Visualization
             return r;
         }
 
-        public static RectangleF ToRect(float[,] f)
-        {
-            return new RectangleF(
-                f[(int)Dir.X, (int)Bound.Min],
-                f[(int)Dir.Y, (int)Bound.Min],
-                f.Width(),
-                f.Height());
-        }
-
-        public static float Width(this float[,] f)
+        public static double Width(this double[,] f)
         {
             return f[(int)Dir.X, (int)Bound.Max] - f[(int)Dir.X, (int)Bound.Min];
         }
 
-        public static float Height(this float[,] f)
+        public static double Height(this double[,] f)
         {
             return f[(int)Dir.Y, (int)Bound.Max] - f[(int)Dir.Y, (int)Bound.Min];
         }
 
-        public static bool Intersects(this float[,] a, float[,] b)
+        public static bool Intersects(this double[,] a, double[,] b)
         {
-            return ToRect(a).IntersectsWith(ToRect(b));
+            return a.ToRectangleF().IntersectsWith(b.ToRectangleF());
         }
 
-        public static float[,] Create(float x0, float y0, float x1, float y1)
+        public static double[,] Create(double x0, double y0, double x1, double y1)
         {
-            var r = new float[2, 2];
+            var r = new double[2, 2];
             r[(int)Dir.X, (int)Bound.Min] = x0;
             r[(int)Dir.X, (int)Bound.Max] = x1;
             r[(int)Dir.Y, (int)Bound.Min] = y0;
@@ -150,9 +141,9 @@ namespace Sidi.Visualization
             return r;
         }
 
-        public static float[,] Create(RectangleF rect)
+        public static double[,] Create(RectangleF rect)
         {
-            var r = new float[2, 2];
+            var r = new double[2, 2];
             r[(int)Dir.X, (int)Bound.Min] = rect.Left;
             r[(int)Dir.X, (int)Bound.Max] = rect.Right;
             r[(int)Dir.Y, (int)Bound.Min] = rect.Top;
@@ -160,10 +151,11 @@ namespace Sidi.Visualization
             return r;
         }
 
-        public static void Transform(this Matrix m, float[,] x)
+        public static void Transform(this Matrix m, double[,] x)
         {
-            var p = new PointF[]{ new PointF(x[(int)Dir.X, (int)Bound.Min], x[(int)Dir.Y, (int)Bound.Min]),
-                new PointF(x[(int)Dir.X, (int)Bound.Max], x[(int)Dir.Y, (int)Bound.Max])};
+            var p = new PointF[]{
+                    new PointF((float)x[(int)Dir.X, (int)Bound.Min], (float)x[(int)Dir.Y, (int)Bound.Min]),
+                    new PointF((float)x[(int)Dir.X, (int)Bound.Max], (float)x[(int)Dir.Y, (int)Bound.Max])};
 
             m.TransformPoints(p);
             x[(int)Dir.X, (int)Bound.Min] = p[0].X;
@@ -172,9 +164,9 @@ namespace Sidi.Visualization
             x[(int)Dir.Y, (int)Bound.Max] = p[1].Y;
         }
 
-        public static void Transform(this Matrix m, float[] x)
+        public static void Transform(this Matrix m, double[] x)
         {
-            var p = new PointF[]{ new PointF(x[(int)Dir.X], x[(int)Dir.Y]) };
+            var p = new PointF[]{ new PointF((float)x[(int)Dir.X], (float) x[(int)Dir.Y]) };
             m.TransformPoints(p);
             x[(int)Dir.X] = p[0].X;
             x[(int)Dir.Y] = p[0].Y;

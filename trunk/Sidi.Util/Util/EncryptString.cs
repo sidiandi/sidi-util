@@ -55,15 +55,18 @@ namespace Sidi.Util
         /// <returns></returns>
         private static byte[] Decrypt(byte[] cipherData, byte[] Key, byte[] IV)
         {
-            MemoryStream ms = new MemoryStream();
-            Rijndael alg = Rijndael.Create();
-            alg.Key = Key;
-            alg.IV = IV;
-            CryptoStream cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write);
-            cs.Write(cipherData, 0, cipherData.Length);
-            cs.Close();
-            byte[] decryptedData = ms.ToArray();
-            return decryptedData;
+            using (var ms = new MemoryStream())
+            using (var alg = Rijndael.Create())
+            {
+                alg.Key = Key;
+                alg.IV = IV;
+                using (var cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write))
+                {
+                    cs.Write(cipherData, 0, cipherData.Length);
+                }
+                byte[] decryptedData = ms.ToArray();
+                return decryptedData;
+            }
         }
 
         /// <summary>

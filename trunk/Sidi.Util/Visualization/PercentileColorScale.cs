@@ -6,21 +6,21 @@ using System.Drawing;
 
 namespace Sidi.Visualization
 {
-    public class PercentileColorMap
+    public class PercentileColorScale
     {
         Bins bins;
-        ColorScale colorMap;
+        ColorScale colorScale;
 
-        public PercentileColorMap(IEnumerable<IComparable> list)
+        public PercentileColorScale(IEnumerable<IComparable> list, Color[] colorScale)
         {
             bins = new Bins(list);
-            colorMap = ColorScale.BlueRed(0.0, 1.0);
+            this.colorScale = new ColorScale(0.0, 1.0, colorScale);
         }
 
         public Color GetColor(IComparable item)
         {
             var p = bins.Percentile(item);
-            return colorMap.ToColor(p);
+            return colorScale.ToColor(p);
         }
     }
 }

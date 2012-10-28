@@ -34,5 +34,13 @@ namespace Sidi.IO.Long
                 return LocalPath(Assembly.GetExecutingAssembly()).Parent;
             }
         }
+
+        public static Path Temp
+        {
+            get
+            {
+                return new Path(System.IO.Path.GetTempPath());
+            }
+        }
     }
 }

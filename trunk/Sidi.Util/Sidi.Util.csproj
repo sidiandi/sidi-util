@@ -246,7 +246,7 @@
     <Compile Include="Visualization\HSLColor.cs" />
     <Compile Include="Visualization\ITree.cs" />
     <Compile Include="Visualization\LabelPainter.cs" />
-    <Compile Include="Visualization\PercentileColorMap.cs" />
+    <Compile Include="Visualization\PercentileColorScale.cs" />
     <Compile Include="Visualization\SimpleTreeMap.cs">
       <SubType>Component</SubType>
     </Compile>

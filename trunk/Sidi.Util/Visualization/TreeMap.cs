@@ -129,17 +129,6 @@ namespace Sidi.Visualization
             }
         }
 
-        /// <summary>
-        /// Orders all tree objects by orderBy and assigns a color based on the percentile
-        /// </summary>
-        /// <param name="orderBy"></param>
-        public void SetBinnedNodeColor(Func<object, IComparable> orderBy)
-        {
-            var bins = new Bins(Tree.GetAllNodes().Cast<object>().Select(orderBy));
-            var colorMap = ColorScale.BlueRed(0.0, 1.0);
-            CushionPainter.NodeColor = n => colorMap.ToColor(bins.Percentile(orderBy(n)));
-        }
-
         Layout GetLayoutAt(Point p)
         {
             if (LayoutManager == null)
@@ -163,7 +152,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public float[] GetWorldPoint(Point p)
+        public double[] GetWorldPoint(Point p)
         {
             var fp = p.ToArray();
             var inverse = WorldTransform.Clone();

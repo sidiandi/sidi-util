@@ -19,6 +19,7 @@ namespace Sidi.Visualization
             PathSeparator = @"\";
             GetColor = x => System.Drawing.Color.White;
             GetText = x => x.ToString();
+            GetSize = x => 1.0f;
 
             LabelPainter = new LabelPainter(this);
             LabelPainter.HotkeysEnabled = true;
@@ -33,6 +34,17 @@ namespace Sidi.Visualization
         }
 
         ToolTip toolTip = new ToolTip();
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (treeUpdateRequired)
+            {
+                this.Tree = BuildTree(Items, GroupBy, GetSize);
+                treeUpdateRequired = false;
+            }
+
+            base.OnPaint(e);
+        }
 
         public IList Items
         {
@@ -49,16 +61,18 @@ namespace Sidi.Visualization
         }
 
         IList items;
+        bool treeUpdateRequired = true;
 
         void UpdateTree()
         {
-            this.Tree = BuildTree(Items, GetLineage, GetSize);
+            treeUpdateRequired = true;
+            Invalidate();
         }
 
         public LabelPainter LabelPainter;
 
         [SuppressMessage("Microsoft.Design", "CA1006")]
-        public static Tree BuildTree(IList items, Func<object, IEnumerable> lineage, Func<object, float> size)
+        public static Tree BuildTree(IList items, Func<object, IEnumerable> lineage, Func<object, double> size)
         {
             if (items == null)
             {
@@ -79,7 +93,7 @@ namespace Sidi.Visualization
             return tree;
         }
 
-        static void Add(Tree tree, object item, object[] lineage, float size, int level)
+        static void Add(Tree tree, object item, object[] lineage, double size, int level)
         {
             if (level < lineage.Length)
             {
@@ -94,7 +108,14 @@ namespace Sidi.Visualization
             }
             else
             {
-                tree.Size += size;
+                var pathPart = item;
+                var c = tree.Children.FirstOrDefault(i => i.Object.Equals(pathPart));
+                if (c == null)
+                {
+                    c = new Tree(tree);
+                    c.Object = pathPart;
+                }
+                c.Size += size;
             }
         }
 
@@ -102,37 +123,92 @@ namespace Sidi.Visualization
         {
             set
             {
-                base.CushionPainter.NodeColor = value;
+                base.CushionPainter.GetColor = x => { try { return value(x); } catch { return Color.Red; } };
+                UpdateTree();
+            }
+
+            get
+            {
+                return base.CushionPainter.GetColor;
             }
         }
-        public Func<object, float> GetSize = x => 1.0f;
-        public Func<object, IEnumerable> GetLineage { set; private get; }
+
+        public Func<object, double> GetSize
+        {
+            set
+            {
+                myGetSize = x => { try { return value(x); } catch { return 0; } };
+                UpdateTree();
+            }
+        
+            get
+            {
+                return myGetSize;
+            }
+        }
+        Func<object, double> myGetSize;
+
+        public Func<object, IEnumerable> GroupBy
+        {
+            set
+            {
+                myGroupBy = x => { try { return value(x); } catch { return new System.Collections.ArrayList(); } };
+                UpdateTree();
+            }
+
+            get
+            {
+                return myGroupBy;
+            }
+        }
+        
+        Func<object, IEnumerable> myGroupBy;
+
         public Func<object, object> GetParent
         {
             set
             {
-                GetLineage = x => IEnumerableExtensions
+                GroupBy = x => IEnumerableExtensions
                     .Chain(x, value)
                     .Reverse();
             }
         }
+
         public string PathSeparator
         {
             get
             {
-                return pathSeparator;
+                return myPathSeparator;
             }
             
             set 
             {
-                pathSeparator = value;
-                GetLineage = x => x.SafeToString()
-                    .Split(new string[] { pathSeparator }, StringSplitOptions.RemoveEmptyEntries)
-                    .JoinSelect(pathSeparator)
+                myPathSeparator = value;
+                GroupBy = x => x.SafeToString()
+                    .Split(new string[] { myPathSeparator }, StringSplitOptions.RemoveEmptyEntries)
+                    .JoinSelect(myPathSeparator)
                     .Cast<object>();
             }
         }
-        public Func<object, string> GetText { set; private get; }
+
+        string myPathSeparator;
+
+        Dictionary<Type, Func<object, string>> textMapper = new Dictionary<Type,Func<object,string>>();
+        
+        public Func<object, string> GetText
+        {
+            set
+            {
+                myGetText = x => { try { return value(x); } catch { return String.Empty; } };
+                Invalidate();
+            }
+
+            get
+            {
+                return myGetText;
+            }
+        }
+        Func<object, string> myGetText;
 
         public Func<object, object> GetDistinctColor
         {
@@ -142,7 +218,5 @@ namespace Sidi.Visualization
                 GetColor = x => dc.ToColor(value(x));
             }
         }
-
-        string pathSeparator;
     }
 }

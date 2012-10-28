@@ -54,7 +54,7 @@ namespace Sidi.Visualization
                     var ct = GetTestTree(t, childCount, levels - 1);
                     ct.Object = c;
                 }
-                t.Size = t.Children.Aggregate(0.0f, (s, x) => s + x.Size);
+                t.Size = t.Children.Aggregate(0.0, (s, x) => s + x.Size);
             }
             else
             {

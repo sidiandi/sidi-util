@@ -40,7 +40,7 @@ namespace Sidi.Visualization
         }
 
         public object Object { get; set; }
-        public float Size { get; set; }
+        public double Size { get; set; }
 
         ITree ITree.Parent
         {
@@ -80,11 +80,11 @@ namespace Sidi.Visualization
         /// <summary>
         /// calculates the sum of the sizes of all children
         /// </summary>
-        public float ChildSize
+        public double ChildSize
         {
             get
             {
-                return Children.Aggregate(0.0f, (s, i) => s + i.Size);
+                return Children.Aggregate(0.0, (s, i) => s + i.Size);
             }
         }
 

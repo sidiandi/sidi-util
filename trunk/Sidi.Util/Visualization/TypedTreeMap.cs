@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Windows.Forms;
 using System.Drawing;
+using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
@@ -45,7 +46,7 @@ namespace Sidi.Visualization
             }
         }
 
-        new public Func<T, float> GetSize
+        new public Func<T, double> GetSize
         {
             set
             {
@@ -59,9 +60,24 @@ namespace Sidi.Visualization
             {
                 base.GetText = x =>
                 {
-                    var t = (T)x;
-                    return t == null ? String.Empty : value(t);
+                    if (x is T)
+                    {
+                        var t = (T)x;
+                        return t == null ? String.Empty : value(t);
+                    }
+                    else
+                    {
+                        return x.ToString();
+                    }
                 };
+            }
+        }
+
+        new public Func<T, IEnumerable> GetLineage
+        {
+            set
+            {
+                base.GroupBy = x => value((T)x);
             }
         }
 
@@ -80,13 +96,10 @@ namespace Sidi.Visualization
 
         public Action<T> Activate;
 
-        public Func<T, IComparable> PercentileColorMap
+        public void SetPercentileColorScale(Func<T, IComparable> func, Color[] colorScale)
         {
-            set
-            {
-                var pcm = new PercentileColorMap(Items.Select(value));
-                GetColor = x => pcm.GetColor(value(x));
-            }
+            var pcm = new PercentileColorScale(Items.SafeSelect(func), colorScale);
+            GetColor = x => pcm.GetColor(func(x));
         }
     }
 }
