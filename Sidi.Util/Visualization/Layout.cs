@@ -10,12 +10,12 @@ namespace Sidi.Visualization
         public Layout(Layout parent)
             : base(parent)
         {
-            Bounds = new float[2, 2];
+            Bounds = new double[2, 2];
         }
 
         public new IEnumerable<Layout> Children { get { return base.Children.Cast<Layout>(); } }
 
-        public float[,] Bounds { get; set; }
+        public double[,] Bounds { get; set; }
         public Tree Tree { get; set; }
     }
 

@@ -25,7 +25,7 @@ namespace Sidi.Visualization
             var file = TestFile(@"mail\message-1-1456.eml");
             var words = Regex.Split(File.ReadAllText(new Sidi.IO.Long.Path(file)), @"\s+");
             var st = new SimpleTreeMap();
-            st.GetLineage = x =>
+            st.GroupBy = x =>
                 {
                     var word = ((string)x);
                     var wordEnum = word.AggregateSelect(String.Empty, (s, c) => s + c);
@@ -80,16 +80,21 @@ namespace Sidi.Visualization
         }
 
         [Test, Explicit("interactive")]
-        public void ColorMap()
+        public void ColorScale()
         {
             var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
-            var tm = new TypedTreeMap<L.Path>();
-            tm.GetParent = x => x.Parent;
-            tm.GetSize = x => x.Info.Length;
-            tm.Activate = x => MessageBox.Show(x.ToString());
-            tm.Items = files;
-            tm.GetText = x => x.Name;
-            tm.PercentileColorMap = x => x.Info.LastWriteTimeUtc;
+            var tm = new TypedTreeMap<L.Path>()
+            {
+                GetParent = x => x.Parent,
+                GetSize = x => x.Info.Length,
+                Activate = x => MessageBox.Show(x.ToString()),
+                Items = files,
+                GetText = x => x.Name,
+            };
+
+            // tm.SetPercentileColorScale(i => i.Info.LastWriteTime, Sidi.Visualization.ColorScale.GreenYellowRed());
+            tm.SetPercentileColorScale(i => i.Info.LastWriteTime, Sidi.Visualization.ColorScale.GetColorScale(256, Color.Gray, Color.Red));
+
             tm.RunFullScreen();
         }
 
@@ -100,6 +105,21 @@ namespace Sidi.Visualization
             var tm = new SimpleTreeMap();
             tm.GetDistinctColor = x => System.IO.Path.GetExtension((string)x);
             tm.Items = files.ToList();
+            tm.RunFullScreen();
+        }
+
+        [Test, Explicit("interactive")]
+        public void ProcessTree()
+        {
+            var p = Process.GetProcesses().ToList();
+            var tm = new TypedTreeMap<Process>()
+            {
+                Items = p,
+                GetLineage = i => i.MainModule.FileName.ToLower().Split('\\'),
+                GetSize = i => i.WorkingSet64,
+                GetText = i => i.ProcessName,
+            };
+
             tm.RunFullScreen();
         }
     }

@@ -14,11 +14,11 @@ namespace Sidi.Visualization
 {
     public class CushionPainter : IDisposable
     {
-        float h = 0.75f;
-        float f = 0.75f;
-        const float Ia = 40;
-        const float Is = 215;
-        float[] L = new float[] { 0.09759f, -0.19518f, 0.9759f };
+        double h = 0.75f;
+        double f = 0.75f;
+        const double Ia = 40;
+        const double Is = 215;
+        double[] L = new double[] { 0.09759f, -0.19518f, 0.9759f };
 
         public CushionPainter(TreeMap control)
         {
@@ -70,8 +70,8 @@ namespace Sidi.Visualization
             {
                 if (this.layout != null)
                 {
-                    var surface = new float[4];
-                    var s = new float[2, 2];
+                    var surface = new double[4];
+                    var s = new double[2, 2];
                     Render(data, layout.Root, h, f, s);
                 }
             }
@@ -83,7 +83,7 @@ namespace Sidi.Visualization
             return bitmap;
         }
 
-        void Render(BitmapData bitmap, Layout layout, float h, float f, float[,] s)
+        void Render(BitmapData bitmap, Layout layout, double h, double f, double[,] s)
         {
             var r = layout.Bounds;
 
@@ -107,7 +107,7 @@ namespace Sidi.Visualization
             {
                 var bitmapR = r.Copy();
                 transform.Transform(bitmapR);
-                RenderCushion(bitmap, bitmapR, r, s, NodeColor(layout.Tree.Object).ToArray());
+                RenderCushion(bitmap, bitmapR, r, s, GetColor(layout.Tree.Object).ToArray());
             }
             else
             {
@@ -119,30 +119,30 @@ namespace Sidi.Visualization
         }
 
         Matrix transform;
-        float[,] rect;
+        double[,] rect;
         
         unsafe void RenderCushion(
             BitmapData bitmap,
-            float[,] bitmapR,
-            float[,] r,
-            float[,] s,
-            float[] color
+            double[,] bitmapR,
+            double[,] r,
+            double[,] s,
+            double[] color
             )
         {
             var ey = Math.Min((int)Math.Ceiling(bitmapR[(int)Dir.Y, (int)Bound.Max]), bitmap.Height);
             var by = Math.Max((int)Math.Ceiling(bitmapR[(int)Dir.Y, (int)Bound.Min]), 0);
             var ex = Math.Min((int)Math.Ceiling(bitmapR[(int)Dir.X, (int)Bound.Max]), bitmap.Width);
             var bx = Math.Max((int)Math.Ceiling(bitmapR[(int)Dir.X, (int)Bound.Min]), 0);
-            float yScale = (r[(int)Dir.Y, (int)Bound.Max] - r[(int)Dir.Y, (int)Bound.Min]) / (bitmapR[(int)Dir.Y, (int)Bound.Max] - bitmapR[(int)Dir.Y, (int)Bound.Min]);
-            float xScale = (r[(int)Dir.X, (int)Bound.Max] - r[(int)Dir.X, (int)Bound.Min]) / (bitmapR[(int)Dir.X, (int)Bound.Max] - bitmapR[(int)Dir.X, (int)Bound.Min]);
+            double yScale = (r[(int)Dir.Y, (int)Bound.Max] - r[(int)Dir.Y, (int)Bound.Min]) / (bitmapR[(int)Dir.Y, (int)Bound.Max] - bitmapR[(int)Dir.Y, (int)Bound.Min]);
+            double xScale = (r[(int)Dir.X, (int)Bound.Max] - r[(int)Dir.X, (int)Bound.Min]) / (bitmapR[(int)Dir.X, (int)Bound.Max] - bitmapR[(int)Dir.X, (int)Bound.Min]);
  
             for (int iy = by; iy < ey; ++iy)
             {
-                float y = r[(int)Dir.Y, (int)Bound.Min] + ((float)iy + 0.5f - bitmapR[(int)Dir.Y, (int)Bound.Min]) * yScale;  
+                double y = r[(int)Dir.Y, (int)Bound.Min] + ((double)iy + 0.5f - bitmapR[(int)Dir.Y, (int)Bound.Min]) * yScale;  
                 byte* row = (byte*)bitmap.Scan0 + iy * bitmap.Stride + bx * 3;
                 for (int ix = bx; ix < ex; ++ix)
                 {
-                    float x = r[(int)Dir.X, (int)Bound.Min] + ((float)ix + 0.5f - bitmapR[(int)Dir.X, (int)Bound.Min]) * xScale;
+                    double x = r[(int)Dir.X, (int)Bound.Min] + ((double)ix + 0.5f - bitmapR[(int)Dir.X, (int)Bound.Min]) * xScale;
                     var nx = (2 * s[(int)Dir.X, 1] * (x) + s[(int)Dir.X, 0]);
                     var ny = -(2 * s[(int)Dir.Y, 1] * (y) + s[(int)Dir.Y, 0]);
                     var cosa = (nx * L[0] + ny * L[1] + L[2]) / Math.Sqrt(nx * nx + ny * ny + 1.0);
@@ -157,7 +157,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public Func<object, Color> NodeColor
+        public Func<object, Color> GetColor
         {
             set
             {
@@ -234,7 +234,7 @@ namespace Sidi.Visualization
         Sidi.Collections.LruCacheBackground<Tile, Bitmap> tileBitmaps;
         Tiles tiles = new Tiles(new Size(0x100, 0x100));
         
-        void AddRidge(float x1, float x2, float h, ref float s1, ref float s2)
+        void AddRidge(double x1, double x2, double h, ref double s1, ref double s2)
         {
             s1 = s1 + 4 * h * (x2 + x1) / (x2 - x1);
             s2 = s2 - 4 * h / (x2 - x1);

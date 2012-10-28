@@ -32,7 +32,7 @@ namespace Sidi.Visualization
             
             var t = TreeMapTestData.GetTestTree();
             var tm = new TreeMap() { Tree = t };
-            tm.CushionPainter.NodeColor = n => new HSLColor(hsv.Hue + ((int)n)*0.02, 1.0, 0.5);
+            tm.CushionPainter.GetColor = n => new HSLColor(hsv.Hue + ((int)n)*0.02, 1.0, 0.5);
             var lp = tm.CreateLabelPainter();
             tm.Paint += (s, e) => lp.Paint(e);
             lp.InteractMode = InteractionMode.MouseFocus;
