@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Threading;
+using Sidi.IO;
 
 namespace Sidi.Visualization
 {
@@ -11,12 +12,12 @@ namespace Sidi.Visualization
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Tree Get(Sidi.IO.Long.Path dir)
+        public static Tree Get(Path dir)
         {
-            return GetRecursive(null, new Sidi.IO.Long.FileSystemInfo(dir));
+            return GetRecursive(null, new FileSystemInfo(dir));
         }
 
-        public static Tree GetBackground(Sidi.IO.Long.Path dir)
+        public static Tree GetBackground(Path dir)
         {
             var t = new Tree(null) { Object = dir.Info };
 
@@ -31,7 +32,7 @@ namespace Sidi.Visualization
         static void GetChildrenRecursive(Tree t)
         {
             log.Info(t.Object);    
-            var i = (IO.Long.FileSystemInfo) t.Object;
+            var i = (Sidi.IO.FileSystemInfo) t.Object;
             if (i.IsDirectory)
             {
                 foreach (var x in i.GetFileSystemInfos())
@@ -46,7 +47,7 @@ namespace Sidi.Visualization
             }
         }
 
-        static Tree GetRecursive(Tree parent, Sidi.IO.Long.FileSystemInfo i)
+        static Tree GetRecursive(Tree parent, Sidi.IO.FileSystemInfo i)
         {
             var t = new Tree(parent) { Object = i };
             if (i.IsDirectory)

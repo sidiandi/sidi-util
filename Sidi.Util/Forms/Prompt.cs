@@ -85,21 +85,22 @@ namespace Sidi.Forms
 
         public static string EditInteractive(string text)
         {
-            string tf = null;
+            Sidi.IO.Path tf = null;
             try
             {
-                tf = Path.GetTempFileName();
-                File.WriteAllText(tf, text);
+                tf = Sidi.IO.Path.GetTempFileName();
+                Sidi.IO.File.WriteAllText(tf, text);
 
                 using (var p = new Process())
                 {
-
-                    p.StartInfo.FileName = new Sidi.IO.Long.Path(
+                    var fileName = new Sidi.IO.Path(
                         Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)).CatDir(
                         "Notepad++", "notepad++.exe");
+
+                    p.StartInfo.FileName = fileName;
                     p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
 
-                    if (!File.Exists(p.StartInfo.FileName))
+                    if (!fileName.Exists)
                     {
                         p.StartInfo.FileName = "notepad.exe";
                         p.StartInfo.Arguments = tf.Quote();
@@ -108,14 +109,14 @@ namespace Sidi.Forms
                     p.Start();
                     log.Info(p.DetailedInfo());
                     p.WaitForExit();
-                    return File.ReadAllText(tf);
+                    return Sidi.IO.File.ReadAllText(tf);
                 }
             }
             finally
             {
                 try
                 {
-                    File.Delete(tf);
+                    tf.EnsureNotExists();
                 }
                 catch
                 {

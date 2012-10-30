@@ -40,18 +40,18 @@ namespace Sidi.Persistence
         [SetUp()]
         public void SetUp()
         {
-            string path = TestFile("dictionary_test.sqlite");
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            path = TestFile("dictionary_test.sqlite");
+            path.EnsureNotExists();
             dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options");
         }
+
+        Sidi.IO.Path path;
 
         [TearDown()]
         public void TearDown()
         {
             dictionary.Dispose();
+            path.EnsureNotExists();
         }
 
         [Test()]

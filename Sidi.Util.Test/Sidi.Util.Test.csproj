@@ -135,14 +135,14 @@
     <Compile Include="IMAP\SessionTest.cs" />
     <Compile Include="IntSetTest.cs" />
     <Compile Include="IO\CopyTest.cs" />
-    <Compile Include="IO\Long\CopyProgressTest.cs" />
-    <Compile Include="IO\Long\Directory.cs" />
-    <Compile Include="IO\Long\Enum.cs" />
-    <Compile Include="IO\Long\File.cs" />
-    <Compile Include="IO\Long\EnumConfig.cs" />
-    <Compile Include="IO\Long\FileListTest.cs" />
-    <Compile Include="IO\Long\FileSystemInfo.cs" />
-    <Compile Include="IO\Long\PathTest.cs" />
+    <Compile Include="IO\CopyProgressTest.cs" />
+    <Compile Include="IO\Directory.cs" />
+    <Compile Include="IO\Enum.cs" />
+    <Compile Include="IO\File.cs" />
+    <Compile Include="IO\EnumConfig.cs" />
+    <Compile Include="IO\FileListTest.cs" />
+    <Compile Include="IO\FileSystemInfo.cs" />
+    <Compile Include="IO\PathTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
@@ -201,6 +201,9 @@
     <Content Include="x86\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IO\Long\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

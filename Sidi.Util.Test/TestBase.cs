@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sidi.IO;
+using L = Sidi.IO;
 using Sidi.Util;
 using System.Reflection;
 using log4net.Repository.Hierarchy;
@@ -53,11 +54,10 @@ namespace Sidi
         {
         }
 
-        protected Sidi.IO.Long.Path TestFile(string relPath)
+        protected Sidi.IO.Path TestFile(Sidi.IO.Path relPath)
         {
             var testFile = 
-                new Sidi.IO.Long.Path(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath)
-                .Parent
+                Paths.BinDir
                 .Parent
                 .CatDir("test", relPath);
             return testFile;

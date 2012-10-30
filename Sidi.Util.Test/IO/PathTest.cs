@@ -4,17 +4,11 @@ using System.Linq;
 using System.Text;
 using Sidi.Util;
 using NUnit.Framework;
-using Sidi.IO.Long.Extensions;
 using System.Xml.Serialization;
 using Sidi.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
-    [TestFixture]
-    public static class LongNameExTest
-    {
-    }
-
     [TestFixture]
     public class PathTest : TestBase
     {
@@ -67,7 +61,7 @@ namespace Sidi.IO.Long
         [Test]
         public void SpecialPaths()
         {
-            for (var p = System.Environment.SystemDirectory.Long(); p != null; p = p.Parent)
+            for (Sidi.IO.Path p = System.Environment.SystemDirectory; p != null; p = p.Parent)
             {
                 Console.WriteLine(p);
                 Assert.IsTrue(Directory.Exists(p));
@@ -78,14 +72,15 @@ namespace Sidi.IO.Long
         [Test]
         public void UncPaths()
         {
-            var tempDir = System.IO.Path.GetTempPath();
-            Assert.IsTrue(Directory.Exists(tempDir.Long()));
+            var tempDir = Path.GetTempPath();
+            Assert.IsTrue(tempDir.IsDirectory);
 
-            var unc = @"\\" + System.Environment.MachineName + @"\" + tempDir.Substring(0, 1) + "$" + tempDir.Substring(2);
+            log.Info(tempDir.DriveLetter);
+            var unc = @"\\" + System.Environment.MachineName + @"\" + tempDir.DriveLetter + "$";
             Assert.IsTrue(System.IO.Directory.Exists(unc));
 
-            var longNameUnc = unc.Long();
-            Assert.IsTrue(Directory.Exists(longNameUnc));
+            var longNameUnc = new Sidi.IO.Path(unc);
+            Assert.IsTrue(longNameUnc.IsDirectory);
             Assert.IsTrue(longNameUnc.IsUnc);
 
             tempDir = longNameUnc.NoPrefix;
@@ -119,7 +114,7 @@ namespace Sidi.IO.Long
         [Test]
         public void PathRoot()
         {
-            var n = System.IO.Path.GetTempPath().Long();
+            var n = Sidi.IO.Path.GetTempPath();
             Assert.AreEqual(System.IO.Path.GetPathRoot(n.NoPrefix), n.PathRoot.NoPrefix + @"\");
         }
 
@@ -158,7 +153,7 @@ namespace Sidi.IO.Long
         [Test]
         public void XmlSerialize()
         {
-            var n = System.IO.Path.GetTempPath().Long();
+            var n = Sidi.IO.Path.GetTempPath();
             var s = new XmlSerializer(typeof(Path));
             var t = new System.IO.StringWriter();
             s.Serialize(t, n);
@@ -190,7 +185,7 @@ namespace Sidi.IO.Long
         [Test]
         public void Sibling()
         {
-            Assert.IsTrue(new Sidi.IO.Long.Path(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
+            Assert.IsTrue(new Sidi.IO.Path(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
         }
 
         [Test]
@@ -200,6 +195,13 @@ namespace Sidi.IO.Long
             var p = Path.Join(@"C:\temp", someNum);
             Assert.AreEqual(new Path(@"C:\temp\123"), p);
             Assert.AreEqual(new Path(@"C:\temp\123\dir"), Path.Join(p, "dir"));
+        }
+
+        [Test]
+        public void GetRelativePath()
+        {
+            Assert.AreEqual(new Path("a.txt"), new Path(@"d:\temp\a.txt").GetRelative(@"d:\temp"));
+            Assert.AreEqual(new Path(".."), new Path(@"d:\temp").GetRelative(@"d:\temp\a.txt"));
         }
     }
 }

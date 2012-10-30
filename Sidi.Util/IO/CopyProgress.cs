@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Sidi.Util;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class CopyProgress
     {

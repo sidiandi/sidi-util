@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using Sidi.Util;
 using Sidi.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class FileList : List<Path>
     {
@@ -26,7 +26,7 @@ namespace Sidi.IO.Long
             var fileList = new FileList();
             fileList.AddRange(Clipboard.GetFileDropList()
                 .Cast<string>()
-                .Select(x => new Sidi.IO.Long.Path(x)));
+                .Select(x => new Sidi.IO.Path(x)));
             return fileList;
         }
 
@@ -37,7 +37,7 @@ namespace Sidi.IO.Long
                 return ReadClipboard();
             }
 
-            return new FileList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.Long.Path(x)));
+            return new FileList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.Path(x)));
         }
 
         public override string ToString()

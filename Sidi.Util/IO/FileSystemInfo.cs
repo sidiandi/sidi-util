@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sidi.IO.Long.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class FileSystemInfo : IEquatable<FileSystemInfo>
     {
@@ -54,6 +53,19 @@ namespace Sidi.IO.Long
             get
             {
                 return IsAttribute(System.IO.FileAttributes.ReadOnly);
+            }
+        }
+
+        public bool IsHidden
+        {
+            set
+            {
+                SetAttributes(System.IO.FileAttributes.Hidden, value);
+            }
+
+            get
+            {
+                return IsAttribute(System.IO.FileAttributes.Hidden);
             }
         }
 

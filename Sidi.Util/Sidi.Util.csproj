@@ -124,21 +124,20 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
-    <Compile Include="IO\Long\Paths.cs" />
-    <Compile Include="IO\Long\CopyOp.cs" />
-    <Compile Include="IO\Long\CopyProgress.cs" />
-    <Compile Include="IO\Long\Directory.cs" />
-    <Compile Include="IO\Long\FileEnumerator.cs" />
-    <Compile Include="IO\Long\Extensions\PathExtensions.cs" />
-    <Compile Include="IO\Long\File.cs" />
-    <Compile Include="IO\Long\FileEnum.cs" />
-    <Compile Include="IO\Long\FileList.cs" />
-    <Compile Include="IO\Long\FileSystemInfo.cs" />
-    <Compile Include="IO\Long\FileType.cs" />
-    <Compile Include="IO\Long\FindData.cs" />
-    <Compile Include="IO\Long\Kernel32.cs" />
-    <Compile Include="IO\Long\Path.cs" />
-    <Compile Include="IO\Long\PathTypeConverter.cs" />
+    <Compile Include="IO\Paths.cs" />
+    <Compile Include="IO\CopyOp.cs" />
+    <Compile Include="IO\CopyProgress.cs" />
+    <Compile Include="IO\Directory.cs" />
+    <Compile Include="IO\Find.cs" />
+    <Compile Include="IO\File.cs" />
+    <Compile Include="IO\FileEnum.cs" />
+    <Compile Include="IO\FileList.cs" />
+    <Compile Include="IO\FileSystemInfo.cs" />
+    <Compile Include="IO\FileType.cs" />
+    <Compile Include="IO\FindData.cs" />
+    <Compile Include="IO\Kernel32.cs" />
+    <Compile Include="IO\Path.cs" />
+    <Compile Include="IO\PathTypeConverter.cs" />
     <Compile Include="IO\NativeMethods.cs" />
     <Compile Include="Net\Abnf.cs" />
     <Compile Include="Net\HtmlCodeWriter.cs" />
@@ -153,7 +152,6 @@
     <Compile Include="CommandLine\ShowUserInterface.cs" />
     <Compile Include="Util\Comparer.cs" />
     <Compile Include="IO\Copy.cs" />
-    <Compile Include="IO\Find.cs" />
     <Compile Include="Forms\BossController.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -198,8 +196,8 @@
     <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\Interval.cs" />
     <Compile Include="Collections\IntSet.cs" />
-    <Compile Include="IO\PathExtensions.cs" />
-    <Compile Include="IO\Long\SearchPath.cs" />
+    <None Include="IO\PathExtensions.cs" />
+    <Compile Include="IO\SearchPath.cs" />
     <Compile Include="Util\ListEx.cs" />
     <Compile Include="Collections\LruCache.cs" />
     <Compile Include="Collections\LruCacheBackground.cs" />

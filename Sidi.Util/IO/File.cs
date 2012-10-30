@@ -6,7 +6,7 @@ using System.ComponentModel;
 using Sidi.Util;
 using System.Runtime.InteropServices;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class File
     {

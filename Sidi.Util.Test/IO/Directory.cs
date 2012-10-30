@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     [TestFixture]
     public class DirectoryTest

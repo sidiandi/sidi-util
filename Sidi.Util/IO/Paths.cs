@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Reflection;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public static class Paths
     {

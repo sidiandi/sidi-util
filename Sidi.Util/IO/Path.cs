@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Reflection;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class Path : IXmlSerializable
     {
@@ -37,6 +37,21 @@ namespace Sidi.IO.Long
         public static implicit operator string(Path path)
         {
             return path.path;
+        }
+
+        public static Path GetTempFileName()
+        {
+            return new Path(System.IO.Path.GetTempFileName());
+        }
+
+        public static Path GetTempPath()
+        {
+            return new Path(System.IO.Path.GetTempPath());
+        }
+
+        public string Quote()
+        {
+            return this.ToString().Quote();
         }
 
         public void RemoveEmptyDirectories()
@@ -196,6 +211,22 @@ namespace Sidi.IO.Long
             get
             {
                 return new Path(Parts.Take(1));
+            }
+        }
+
+        public string DriveLetter
+        {
+            get
+            {
+                var r = PathRoot.ToString();
+                if (r.Length == 2 && r[1] == ':')
+                {
+                    return r[0].ToString();
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
             }
         }
 
@@ -400,9 +431,40 @@ namespace Sidi.IO.Long
             return Parent.CatDir(siblingName);
         }
 
+        /// <summary>
+        /// Returns this path written relative to basePath
+        /// </summary>
+        /// <param name="basePath"></param>
+        /// <returns></returns>
         public Path GetRelative(Path basePath)
         {
-            throw new NotImplementedException();
+            var path = this.GetFullPath();
+            basePath = basePath.GetFullPath();
+            List<string> result = new List<string>();
+
+            var p = path.Parts;
+            var b = basePath.Parts;
+
+            int different = 0;
+            for (different = 0; different < p.Length && different < b.Length; ++different)
+            {
+                if (!p[different].Equals(b[different]))
+                {
+                    break;
+                }
+            }
+
+            for (int i = different; i < b.Length; ++i)
+            {
+                result.Add("..");
+            }
+
+            for (int i = different; i < p.Length; ++i)
+            {
+                result.Add(p[i]);
+            }
+
+            return new Path(result);
         }
         
         public Path Parent
@@ -558,6 +620,24 @@ namespace Sidi.IO.Long
             var rp = root.Parts;
 
             return new Path(Parts.Skip(rp.Length));
+        }
+
+        public bool IsDirectory
+        {
+            get
+            {
+                var info = this.Info;
+                return info.Exists && info.IsDirectory;
+            }
+        }
+
+        public bool IsFile
+        {
+            get
+            {
+                var info = this.Info;
+                return info.Exists && !info.IsDirectory;
+            }
         }
 
         public void EnsureNotExists()

@@ -5,7 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class Directory
     {

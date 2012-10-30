@@ -6,10 +6,9 @@ using Sidi.Util;
 using System.IO;
 using NUnit.Framework;
 using Sidi.CommandLine;
-using Sidi.IO.Long.Extensions;
 using Sidi.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
         [TestFixture]
         public class EnumTest : TestBase
@@ -19,7 +18,7 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Depth()
             {
-                var e = new FileEnumerator()
+                var e = new Find()
                 {
                     Root = TestTree,
                 };
@@ -33,7 +32,7 @@ namespace Sidi.IO.Long
             [Test, Explicit]
             public void Breadth()
             {
-                var e = new FileEnumerator()
+                var e = new Find()
                 {
                     Root = TestTree
                 };
@@ -48,9 +47,9 @@ namespace Sidi.IO.Long
             [Test]
             public void Output()
             {
-                var e = new FileEnumerator()
+                var e = new Find()
                 {
-                    Output = FileEnumerator.OnlyFiles,
+                    Output = Find.OnlyFiles,
                     Root = TestTree
                 };
                 var files = e.Depth().ToList();
@@ -61,14 +60,14 @@ namespace Sidi.IO.Long
             [Test]
             public void NotExists()
             {
-                var files = FileEnumerator.AllFiles(new Path(@"C:\does_not_exist_4352345234234")).ToList();
+                var files = Find.AllFiles(new Path(@"C:\does_not_exist_4352345234234")).ToList();
                 Assert.AreEqual(0, files.Count);
             }
 
             [Test]
             public void Dump()
             {
-                var e = new FileEnumerator()
+                var e = new Find()
                 {
                     Root = TestFile("."),
                 };
@@ -83,10 +82,10 @@ namespace Sidi.IO.Long
             public void FileType()
             {
                 var fileType = new FileType("exe");
-                var e = new FileEnumerator()
+                var e = new Find()
                 {
-                    Output = x => FileEnumerator.OnlyFiles(x) && fileType.Is(x.Name),
-                    Follow = x => FileEnumerator.NoDotNoHidden(x) && x.Name != "test",
+                    Output = x => Find.OnlyFiles(x) && fileType.Is(x.Name),
+                    Follow = x => Find.NoDotNoHidden(x) && x.Name != "test",
                     Root = TestTree
                 };
                 
@@ -98,9 +97,9 @@ namespace Sidi.IO.Long
             [Test]
             public void Unique()
             {
-                var e = new FileEnumerator()
+                var e = new Find()
                 {
-                    Output = FileEnumerator.OnlyFiles,
+                    Output = Find.OnlyFiles,
                     Root = TestTree,
                 };
 

@@ -7,7 +7,7 @@ using Com = System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     internal class FindHandle : SafeHandleZeroOrMinusOneIsInvalid
     {

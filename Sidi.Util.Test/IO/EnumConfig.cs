@@ -8,10 +8,10 @@ using NUnit.Framework;
 using Sidi.CommandLine;
 using System.Text.RegularExpressions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     /// <summary>
-    /// Command line parser interface for Sidi.IO.Long.Enum
+    /// Command line parser interface for Sidi.IO.Enum
     /// </summary>
     public class EnumConfigTest
     {

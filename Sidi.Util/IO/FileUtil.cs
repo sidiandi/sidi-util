@@ -24,7 +24,7 @@ using Sidi.Util;
 using Sidi.Extensions;
 using System.Runtime.InteropServices;
 using System.Linq;
-using L = Sidi.IO.Long;
+using L = Sidi.IO;
 
 namespace Sidi.IO
 {

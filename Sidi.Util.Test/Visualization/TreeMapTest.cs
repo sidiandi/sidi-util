@@ -7,9 +7,8 @@ using Sidi.Forms;
 using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO;
-using Sidi.IO.Long;
+using Sidi.IO;
 using System.Diagnostics;
-using Sidi.IO.Long.Extensions;
 using System.Text.RegularExpressions;
 
 namespace Sidi.Visualization

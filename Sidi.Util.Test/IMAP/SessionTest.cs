@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Sidi.Util;
-using Sidi.IO.Long;
-using Sidi.IO.Long.Extensions;
+using Sidi.IO;
 using System.IO;
 using Sidi.Extensions;
 

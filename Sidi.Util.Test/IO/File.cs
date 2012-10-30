@@ -5,9 +5,8 @@ using System.Text;
 using System.ComponentModel;
 using NUnit.Framework;
 using Sidi.Util;
-using Sidi.IO.Long.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
         [TestFixture]
         public class FileTest : TestBase
@@ -72,7 +71,7 @@ namespace Sidi.IO.Long
             public void Copy()
             {
                 CreateSampleFile(lp);
-                var lpCopy = (lp.ToString() + ".copy").Long();
+                var lpCopy = lp.CatName(".copy");
                 File.Copy(lp, lpCopy);
                 Assert.IsTrue(File.Exists(lpCopy));
 
@@ -110,7 +109,7 @@ namespace Sidi.IO.Long
             public void HardLink()
             {
                 CreateSampleFile(lp);
-                var lpCopy = (lp.ToString() + ".link").Long();
+                var lpCopy = lp.CatName(".link");
                 File.CreateHardLink(lpCopy, lp);
                 Assert.IsTrue(File.Exists(lpCopy));
                 log.Info(Directory.GetChilds(lp.Parent));

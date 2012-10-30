@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     public class CopyOp
     {
@@ -41,10 +41,10 @@ namespace Sidi.IO.Long
 
         public void CopyRooted(Path source, Path sourceRoot, Path destinationRoot)
         {
-            var e = new FileEnumerator()
+            var e = new Find()
             {
                 Root = source,
-                Output = FileEnumerator.OnlyFiles,
+                Output = Find.OnlyFiles,
             };
 
             foreach (var s in e.Depth())

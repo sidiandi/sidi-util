@@ -251,7 +251,10 @@ namespace Sidi.Extensions
         {
             using (var r = new StringReader(text))
             {
-                return r.ReadLines();
+                for (string line = r.ReadLine(); line != null; line = r.ReadLine())
+                {
+                    yield return line;
+                }
             }
         }
 

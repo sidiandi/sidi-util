@@ -29,7 +29,7 @@ using Sidi.Util;
 using System.Linq;
 using System.Threading;
 using System.Net;
-using Sidi.IO.Long;
+using Sidi.IO;
 using Sidi.Extensions;
 
 namespace Sidi.CommandLine.Test
@@ -306,9 +306,9 @@ namespace Sidi.CommandLine.Test
             [Usage("Directory list")]
             public void Files(string dir)
             {
-                var e = new Sidi.IO.Long.FileEnumerator()
+                var e = new Sidi.IO.Find()
                 {
-                    Root = new Sidi.IO.Long.Path(dir)
+                    Root = new Sidi.IO.Path(dir)
                 };
 
                 foreach (var f in e.Depth())
