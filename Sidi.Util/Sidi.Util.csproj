@@ -128,7 +128,7 @@
     <Compile Include="IO\Long\CopyOp.cs" />
     <Compile Include="IO\Long\CopyProgress.cs" />
     <Compile Include="IO\Long\Directory.cs" />
-    <Compile Include="IO\Long\Enum.cs" />
+    <Compile Include="IO\Long\FileEnumerator.cs" />
     <Compile Include="IO\Long\Extensions\PathExtensions.cs" />
     <Compile Include="IO\Long\File.cs" />
     <Compile Include="IO\Long\FileEnum.cs" />
