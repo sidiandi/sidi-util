@@ -73,7 +73,7 @@ namespace Sidi.Visualization
             }
         }
 
-        new public Func<T, IEnumerable> GetLineage
+        public Func<T, IEnumerable> GetLineage
         {
             set
             {

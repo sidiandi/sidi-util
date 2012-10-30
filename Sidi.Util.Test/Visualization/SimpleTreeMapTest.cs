@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO;
 using Sidi.Extensions;
-using Sidi.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using L = Sidi.IO;
