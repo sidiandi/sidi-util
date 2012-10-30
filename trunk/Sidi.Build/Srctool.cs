@@ -72,7 +72,7 @@ namespace Sidi.Build
         public void Extract(string pdbFile)
         {
             var pdbFilePath = new Sidi.IO.Path(pdbFile);
-            if (pdbFilePath.IsFile)
+            if (!pdbFilePath.IsFile)
             {
                 throw new FileNotFoundException(pdbFile);
             }
