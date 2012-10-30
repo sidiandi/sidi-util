@@ -73,7 +73,7 @@ namespace Sidi.Visualization
             tm.GetDistinctColor = x => x.Extension;
             tm.GetSize = x => x.Info.Length;
             tm.Activate = x => MessageBox.Show(x.ToString());
-            tm.GetText = x => x.Name;
+            tm.GetText = x => x.FileName;
             tm.Items = files;
             tm.RunFullScreen();
         }
@@ -88,7 +88,7 @@ namespace Sidi.Visualization
                 GetSize = x => x.Info.Length,
                 Activate = x => MessageBox.Show(x.ToString()),
                 Items = files,
-                GetText = x => x.Name,
+                GetText = x => x.FileName,
             };
 
             // tm.SetPercentileColorScale(i => i.Info.LastWriteTime, Sidi.Visualization.ColorScale.GreenYellowRed());

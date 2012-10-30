@@ -203,5 +203,14 @@ namespace Sidi.IO
             Assert.AreEqual(new Path("a.txt"), new Path(@"d:\temp\a.txt").GetRelative(@"d:\temp"));
             Assert.AreEqual(new Path(".."), new Path(@"d:\temp").GetRelative(@"d:\temp\a.txt"));
         }
+
+        [Test]
+        public void HasExtension()
+        {
+            var p = new Path("a.txt");
+            Assert.IsTrue(p.HasExtension);
+            p = p.ChangeExtension(null);
+            Assert.IsFalse(p.HasExtension);
+        }
     }
 }

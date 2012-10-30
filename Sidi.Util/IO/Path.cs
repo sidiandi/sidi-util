@@ -12,11 +12,15 @@ namespace Sidi.IO
 {
     public class Path : IXmlSerializable
     {
+        string path;
+        static Path empty = new Path();
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         const string pathPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
         const string shortUncPrefix = @"\\";
+        const string extensionSeparator = ".";
 
         static Regex invalidFilenameRegex = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
@@ -337,6 +341,14 @@ namespace Sidi.IO
 
             return full;
         }
+
+        public bool HasExtension
+        {
+            get
+            {
+                return !String.IsNullOrEmpty(Extension);
+            }
+        }
         
         public Path CatDir(IEnumerable<string> parts)
         {
@@ -414,16 +426,25 @@ namespace Sidi.IO
             }
         }
 
-        string path;
-
         /// <summary>
         /// Replaces the file extension of a path. 
         /// </summary>
-        /// <param name="newExtension">New extension (without dot)</param>
+        /// <param name="newExtension">New extension (with or without dot)</param>
         /// <returns></returns>
-        public Path ReplaceExtension(string newExtension)
+        public Path ChangeExtension(string newExtension)
         {
-            return Parent.CatDir(FileNameWithoutExtension + "." + newExtension);
+            if (newExtension == null)
+            {
+                return Parent.CatDir(FileNameWithoutExtension);
+            }
+            else
+            {
+                if (!newExtension.StartsWith(extensionSeparator, StringComparison.OrdinalIgnoreCase))
+                {
+                    newExtension = extensionSeparator + newExtension;
+                }
+                return Parent.CatDir(FileNameWithoutExtension + newExtension);
+            }
         }
 
         public Path Sibling(string siblingName)
@@ -499,7 +520,7 @@ namespace Sidi.IO
             }
         }
 
-        public string Name
+        public string FileName
         {
             get
             {
@@ -595,8 +616,6 @@ namespace Sidi.IO
                 return empty;
             }
         }
-        static Path empty = new Path();
-
         
         public override bool Equals(object obj)
         {
@@ -687,7 +706,7 @@ namespace Sidi.IO
         {
             get
             {
-                return System.IO.Path.GetExtension(Name);
+                return System.IO.Path.GetExtension(FileName);
             }
         }
 
@@ -695,7 +714,7 @@ namespace Sidi.IO
         {
             get
             {
-                return System.IO.Path.GetFileNameWithoutExtension(Name);
+                return System.IO.Path.GetFileNameWithoutExtension(FileName);
             }
         }
 

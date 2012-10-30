@@ -79,7 +79,7 @@ namespace Sidi.Build.Test
                 throw new FileNotFoundException(pdbFile);
             }
 
-            string pdbFileIndexed = TestFile(pdbFile.Name);
+            string pdbFileIndexed = TestFile(pdbFile.FileName);
 
             Sidi.IO.File.Copy(pdbFile, pdbFileIndexed, true);
 
