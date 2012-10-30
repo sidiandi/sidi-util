@@ -8,11 +8,10 @@ using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO;
 using Sidi.Extensions;
-using Sidi.IO.Long;
+using Sidi.IO;
 using System.Diagnostics;
-using Sidi.IO.Long.Extensions;
 using System.Text.RegularExpressions;
-using L = Sidi.IO.Long;
+using L = Sidi.IO;
 
 namespace Sidi.Visualization
 {
@@ -23,7 +22,7 @@ namespace Sidi.Visualization
         public void Simple()
         {
             var file = TestFile(@"mail\message-1-1456.eml");
-            var words = Regex.Split(File.ReadAllText(new Sidi.IO.Long.Path(file)), @"\s+");
+            var words = Regex.Split(File.ReadAllText(new Sidi.IO.Path(file)), @"\s+");
             var st = new SimpleTreeMap();
             st.GroupBy = x =>
                 {

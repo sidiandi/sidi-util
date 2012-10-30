@@ -94,7 +94,7 @@ namespace Sidi.Util
         public static HashSet<Type> acceptableTypes = new HashSet<Type>(new[]
         {
             typeof(System.String),
-            typeof(Sidi.IO.Long.Path)
+            typeof(Sidi.IO.Path)
         });
 
         static bool HasAcceptableToStringMethod(Type t)

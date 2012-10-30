@@ -23,7 +23,7 @@ using System.Reflection;
 using System.Xml.Serialization;
 using System.Net;
 using System.IO;
-using Sidi.IO;
+using L = Sidi.IO;
 using System.Threading;
 using System.Net.Cache;
 using System.Windows.Forms;
@@ -56,7 +56,7 @@ namespace Sidi.Util
         public void Write(string outFile)
         {
             XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
-            using (Stream f = File.OpenWrite(outFile))
+            using (Stream f = L.File.OpenWrite(outFile))
             {
                 s.Serialize(f, this);
             }

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sidi.IO.Long;
+using Sidi.IO;
 using System.Text.RegularExpressions;
 using System.Globalization;
-using Sidi.IO.Long.Extensions;
 
 namespace Sidi.IMAP
 {
@@ -129,7 +128,7 @@ namespace Sidi.IMAP
             get
             {
                 var rootLength = directory.NoPrefix.Length;
-                var e = new Sidi.IO.Long.FileEnumerator()
+                var e = new Sidi.IO.Find()
                 {
                     Root = directory,
                     Output = x => x.IsDirectory,
@@ -153,7 +152,7 @@ namespace Sidi.IMAP
 
         public IMailbox GetMailbox(string name)
         {
-            return new EmlMailbox(directory.CatDir(name.Replace(Delimiter, Sidi.IO.Long.Path.DirectorySeparator)));
+            return new EmlMailbox(directory.CatDir(name.Replace(Delimiter, Sidi.IO.Path.DirectorySeparator)));
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
-using Sidi.IO.Long;
+using Sidi.IO;
 using System.Drawing.Drawing2D;
 using Sidi.Extensions;
 

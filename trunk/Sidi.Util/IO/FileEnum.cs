@@ -6,18 +6,17 @@ using Sidi.Util;
 using System.IO;
 using Sidi.CommandLine;
 using System.Text.RegularExpressions;
-using Sidi.IO.Long.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     /// <summary>
-    /// Command line parser interface for Sidi.IO.Long.Enum
+    /// Command line parser interface for Sidi.IO.Enum
     /// </summary>
     public class EnumConfig
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public FileEnumerator Enumerator = new FileEnumerator();
+        public Find Enumerator = new Find();
         List<Regex> exclude = new List<Regex>();
         
         public EnumConfig()

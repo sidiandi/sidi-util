@@ -15,7 +15,6 @@ namespace Sidi.Net
     {
         public HtmlGenerator()
         {
-            Catch = e => { throw e; };
         }
 
         public Action<TextWriter> Tag(string tag, params object[] childs)
@@ -35,15 +34,15 @@ namespace Sidi.Net
                         RenderChild(o, i);
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    if (tag == "body")
+                    if (Catch == null)
                     {
-                        this.Verbose(x => x.WriteLine(e.ToString()))(o);
+                        throw;
                     }
                     else
                     {
-                        throw new Exception(tag, e);
+                        Catch(ex)(o);
                     }
                 }
                 finally

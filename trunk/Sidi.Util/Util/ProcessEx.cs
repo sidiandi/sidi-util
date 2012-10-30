@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
-using Sidi.IO;
+using L = Sidi.IO;
 using System.Linq;
 
 namespace Sidi.Util
@@ -57,7 +57,7 @@ namespace Sidi.Util
 
         public static bool IsAlreadyRunning(this Process p)
         {
-            var sp = Sidi.IO.Long.SearchPath.PATH;
+            var sp = Sidi.IO.SearchPath.PATH;
             sp.Paths.Insert(0, p.StartInfo.WorkingDirectory);
             string pFilename = Path.GetFullPath(sp.Find(p.StartInfo.FileName)).ToLower();
 

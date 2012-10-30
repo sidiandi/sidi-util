@@ -5,7 +5,7 @@ using System.Text;
 using ComTypes=System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct FindData

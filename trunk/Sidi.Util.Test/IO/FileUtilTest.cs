@@ -83,14 +83,6 @@ namespace Sidi.Util
             Assert.AreEqual(@".\a".GetRelativePath(@"."), @"a");
             Assert.AreEqual(@".".GetRelativePath(@".\a"), @"..");
         }
-
-        [Test]
-        public void GetFileSystemInfo()
-        {
-            string p = TestFile(".");
-            FileSystemInfo fi = p.GetFileSystemInfo();
-            Assert.AreEqual(Path.GetDirectoryName(p), fi.FullName);
-        }
     }
 
 }

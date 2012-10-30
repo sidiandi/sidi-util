@@ -4,7 +4,6 @@
     <StartProgram>C:\work\sidi-util\lib\\NUnit\bin\net-2.0\nunit.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
-  <Import Project="..\Common.Targets" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartAction>Program</StartAction>
     <StartProgram>$(LibDir)\NUnit\bin\net-2.0\nunit.exe</StartProgram>

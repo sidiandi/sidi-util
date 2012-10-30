@@ -23,7 +23,7 @@ using NUnit.Framework;
 using Sidi.IO;
 using System.IO;
 using Sidi.Build;
-using L = Sidi.IO.Long;
+using L = Sidi.IO;
 
 namespace Sidi.Build.Test
 {
@@ -54,7 +54,7 @@ namespace Sidi.Build.Test
             instance = new Srctool();
         }
 
-        string pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
+        Sidi.IO.Path pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
 
         /// <summary>
         /// Dump source information of a PDB file
@@ -74,14 +74,14 @@ namespace Sidi.Build.Test
         [Test]
         public void Instrument()
         {
-            if (!File.Exists(pdbFile))
+            if (!System.IO.File.Exists(pdbFile))
             {
                 throw new FileNotFoundException(pdbFile);
             }
 
-            string pdbFileIndexed = TestFile(Path.GetFileName(pdbFile));
+            string pdbFileIndexed = TestFile(pdbFile.Name);
 
-            File.Copy(pdbFile, pdbFileIndexed, true);
+            Sidi.IO.File.Copy(pdbFile, pdbFileIndexed, true);
 
             StringWriter w = new StringWriter();
 

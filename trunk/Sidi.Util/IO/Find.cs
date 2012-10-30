@@ -1,93 +1,167 @@
-// Copyright (c) 2009, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
-// 
-// This file is part of sidi-util.
-// 
-// sidi-util is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// sidi-util is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Sidi.Util;
 using System.IO;
+using Sidi.CommandLine;
 
 namespace Sidi.IO
 {
     public class Find
     {
-        public void Recurse(string path, FileHandler handler)
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public Find()
         {
-            Recurse(Sidi.IO.FileUtil.GetFileSystemInfo(path), handler);
+            Visit = x => { };
+            Follow = x => true;
+            Output = x => true;
         }
 
-        int m_maxLevel = Int32.MaxValue;
-
-        public int MaxLevel
+        public static IEnumerable<FileSystemInfo> AllFiles(Path root)
         {
-            get { return m_maxLevel; }
-            set { m_maxLevel = value; }
-        }
-
-        int m_level = 0;
-
-        public int Level
-        {
-            get { return m_level; }
-        }
-
-        public void Recurse(FileSystemInfo file, FileHandler handler)
-        {
-            OnFile = handler;
-            MaxLevel = Int32.MaxValue;
-            Recurse(file, 0);
-        }
-
-        public void Recurse(FileSystemInfo file)
-        {
-            Recurse(file, 0);
-        }
-
-        void Recurse(FileSystemInfo file, int level)
-        {
-            m_level = level;
-
-            DirectoryInfo d = file as DirectoryInfo;
-            if (d == null)
+            var e = new Find()
             {
-                FileInfo f = file as FileInfo;
-                if (f != null)
+                Root = root,
+                Output = Find.OnlyFiles,
+            };
+            return e.Depth();
+        }
+
+        public static Find Parse(string text)
+        {
+            var list = FileList.Parse(text);
+            return new Find()
+            {
+                Output = OnlyFiles,
+                Roots = list
+            };
+        }
+        
+        /// <summary>
+        /// Set this function to decide which files should be returned.
+        /// </summary>
+        public Func<FileSystemInfo, bool> Output { set; get; }
+
+        /// <summary>
+        /// Set this function to decide which directories should be followed.
+        /// </summary>
+        public Func<FileSystemInfo, bool> Follow { set; get; }
+
+        /// <summary>
+        /// Set this function to see every file, not matter if output or not.
+        /// </summary>
+        public Action<FileSystemInfo> Visit { set; get; }
+
+        /// <summary>
+        /// Counts the visited files
+        /// </summary>
+        public int Count { private set; get; }
+        
+        /// <summary>
+        /// List of start paths for Depth() and Breath(). Multiple start roots are supported.
+        /// </summary>
+        public IList<Path> Roots = new List<Path>();
+
+        /// <summary>
+        /// Sets a single root path. Roots will then have exactly one element.
+        /// </summary>
+        public Path Root
+        {
+            set
+            {
+                Roots = new List<Path>() { value };
+            }
+        }
+
+        /// <summary>
+        /// Recurses all start roots depth-first
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<FileSystemInfo> Depth()
+        {
+            Count = 0;
+            var stack = new List<FileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+
+            for (; stack.Count > 0; )
+            {
+                var i = stack.First();
+                stack.RemoveAt(0);
+
+                Visit(i);
+
+                if (Output(i))
                 {
-                    if (OnFile != null) OnFile(f);
+                    yield return i;
+                }
+
+                if (MustFollow(i))
+                {
+                    stack.InsertRange(0, i.GetFileSystemInfos());
                 }
             }
-            else
-            {
-                if (OnDirectory != null) OnDirectory(d);
+        }
 
-                if (level < m_maxLevel)
+        /// <summary>
+        /// Recurses all start roots breadth-first
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<FileSystemInfo> Breadth()
+        {
+            Count = 0;
+            var stack = new List<FileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+
+            for (; stack.Count > 0; )
+            {
+                var i = stack.First();
+                stack.RemoveAt(0);
+
+                Visit(i);
+
+                if (Output(i))
                 {
-                    ++level;
-                    foreach (FileSystemInfo i in d.GetFileSystemInfos())
-                    {
-                        Recurse(i, level);
-                    }
+                    yield return i;
+                    ++Count;
+                }
+
+                if (i.IsDirectory && Follow(i))
+                {
+                    stack.InsertRange(stack.Count, i.GetFileSystemInfos());
                 }
             }
         }
 
-        public delegate void DirectoryHandler(DirectoryInfo directory);
-        public DirectoryHandler OnDirectory = null;
+        DateTime nextReport = DateTime.MinValue;
 
-        public delegate void FileHandler(FileInfo file);
-        public FileHandler OnFile = null;
+        bool MustFollow(FileSystemInfo i)
+        {
+            var f = i.IsDirectory && Follow(i);
+            if (f)
+            {
+                log.DebugFormat("Follow {0}", i);
+            }
+            return f;
+        }
+
+        /// <summary>
+        /// Follows files only
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static bool OnlyFiles(FileSystemInfo i)
+        {
+            return !i.IsDirectory;
+        }
+
+        /// <summary>
+        /// Only follows elements which do not start with . and are not hidden
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static bool NoDotNoHidden(FileSystemInfo i)
+        {
+            return !i.Hidden && !i.Name.StartsWith(".");
+        }
     }
 }

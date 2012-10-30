@@ -18,6 +18,7 @@ using Sidi.IO;
 using Sidi.Net;
 using Sidi.Extensions;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 
 namespace Sidi.CommandLine
 {
@@ -98,7 +99,7 @@ namespace Sidi.CommandLine
         [Usage("Display web server in the default web browser")]
         public void Browse()
         {
-            this.Prefix.ShellOpen();
+            Process.Start(this.Prefix);
         }
 
         void ServerThread()

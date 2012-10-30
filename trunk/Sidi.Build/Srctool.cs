@@ -42,7 +42,7 @@ namespace Sidi.Build
         {
         }
 
-        Sidi.IO.Long.Path Program
+        Sidi.IO.Path Program
         {
             get
             {
@@ -57,7 +57,8 @@ namespace Sidi.Build
         /// <returns>Sequence of source file names</returns>
         public IEnumerable<string> DumpRaw(string pdbFile)
         {
-            if (!File.Exists(pdbFile))
+            var pdbFilePath = new Sidi.IO.Path(pdbFile);
+            if (!pdbFilePath.IsFile)
             {
                 throw new FileNotFoundException(pdbFile);
             }
@@ -70,7 +71,8 @@ namespace Sidi.Build
 
         public void Extract(string pdbFile)
         {
-            if (!File.Exists(pdbFile))
+            var pdbFilePath = new Sidi.IO.Path(pdbFile);
+            if (pdbFilePath.IsFile)
             {
                 throw new FileNotFoundException(pdbFile);
             }

@@ -21,7 +21,7 @@ using System.Text;
 using System.IO;
 using Sidi.Util;
 using Sidi.Extensions;
-using L = Sidi.IO.Long;
+using L = Sidi.IO;
 
 namespace Sidi.IO
 {
@@ -34,11 +34,11 @@ namespace Sidi.IO
             CopyCondition = x => true;
         }
 
-        public void CopyToDir(IEnumerable<string> files, string destinationDir)
+        public void CopyToDir(IEnumerable<Path> files, Path destinationDir)
         {
-            foreach (string s in files)
+            foreach (var s in files)
             {
-                string d = Path.Combine(destinationDir, Path.GetFileName(s));
+                string d = destinationDir.CatDir(s.Name);
                 FastCopy(s, d);
             }
         }
@@ -49,20 +49,20 @@ namespace Sidi.IO
         /// <param name="s"></param>
         /// <param name="destinationDir"></param>
         /// <returns>The destination path of the file</returns>
-        public string CopyToDir(string s, string destinationDir)
+        public string CopyToDir(Path s, Path destinationDir)
         {
-            string d = Path.Combine(destinationDir, Path.GetFileName(s));
+            string d = destinationDir.CatDir(s.Name);
             FastCopy(s, d);
             return d;
         }
 
-        public bool FastCopy(string source, string dest)
+        public bool FastCopy(Path source, Path dest)
         {
-            new L.Path(dest).EnsureParentDirectoryExists();
+            dest.EnsureParentDirectoryExists();
             return FastCopyNoCreateDir(source, dest);
         }
 
-        public Func<string, bool> CopyCondition { get; set; }
+        public Func<Path, bool> CopyCondition { get; set; }
 
         /// <summary>
         /// Used by FastCopy to decide if a file must be copied or can be skipped
@@ -70,7 +70,7 @@ namespace Sidi.IO
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <returns></returns>
-        public virtual bool CanSkipCopy(string source, string dest)
+        public virtual bool CanSkipCopy(Path source, Path dest)
         {
             if (!CopyCondition(source))
             {
@@ -82,20 +82,20 @@ namespace Sidi.IO
 
         public string RenameLockedDestinationFilesExtension = "renamed-to-overwrite";
 
-        public bool FastCopyNoCreateDir(string source, string dest)
+        public bool FastCopyNoCreateDir(Path source, Path dest)
         {
-            FileInfo si = new FileInfo(source);
-            FileInfo di = new FileInfo(dest);
+            var si = source.Info;
+            var di = dest.Info;
             bool copied = false;
 
             if (!CanSkipCopy(source, dest))
             {
                 if (di.Exists && OverwriteReadOnly)
                 {
-                    FileInfo destFileInfo = new FileInfo(dest);
-                    if ((destFileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    var destFileInfo = dest.Info;
+                    if (destFileInfo.IsReadOnly)
                     {
-                        destFileInfo.Attributes = (FileAttributes)(destFileInfo.Attributes - FileAttributes.ReadOnly);
+                        destFileInfo.IsReadOnly = false;
                     }
                 }
 
@@ -132,12 +132,12 @@ namespace Sidi.IO
                     new FileInfo(dest).IsReadOnly = false;
                 }
 
-                log.InfoFormat("Copy {0} -> {1}", source.Printable(), dest.Printable());
+                log.InfoFormat("Copy {0} -> {1}", source, dest);
                 copied = true;
             }
             else
             {
-                log.InfoFormat("Skip: {0} -> {1}", source.Printable(), dest.Printable());
+                log.InfoFormat("Skip: {0} -> {1}", source, dest);
             }
             return copied;
         }
@@ -156,9 +156,9 @@ namespace Sidi.IO
             CopyRecursive(source, dest, 0);
         }
 
-        public void CopyRecursive(string source, string dest, int numberOfCopiedDirectoryLevels)
+        public void CopyRecursive(Path source, Path dest, int numberOfCopiedDirectoryLevels)
         {
-            string[] parts = source.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
+            string[] parts = source.Parts;
             if (parts.Length < numberOfCopiedDirectoryLevels)
             {
                 throw new ArgumentOutOfRangeException("numberOfCopiedDirectoryLevels", numberOfCopiedDirectoryLevels, "must be equal or less the number of directories in source");
@@ -168,15 +168,15 @@ namespace Sidi.IO
             {
                 if (i >= parts.Length - numberOfCopiedDirectoryLevels)
                 {
-                    dest = Path.Combine(dest, parts[i]);
+                    dest = dest.CatDir(parts[i]);
                 }
             }
 
-            if (Directory.Exists(source))
+            if (source.IsDirectory)
             {
-                DirectoryInfo d = new DirectoryInfo(source);
+                var d = source.Info;
 
-                if ((d.Attributes & FileAttributes.Hidden) != 0)
+                if (d.IsHidden)
                 {
                     return;
                 }
@@ -184,7 +184,7 @@ namespace Sidi.IO
                 log.Info(d.FullName);
                 foreach (FileSystemInfo i in d.GetFileSystemInfos())
                 {
-                    CopyRecursive(i.FullName, Path.Combine(dest, i.Name));
+                    CopyRecursive(i.FullName, dest.CatDir(i.Name));
                 }
             }
             else
@@ -195,7 +195,7 @@ namespace Sidi.IO
 
         public void IncrementalCopy(L.Path source, L.Path dest, L.Path existingCopy)
         {
-            foreach (var sInfo in L.FileEnumerator.AllFiles(source))
+            foreach (var sInfo in L.Find.AllFiles(source))
             {
                 var s = sInfo.FullName;
                 var relativePath = s.GetRelative(source);
@@ -204,7 +204,7 @@ namespace Sidi.IO
 
                 if (sInfo.IsDirectory)
                 {
-                    Directory.CreateDirectory(d);
+                    Sidi.IO.Directory.Create(d);
                 }
                 else
                 {
@@ -229,24 +229,27 @@ namespace Sidi.IO
         /// Delete all files in directory dir. Does not recurse into sub directories.
         /// </summary>
         /// <param name="dir"></param>
-        public void DeleteAllFilesIn(string dir)
+        public void DeleteAllFilesIn(Path dir)
         {
-            if (Directory.Exists(dir))
+            if (dir.IsDirectory)
             {
                 log.InfoFormat("Deleting all files in {0}", dir);
-                foreach (string i in Directory.GetFiles(dir))
+                foreach (var i in dir.Children)
                 {
                     try
                     {
-                        File.Delete(i);
+                        Sidi.IO.File.Delete(i);
                     }
                     catch (System.UnauthorizedAccessException)
                     {
                         // try harder
                         log.WarnFormat("Removing read-only protection from {0}", i);
-                        FileInfo fi = new FileInfo(i);
-                        fi.Attributes = fi.Attributes & (~FileAttributes.ReadOnly);
-                        File.Delete(i);
+                        var info = i.Info;
+                        if (info.IsReadOnly)
+                        {
+                            info.IsReadOnly = false;
+                        }
+                        Sidi.IO.File.Delete(i);
                     }
                 }
             }

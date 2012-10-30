@@ -5,10 +5,9 @@ using System.Text;
 using System.ComponentModel;
 using NUnit.Framework;
 using Sidi.Util;
-using Sidi.IO.Long.Extensions;
 using System.Threading;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     [TestFixture]
     public class CopyProgressTestTest : TestBase

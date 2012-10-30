@@ -20,19 +20,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Sidi.Extensions;
 
 namespace Sidi.IO
 {
     public class SearchPath
     {
-        public List<string> Paths;
+        public FileList Paths;
 
         public SearchPath()
         {
-            Paths = new List<string>();
+            Paths = new FileList();
         }
 
-        public void AppendIfNotExist(string dir)
+        public static SearchPath PATH
+        {
+            get
+            {
+                return SearchPath.Parse(Environment.GetEnvironmentVariable("PATH"));
+            }
+        }
+
+        public void AppendIfNotExist(Path dir)
         {
             if (Paths.Contains(dir))
             {
@@ -41,7 +50,7 @@ namespace Sidi.IO
             Paths.Add(dir);
         }
 
-        public void PrependIfNotExist(string dir)
+        public void PrependIfNotExist(Path dir)
         {
             if (Paths.Contains(dir))
             {
@@ -52,46 +61,33 @@ namespace Sidi.IO
 
         public static SearchPath Parse(string semiColonSeparatedPath)
         {
-            SearchPath p = new SearchPath();
-            p.Paths = new List<string>(semiColonSeparatedPath.SplitPathList());
-            return p;
+            return new SearchPath()
+            {
+                Paths = FileList.Parse(semiColonSeparatedPath)
+            };
         }
 
         public override string ToString()
         {
-            return Paths.Aggregate((x, y) => x + ";" + y);
+            return Paths.Join(";");
         }
 
-        public string NewLineSeparatedString
+        public Path Find(Path file)
         {
-            get
-            {
-                return Paths.Aggregate((x, y) => x + "\r\n" + y);
-            }
-        }
-
-        public string Find(string file)
-        {
-            string path;
+            Path path;
             if (TryFind(file, out path))
             {
                 return path;
             }
 
-            StringBuilder b = new StringBuilder();
-            foreach (string i in Paths)
-            {
-                b.AppendLine(FileUtil.CatDir(i, file));
-            }
-
-            throw new System.IO.FileNotFoundException(b.ToString(), file);
+            throw new System.IO.FileNotFoundException(Paths.Select(x => x.CatDir(file)).Join());
         }
 
-        public bool TryFind(string file, out string path)
+        public bool TryFind(Path file, out Path path)
         {
-            foreach (string i in Paths)
+            foreach (var i in Paths)
             {
-                string p = FileUtil.CatDir(i, file);
+                string p = i.CatDir(file);
                 if (File.Exists(p))
                 {
                     path = p;

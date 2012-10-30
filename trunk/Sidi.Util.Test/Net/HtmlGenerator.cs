@@ -51,17 +51,17 @@ namespace Sidi.Net
             Assert.IsTrue(o.ToString().Contains("NullReferenceException"));
         }
 
-        [Test]
+        [Test, ExpectedException(typeof(NullReferenceException))]
         public void ExceptionWhileRendering()
         {
+            var g = new HtmlGenerator();
             string name = null;
             var o = new StringWriter();
-            this.Write(o, () => html(head(), body(
-                img(
-                    div(new Action<TextWriter>(x => x.WriteLine(name.Length)))
+            g.html(g.head(), g.body(
+                g.img(
+                    g.div(new Action<TextWriter>(x => x.WriteLine(name.Length)))
                 )
-                )));
-            Assert.IsTrue(o.ToString().Contains(typeof(NullReferenceException).Name));
+                ))(o);
             Console.WriteLine(o.ToString());
         }
 

@@ -5,9 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using Sidi.Util;
 using Sidi.Extensions;
-using Sidi.IO.Long.Extensions;
 
-namespace Sidi.IO.Long
+namespace Sidi.IO
 {
     [TestFixture]
     public class FileSystemInfoTest : TestBase

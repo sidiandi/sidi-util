@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Sidi.IO;
-using L = Sidi.IO.Long;
+using L = Sidi.IO;
 using System.IO;
 using Sidi.Util;
 
@@ -33,7 +33,7 @@ namespace Sidi.Build.Test
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         Pdbstr instance = null;
-        string pdbFile;
+        Sidi.IO.Path pdbFile;
 
         public PdbstrTest()
         {
@@ -50,8 +50,8 @@ namespace Sidi.Build.Test
         [Test]
         public void Write()
         {
-            string pdbFileCopy = TestFile(Path.GetFileNameWithoutExtension(pdbFile) + ".modified.pdb");
-            File.Copy(pdbFile, pdbFileCopy, true);
+            var pdbFileCopy = TestFile(pdbFile.ReplaceExtension(".modified.pdb"));
+            Sidi.IO.File.Copy(pdbFile, pdbFileCopy, true);
 
             string content = "Hello, Test";
             string streamName = "srcsrv";

@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using Sidi.IO;
 using System.IO;
-using L = Sidi.IO.Long;
+using L = Sidi.IO;
 
 namespace Sidi.Build
 {
