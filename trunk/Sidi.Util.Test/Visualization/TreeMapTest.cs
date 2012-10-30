@@ -7,7 +7,6 @@ using Sidi.Forms;
 using System.Windows.Forms;
 using System.Drawing;
 using Sidi.IO;
-using Sidi.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
