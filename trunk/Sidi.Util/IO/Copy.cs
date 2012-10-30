@@ -38,7 +38,7 @@ namespace Sidi.IO
         {
             foreach (var s in files)
             {
-                string d = destinationDir.CatDir(s.Name);
+                string d = destinationDir.CatDir(s.FileName);
                 FastCopy(s, d);
             }
         }
@@ -51,7 +51,7 @@ namespace Sidi.IO
         /// <returns>The destination path of the file</returns>
         public string CopyToDir(Path s, Path destinationDir)
         {
-            string d = destinationDir.CatDir(s.Name);
+            string d = destinationDir.CatDir(s.FileName);
             FastCopy(s, d);
             return d;
         }

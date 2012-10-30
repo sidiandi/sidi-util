@@ -50,7 +50,7 @@ namespace Sidi.Build.Test
         [Test]
         public void Write()
         {
-            var pdbFileCopy = TestFile(pdbFile.ReplaceExtension(".modified.pdb"));
+            var pdbFileCopy = TestFile(pdbFile.ChangeExtension(".modified.pdb"));
             Sidi.IO.File.Copy(pdbFile, pdbFileCopy, true);
 
             string content = "Hello, Test";
