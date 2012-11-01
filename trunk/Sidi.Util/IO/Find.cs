@@ -29,6 +29,16 @@ namespace Sidi.IO
             return e.Depth();
         }
 
+        public static IEnumerable<FileSystemInfo> AllFiles(IEnumerable<Path> roots)
+        {
+            var e = new Find()
+            {
+                Roots = roots.ToList(),
+                Output = Find.OnlyFiles,
+            };
+            return e.Depth();
+        }
+
         public static Find Parse(string text)
         {
             var list = FileList.Parse(text);
