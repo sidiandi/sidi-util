@@ -42,5 +42,10 @@ namespace Sidi.IO
                 return new Path(System.IO.Path.GetTempPath());
             }
         }
+
+        public static Path GetFolderPath(Environment.SpecialFolder sf)
+        {
+            return new Path(System.Environment.GetFolderPath(sf));
+        }
     }
 }
