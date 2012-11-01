@@ -82,6 +82,12 @@ namespace Sidi.CommandLine
         }
 
         public ParameterInfo Parameter { get; private set; }
+
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Parameter", Parameter);
+        }
     }
 
     /// <summary>

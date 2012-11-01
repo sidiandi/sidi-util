@@ -1047,10 +1047,12 @@ new rule("WSP", new alternation("SP", "HTAB")) //; white space
 
             if (!rulelist.Success)
             {
-                var w = new StringWriter();
-                w.WriteLine("Cannot parse grammar");
-                rulelist.DumpAll(w);
-                throw new ArgumentException(w.ToString());
+                using (var w = new StringWriter())
+                {
+                    w.WriteLine("Cannot parse grammar");
+                    rulelist.DumpAll(w);
+                    throw new ArgumentException(w.ToString());
+                }
             }
 
             Match.Types.AddRange(this.GetType().GetNestedTypes());

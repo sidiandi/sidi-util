@@ -136,7 +136,6 @@
     <Compile Include="IO\FileSystemInfo.cs" />
     <Compile Include="IO\FileType.cs" />
     <Compile Include="IO\FindData.cs" />
-    <Compile Include="IO\Kernel32.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathTypeConverter.cs" />
     <Compile Include="IO\NativeMethods.cs" />

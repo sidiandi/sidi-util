@@ -18,7 +18,7 @@ namespace Sidi.IO
         internal int nFileSizeLow;
         internal int dwReserved0;
         internal int dwReserved1;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Kernel32.MAX_PATH)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH)]
         internal string Name;
         // not using this
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]

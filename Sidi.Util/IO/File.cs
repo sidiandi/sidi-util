@@ -14,10 +14,10 @@ namespace Sidi.IO
 
         public static void Delete(Path path)
         {
-            if (!Kernel32.DeleteFile(path.Param))
+            if (!NativeMethods.DeleteFile(path.Param))
             {
                 new FileSystemInfo(path).IsReadOnly = false;
-                Kernel32.DeleteFile(path.Param).CheckApiCall(path);
+                NativeMethods.DeleteFile(path.Param).CheckApiCall(path);
             }
             log.InfoFormat("Delete {0}", path);
         }
@@ -38,16 +38,17 @@ namespace Sidi.IO
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.StreamReader StreamReader(Path path)
         {
             var s = OpenRead(path);
             return new System.IO.StreamReader(s);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.StreamWriter StreamWriter(Path path)
         {
-            var s = OpenWrite(path);
-            return new System.IO.StreamWriter(s);
+            return new System.IO.StreamWriter(OpenWrite(path));
         }
 
         public static bool Exists(Path path)
@@ -65,33 +66,34 @@ namespace Sidi.IO
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.FileStream Open(Path path, System.IO.FileMode fileMode)
         {
-            Kernel32.EFileAccess dwDesiredAccess = Kernel32.EFileAccess.GenericAll;
-            Kernel32.EFileShare dwShareMode = Kernel32.EFileShare.None;
+            NativeMethods.EFileAccess dwDesiredAccess = NativeMethods.EFileAccess.GenericAll;
+            NativeMethods.EFileShare dwShareMode = NativeMethods.EFileShare.None;
             IntPtr lpSecurityAttributes = IntPtr.Zero;
-            Kernel32.ECreationDisposition dwCreationDisposition = Kernel32.ECreationDisposition.OpenExisting;
-            Kernel32.EFileAttributes dwFlagsAndAttributes = 0;
+            NativeMethods.ECreationDisposition dwCreationDisposition = NativeMethods.ECreationDisposition.OpenExisting;
+            NativeMethods.EFileAttributes dwFlagsAndAttributes = 0;
             IntPtr hTemplateFile = IntPtr.Zero;
             System.IO.FileAccess access = System.IO.FileAccess.Read;
 
             switch (fileMode)
             {
                 case System.IO.FileMode.Create:
-                    dwDesiredAccess = Kernel32.EFileAccess.GenericWrite;
-                    dwCreationDisposition = Kernel32.ECreationDisposition.CreateAlways;
+                    dwDesiredAccess = NativeMethods.EFileAccess.GenericWrite;
+                    dwCreationDisposition = NativeMethods.ECreationDisposition.CreateAlways;
                     access = System.IO.FileAccess.ReadWrite;
                     break;
                 case System.IO.FileMode.Open:
-                    dwDesiredAccess = Kernel32.EFileAccess.GenericRead;
-                    dwCreationDisposition = Kernel32.ECreationDisposition.OpenExisting;
+                    dwDesiredAccess = NativeMethods.EFileAccess.GenericRead;
+                    dwCreationDisposition = NativeMethods.ECreationDisposition.OpenExisting;
                     access = System.IO.FileAccess.Read;
                     break;
                 default:
                     throw new NotImplementedException(fileMode.ToString());
             }
 
-            var h = Kernel32.CreateFile(path.Param, dwDesiredAccess,
+            var h = NativeMethods.CreateFile(path.Param, dwDesiredAccess,
                 dwShareMode, lpSecurityAttributes, dwCreationDisposition,
                 dwFlagsAndAttributes,
                 hTemplateFile);
@@ -110,11 +112,13 @@ namespace Sidi.IO
             return Open(path, System.IO.FileMode.Open);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.StreamWriter TextWriter(Path p)
         {
             return new System.IO.StreamWriter(Open(p, System.IO.FileMode.Create));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.StreamReader TextReader(Path p)
         {
             return new System.IO.StreamReader(Open(p, System.IO.FileMode.Open));
@@ -232,16 +236,16 @@ namespace Sidi.IO
 
             var nextProgress = DateTime.Now + progressInterval;
 
-            Kernel32.CopyFileEx(
+            NativeMethods.CopyFileEx(
                 sourceFileName.Param,
                 destFileName.Param,
-                new Kernel32.CopyProgressRoutine(
+                new NativeMethods.CopyProgressRoutine(
                     (long TotalFileSize,
             long TotalBytesTransferred,
             long StreamSize,
             long StreamBytesTransferred,
             uint dwStreamNumber,
-            Kernel32.CopyProgressCallbackReason dwCallbackReason,
+            NativeMethods.CopyProgressCallbackReason dwCallbackReason,
             IntPtr hSourceFile,
             IntPtr hDestinationFile,
             IntPtr lpData) =>
@@ -253,11 +257,11 @@ namespace Sidi.IO
                             progressCallback(progress);
                             nextProgress = n + progressInterval;
                         }
-                        return Kernel32.CopyProgressResult.PROGRESS_CONTINUE;
+                        return NativeMethods.CopyProgressResult.PROGRESS_CONTINUE;
                     }),
             IntPtr.Zero,
            ref pbCancel,
-           overwrite ? 0 : Kernel32.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
+           overwrite ? 0 : NativeMethods.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
             .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
         }
 
@@ -303,13 +307,13 @@ namespace Sidi.IO
         //     sourceFileName or destFileName is in an invalid format.
         public static void Move(Path sourceFileName, Path destFileName)
         {
-            Kernel32.MoveFileEx(sourceFileName.Param, destFileName.Param, 0)
+            NativeMethods.MoveFileEx(sourceFileName.Param, destFileName.Param, 0)
                 .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
         }
 
         public static void CreateHardLink(Path fileName, Path existingFileName)
         {
-            Kernel32.CreateHardLink(fileName.Param, existingFileName.Param, IntPtr.Zero)
+            NativeMethods.CreateHardLink(fileName.Param, existingFileName.Param, IntPtr.Zero)
                 .CheckApiCall(String.Format("{0} -> {1}", fileName, existingFileName));
         }
 
@@ -343,14 +347,11 @@ namespace Sidi.IO
             }
         }
 
-        [DllImport("msvcrt.dll")]
-        static extern int memcmp(byte[] b1, byte[] b2, long count);
-
         static bool Equals(byte[] b1, byte[] b2, int count)
         {
             // Validate buffers are the same length.
             // This also ensures that the count does not exceed the length of either buffer.  
-            return memcmp(b1, b2, count) == 0;
+            return NativeMethods.memcmp(b1, b2, count) == 0;
         }
 
         public static bool EqualByContent(Path f1, Path f2)

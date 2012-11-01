@@ -38,7 +38,7 @@ namespace Sidi.IO
 
             set
             {
-                Kernel32.SetFileAttributes(FullName.Param, value).CheckApiCall(FullName);
+                NativeMethods.SetFileAttributes(FullName.Param, value).CheckApiCall(FullName);
                 _findData.Attributes = value;
             }
         }
