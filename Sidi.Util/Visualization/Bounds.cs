@@ -30,6 +30,23 @@ namespace Sidi.Visualization
             P1 = new Point(r, b);
         }
 
+        public bool CoversPixel
+        {
+            get
+            {
+                return ((int)P0.X != (int)P1.X) && ((int)P0.Y != (int)P1.Y);
+            }
+        }
+
+        public int PixelsCovered
+        {
+            get
+            {
+                var r = this.ToRectangle();
+                return r.Width * r.Height;
+            }
+        }
+
         public Bounds Inflate(Bounds b)
         {
             return new Bounds()
@@ -188,6 +205,18 @@ namespace Sidi.Visualization
                 m.Elements[3],
                 m.Elements[4],
                 m.Elements[5]);
+        }
+
+        const double cf = 1.0 / 256.0;
+
+        public static double[] ToArray(this System.Drawing.Color color)
+        {
+            return new double[]
+            {
+                color.B * cf,
+                color.G * cf,
+                color.R * cf
+            };
         }
     }
 }

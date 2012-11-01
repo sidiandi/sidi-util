@@ -87,6 +87,18 @@ namespace Sidi.Visualization
             return bitmap;
         }
 
+        Layout FirstLeaf(Layout layout)
+        {
+            if (layout.Children.Any())
+            {
+                return FirstLeaf(layout.Children.First());
+            }
+            else
+            {
+                return layout;
+            }
+        }
+
         void Render(BitmapData bitmap, Layout layout, double h, double f, Bounds s)
         {
             var r = layout.Bounds;
@@ -113,6 +125,20 @@ namespace Sidi.Visualization
                 }
             }
 
+            var bitmapR = transform.Transform(r);
+            if (!layout.Children.Any() || bitmapR.PixelsCovered <= 9)
+            {
+                RenderCushion(bitmap, bitmapR, r, s, GetColor(FirstLeaf(layout).Tree.Object).ToArray());
+            }
+            else
+            {
+                foreach (var i in layout.Children)
+                {
+                    Render(bitmap, i, h * f, f, s);
+                }
+            }
+
+            /*
             if (!layout.Children.Any())
             {
                 var bitmapR = transform.Transform(r);
@@ -125,6 +151,7 @@ namespace Sidi.Visualization
                     Render(bitmap, i, h * f, f, s);
                 }
             }
+             */
         }
 
         System.Windows.Media.Matrix transform;
