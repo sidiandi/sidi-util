@@ -139,12 +139,12 @@ namespace Sidi.Visualization
 
         bool focusPointEnabled = false;
         Point focusPoint;
-        double[] worldFocusPoint;
+        System.Windows.Point worldFocusPoint;
 
         public void Paint(PaintEventArgs e)
         {
             var layout = treeMapControl.LayoutManager;
-            double maxArea = layout.Root.Bounds.Area();
+            double maxArea = layout.Root.Bounds.Area;
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             if (focusPointEnabled)
             {
@@ -166,7 +166,7 @@ namespace Sidi.Visualization
 
         bool PaintRecursive(PaintEventArgs e, Layout n, int level)
         {
-            var rectArea = n.Bounds.Area();
+            var rectArea = n.Bounds.Area;
             if (!e.ClipRectangle.IntersectsWith(n.Bounds.ToRectangle()))
             {
                 return false;

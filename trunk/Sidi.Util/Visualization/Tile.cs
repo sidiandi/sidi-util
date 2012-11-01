@@ -9,8 +9,7 @@ namespace Sidi.Visualization
 {
     class Tile
     {
-        public PointF P0;
-        public PointF P1;
+        public Bounds Bounds;
         public int Level;
         public int X;
         public int Y;

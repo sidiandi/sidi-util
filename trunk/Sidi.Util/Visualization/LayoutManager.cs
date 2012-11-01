@@ -21,7 +21,7 @@ namespace Sidi.Visualization
                 throw new ArgumentNullException("root");
             }
 
-            layout = new Layout(null) { Tree = root, Bounds = bounds.ToArray() };
+            layout = new Layout(null) { Tree = root, Bounds = bounds.ToBounds() };
             DoLayout = Squares;
             Update(layout);
         }
@@ -36,7 +36,7 @@ namespace Sidi.Visualization
             }
         }
 
-        double[,] margin = new double[,] { { 0, 0 }, { 0, 0 } };
+        Bounds margin = new Bounds();
 
         /// <summary>
         /// Recursively updates a layout tree.
@@ -50,9 +50,8 @@ namespace Sidi.Visualization
                 var lc = new LayoutContext()
                 {
                     Layout = layout.Tree.Children.Select(x => new Layout(layout) { Tree = x }).ToArray(),
-                    Rectangle = layout.Bounds.Copy()
+                    Rectangle = layout.Bounds.Inflate(margin)
                 };
-                lc.Rectangle.Add(margin);
                 
                 DoLayout(lc);
 
@@ -63,12 +62,12 @@ namespace Sidi.Visualization
             }
         }
 
-        public Layout GetLayoutAt(double[] p, int levels)
+        public Layout GetLayoutAt(System.Windows.Point p, int levels)
         {
             return GetLayoutAt(layout, p, levels);
         }
 
-        Layout GetLayoutAt(Layout t, double[] p, int levels)
+        Layout GetLayoutAt(Layout t, System.Windows.Point p, int levels)
         {
             if (t != null && t.Bounds.Contains(p))
             {
@@ -93,8 +92,8 @@ namespace Sidi.Visualization
 
         public class LayoutContext
         {
-            public double[,] Rectangle;
-            public Dir Direction;
+            public Bounds Rectangle;
+            public Dimension Direction;
             public Layout[] Layout;
         }
 
@@ -103,26 +102,26 @@ namespace Sidi.Visualization
         static void Stripes(LayoutContext c)
         {
             var d = c.Direction;
-            Dir od;
-            if (d == Dir.X)
+            Dimension od;
+            if (d == Dimension.X)
             {
-                od = Dir.Y;
+                od = Dimension.Y;
             }
             else
             {
-                od = Dir.X;
+                od = Dimension.X;
             }
 
-            double m = c.Rectangle.Width(d) / c.Layout.First().Tree.Parent.Size;
-            double x = c.Rectangle[(int)d, (int)Bound.Min];
+            double m = c.Rectangle.Extent(d) / c.Layout.First().Tree.Parent.Size;
+            double x = c.Rectangle[d, Bound.Min];
             foreach (var tc in c.Layout)
             {
                 var r = tc.Bounds;
-                r[(int)d, (int)Bound.Min] = x;
+                r[d, Bound.Min] = x;
                 x += tc.Tree.Size * m;
-                r[(int)d, (int)Bound.Max] =
-                r[(int)od, (int)Bound.Min] = c.Rectangle[(int)od, (int)Bound.Min];
-                r[(int)od, (int)Bound.Max] = c.Rectangle[(int)od, (int)Bound.Max];
+                r[d, Bound.Max] =
+                r[od, Bound.Min] = c.Rectangle[od, Bound.Min];
+                r[od, Bound.Max] = c.Rectangle[od, Bound.Max];
             }
         }
 
@@ -162,7 +161,7 @@ namespace Sidi.Visualization
             Squarify(c.Layout, c.Rectangle, c.Direction, 0, c.Layout.Length);
         }
 
-        static void Squarify(Layout[] layout, double[,] r, Dir d, int b, int e)
+        static void Squarify(Layout[] layout, Bounds r, Dimension d, int b, int e)
         {
             if (layout.Length == 0)
             {
@@ -170,27 +169,27 @@ namespace Sidi.Visualization
             }
 
             // fill one row until aspect ratio gets worse again
-            if (r.Width(Dir.X) > r.Width(Dir.Y))
+            if (r.Width > r.Height)
             {
-                d = Dir.Y;
+                d = Dimension.Y;
             }
             else
             {
-                d = Dir.X;
+                d = Dimension.X;
             }
 
             double aspectRatio = double.MaxValue;
-            var width = r.Width(d);
-            if (width < double.Epsilon)
+            var extent = r.Extent(d);
+            if (extent < double.Epsilon)
             {
                 for (int i = b; i < e; ++i)
                 {
-                    layout[i].Bounds = (double[,])r.Clone();
+                    layout[i].Bounds = r;
                 }
                 return;
             }
-            var pixPerSize = r.Area() / SizeSum(layout, b, e);
-            var pixPerHeight = pixPerSize / width;
+            var pixPerSize = r.Area / SizeSum(layout, b, e);
+            var pixPerHeight = pixPerSize / extent;
             double rowSize = 0.0;
             double newRowSize;
             int rowEnd;
@@ -222,37 +221,39 @@ namespace Sidi.Visualization
 
             // new row consists of array elements [b, rowEnd[
             var od = Flip(d);
-            var rowRect = (double[,])r.Clone();
-            rowRect[(int)od, (int)Bound.Max] = rowRect[(int)od, (int)Bound.Min] + h;
-            var x = rowRect[(int)d, (int)Bound.Min];
-            var widthPerSize = pixPerSize / h;
-            if (double.IsNaN(widthPerSize))
+            Bounds rowRect = r;
+            rowRect[od, Bound.Max] = rowRect[od, Bound.Min] + h;
+            var x = rowRect[d, Bound.Min];
+            var extentPerSize = pixPerSize / h;
+            if (double.IsNaN(extentPerSize))
             {
-                widthPerSize = 0.0f;
+                extentPerSize = 0.0f;
             }
             for (int i = b; i < rowEnd; ++i)
             {
-                layout[i].Bounds[(int)d, (int)Bound.Min] = x;
-                var w = layout[i].Tree.Size * widthPerSize;
-                x = Math.Min(x + w, r[(int)d, (int)Bound.Max]);
+                Bounds ib = new Bounds();
+                ib[d, Bound.Min] = x;
+                var w = layout[i].Tree.Size * extentPerSize;
+                x = Math.Min(x + w, r[d, Bound.Max]);
                 if (double.IsNaN(x))
                 {
                     throw new InvalidOperationException();
                 }
-                layout[i].Bounds[(int)d, (int)Bound.Max] = x;
-                layout[i].Bounds[(int)od, (int)Bound.Min] = rowRect[(int)od, (int)Bound.Min];
-                layout[i].Bounds[(int)od, (int)Bound.Max] = rowRect[(int)od, (int)Bound.Max];
+                ib[d, Bound.Max] = x;
+                ib[od, Bound.Min] = rowRect[od, Bound.Min];
+                ib[od, Bound.Max] = rowRect[od, Bound.Max];
+                layout[i].Bounds = ib;
             }
 
             // check results
             for (int i = b; i < rowEnd; ++i)
             {
                 var re = layout[i].Bounds;
-                foreach (Dir id in Enum.GetValues(typeof(Dir)))
+                foreach (Dimension id in Enum.GetValues(typeof(Dimension)))
                 {
                     foreach (Bound ib in Enum.GetValues(typeof(Bound)))
                     {
-                        if (double.IsNaN(re[(int)id, (int)ib]))
+                        if (double.IsNaN(re[id, ib]))
                         {
                             throw new Exception(i.ToString());
                         }
@@ -261,7 +262,7 @@ namespace Sidi.Visualization
             }
 
             // calculate remaining rectangle
-            r[(int)od, (int)Bound.Min] = rowRect[(int)od, (int)Bound.Max];
+            r[od, Bound.Min] = rowRect[od, Bound.Max];
 
             // squarify the rest
             if (rowEnd < e)
@@ -283,14 +284,14 @@ namespace Sidi.Visualization
              */
         }
 
-        static Dir Flip(Dir d)
+        static Dimension Flip(Dimension d)
         {
             switch (d)
             {
-                case Dir.X:
-                    return Dir.Y;
-                case Dir.Y:
-                    return Dir.X;
+                case Dimension.X:
+                    return Dimension.Y;
+                case Dimension.Y:
+                    return Dimension.X;
             }
             throw new ArgumentException(d.ToString());
         }

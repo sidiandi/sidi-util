@@ -82,6 +82,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\ICache.cs" />
@@ -232,6 +233,7 @@
     <Compile Include="Util\Zip.cs" />
     <Compile Include="Visualization\ArrayRect.cs" />
     <Compile Include="Visualization\Bins.cs" />
+    <Compile Include="Visualization\Bounds.cs" />
     <Compile Include="Visualization\ColorScale.cs" />
     <Compile Include="Visualization\CushionPainter.cs" />
     <Compile Include="Visualization\DistinctColor.cs" />
