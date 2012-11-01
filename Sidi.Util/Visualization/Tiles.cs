@@ -62,8 +62,9 @@ namespace Sidi.Visualization
                         Level = level,
                         X = x,
                         Y = y,
-                        P0 = new PointF(x * worldTileSize, y * worldTileSize),
-                        P1 = new PointF((x + 1) * worldTileSize, (y + 1) * worldTileSize),
+                        Bounds = new Bounds(
+                            x * worldTileSize, y * worldTileSize,
+                            (x + 1) * worldTileSize, (y + 1) * worldTileSize),
                     };
                 }
             }

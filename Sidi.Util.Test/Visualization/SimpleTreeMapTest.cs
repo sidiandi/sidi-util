@@ -120,5 +120,19 @@ namespace Sidi.Visualization
 
             tm.RunFullScreen();
         }
+
+        [Test, Explicit("big")]
+        public void Big()
+        {
+            var items = Enumerable.Range(0, 100000).Select(x => x.ToString("D8"));
+
+            var tm = new TypedTreeMap<string>()
+            {
+                Items = items.ToList(),
+                GetLineage = i => i,
+            };
+
+            tm.RunFullScreen();
+        }
     }
 }

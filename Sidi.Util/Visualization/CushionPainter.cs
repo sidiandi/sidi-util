@@ -29,7 +29,9 @@ namespace Sidi.Visualization
 
             tileBitmaps = new Collections.LruCacheBackground<Tile, Bitmap>(cachedTiles, tile =>
                 {
-                    return Render(tiles.Size, RectangleF.FromLTRB(tile.P0.X, tile.P0.Y, tile.P1.X, tile.P1.Y));
+                    return Render(
+                        tiles.Size, 
+                        tile.Bounds);
                 });
 
             tileBitmaps.EntryUpdated += (s, e) =>
@@ -50,16 +52,18 @@ namespace Sidi.Visualization
 
         TreeMap control;
 
-        public Bitmap Render(Size bitmapSize, RectangleF rect)
+        public Bitmap Render(Size bitmapSize, Bounds rect)
         {
             var bitmap = new Bitmap(bitmapSize.Width, bitmapSize.Height, PixelFormat.Format24bppRgb);
 
-            this.transform = new Matrix(rect, new[]{
+            //todo: rework
+            this.transform = new System.Drawing.Drawing2D.Matrix(rect.ToRectangleF(), new[]{
                 new PointF(0,0), 
                 new PointF(bitmapSize.Width, 0),
                 new PointF(0, bitmapSize.Height)
-            });
-            this.rect = rect.ToArray();
+            }).ToMatrixD();
+
+            this.rect = rect;
 
             var data = bitmap.LockBits(
                 new Rectangle(0, 0, bitmap.Width, bitmap.Height),
@@ -71,7 +75,7 @@ namespace Sidi.Visualization
                 if (this.layout != null)
                 {
                     var surface = new double[4];
-                    var s = new double[2, 2];
+                    var s = new Bounds();
                     Render(data, layout.Root, h, f, s);
                 }
             }
@@ -83,7 +87,7 @@ namespace Sidi.Visualization
             return bitmap;
         }
 
-        void Render(BitmapData bitmap, Layout layout, double h, double f, double[,] s)
+        void Render(BitmapData bitmap, Layout layout, double h, double f, Bounds s)
         {
             var r = layout.Bounds;
 
@@ -92,21 +96,26 @@ namespace Sidi.Visualization
                 return;
             }
 
-            s = s.Copy();
-
             if (layout.Parent != null)
             {
-                for (int d = 0; d < 2; ++d)
+                for (Dimension d = Dimension.X; d <= Dimension.Y; ++d)
                 {
-                    AddRidge(r[(int)d, (int)Bound.Min], r[(int)d, (int)Bound.Max], h,
-                        ref s[(int)d, (int)0], ref s[(int)d, (int)1]);
+                    double s0 = s[d, Bound.Min];
+                    double s1 = s[d, Bound.Max];
+                    AddRidge(
+                        r[d, Bound.Min],
+                        r[d, Bound.Max], h,
+                        ref s0,
+                        ref s1);
+
+                    s[d, Bound.Min] = s0;
+                    s[d, Bound.Max] = s1;
                 }
             }
 
             if (!layout.Children.Any())
             {
-                var bitmapR = r.Copy();
-                transform.Transform(bitmapR);
+                var bitmapR = transform.Transform(r);
                 RenderCushion(bitmap, bitmapR, r, s, GetColor(layout.Tree.Object).ToArray());
             }
             else
@@ -118,33 +127,33 @@ namespace Sidi.Visualization
             }
         }
 
-        Matrix transform;
-        double[,] rect;
+        System.Windows.Media.Matrix transform;
+        Bounds rect;
         
         unsafe void RenderCushion(
             BitmapData bitmap,
-            double[,] bitmapR,
-            double[,] r,
-            double[,] s,
+            Bounds bitmapR,
+            Bounds r,
+            Bounds s,
             double[] color
             )
         {
-            var ey = Math.Min((int)Math.Ceiling(bitmapR[(int)Dir.Y, (int)Bound.Max]), bitmap.Height);
-            var by = Math.Max((int)Math.Ceiling(bitmapR[(int)Dir.Y, (int)Bound.Min]), 0);
-            var ex = Math.Min((int)Math.Ceiling(bitmapR[(int)Dir.X, (int)Bound.Max]), bitmap.Width);
-            var bx = Math.Max((int)Math.Ceiling(bitmapR[(int)Dir.X, (int)Bound.Min]), 0);
-            double yScale = (r[(int)Dir.Y, (int)Bound.Max] - r[(int)Dir.Y, (int)Bound.Min]) / (bitmapR[(int)Dir.Y, (int)Bound.Max] - bitmapR[(int)Dir.Y, (int)Bound.Min]);
-            double xScale = (r[(int)Dir.X, (int)Bound.Max] - r[(int)Dir.X, (int)Bound.Min]) / (bitmapR[(int)Dir.X, (int)Bound.Max] - bitmapR[(int)Dir.X, (int)Bound.Min]);
+            var ey = Math.Min((int)Math.Ceiling(bitmapR[Dimension.Y, Bound.Max]), bitmap.Height);
+            var by = Math.Max((int)Math.Ceiling(bitmapR[Dimension.Y, Bound.Min]), 0);
+            var ex = Math.Min((int)Math.Ceiling(bitmapR[Dimension.X, Bound.Max]), bitmap.Width);
+            var bx = Math.Max((int)Math.Ceiling(bitmapR[Dimension.X, Bound.Min]), 0);
+            double yScale = (r[Dimension.Y, Bound.Max] - r[Dimension.Y, Bound.Min]) / (bitmapR[Dimension.Y, Bound.Max] - bitmapR[Dimension.Y, Bound.Min]);
+            double xScale = (r[Dimension.X, Bound.Max] - r[Dimension.X, Bound.Min]) / (bitmapR[Dimension.X, Bound.Max] - bitmapR[Dimension.X, Bound.Min]);
  
             for (int iy = by; iy < ey; ++iy)
             {
-                double y = r[(int)Dir.Y, (int)Bound.Min] + ((double)iy + 0.5f - bitmapR[(int)Dir.Y, (int)Bound.Min]) * yScale;  
+                double y = r[Dimension.Y, Bound.Min] + ((double)iy + 0.5f - bitmapR[Dimension.Y, Bound.Min]) * yScale;  
                 byte* row = (byte*)bitmap.Scan0 + iy * bitmap.Stride + bx * 3;
                 for (int ix = bx; ix < ex; ++ix)
                 {
-                    double x = r[(int)Dir.X, (int)Bound.Min] + ((double)ix + 0.5f - bitmapR[(int)Dir.X, (int)Bound.Min]) * xScale;
-                    var nx = (2 * s[(int)Dir.X, 1] * (x) + s[(int)Dir.X, 0]);
-                    var ny = -(2 * s[(int)Dir.Y, 1] * (y) + s[(int)Dir.Y, 0]);
+                    double x = r[Dimension.X, Bound.Min] + ((double)ix + 0.5f - bitmapR[Dimension.X, Bound.Min]) * xScale;
+                    var nx = (2 * s[Dimension.X, Bound.Max] * (x) + s[Dimension.X, Bound.Min]);
+                    var ny = -(2 * s[Dimension.Y, Bound.Max] * (y) + s[Dimension.Y, Bound.Min]);
                     var cosa = (nx * L[0] + ny * L[1] + L[2]) / Math.Sqrt(nx * nx + ny * ny + 1.0);
                     var intensity = Ia + Math.Max(0, Is * cosa);
                     *row = Util.ClipByte(intensity * color[0]);
@@ -196,7 +205,7 @@ namespace Sidi.Visualization
             
             foreach (var i in tiles.Get(transform, control.ClientRectangle))
             {
-                var pts = new[] { i.P0, i.P1 };
+                var pts = new[] { i.Bounds.P0.ToPointF(), i.Bounds.P1.ToPointF() };
                 transform.TransformPoints(pts);
                 var intPts = pts.Select(x => new Point((int)x.X, (int)x.Y)).ToArray();
                 // var destRect = Rectangle.FromLTRB(intPts[0].X, intPts[0].Y, intPts[1].X, intPts[1].Y);
@@ -256,7 +265,6 @@ namespace Sidi.Visualization
             if (disposing)
             {
                tileBitmaps.Dispose();
-               this.transform.Dispose();
             }
             // Free your own state (unmanaged objects).
             // Set large fields to null.

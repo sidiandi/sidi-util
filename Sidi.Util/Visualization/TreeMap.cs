@@ -152,13 +152,12 @@ namespace Sidi.Visualization
             }
         }
 
-        public double[] GetWorldPoint(Point p)
+        public System.Windows.Point GetWorldPoint(Point p)
         {
-            var fp = p.ToArray();
-            var inverse = WorldTransform.Clone();
+            var fp = p.ToPointD();
+            var inverse = WorldTransform.ToMatrixD();
             inverse.Invert();
-            inverse.Transform(fp);
-            return fp;
+            return inverse.Transform(fp);
         }
 
         public object GetObjectAt(Point p)
@@ -224,10 +223,25 @@ namespace Sidi.Visualization
         }
 
         Matrix worldTransform = new Matrix();
+
+        void DrawWireFrame(PaintEventArgs e, Layout layout)
+        {
+            e.Graphics.DrawRectangle(new Pen(Color.Red), layout.Bounds.ToRectangle());
+            foreach (var i in layout.Children)
+            {
+                DrawWireFrame(e, i);
+            }
+        }
         
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.Transform = zoomPanController.Transform;
+
+            /*
+            DrawWireFrame(e, this.LayoutManager.Root);
+            return;
+            */
+
             CushionPainter.Paint(e);
             base.OnPaint(e);
         }
