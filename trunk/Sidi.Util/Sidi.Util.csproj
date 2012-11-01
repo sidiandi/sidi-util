@@ -231,7 +231,6 @@
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Util\Zip.cs" />
-    <Compile Include="Visualization\ArrayRect.cs" />
     <Compile Include="Visualization\Bins.cs" />
     <Compile Include="Visualization\Bounds.cs" />
     <Compile Include="Visualization\ColorScale.cs" />

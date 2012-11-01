@@ -124,7 +124,7 @@ namespace Sidi.Visualization
         [Test, Explicit("big")]
         public void Big()
         {
-            var items = Enumerable.Range(0, 100000).Select(x => x.ToString("D8"));
+            var items = Enumerable.Range(0, 1000000).Select(x => x.ToString("D8"));
 
             var tm = new TypedTreeMap<string>()
             {
