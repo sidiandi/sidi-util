@@ -29,7 +29,7 @@ namespace Sidi.Visualization
             this.ItemMouseHover += (s,e) =>
                 {
                     toolTip.SetToolTip(this,
-                        e.Layout.Tree.Up.Select(x => String.Format("{0}: {1}", x.Size, x.Object)).Join());
+                        e.Layout.Tree.Up.Select(x => String.Format("{0}: {1}", x.Size, GetText(x.Object))).Join());
                 };
         }
 
@@ -95,7 +95,7 @@ namespace Sidi.Visualization
 
         static void Add(Tree tree, object item, object[] lineage, double size, int level)
         {
-            if (level < lineage.Length)
+            if (level < lineage.Length - 1)
             {
                 var pathPart = lineage[level];
                 var c = tree.Children.FirstOrDefault(i => i.Object.Equals(pathPart));

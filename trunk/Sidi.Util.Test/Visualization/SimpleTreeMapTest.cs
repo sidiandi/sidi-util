@@ -113,7 +113,7 @@ namespace Sidi.Visualization
             var tm = new TypedTreeMap<Process>()
             {
                 Items = p,
-                GetLineage = i => i.MainModule.FileName.ToLower().Split('\\'),
+                GetLineage = i => new Path(i.MainModule.FileName).Parts,
                 GetSize = i => i.WorkingSet64,
                 GetText = i => i.ProcessName,
             };

@@ -17,6 +17,8 @@ namespace Sidi.Visualization
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.Selectable, true);
+            SetStyle(ControlStyles.StandardClick, true);
 
             this.SizeChanged += new EventHandler(CushionTreeMapControl_SizeChanged);
             this.MouseMove += new MouseEventHandler(CushionTreeMapControl_MouseMove);
@@ -37,6 +39,7 @@ namespace Sidi.Visualization
                 
             this.MouseClick += (s, e) =>
             {
+                this.Focus();
                 ClickLocation = e.Location;
                 SelectedObject = GetObjectAt(e.Location);
             };
@@ -55,6 +58,12 @@ namespace Sidi.Visualization
             };
 
             CushionPainter = new CushionPainter(this);
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (CanSelect) Select();
         }
 
         void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs ce)

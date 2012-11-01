@@ -17,10 +17,10 @@ namespace Sidi.IO
 
         public static void Delete(Path directory)
         {
-            if (!Kernel32.RemoveDirectory(directory.Param))
+            if (!NativeMethods.RemoveDirectory(directory.Param))
             {
                 new FileSystemInfo(directory).IsReadOnly = false;
-                Kernel32.RemoveDirectory(directory.Param).CheckApiCall(directory);
+                NativeMethods.RemoveDirectory(directory.Param).CheckApiCall(directory);
             }
             log.InfoFormat("Delete {0}", directory);
         }
@@ -45,7 +45,7 @@ namespace Sidi.IO
 
         public static void Move(Path from, Path to)
         {
-            Kernel32.MoveFileEx(from.Param, to.Param, 0).CheckApiCall(String.Format("{0} -> {1}", from, to));
+            NativeMethods.MoveFileEx(from.Param, to.Param, 0).CheckApiCall(String.Format("{0} -> {1}", from, to));
         }
 
         /// <summary>
@@ -57,12 +57,12 @@ namespace Sidi.IO
         {
             FindData fd;
 
-            using (var fh = Kernel32.FindFirstFile(searchPath.Param, out fd))
+            using (var fh = NativeMethods.FindFirstFile(searchPath.Param, out fd))
             {
                 if (!fh.IsInvalid)
                 {
                     yield return fd;
-                    while (Kernel32.FindNextFile(fh, out fd))
+                    while (NativeMethods.FindNextFile(fh, out fd))
                     {
                         yield return fd;
                     }
@@ -105,7 +105,7 @@ namespace Sidi.IO
 
         static void CreateDirectoryInternal(Path path)
         {
-            if (!Kernel32.CreateDirectory(path.Param, IntPtr.Zero))
+            if (!NativeMethods.CreateDirectory(path.Param, IntPtr.Zero))
             {
                 switch (Marshal.GetLastWin32Error())
                 {
@@ -115,7 +115,7 @@ namespace Sidi.IO
                         {
                             var p = path.Parent;
                             CreateDirectoryInternal(p);
-                            Kernel32.CreateDirectory(path.Param, IntPtr.Zero).CheckApiCall(path);
+                            NativeMethods.CreateDirectory(path.Param, IntPtr.Zero).CheckApiCall(path);
                         }
                         break;
                     default:

@@ -27,7 +27,7 @@ namespace Sidi.IO
         {
             get
             {
-                throw new NotImplementedException();
+                return DateTime.Now + RemainingTime;
             }
         }
 

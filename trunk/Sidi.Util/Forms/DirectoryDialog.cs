@@ -57,7 +57,7 @@ using System.Runtime.InteropServices;
 //<summary>The <strong>Org.Mentalis.Utilities.DirectoryDialog</strong> namespace provides a managed implementation of the SHBrowseForFolder function that creates a directory dialog.</summary>
 namespace Sidi.Forms {
 	///<summary>Contains parameters for the SHBrowseForFolder function and receives information about the folder selected by the user.</summary>
-	[ StructLayout( LayoutKind.Sequential, CharSet=CharSet.Ansi )]
+	[ StructLayout( LayoutKind.Sequential, CharSet=CharSet.Unicode )]
 	internal struct BROWSEINFO {
 		///<summary>Handle to the owner window for the dialog box.</summary>
 		public IntPtr hWndOwner;
