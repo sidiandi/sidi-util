@@ -6,11 +6,13 @@ using Sidi.Util;
 using NUnit.Framework;
 using System.Xml.Serialization;
 using Sidi.Extensions;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Sidi.IO
 {
     [TestFixture]
-    public class PathTest : TestBase
+    public class LPathTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -31,6 +33,18 @@ namespace Sidi.IO
         {
             var cd = new LPath(System.Environment.CurrentDirectory);
             Assert.AreEqual(cd.ToString(), new System.IO.DirectoryInfo(cd).FullName);
+        }
+
+        [Test]
+        public void Serialize()
+        {
+            var p = Paths.BinDir;
+            var b = new BinaryFormatter();
+            var m = new MemoryStream();
+            b.Serialize(m, p);
+            m.Seek(0, SeekOrigin.Begin);
+            var p1 = (LPath)b.Deserialize(m);
+            Assert.AreEqual(p, p1);
         }
 
         [Test]

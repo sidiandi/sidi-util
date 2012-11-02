@@ -10,6 +10,7 @@ using System.Reflection;
 
 namespace Sidi.IO
 {
+    [Serializable]
     public class LPath : IXmlSerializable
     {
         string path;
