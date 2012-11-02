@@ -4,7 +4,7 @@
     <PropertyGroup>
         <ProjectName>sidi-util</ProjectName>
         <Major>2</Major>
-        <Minor>2</Minor>
+        <Minor>3</Minor>
         <Build>0</Build>
 		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\lib</MSBuildExtensionsPath>
     </PropertyGroup>
