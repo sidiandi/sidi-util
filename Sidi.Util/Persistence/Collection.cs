@@ -207,6 +207,7 @@ namespace Sidi.Persistence
             return command;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         void Init(string a_path, string a_table)
         {
             path = a_path;
@@ -799,7 +800,7 @@ namespace Sidi.Persistence
             catch (Exception ex)
             {
                 log.Warn(String.Format("{0}", i.FieldType()), ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -1033,8 +1034,23 @@ namespace Sidi.Persistence
             #endregion
         }
 
+        
+
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
+          Dispose(true);
+          GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
             insert.Dispose();
             select.Dispose();
             getDataByRowId.Dispose();
@@ -1042,6 +1058,19 @@ namespace Sidi.Persistence
             deleteByRowId.Dispose();
             containsQuery.Dispose();
             m_connection.Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
         }
+
+        // Use C# destructor syntax for finalization code.
+        ~Collection()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
     }
 }

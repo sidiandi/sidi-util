@@ -16,18 +16,18 @@ namespace Sidi.IO
         public void Parse()
         {
             var text = @"C:\temp;D:\docs;E:\something";
-            var fl = FileList.Parse(text);
+            var fl = PathList.Parse(text);
             Assert.AreEqual(3, fl.Count);
-            Assert.AreEqual(new Path(@"C:\temp"), fl[0]);
+            Assert.AreEqual(new LPath(@"C:\temp"), fl[0]);
         }
 
         [Test]
         public void Network()
         {
-            var p = new Path(TestFile(".")).Parts;
+            var p = new LPath(TestFile(".")).Parts;
             var p1 = new []{ @"\", Environment.MachineName, p[0].Replace(":", "$")}.Concat(p.Skip(1));
             log.Info(p1.Join());
-            var nwPath = new Path(p1);
+            var nwPath = new LPath(p1);
             log.Info(nwPath);
 
             var i = nwPath.Info;

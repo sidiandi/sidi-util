@@ -94,9 +94,11 @@ namespace Sidi.Net.Pop3
 
         protected virtual void Session(TcpClient tcpClient)
         {
-            Session session = new Session(tcpClient);
-            session.MailboxProvider = MailboxProvider;
-            session.Run();
+            using (var session = new Session(tcpClient))
+            {
+                session.MailboxProvider = MailboxProvider;
+                session.Run();
+            }
         }
     }
 }

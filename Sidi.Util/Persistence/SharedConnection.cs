@@ -85,13 +85,42 @@ namespace Sidi.Persistence
             }
         }
         Shared shared;
-        
+
+
+
+        private bool disposed = false;
+
+        //Implement IDisposable.
         public void Dispose()
         {
-            if (!shared.RemoveRef())
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                shared.Dispose();
+                if (disposing)
+                {
+                    if (!shared.RemoveRef())
+                    {
+                        shared.Dispose();
+                    }
+
+                }
+                // Free your own state (unmanaged objects).
+                // Set large fields to null.
+                disposed = true;
             }
         }
+
+        // Use C# destructor syntax for finalization code.
+        ~SharedConnection()
+        {
+            // Simply call Dispose(false).
+            Dispose(false);
+        }
+
     }
 }

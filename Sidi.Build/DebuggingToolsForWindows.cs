@@ -35,14 +35,14 @@ namespace Sidi.Build
             }
         }
         
-        public static L.Path Directory
+        public static L.LPath Directory
         {
             get
             {
                 string[] searchPath = new string[]
                 {
-                    L.Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
-                    L.Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
+                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows"),
+                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
                 };
 
                 foreach (string d in searchPath)

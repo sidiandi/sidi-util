@@ -18,7 +18,7 @@ namespace Sidi.IO
 
         HashSet<string> e;
 
-        public bool Is(Path fileName)
+        public bool Is(LPath fileName)
         {
             return e.Contains(fileName.Extension.ToLower());
         }

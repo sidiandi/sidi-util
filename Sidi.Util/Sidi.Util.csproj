@@ -49,7 +49,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -128,15 +129,15 @@
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
     <Compile Include="IO\CopyProgress.cs" />
-    <Compile Include="IO\Directory.cs" />
+    <Compile Include="IO\LDirectory.cs" />
     <Compile Include="IO\Find.cs" />
-    <Compile Include="IO\File.cs" />
-    <Compile Include="IO\FileEnum.cs" />
-    <Compile Include="IO\FileList.cs" />
+    <Compile Include="IO\LFile.cs" />
+    <Compile Include="IO\FindConfig.cs" />
+    <Compile Include="IO\PathList.cs" />
     <Compile Include="IO\FileSystemInfo.cs" />
     <Compile Include="IO\FileType.cs" />
     <Compile Include="IO\FindData.cs" />
-    <Compile Include="IO\Path.cs" />
+    <Compile Include="IO\LPath.cs" />
     <Compile Include="IO\PathTypeConverter.cs" />
     <Compile Include="IO\NativeMethods.cs" />
     <Compile Include="Net\Abnf.cs" />

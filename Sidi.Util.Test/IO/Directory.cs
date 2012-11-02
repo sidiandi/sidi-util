@@ -14,9 +14,9 @@ namespace Sidi.IO
         [Test]
         public void Exists()
         {
-            var p = new Path(String.Format(@"\\{0}\C$", System.Environment.MachineName));
+            var p = new LPath(String.Format(@"\\{0}\C$", System.Environment.MachineName));
             Assert.IsTrue(System.IO.Directory.Exists(p.NoPrefix)); 
-            Assert.IsTrue(Directory.Exists(p));
+            Assert.IsTrue(LDirectory.Exists(p));
         }
     }
 }

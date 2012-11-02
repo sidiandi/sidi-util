@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 
 namespace Sidi.IO
 {
-    public class File
+    public class LFile
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void Delete(Path path)
+        public static void Delete(LPath path)
         {
             if (!NativeMethods.DeleteFile(path.Param))
             {
@@ -22,7 +22,7 @@ namespace Sidi.IO
             log.InfoFormat("Delete {0}", path);
         }
 
-        public static void WriteAllText(Path path, string contents)
+        public static void WriteAllText(LPath path, string contents)
         {
             using (var w = StreamWriter(path))
             {
@@ -30,7 +30,7 @@ namespace Sidi.IO
             }
         }
 
-        public static string ReadAllText(Path path)
+        public static string ReadAllText(LPath path)
         {
             using (var r = StreamReader(path))
             {
@@ -39,21 +39,21 @@ namespace Sidi.IO
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamReader StreamReader(Path path)
+        public static System.IO.StreamReader StreamReader(LPath path)
         {
             var s = OpenRead(path);
             return new System.IO.StreamReader(s);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamWriter StreamWriter(Path path)
+        public static System.IO.StreamWriter StreamWriter(LPath path)
         {
             return new System.IO.StreamWriter(OpenWrite(path));
         }
 
-        public static bool Exists(Path path)
+        public static bool Exists(LPath path)
         {
-            using (var f = Directory.FindFile(path).GetEnumerator())
+            using (var f = LDirectory.FindFile(path).GetEnumerator())
             {
                 if (f.MoveNext())
                 {
@@ -67,7 +67,7 @@ namespace Sidi.IO
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.FileStream Open(Path path, System.IO.FileMode fileMode)
+        public static System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode)
         {
             NativeMethods.EFileAccess dwDesiredAccess = NativeMethods.EFileAccess.GenericAll;
             NativeMethods.EFileShare dwShareMode = NativeMethods.EFileShare.None;
@@ -101,25 +101,25 @@ namespace Sidi.IO
             return new System.IO.FileStream(h, access);
         }
 
-        public static System.IO.FileStream OpenWrite(Path path)
+        public static System.IO.FileStream OpenWrite(LPath path)
         {
             path.EnsureParentDirectoryExists();
             return Open(path, System.IO.FileMode.Create);
         }
 
-        public static System.IO.FileStream OpenRead(Path path)
+        public static System.IO.FileStream OpenRead(LPath path)
         {
             return Open(path, System.IO.FileMode.Open);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamWriter TextWriter(Path p)
+        public static System.IO.StreamWriter TextWriter(LPath p)
         {
             return new System.IO.StreamWriter(Open(p, System.IO.FileMode.Create));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamReader TextReader(Path p)
+        public static System.IO.StreamReader TextReader(LPath p)
         {
             return new System.IO.StreamReader(Open(p, System.IO.FileMode.Open));
         }
@@ -166,7 +166,7 @@ namespace Sidi.IO
         //
         //   System.NotSupportedException:
         //     sourceFileName or destFileName is in an invalid format.
-        public static void Copy(Path sourceFileName, Path destFileName)
+        public static void Copy(LPath sourceFileName, LPath destFileName)
         {
             Copy(sourceFileName, destFileName, false);
         }
@@ -215,7 +215,7 @@ namespace Sidi.IO
         //
         //   System.NotSupportedException:
         //     sourceFileName or destFileName is in an invalid format.
-        public static void Copy(Path sourceFileName, Path destFileName, bool overwrite)
+        public static void Copy(LPath sourceFileName, LPath destFileName, bool overwrite)
         {
             Copy(sourceFileName, destFileName, overwrite, (p) =>
                 {
@@ -226,8 +226,8 @@ namespace Sidi.IO
         static TimeSpan progressInterval = TimeSpan.FromSeconds(1);
 
         public static void Copy(
-            Path sourceFileName,
-            Path destFileName,
+            LPath sourceFileName,
+            LPath destFileName,
             bool overwrite,
             Action<CopyProgress> progressCallback)
         {
@@ -305,19 +305,19 @@ namespace Sidi.IO
         //
         //   System.NotSupportedException:
         //     sourceFileName or destFileName is in an invalid format.
-        public static void Move(Path sourceFileName, Path destFileName)
+        public static void Move(LPath sourceFileName, LPath destFileName)
         {
             NativeMethods.MoveFileEx(sourceFileName.Param, destFileName.Param, 0)
                 .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
         }
 
-        public static void CreateHardLink(Path fileName, Path existingFileName)
+        public static void CreateHardLink(LPath fileName, LPath existingFileName)
         {
             NativeMethods.CreateHardLink(fileName.Param, existingFileName.Param, IntPtr.Zero)
                 .CheckApiCall(String.Format("{0} -> {1}", fileName, existingFileName));
         }
 
-        public static void CopyOrHardLink(Path source, Path destination)
+        public static void CopyOrHardLink(LPath source, LPath destination)
         {
             if (!destination.Exists)
             {
@@ -328,12 +328,12 @@ namespace Sidi.IO
                 }
                 else
                 {
-                    File.Copy(source, destination);
+                    LFile.Copy(source, destination);
                 }
             }
         }
 
-        public static bool EqualByTime(Path f1, Path f2)
+        public static bool EqualByTime(LPath f1, LPath f2)
         {
             FindData d1;
             FindData d2;
@@ -354,7 +354,7 @@ namespace Sidi.IO
             return NativeMethods.memcmp(b1, b2, count) == 0;
         }
 
-        public static bool EqualByContent(Path f1, Path f2)
+        public static bool EqualByContent(LPath f1, LPath f2)
         {
             FindData d1;
             FindData d2;

@@ -42,7 +42,7 @@ namespace Sidi.IO
                 Assert.IsFalse(d.Except(b).Any());
             }
 
-            Path TestTree = Paths.BinDir.CatDir(".");
+            LPath TestTree = Paths.BinDir.CatDir(".");
 
             [Test]
             public void Output()
@@ -60,7 +60,7 @@ namespace Sidi.IO
             [Test]
             public void NotExists()
             {
-                var files = Find.AllFiles(new Path(@"C:\does_not_exist_4352345234234")).ToList();
+                var files = Find.AllFiles(new LPath(@"C:\does_not_exist_4352345234234")).ToList();
                 Assert.AreEqual(0, files.Count);
             }
 

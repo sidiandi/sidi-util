@@ -40,7 +40,7 @@ namespace Sidi.Tool
             public void Path()
             {
                 var d = new Dump();
-                var x = new Sidi.IO.Path(@"C:\temp");
+                var x = new Sidi.IO.LPath(@"C:\temp");
                 d.Write(x, Console.Out);
             }
         }

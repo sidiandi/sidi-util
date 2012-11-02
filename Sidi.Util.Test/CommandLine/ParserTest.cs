@@ -31,6 +31,7 @@ using System.Threading;
 using System.Net;
 using Sidi.IO;
 using Sidi.Extensions;
+using System.IO;
 
 namespace Sidi.CommandLine.Test
 {
@@ -308,7 +309,7 @@ namespace Sidi.CommandLine.Test
             {
                 var e = new Sidi.IO.Find()
                 {
-                    Root = new Sidi.IO.Path(dir)
+                    Root = new Sidi.IO.LPath(dir)
                 };
 
                 foreach (var f in e.Depth())
@@ -451,6 +452,7 @@ namespace Sidi.CommandLine.Test
             Assert.AreNotEqual(a.Current, b.Current);
         }
 
+        [Usage("Tests preferences")]
         public class PreferencesTestApplication
         {
             [Usage("Your name")]
@@ -465,6 +467,9 @@ namespace Sidi.CommandLine.Test
             [Usage("other option, is null by default")]
             [Persistent]
             public string AnotherOption { set; get; }
+
+            [SubCommand]
+            public PreferencesTestApplication Test;
         }
 
         [Test]
@@ -491,6 +496,12 @@ namespace Sidi.CommandLine.Test
             pb.LoadPreferences();
             Assert.AreEqual(a.Name, b.Name);
             Assert.AreEqual(a.Password, b.Password);
+        }
+
+        [Test]
+        public void Preferences2()
+        {
+            Parser.Run(new PreferencesTestApplication(), new string[] { });
         }
 
         [Test, Explicit("interactive")]
@@ -624,8 +635,8 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void ParseValues()
         {
-            var ln = (Path) Parser.ParseValue(@"C:\temp", typeof(Path));
-            Assert.AreEqual(new Path(@"C:\temp"), ln);
+            var ln = (LPath) Parser.ParseValue(@"C:\temp", typeof(LPath));
+            Assert.AreEqual(new LPath(@"C:\temp"), ln);
         }
 
         class MySubCommand
@@ -648,8 +659,15 @@ namespace Sidi.CommandLine.Test
             Parser.Run(new MyApp(), new string[]{"Sub", "Name", name});
 
             var a = new MyApp();
-            Parser.Run(a, new string[] {});
-            Assert.AreEqual(name, a.Sub.Name);
+            using (var w = new StringWriter())
+            {
+                var consoleOut = Console.Out;
+                Console.SetOut(w);
+                Parser.Run(new MyApp(), new string[] { "Sub", });
+                Console.SetOut(consoleOut);
+
+                Assert.IsTrue(w.ToString().Contains(name));
+            }
         }
     }
 }

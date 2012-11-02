@@ -11,18 +11,18 @@ namespace Sidi.IMAP
     [CLSCompliant(false)]
     public class EmlMailbox : IMailbox
     {
-        public EmlMailbox(Path directory)
+        public EmlMailbox(LPath directory)
         {
             this.directory = directory;
-            if (!Directory.Exists(directory))
+            if (!LDirectory.Exists(directory))
             {
                 throw new System.IO.IOException(directory.ToString());
             }
-            mails = Directory.GetChilds(directory)
+            mails = LDirectory.GetChilds(directory)
                 .Where(x => !x.IsDirectory && x.Name.EndsWith(".eml", StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
         }
-        Path directory;
+        LPath directory;
         IList<FileSystemInfo> mails;
 
         public IList<IMail> Items
@@ -67,7 +67,7 @@ namespace Sidi.IMAP
             {
                 if (_Message == null)
                 {
-                    using (var r = File.Open(fileInfo.FullName, System.IO.FileMode.Open))
+                    using (var r = LFile.Open(fileInfo.FullName, System.IO.FileMode.Open))
                     {
                         _Message = Rfc822Message.Parse(new System.IO.StreamReader(r));
                     }
@@ -116,12 +116,12 @@ namespace Sidi.IMAP
     [CLSCompliant(false)]
     public class EmlDirectory : IRepository
     {
-        public EmlDirectory(Path directory)
+        public EmlDirectory(LPath directory)
         {
             this.directory = directory;
         }
 
-        Path directory;
+        LPath directory;
 
         public IList<string> MailboxNames
         {
@@ -152,7 +152,7 @@ namespace Sidi.IMAP
 
         public IMailbox GetMailbox(string name)
         {
-            return new EmlMailbox(directory.CatDir(name.Replace(Delimiter, Sidi.IO.Path.DirectorySeparator)));
+            return new EmlMailbox(directory.CatDir(name.Replace(Delimiter, Sidi.IO.LPath.DirectorySeparator)));
         }
     }
 }

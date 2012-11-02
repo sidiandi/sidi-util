@@ -12,14 +12,14 @@ namespace Sidi.IO
     /// <summary>
     /// Command line parser interface for Sidi.IO.Enum
     /// </summary>
-    public class EnumConfig
+    public class FindConfig
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public Find Enumerator = new Find();
         List<Regex> exclude = new List<Regex>();
         
-        public EnumConfig()
+        public FindConfig()
         {
             Enumerator.Output = x => !exclude.Any(e => e.IsMatch(x.Name));
             Enumerator.Follow = x => !exclude.Any(e => e.IsMatch(x.Name));

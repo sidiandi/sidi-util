@@ -38,7 +38,7 @@ namespace Sidi.IO
 
         public const int MAX_PATH = 260;
 
-        public static void CheckApiCall(this bool result, Path path)
+        public static void CheckApiCall(this bool result, LPath path)
         {
             CheckApiCall(result, path.ToString());
         }

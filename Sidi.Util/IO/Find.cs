@@ -19,7 +19,7 @@ namespace Sidi.IO
             Output = x => true;
         }
 
-        public static IEnumerable<FileSystemInfo> AllFiles(Path root)
+        public static IEnumerable<FileSystemInfo> AllFiles(LPath root)
         {
             var e = new Find()
             {
@@ -29,7 +29,7 @@ namespace Sidi.IO
             return e.Depth();
         }
 
-        public static IEnumerable<FileSystemInfo> AllFiles(IEnumerable<Path> roots)
+        public static IEnumerable<FileSystemInfo> AllFiles(IEnumerable<LPath> roots)
         {
             var e = new Find()
             {
@@ -41,7 +41,7 @@ namespace Sidi.IO
 
         public static Find Parse(string text)
         {
-            var list = FileList.Parse(text);
+            var list = PathList.Parse(text);
             return new Find()
             {
                 Output = OnlyFiles,
@@ -72,16 +72,16 @@ namespace Sidi.IO
         /// <summary>
         /// List of start paths for Depth() and Breath(). Multiple start roots are supported.
         /// </summary>
-        public IList<Path> Roots = new List<Path>();
+        public IList<LPath> Roots = new List<LPath>();
 
         /// <summary>
         /// Sets a single root path. Roots will then have exactly one element.
         /// </summary>
-        public Path Root
+        public LPath Root
         {
             set
             {
-                Roots = new List<Path>() { value };
+                Roots = new List<LPath>() { value };
             }
         }
 

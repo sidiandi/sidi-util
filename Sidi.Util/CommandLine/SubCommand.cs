@@ -159,6 +159,14 @@ namespace Sidi.CommandLine
             return null;
         }
 
+        public bool IsInstanciated
+        {
+            get
+            {
+                return GetValue() != null;
+            }
+        }
+
         public object CommandInstance
         {
             get
@@ -180,6 +188,11 @@ namespace Sidi.CommandLine
                         pi.SetValue(Application, i, new object[] { });
                     }
                 }
+
+                var p = new Parser();
+                p.Applications.Add(i);
+                p.LoadPreferences();
+
                 return i;
             }
         }

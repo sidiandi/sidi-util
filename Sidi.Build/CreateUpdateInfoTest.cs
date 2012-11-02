@@ -42,7 +42,7 @@ namespace Sidi.Build.Test
         [Test]
         public void Writer()
         {
-            var outFile = this.TestFile(new Sidi.IO.Path("generated.xml"));
+            var outFile = this.TestFile(new Sidi.IO.LPath("generated.xml"));
             {
                 CreateUpdateInfo cui = new CreateUpdateInfo();
                 cui.OutputFile = outFile;

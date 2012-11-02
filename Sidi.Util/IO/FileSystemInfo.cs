@@ -7,22 +7,22 @@ namespace Sidi.IO
 {
     public class FileSystemInfo : IEquatable<FileSystemInfo>
     {
-        public FileSystemInfo(Path path)
+        public FileSystemInfo(LPath path)
         {
             this.path = path.GetFullPath();
             _findDataValid = this.path.GetFindData(out _findData);
         }
 
-        public Path FullName
+        public LPath FullName
         {
             get { return path; }
         }
         
-        Path path;
+        LPath path;
         FindData _findData;
         bool _findDataValid = false;
 
-        internal FileSystemInfo(Path directory, FindData findData)
+        internal FileSystemInfo(LPath directory, FindData findData)
         {
             _findData = findData;
             _findDataValid = true;
@@ -110,7 +110,7 @@ namespace Sidi.IO
 
         public IList<FileSystemInfo> GetFileSystemInfos()
         {
-            return Directory.GetChilds(path);
+            return LDirectory.GetChilds(path);
         }
 
         public IList<FileSystemInfo> GetDirectories()
@@ -120,7 +120,7 @@ namespace Sidi.IO
 
         public IList<FileSystemInfo> GetDirectories(string searchPattern)
         {
-            return Directory.FindFile(FullName.CatDir(searchPattern))
+            return LDirectory.FindFile(FullName.CatDir(searchPattern))
                 .Where(x => x.IsDirectory)
                 .ToList();
         }
@@ -132,7 +132,7 @@ namespace Sidi.IO
 
         public IList<FileSystemInfo> GetFiles(string searchPattern)
         {
-            return Directory.FindFile(FullName.CatDir(searchPattern))
+            return LDirectory.FindFile(FullName.CatDir(searchPattern))
                 .Where(x => !x.IsDirectory)
                 .ToList();
         }

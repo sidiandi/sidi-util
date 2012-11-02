@@ -13,8 +13,8 @@ namespace Sidi.IO
         {
             private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            public Path root;
-            public Path lp;
+            public LPath root;
+            public LPath lp;
 
             [SetUp]
             public void Setup()
@@ -56,9 +56,9 @@ namespace Sidi.IO
                 Assert.IsTrue(e.Count() >= 10);
             }
 
-            public void CreateSampleFile(Path lp)
+            public void CreateSampleFile(LPath lp)
             {
-                using (var f = File.Open(lp, System.IO.FileMode.Create))
+                using (var f = LFile.Open(lp, System.IO.FileMode.Create))
                 {
                     using (var o = new System.IO.StreamWriter(f))
                     {
@@ -72,10 +72,10 @@ namespace Sidi.IO
             {
                 CreateSampleFile(lp);
                 var lpCopy = lp.CatName(".copy");
-                File.Copy(lp, lpCopy);
-                Assert.IsTrue(File.Exists(lpCopy));
+                LFile.Copy(lp, lpCopy);
+                Assert.IsTrue(LFile.Exists(lpCopy));
 
-                log.Info(Directory.GetChilds(lp.Parent));
+                log.Info(LDirectory.GetChilds(lp.Parent));
 
                 log.Info(lp);
             }
@@ -85,7 +85,7 @@ namespace Sidi.IO
             {
                 var bigSampleFile = root.CatDir("big");
                 
-                using (var f = File.Open(bigSampleFile, System.IO.FileMode.Create))
+                using (var f = LFile.Open(bigSampleFile, System.IO.FileMode.Create))
                 {
                     var b = new byte[1024*1024];
                     for (int i = 0; i < 100; ++i)
@@ -96,11 +96,11 @@ namespace Sidi.IO
 
                 log.Info(bigSampleFile.Info.Length);
                 var lpCopy = bigSampleFile.CatName(".copy");
-                File.Copy(bigSampleFile, lpCopy, true, (p) =>
+                LFile.Copy(bigSampleFile, lpCopy, true, (p) =>
                 {
                     log.Info(p.Message);
                 });
-                Assert.IsTrue(File.Exists(lpCopy));
+                Assert.IsTrue(LFile.Exists(lpCopy));
                 lpCopy.EnsureNotExists();
                 bigSampleFile.EnsureNotExists();
             }
@@ -110,23 +110,23 @@ namespace Sidi.IO
             {
                 CreateSampleFile(lp);
                 var lpCopy = lp.CatName(".link");
-                File.CreateHardLink(lpCopy, lp);
-                Assert.IsTrue(File.Exists(lpCopy));
-                log.Info(Directory.GetChilds(lp.Parent));
+                LFile.CreateHardLink(lpCopy, lp);
+                Assert.IsTrue(LFile.Exists(lpCopy));
+                log.Info(LDirectory.GetChilds(lp.Parent));
                 log.Info(lp);
-                Assert.IsTrue(File.EqualByTime(lp, lpCopy));
+                Assert.IsTrue(LFile.EqualByTime(lp, lpCopy));
             }
 
             [Test]
             public void Move()
             {
                 CreateSampleFile(lp);
-                var m = new Path(lp.Parts.Take(20));
+                var m = new LPath(lp.Parts.Take(20));
                 var dest = root.CatDir("moved");
-                Directory.Move(m, dest);
-                Assert.IsTrue(Directory.Exists(dest));
-                Assert.IsFalse(File.Exists(lp));
-                Assert.IsTrue(Directory.Exists(root));
+                LDirectory.Move(m, dest);
+                Assert.IsTrue(LDirectory.Exists(dest));
+                Assert.IsFalse(LFile.Exists(lp));
+                Assert.IsTrue(LDirectory.Exists(root));
             }
 
             [Test]
@@ -137,7 +137,7 @@ namespace Sidi.IO
                 Assert.IsFalse(info.IsReadOnly);
                 info.IsReadOnly = true;
                 Assert.IsTrue(info.IsReadOnly);
-                File.Delete(lp);
+                LFile.Delete(lp);
             }
 
             [Test]
@@ -146,15 +146,15 @@ namespace Sidi.IO
                 var f1 = lp;
                 CreateSampleFile(f1);
                 var f2 = f1.CatName(".copy");
-                File.Copy(f1, f2);
-                Assert.IsTrue(File.EqualByContent(f1, f2));
+                LFile.Copy(f1, f2);
+                Assert.IsTrue(LFile.EqualByContent(f1, f2));
 
-                using (var s = File.Open(f2, System.IO.FileMode.Create))
+                using (var s = LFile.Open(f2, System.IO.FileMode.Create))
                 {
                     s.WriteByte(0);
                 }
 
-                Assert.IsFalse(File.EqualByContent(f1, f2));
+                Assert.IsFalse(LFile.EqualByContent(f1, f2));
             }
 
             [Test]
@@ -163,8 +163,8 @@ namespace Sidi.IO
                 var d = this.TestFile("Long").CatDir("blablabla");
                 d.EnsureNotExists();
                 var p = d.CatDir(".moviesidi");
-                File.WriteAllText(p, "hello");
-                Assert.AreEqual("hello", File.ReadAllText(p));
+                LFile.WriteAllText(p, "hello");
+                Assert.AreEqual("hello", LFile.ReadAllText(p));
                 d.EnsureNotExists();
             }
 
@@ -173,19 +173,19 @@ namespace Sidi.IO
             {
                 var text = "world";
                 var d = this.TestFile("Long").CatDir("234234", "23443", "blablabla");
-                using (var s = File.StreamWriter(d))
+                using (var s = LFile.StreamWriter(d))
                 {
                     s.WriteLine("hello");
                 }
-                using (var s = File.StreamWriter(d))
+                using (var s = LFile.StreamWriter(d))
                 {
                     s.Write(text);
                 }
-                using (var s = File.StreamReader(d))
+                using (var s = LFile.StreamReader(d))
                 {
                     Assert.AreEqual(text, s.ReadToEnd());
                 }
-                Assert.AreEqual(text, File.ReadAllText(d));
+                Assert.AreEqual(text, LFile.ReadAllText(d));
             }
         }
 }

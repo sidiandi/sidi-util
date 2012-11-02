@@ -54,7 +54,7 @@ namespace Sidi.Build.Test
             instance = new Srctool();
         }
 
-        Sidi.IO.Path pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
+        Sidi.IO.LPath pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
 
         /// <summary>
         /// Dump source information of a PDB file
@@ -81,7 +81,7 @@ namespace Sidi.Build.Test
 
             string pdbFileIndexed = TestFile(pdbFile.FileName);
 
-            Sidi.IO.File.Copy(pdbFile, pdbFileIndexed, true);
+            Sidi.IO.LFile.Copy(pdbFile, pdbFileIndexed, true);
 
             StringWriter w = new StringWriter();
 

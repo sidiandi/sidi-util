@@ -68,7 +68,7 @@ namespace Sidi.Build.Test
             instance.Execute();
 
             Srctool s = new Srctool();
-            s.Extract(new Sidi.IO.Path(t.ItemSpec).ChangeExtension("pdb"));
+            s.Extract(new Sidi.IO.LPath(t.ItemSpec).ChangeExtension("pdb"));
         }
     }
 }

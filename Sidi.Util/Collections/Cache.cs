@@ -20,7 +20,7 @@ namespace Sidi.Collections
             this.MaxAge = TimeSpan.MaxValue;
         }
 
-        Path storeDirectory;
+        LPath storeDirectory;
 
         public T GetCached<T>(object key, Func<T> provider)
         {
@@ -33,7 +33,7 @@ namespace Sidi.Collections
                     }
 
                     var b = new BinaryFormatter();
-                    using (var stream = File.OpenRead(path))
+                    using (var stream = LFile.OpenRead(path))
                     {
                         var cacheContent= b.Deserialize(stream);
                         if (cacheContent is Exception)
@@ -49,7 +49,7 @@ namespace Sidi.Collections
                 (path, t) =>
                 {
                     path.EnsureParentDirectoryExists();
-                    using (var stream = File.OpenWrite(path))
+                    using (var stream = LFile.OpenWrite(path))
                     {
                         if (t != null)
                         {
@@ -60,7 +60,7 @@ namespace Sidi.Collections
                 });
         }
 
-        public T GetCached<T>(object key, Func<T> provider, Func<Path, object> reader, Action<Path, object> writer)
+        public T GetCached<T>(object key, Func<T> provider, Func<LPath, object> reader, Action<LPath, object> writer)
         {
             var p = CachePath(key);
             if (p.Exists && (DateTime.UtcNow - p.Info.LastWriteTimeUtc) < MaxAge)
@@ -103,7 +103,7 @@ namespace Sidi.Collections
             return CachePath(key).Exists;
         }
 
-        Path CachePath(object key)
+        LPath CachePath(object key)
         {
             return storeDirectory.CatDir(Digest(key));
         }

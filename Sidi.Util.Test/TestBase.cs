@@ -54,7 +54,7 @@ namespace Sidi
         {
         }
 
-        protected Sidi.IO.Path TestFile(Sidi.IO.Path relPath)
+        protected Sidi.IO.LPath TestFile(Sidi.IO.LPath relPath)
         {
             var testFile = 
                 Paths.BinDir

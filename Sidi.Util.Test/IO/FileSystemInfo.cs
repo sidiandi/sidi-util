@@ -16,7 +16,7 @@ namespace Sidi.IO
         [Test]
         public void DriveRoot()
         {
-            var drive = Directory.Current.PathRoot;
+            var drive = LDirectory.Current.PathRoot;
             Assert.IsTrue(drive.IsRoot);
             var c = new FileSystemInfo(drive);
             Assert.IsTrue(c.Exists);
@@ -27,15 +27,15 @@ namespace Sidi.IO
         [Test]
         public void DotHandling()
         {
-            var dot = new Path(".");
+            var dot = new LPath(".");
             Assert.IsTrue(dot.Info.Exists);
         }
 
         [Test]
         public void Fullname()
         {
-            var currentDirectory = new Path(System.Environment.CurrentDirectory);
-            var dot = new Path(".");
+            var currentDirectory = new LPath(System.Environment.CurrentDirectory);
+            var dot = new LPath(".");
             dot.Info.DumpProperties(Console.Out);
             Assert.AreEqual(currentDirectory, dot.Info.FullName);
         }

@@ -27,7 +27,7 @@ namespace Sidi.Net
 
         public override Encoding Encoding
         {
-            get { throw new NotImplementedException(); }
+            get { return ownO.Encoding; }
         }
 
         public override void WriteLine(string value)

@@ -21,7 +21,7 @@ namespace Sidi.Visualization
         public void Simple()
         {
             var file = TestFile(@"mail\message-1-1456.eml");
-            var words = Regex.Split(File.ReadAllText(new Sidi.IO.Path(file)), @"\s+");
+            var words = Regex.Split(LFile.ReadAllText(new Sidi.IO.LPath(file)), @"\s+");
             var st = new SimpleTreeMap();
             st.GroupBy = x =>
                 {
@@ -66,8 +66,8 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void Generic()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
-            var tm = new TypedTreeMap<L.Path>();
+            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.LPath(x)).ToList();
+            var tm = new TypedTreeMap<L.LPath>();
             tm.GetParent = x => x.Parent;
             tm.GetDistinctColor = x => x.Extension;
             tm.GetSize = x => x.Info.Length;
@@ -80,8 +80,8 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void ColorScale()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.Path(x)).ToList();
-            var tm = new TypedTreeMap<L.Path>()
+            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.LPath(x)).ToList();
+            var tm = new TypedTreeMap<L.LPath>()
             {
                 GetParent = x => x.Parent,
                 GetSize = x => x.Info.Length,
@@ -113,7 +113,7 @@ namespace Sidi.Visualization
             var tm = new TypedTreeMap<Process>()
             {
                 Items = p,
-                GetLineage = i => new Path(i.MainModule.FileName).Parts,
+                GetLineage = i => new LPath(i.MainModule.FileName).Parts,
                 GetSize = i => i.WorkingSet64,
                 GetText = i => i.ProcessName,
             };

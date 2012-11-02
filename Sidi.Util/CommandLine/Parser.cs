@@ -154,10 +154,7 @@ namespace Sidi.CommandLine
         internal Parser()
         {
             var dumper = new Dump() { MaxLevel = 1 };
-            ProcessResult = result =>
-                {
-                    dumper.Write(result, Console.Out);
-                };
+            ProcessResult = result => { };
             
             cultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
@@ -310,15 +307,8 @@ namespace Sidi.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    log.Warn("Could not load preferences", ex);
+                    log.Warn(String.Format("Could not load preferences for {0}", o.Name), ex);
                 }
-            }
-
-            foreach (var s in SubCommands)
-            {
-                var p = new Parser();
-                p.Applications.Add(s.CommandInstance);
-                p.LoadPreferences();
             }
         }
 
@@ -347,7 +337,7 @@ namespace Sidi.CommandLine
                 }
             }
 
-            foreach (var s in SubCommands)
+            foreach (var s in SubCommands.Where(x => x.IsInstanciated))
             {
                 var p = new Parser();
                 p.Applications.Add(s.CommandInstance);

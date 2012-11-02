@@ -11,8 +11,8 @@ namespace Sidi.IO
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public CopyProgress(
-            Path source,
-            Path destination)
+            LPath source,
+            LPath destination)
         {
             this.Source = source;
             this.Destination = destination;
@@ -95,8 +95,8 @@ namespace Sidi.IO
             Time = DateTime.Now;
         }
 
-        public Path Source;
-        public Path Destination;
+        public LPath Source;
+        public LPath Destination;
 
         static BinaryPrefix binaryPrefix = new BinaryPrefix();
 
