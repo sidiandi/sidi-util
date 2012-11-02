@@ -33,7 +33,7 @@ namespace Sidi.Build.Test
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         Pdbstr instance = null;
-        Sidi.IO.Path pdbFile;
+        Sidi.IO.LPath pdbFile;
 
         public PdbstrTest()
         {
@@ -51,7 +51,7 @@ namespace Sidi.Build.Test
         public void Write()
         {
             var pdbFileCopy = pdbFile.ChangeExtension(".modified.pdb");
-            Sidi.IO.File.Copy(pdbFile, pdbFileCopy, true);
+            Sidi.IO.LFile.Copy(pdbFile, pdbFileCopy, true);
 
             string content = "Hello, Test";
             string streamName = "srcsrv";

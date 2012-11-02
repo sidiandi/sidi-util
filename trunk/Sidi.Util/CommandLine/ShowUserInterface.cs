@@ -335,6 +335,15 @@ namespace Sidi.CommandLine
             }
         }
 
+        bool ExcludedFromUi(IParserItem item)
+        {
+            return ((
+                    item.Application is ShowHelp ||
+                    item.Application is ShowUserInterface ||
+                    item.Application is ShowWebServer ||
+                    false));
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         Form ToDialog(Parser parser)
         {
@@ -346,10 +355,21 @@ namespace Sidi.CommandLine
             main.Height = 480;
             main.Text = parser.ApplicationName;
 
+            var t = ToTabControl(parser);
+
+            main.Controls.Add(t);
+
+            return main;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        TabControl ToTabControl(Parser parser)
+        {
             var t = new TabControl();
             t.Dock = DockStyle.Fill;
 
-            var items = parser.Items.Where(item => !((item.Application is ShowHelp || item.Application is ShowUserInterface || item.Application is ShowWebServer)));
+            var items = parser.Items
+                .Where(item => !(ExcludedFromUi(item) || item is SubCommand));
             var categories = items.SelectMany(i => i.Categories).Distinct().ToList();
 
             foreach (var category in categories)
@@ -382,7 +402,7 @@ namespace Sidi.CommandLine
                     }
                     else if (item is SubCommand)
                     {
-                        childControl = ToControl((SubCommand)item);
+                        continue;
                     }
 
                     if (childControl != null)
@@ -394,10 +414,17 @@ namespace Sidi.CommandLine
 
                 t.TabPages.Add(page);
             }
-            
-            main.Controls.Add(t);
 
-            return main;
+            foreach (var subCommand in parser.SubCommands.Where(x => !ExcludedFromUi(x)))
+            {
+                var scPage = new TabPage(subCommand.Name);
+                var scControl = ToTabControl(new Parser(subCommand.CommandInstance));
+                scControl.Dock = DockStyle.Fill;
+                scPage.Controls.Add(scControl);
+                t.TabPages.Add(scPage);
+            }
+
+            return t;
         }
 
         [Usage("Show an interactive user interface")]

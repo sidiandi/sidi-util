@@ -45,7 +45,7 @@ namespace Sidi.Persistence
             dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options");
         }
 
-        Sidi.IO.Path path;
+        Sidi.IO.LPath path;
 
         [TearDown()]
         public void TearDown()

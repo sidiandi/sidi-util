@@ -38,7 +38,7 @@ namespace Sidi.Build
         {
             get
             {
-                var f = new Sidi.IO.Path(DebuggingToolsForWindows.Directory).CatDir("srcsrv", "pdbstr.exe");
+                var f = new Sidi.IO.LPath(DebuggingToolsForWindows.Directory).CatDir("srcsrv", "pdbstr.exe");
 
                 if (!f.Exists)
                 {
@@ -66,7 +66,7 @@ namespace Sidi.Build
         /// <param name="content">Content of the stream</param>
         public void Write(string pdbFile, string streamName, string content)
         {
-            var temp = Sidi.IO.Path.GetTempFileName();
+            var temp = Sidi.IO.LPath.GetTempFileName();
 
             using (var w = new StreamWriter(temp))
             {

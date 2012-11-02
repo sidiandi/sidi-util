@@ -56,7 +56,7 @@ namespace Sidi.Util
         public void Write(string outFile)
         {
             XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
-            using (Stream f = L.File.OpenWrite(outFile))
+            using (Stream f = L.LFile.OpenWrite(outFile))
             {
                 s.Serialize(f, this);
             }

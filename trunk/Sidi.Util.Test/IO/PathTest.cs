@@ -17,34 +17,34 @@ namespace Sidi.IO
         [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
         public void Check()
         {
-            var ln = new Path(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
+            var ln = new LPath(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
         }
 
         [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
         public void Check2()
         {
-            var ln = new Path(new string('0', 256));
+            var ln = new LPath(new string('0', 256));
         }
 
         [Test]
         public void UseAsString()
         {
-            var cd = new Path(System.Environment.CurrentDirectory);
+            var cd = new LPath(System.Environment.CurrentDirectory);
             Assert.AreEqual(cd.ToString(), new System.IO.DirectoryInfo(cd).FullName);
         }
 
         [Test]
         public void FullPath()
         {
-            var ln = new Path(Enumerable.Range(0, 100).Select(x => "0000000000"));
-            var cd = new Path(System.Environment.CurrentDirectory);
+            var ln = new LPath(Enumerable.Range(0, 100).Select(x => "0000000000"));
+            var cd = new LPath(System.Environment.CurrentDirectory);
             Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
 
-            ln = new Path(@"\" + ln.NoPrefix);
-            Assert.AreEqual(new Path(cd.PathRoot.ToString() + ln.ToString()), ln.GetFullPath());
+            ln = new LPath(@"\" + ln.NoPrefix);
+            Assert.AreEqual(new LPath(cd.PathRoot.ToString() + ln.ToString()), ln.GetFullPath());
 
-            ln = new Path(".");
-            Assert.AreEqual(Directory.Current, ln.GetFullPath());
+            ln = new LPath(".");
+            Assert.AreEqual(LDirectory.Current, ln.GetFullPath());
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace Sidi.IO
         {
             var pCount = 40;
             var part = "0000000000";
-            var ln = new Path(Enumerable.Range(0, pCount).Select(x => part).Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
+            var ln = new LPath(Enumerable.Range(0, pCount).Select(x => part).Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
             var p = ln.Parts;
             Assert.AreEqual(pCount, p.Count());
             Assert.AreEqual(part, p[0]);
@@ -61,25 +61,25 @@ namespace Sidi.IO
         [Test]
         public void SpecialPaths()
         {
-            for (Sidi.IO.Path p = System.Environment.SystemDirectory; p != null; p = p.Parent)
+            for (Sidi.IO.LPath p = System.Environment.SystemDirectory; p != null; p = p.Parent)
             {
                 Console.WriteLine(p);
-                Assert.IsTrue(Directory.Exists(p));
-                Console.WriteLine(Directory.GetChilds(p).Join());
+                Assert.IsTrue(LDirectory.Exists(p));
+                Console.WriteLine(LDirectory.GetChilds(p).Join());
             }
         }
 
         [Test]
         public void UncPaths()
         {
-            var tempDir = Path.GetTempPath();
+            var tempDir = LPath.GetTempPath();
             Assert.IsTrue(tempDir.IsDirectory);
 
             log.Info(tempDir.DriveLetter);
             var unc = @"\\" + System.Environment.MachineName + @"\" + tempDir.DriveLetter + "$";
             Assert.IsTrue(System.IO.Directory.Exists(unc));
 
-            var longNameUnc = new Sidi.IO.Path(unc);
+            var longNameUnc = new Sidi.IO.LPath(unc);
             Assert.IsTrue(longNameUnc.IsDirectory);
             Assert.IsTrue(longNameUnc.IsUnc);
 
@@ -90,8 +90,8 @@ namespace Sidi.IO
             {
                 Console.WriteLine(i);
                 Console.WriteLine(i.Parts.Join("|"));
-                Console.WriteLine(Directory.GetChilds(i).Join());
-                Assert.IsTrue(Directory.Exists(i));
+                Console.WriteLine(LDirectory.GetChilds(i).Join());
+                Assert.IsTrue(LDirectory.Exists(i));
             }
         }
 
@@ -101,30 +101,30 @@ namespace Sidi.IO
             var validName = "I am a valid filename";
             var invalidName = System.IO.Path.GetInvalidFileNameChars().Join(" ");
 
-            Assert.IsTrue(Path.IsValidFilename(validName));
-            Assert.IsFalse(Path.IsValidFilename(invalidName));
+            Assert.IsTrue(LPath.IsValidFilename(validName));
+            Assert.IsFalse(LPath.IsValidFilename(invalidName));
 
-            var f = Path.GetValidFilename(invalidName);
-            Assert.IsTrue(Path.IsValidFilename(f));
+            var f = LPath.GetValidFilename(invalidName);
+            Assert.IsTrue(LPath.IsValidFilename(f));
             Assert.AreNotEqual(invalidName, f);
             Assert.AreEqual(System.IO.Path.GetInvalidFileNameChars().Select(c => "_").Join(" "), f);
-            Assert.AreEqual(validName, Path.GetValidFilename(validName));
+            Assert.AreEqual(validName, LPath.GetValidFilename(validName));
         }
 
         [Test]
         public void PathRoot()
         {
-            var n = Sidi.IO.Path.GetTempPath();
+            var n = Sidi.IO.LPath.GetTempPath();
             Assert.AreEqual(System.IO.Path.GetPathRoot(n.NoPrefix), n.PathRoot.NoPrefix + @"\");
         }
 
         [Test]
         public void Relative()
         {
-            var n = new Path(@"C:\temp\abc.txt");
-            var root = new Path(@"C:\Temp");
-            Assert.AreEqual(new Path("abc.txt"), n.RelativeTo(root));
-            Assert.AreEqual(new Path(), n.RelativeTo(n));
+            var n = new LPath(@"C:\temp\abc.txt");
+            var root = new LPath(@"C:\Temp");
+            Assert.AreEqual(new LPath("abc.txt"), n.RelativeTo(root));
+            Assert.AreEqual(new LPath(), n.RelativeTo(n));
         }
 
         /*
@@ -147,14 +147,14 @@ namespace Sidi.IO
         [Test]
         public void IsValid()
         {
-            Assert.IsTrue(Path.IsValid(@"C:\temp"));
+            Assert.IsTrue(LPath.IsValid(@"C:\temp"));
         }
 
         [Test]
         public void XmlSerialize()
         {
-            var n = Sidi.IO.Path.GetTempPath();
-            var s = new XmlSerializer(typeof(Path));
+            var n = Sidi.IO.LPath.GetTempPath();
+            var s = new XmlSerializer(typeof(LPath));
             var t = new System.IO.StringWriter();
             s.Serialize(t, n);
             log.Info(t.ToString());
@@ -166,14 +166,14 @@ namespace Sidi.IO
         public void StringCast()
         {
             var stringPath = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            Path p = stringPath;
-            Assert.AreEqual(new Path(stringPath), p);
+            LPath p = stringPath;
+            Assert.AreEqual(new LPath(stringPath), p);
         }
 
         [Test]
         public void ParentChildren()
         {
-            Path p = TestFile(".");
+            LPath p = TestFile(".");
             p = p.Canonic;
             Assert.IsTrue(p.Children.Any());
             foreach (var c in p.Children)
@@ -185,29 +185,29 @@ namespace Sidi.IO
         [Test]
         public void Sibling()
         {
-            Assert.IsTrue(new Sidi.IO.Path(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
+            Assert.IsTrue(new Sidi.IO.LPath(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
         }
 
         [Test]
         public void CatDir()
         {
             int someNum = 123;
-            var p = Path.Join(@"C:\temp", someNum);
-            Assert.AreEqual(new Path(@"C:\temp\123"), p);
-            Assert.AreEqual(new Path(@"C:\temp\123\dir"), Path.Join(p, "dir"));
+            var p = LPath.Join(@"C:\temp", someNum);
+            Assert.AreEqual(new LPath(@"C:\temp\123"), p);
+            Assert.AreEqual(new LPath(@"C:\temp\123\dir"), LPath.Join(p, "dir"));
         }
 
         [Test]
         public void GetRelativePath()
         {
-            Assert.AreEqual(new Path("a.txt"), new Path(@"d:\temp\a.txt").GetRelative(@"d:\temp"));
-            Assert.AreEqual(new Path(".."), new Path(@"d:\temp").GetRelative(@"d:\temp\a.txt"));
+            Assert.AreEqual(new LPath("a.txt"), new LPath(@"d:\temp\a.txt").GetRelative(@"d:\temp"));
+            Assert.AreEqual(new LPath(".."), new LPath(@"d:\temp").GetRelative(@"d:\temp\a.txt"));
         }
 
         [Test]
         public void HasExtension()
         {
-            var p = new Path("a.txt");
+            var p = new LPath("a.txt");
             Assert.IsTrue(p.HasExtension);
             p = p.ChangeExtension(null);
             Assert.IsFalse(p.HasExtension);

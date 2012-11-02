@@ -27,6 +27,7 @@ using log4net;
 
 namespace Sidi.Net.Pop3
 {
+    [Serializable]
     public class PopException : Exception
     {
         public PopException(string msg)
@@ -373,15 +374,38 @@ namespace Sidi.Net.Pop3
 
         #region IDisposable Members
 
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            if (ndc != null)
-            {
-                ndc.Dispose();
-                ndc = null;
-            }
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+          if (!disposed)
+          {
+            if (disposing)
+            {
+                ndc.Dispose();
+                this.In.Dispose();
+                Out.Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
+        }
+
+        // Use C# destructor syntax for finalization code.
+        ~Session()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
         #endregion
     }
 }

@@ -9,17 +9,17 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void Move(Path from, Path to)
+        public static void Move(LPath from, LPath to)
         {
-            if (File.Exists(from))
+            if (LFile.Exists(from))
             {
                 to.EnsureParentDirectoryExists();
-                File.Move(from, to);
+                LFile.Move(from, to);
             }
-            else if (Directory.Exists(from))
+            else if (LDirectory.Exists(from))
             {
                 to.EnsureParentDirectoryExists();
-                Directory.Move(from, to);
+                LDirectory.Move(from, to);
             }
             log.InfoFormat("moved {0} to {1}", from, to);
         }
@@ -30,16 +30,16 @@ namespace Sidi.IO
             DoCopy = (s, d) =>
                 {
                     d.EnsureParentDirectoryExists();
-                    File.Copy(s, d);
+                    LFile.Copy(s, d);
                 };
         }
 
-        public void Copy(Path source, Path destination)
+        public void Copy(LPath source, LPath destination)
         {
             CopyRooted(source, source, destination);
         }
 
-        public void CopyRooted(Path source, Path sourceRoot, Path destinationRoot)
+        public void CopyRooted(LPath source, LPath sourceRoot, LPath destinationRoot)
         {
             var e = new Find()
             {
@@ -58,7 +58,7 @@ namespace Sidi.IO
         }
 
         public Func<FileSystemInfo, FileSystemInfo, bool> CopyRequired;
-        public Action<Path, Path> DoCopy;
+        public Action<LPath, LPath> DoCopy;
     }
 
     public class SimpleCopyOp : CopyOp
@@ -89,16 +89,16 @@ namespace Sidi.IO
                         {
                             try
                             {
-                                File.CreateHardLink(d, s);
+                                LFile.CreateHardLink(d, s);
                             }
                             catch (System.IO.IOException)
                             {
-                                File.Copy(s, d);
+                                LFile.Copy(s, d);
                             }
                         }
                         else
                         {
-                            File.Copy(s, d, Overwrite);
+                            LFile.Copy(s, d, Overwrite);
                         }
                     }
                 };

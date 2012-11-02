@@ -85,15 +85,15 @@ namespace Sidi.Forms
 
         public static string EditInteractive(string text)
         {
-            Sidi.IO.Path tf = null;
+            Sidi.IO.LPath tf = null;
             try
             {
-                tf = Sidi.IO.Path.GetTempFileName();
-                Sidi.IO.File.WriteAllText(tf, text);
+                tf = Sidi.IO.LPath.GetTempFileName();
+                Sidi.IO.LFile.WriteAllText(tf, text);
 
                 using (var p = new Process())
                 {
-                    var fileName = new Sidi.IO.Path(
+                    var fileName = new Sidi.IO.LPath(
                         Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)).CatDir(
                         "Notepad++", "notepad++.exe");
 
@@ -109,7 +109,7 @@ namespace Sidi.Forms
                     p.Start();
                     log.Info(p.DetailedInfo());
                     p.WaitForExit();
-                    return Sidi.IO.File.ReadAllText(tf);
+                    return Sidi.IO.LFile.ReadAllText(tf);
                 }
             }
             finally

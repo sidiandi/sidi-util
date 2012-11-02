@@ -95,6 +95,7 @@ namespace Sidi.Util
 
     }
 
+    [Serializable]
     public class ProcessFailedException : Exception
     {
         Process process;

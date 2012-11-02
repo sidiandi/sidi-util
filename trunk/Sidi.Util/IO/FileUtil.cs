@@ -36,7 +36,7 @@ namespace Sidi.IO
         /// <param name="directory"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string SearchUp(L.Path directory, string fileName)
+        public static string SearchUp(L.LPath directory, string fileName)
         {
             if (directory == null)
             {
@@ -46,7 +46,7 @@ namespace Sidi.IO
             for (var p = directory; p != null; p = p.Parent)
             {
                 var file = p.CatDir(fileName);
-                if (File.Exists(file))
+                if (LFile.Exists(file))
                 {
                     return file;
                 }
@@ -108,9 +108,9 @@ namespace Sidi.IO
         /// <returns></returns>
         public static bool FilesAreEqual(string a, string b)
         {
-            if (File.Exists(a))
+            if (LFile.Exists(a))
             {
-                if (File.Exists(b))
+                if (LFile.Exists(b))
                 {
                     FileInfo ia = new FileInfo(a);
                     FileInfo ib = new FileInfo(b);
@@ -123,8 +123,8 @@ namespace Sidi.IO
                     Stream fb = null;
                     try
                     {
-                        fa = File.OpenRead(a);
-                        fb = File.OpenRead(b);
+                        fa = LFile.OpenRead(a);
+                        fb = LFile.OpenRead(b);
                         int da;
                         int db;
                         do
@@ -153,7 +153,7 @@ namespace Sidi.IO
             }
             else
             {
-                if (File.Exists(b))
+                if (LFile.Exists(b))
                 {
                     return false;
                 }
@@ -166,9 +166,9 @@ namespace Sidi.IO
 
         public static bool FilesAreEqualByTime(string a, string b)
         {
-            if (File.Exists(a))
+            if (LFile.Exists(a))
             {
-                if (File.Exists(b))
+                if (LFile.Exists(b))
                 {
                     var fa = new FileInfo(a);
                     var fb = new FileInfo(b);
@@ -183,7 +183,7 @@ namespace Sidi.IO
             }
             else
             {
-                return !File.Exists(b);
+                return !LFile.Exists(b);
             }
         }
 

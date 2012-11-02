@@ -91,7 +91,7 @@ namespace Sidi.Build
 
             foreach (var i in Modules)
             {
-                var pdbFile = new Sidi.IO.Path(i.ItemSpec).ChangeExtension("pdb");
+                var pdbFile = new Sidi.IO.LPath(i.ItemSpec).ChangeExtension("pdb");
                 AddSourceIndex(pdbFile);
             }
             return true;
@@ -103,7 +103,7 @@ namespace Sidi.Build
         /// <param name="pdbFile"></param>
         public void AddSourceIndex(string pdbFile)
         {
-            var pdbFilePath = new Sidi.IO.Path(pdbFile);
+            var pdbFilePath = new Sidi.IO.LPath(pdbFile);
             if (!pdbFilePath.IsFile)
             {
                 throw new FileNotFoundException(pdbFile);

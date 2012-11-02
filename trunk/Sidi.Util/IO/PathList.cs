@@ -8,36 +8,36 @@ using Sidi.Extensions;
 
 namespace Sidi.IO
 {
-    public class FileList : List<Path>
+    public class PathList : List<LPath>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public FileList(IEnumerable<Path> paths)
+        public PathList(IEnumerable<LPath> paths)
         : base(paths)
         {
         }
 
-        public FileList()
+        public PathList()
         {
         }
 
-        public static FileList ReadClipboard()
+        public static PathList ReadClipboard()
         {
-            var fileList = new FileList();
+            var fileList = new PathList();
             fileList.AddRange(Clipboard.GetFileDropList()
                 .Cast<string>()
-                .Select(x => new Sidi.IO.Path(x)));
+                .Select(x => new Sidi.IO.LPath(x)));
             return fileList;
         }
 
-        public static FileList Parse(string files)
+        public static PathList Parse(string files)
         {
             if (files.Equals(":paste", StringComparison.InvariantCultureIgnoreCase))
             {
                 return ReadClipboard();
             }
 
-            return new FileList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.Path(x)));
+            return new PathList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x)));
         }
 
         public override string ToString()

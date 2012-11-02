@@ -14,20 +14,20 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Path LocalPath(this Assembly assembly)
+        public static LPath LocalPath(this Assembly assembly)
         {
-            return new Path(new Uri(assembly.CodeBase).LocalPath);
+            return new LPath(new Uri(assembly.CodeBase).LocalPath);
         }
 
-        public static Path UserSetting(this Type type, string name)
+        public static LPath UserSetting(this Type type, string name)
         {
-            var root = new Path(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData));
+            var root = new LPath(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData));
             var assemblyName = type.Assembly.GetName().Name;
             var path = root.CatDir(assemblyName, name);
             return path;
         }
 
-        public static Path BinDir
+        public static LPath BinDir
         {
             get
             {
@@ -35,17 +35,17 @@ namespace Sidi.IO
             }
         }
 
-        public static Path Temp
+        public static LPath Temp
         {
             get
             {
-                return new Path(System.IO.Path.GetTempPath());
+                return new LPath(System.IO.Path.GetTempPath());
             }
         }
 
-        public static Path GetFolderPath(Environment.SpecialFolder sf)
+        public static LPath GetFolderPath(Environment.SpecialFolder sf)
         {
-            return new Path(System.Environment.GetFolderPath(sf));
+            return new LPath(System.Environment.GetFolderPath(sf));
         }
     }
 }

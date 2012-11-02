@@ -12,12 +12,12 @@ namespace Sidi.Visualization
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static Tree Get(Path dir)
+        public static Tree Get(LPath dir)
         {
             return GetRecursive(null, new FileSystemInfo(dir));
         }
 
-        public static Tree GetBackground(Path dir)
+        public static Tree GetBackground(LPath dir)
         {
             var t = new Tree(null) { Object = dir.Info };
 

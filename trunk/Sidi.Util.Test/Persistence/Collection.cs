@@ -38,7 +38,7 @@ namespace Sidi.Persistence
         [Test]
         public void OpenClose()
         {
-            var dbFile = new L.Path(TestFile(@"test.sqlite"));
+            var dbFile = new L.LPath(TestFile(@"test.sqlite"));
             dbFile.EnsureNotExists();
             var cs = new SQLiteConnectionStringBuilder();
             cs.DataSource = dbFile;
@@ -52,7 +52,7 @@ namespace Sidi.Persistence
         {
             for (int i = 0; i < 20; ++i)
             {
-                var dbFile = new L.Path(TestFile(@"test.sqlite"));
+                var dbFile = new L.LPath(TestFile(@"test.sqlite"));
                 dbFile.EnsureNotExists();
                 using (var c = new Collection<CollectionTest.Address>(dbFile))
                 {
@@ -147,7 +147,7 @@ namespace Sidi.Persistence
             public byte[] aByteArray = System.Text.ASCIIEncoding.ASCII.GetBytes("Hello, World!");
         }
 
-        L.Path testFile;
+        L.LPath testFile;
         string table = "a";
         int count = 10;
 
@@ -520,21 +520,21 @@ namespace Sidi.Persistence
             public long Id;
 
             [Data]
-            public L.Path Path;
+            public L.LPath Path;
         }
 
         [Test]
         public void Path()
         {
             var p = TestFile("path.sqlite");
-            new L.Path(p).EnsureNotExists();
+            new L.LPath(p).EnsureNotExists();
             var db = new Collection<FileInfo>(p);
             db.Add(new FileInfo()
             {
-                Path = new L.Path(@"C:\temp")
+                Path = new L.LPath(@"C:\temp")
             });
 
-            Assert.AreEqual(new L.Path(@"C:\temp"), db.First().Path);
+            Assert.AreEqual(new L.LPath(@"C:\temp"), db.First().Path);
         }
 
         [Test]

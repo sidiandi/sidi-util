@@ -14,17 +14,17 @@ namespace Sidi.IO
 
         public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
         {
-            return new Path((string)value);
+            return new LPath((string)value);
         }
 
         public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, Type destinationType)
         {
-            return destinationType.Equals(typeof(Path));
+            return destinationType.Equals(typeof(LPath));
         }
 
         public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            return ((Path)value).ToString();
+            return ((LPath)value).ToString();
         }
     }
 }

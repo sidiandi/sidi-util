@@ -26,11 +26,11 @@ namespace Sidi.IO
 {
     public class SearchPath
     {
-        public FileList Paths;
+        public PathList Paths;
 
         public SearchPath()
         {
-            Paths = new FileList();
+            Paths = new PathList();
         }
 
         public static SearchPath PATH
@@ -41,7 +41,7 @@ namespace Sidi.IO
             }
         }
 
-        public void AppendIfNotExist(Path dir)
+        public void AppendIfNotExist(LPath dir)
         {
             if (Paths.Contains(dir))
             {
@@ -50,7 +50,7 @@ namespace Sidi.IO
             Paths.Add(dir);
         }
 
-        public void PrependIfNotExist(Path dir)
+        public void PrependIfNotExist(LPath dir)
         {
             if (Paths.Contains(dir))
             {
@@ -63,7 +63,7 @@ namespace Sidi.IO
         {
             return new SearchPath()
             {
-                Paths = FileList.Parse(semiColonSeparatedPath)
+                Paths = PathList.Parse(semiColonSeparatedPath)
             };
         }
 
@@ -72,9 +72,9 @@ namespace Sidi.IO
             return Paths.Join(";");
         }
 
-        public Path Find(Path file)
+        public LPath Find(LPath file)
         {
-            Path path;
+            LPath path;
             if (TryFind(file, out path))
             {
                 return path;
@@ -83,12 +83,12 @@ namespace Sidi.IO
             throw new System.IO.FileNotFoundException(Paths.Select(x => x.CatDir(file)).Join());
         }
 
-        public bool TryFind(Path file, out Path path)
+        public bool TryFind(LPath file, out LPath path)
         {
             foreach (var i in Paths)
             {
                 string p = i.CatDir(file);
-                if (File.Exists(p))
+                if (LFile.Exists(p))
                 {
                     path = p;
                     return true;
