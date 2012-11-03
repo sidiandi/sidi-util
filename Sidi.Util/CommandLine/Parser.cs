@@ -298,6 +298,7 @@ namespace Sidi.CommandLine
                     if (value != null)
                     {
                         var valueString = value.ToString();
+                        log.InfoFormat("Restore persistent option {0}", o);
                         if (o.IsPassword)
                         {
                             valueString = valueString.Decrypt(preferencesPassword);
@@ -307,7 +308,7 @@ namespace Sidi.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    log.Warn(String.Format("Could not load preferences for {0}", o.Name), ex);
+                    log.Warn(String.Format("Could not load preferences for {0}", o), ex);
                 }
             }
         }
@@ -330,9 +331,11 @@ namespace Sidi.CommandLine
                     {
                         v = v.Encrypt(preferencesPassword);
                     }
+
                     if (v != null)
                     {
-                        Registry.SetValue(GetPreferencesKey(o), o.Name, v.ToString());
+                        log.InfoFormat("Store persistent option {0} = {1}", o.Name, o.DisplayValue);
+                        Registry.SetValue(GetPreferencesKey(o), o.Name, v);
                     }
                 }
             }

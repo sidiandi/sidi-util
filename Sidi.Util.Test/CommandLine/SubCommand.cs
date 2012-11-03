@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+// Copyright (c) 2009, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
 // 
 // This file is part of sidi-util.
 // 
@@ -38,11 +38,21 @@ namespace Sidi.CommandLine.Test
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        [Usage("Persistent settings")]
+        public class Settings
+        {
+            [Usage("Name"), Persistent]
+            public string Name { get; set; }
+        }
+        
         [Usage("Test app")]
         public class App
         {
             [SubCommand]
             public Math Math;
+
+            [SubCommand]
+            public Settings Settings;
         }
 
         [Usage("Mathematical operations")]
@@ -100,6 +110,13 @@ namespace Sidi.CommandLine.Test
             var p = new Parser(app);
             p.Parse(new string[] { "Math", "Add", "1", "1", ";", "Math", "Multiply", "2", "2" });
             p.Parse(new string[] { "Math", "Add", "1", "1", "Multiply", "2", "2" });
+        }
+
+        [Test]
+        public void Persistence()
+        {
+            Parser.Run(new App(), new[] { "Settings", "Name", "Andreas" });
+            Parser.Run(new App(), new[] { "Settings" });
         }
     }
 }
