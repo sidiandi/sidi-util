@@ -47,8 +47,8 @@ namespace Sidi.Visualization
             this.treeMapControl = treeMapControl;
 
             LevelVisible = new bool[0x100];
-            MinArea = 100.0f;
-            MinFontSize = 5.0f;
+            MinArea = 1000;
+            MinFontSize = 5;
             LeafsOnly = false;
             Text = t => t == null ? String.Empty : t.ToString();
 
@@ -122,7 +122,7 @@ namespace Sidi.Visualization
             }
         }
 
-        public float MinArea { get; set; }
+        public double MinArea { get; set; }
 
         public void ShowLevels(int index)
         {
@@ -157,16 +157,20 @@ namespace Sidi.Visualization
         bool focusPointEnabled = false;
         Point focusPoint;
         System.Windows.Point worldFocusPoint;
+        System.Windows.Media.Matrix worldToScreenTransform;
+        double areaScale;
 
         public void Paint(PaintEventArgs e)
         {
             var layout = treeMapControl.LayoutManager;
             double maxArea = layout.Root.Bounds.Area;
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
+            worldToScreenTransform = e.Graphics.Transform.ToMatrixD();
+            areaScale = worldToScreenTransform.Transform(new Bounds(0, 0, 1, 1)).Area;
+
             if (focusPointEnabled)
             {
-                worldFocusPoint = treeMapControl.GetWorldPoint(focusPoint);
-                PaintRecursiveFocusPoint(e, layout.Root, 0);
+                PaintFocusPoint(e);
             }
             else
             {
@@ -229,8 +233,17 @@ namespace Sidi.Visualization
             return true;
         }
 
-        public bool DrawLabel(Graphics graphics, string text, RectangleF rect)
+        /// <summary>
+        /// Draws a label in world rectangle rect
+        /// </summary>
+        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="text"></param>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public bool DrawLabel(Graphics graphics, string text, Bounds rect)
         {
+            rect = worldToScreenTransform.Transform(rect);
+
             var textSize = graphics.MeasureString(text, Font);
             var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
             if ((scale * textSize.Height * 8) < rect.Height)
@@ -240,59 +253,70 @@ namespace Sidi.Visualization
             byte a = 255;
 
             var white = new SolidBrush(Color.FromArgb(a, Color.White));
-            float fontSize = Math.Max(Font.Size * scale, 1.0f);
-
-            /*
-            if (fontSize < MinFontSize)
-            {
-                return false;
-            }
-             */
+            var fontSize = (float) Math.Max(Font.Size * scale, 1.0f);
 
             var font = new Font(FontFamily.GenericSansSerif, fontSize);
 
             graphics.DrawString(
-            text,
-            font,
-            white,
-            rect,
-            StringFormat
+                text,
+                font,
+                white,
+                rect.ToRectangleF(),
+                StringFormat
             );
             return true;
 
         }
 
-        bool PaintRecursiveFocusPoint(PaintEventArgs e, Layout layout, int level)
+        void PaintFocusPoint(PaintEventArgs e)
         {
-            // var rectArea = n.Rectangle.Area();
-            /*
-            if (!e.ClipRectangle.IntersectsWith(layout.Rectangle.ToRectangle()))
+            worldFocusPoint = treeMapControl.GetWorldPoint(focusPoint);
+            var layout = treeMapControl.LayoutManager.Root;
+            var state = e.Graphics.Save();
+            try
             {
-                return false;
+                e.Graphics.Transform = new Matrix();
+                PaintRecursiveFocusPoint(e, layout, 0);
             }
-             */
-
-            if (layout.Bounds.Contains(worldFocusPoint))
+            finally
             {
-                if (layout.Children.Any())
+                e.Graphics.Restore(state);
+            }
+        }
+
+        void PaintRecursiveFocusPoint(PaintEventArgs e, Layout layout, int level)
+        {
+            bool drawLabel = !layout.Bounds.Contains(worldFocusPoint) || !layout.Children.Any();
+
+            if (!drawLabel)
+            {
+                // determine if there is enough area to draw a label in at least 75% of all childs
+                double totalArea = 0;
+                double drawableArea = 0;
+                foreach (var c in layout.Children)
                 {
-                    foreach (var c in layout.Children)
+                    var a = c.Bounds.Area * areaScale;
+                    if (a >= MinArea)
                     {
-                        PaintRecursiveFocusPoint(e, c, level + 1);
+                        drawableArea += a;
                     }
+                    totalArea += a;
                 }
-                else
-                {
-                    var text = Text(layout.Tree);
-                    DrawLabel(e.Graphics, text, layout.Bounds.ToRectangleF());
-                }
-                return true;
+
+                drawLabel = drawableArea < 0.75 * totalArea;
+            }
+
+            if (drawLabel)
+            {
+                var text = Text(layout.Tree);
+                DrawLabel(e.Graphics, text, layout.Bounds);
             }
             else
             {
-                var text = Text(layout.Tree);
-                DrawLabel(e.Graphics, text, layout.Bounds.ToRectangleF());
-                return true;
+                foreach (var c in layout.Children)
+                {
+                    PaintRecursiveFocusPoint(e, c, level + 1);
+                };
             }
         }
 
