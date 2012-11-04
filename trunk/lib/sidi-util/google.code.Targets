@@ -106,8 +106,6 @@
             />
   </Target>
 
-  <Target Name="Release" DependsOnTargets="Upload" />
-
   <Target Name="Nuget" DependsOnTargets="Build" >
     <Copy SourceFiles="$(MSBuildProjectDirectory)\$(ProjectName).nuspec" DestinationFolder="$(PackageDir)" />
     <Copy SourceFiles="@(Targets)" DestinationFolder="$(PackageDir)\lib\net40" />
@@ -115,4 +113,7 @@
 	<Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
   </Target>
   
+  <Target Name="Release" DependsOnTargets="Package" />
+  <Target Name="Publish" DependsOnTargets="Upload" />
+
 </Project>
