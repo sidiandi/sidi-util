@@ -31,7 +31,7 @@ namespace Sidi.Visualization
 
         public static Tree Get(LPath dir)
         {
-            return GetRecursive(null, new FileSystemInfo(dir));
+            return GetRecursive(null, new LFileSystemInfo(dir));
         }
 
         public static Tree GetBackground(LPath dir)
@@ -49,7 +49,7 @@ namespace Sidi.Visualization
         static void GetChildrenRecursive(Tree t)
         {
             log.Info(t.Object);    
-            var i = (Sidi.IO.FileSystemInfo) t.Object;
+            var i = (Sidi.IO.LFileSystemInfo) t.Object;
             if (i.IsDirectory)
             {
                 foreach (var x in i.GetFileSystemInfos())
@@ -64,7 +64,7 @@ namespace Sidi.Visualization
             }
         }
 
-        static Tree GetRecursive(Tree parent, Sidi.IO.FileSystemInfo i)
+        static Tree GetRecursive(Tree parent, Sidi.IO.LFileSystemInfo i)
         {
             var t = new Tree(parent) { Object = i };
             if (i.IsDirectory)

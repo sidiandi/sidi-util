@@ -59,7 +59,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
@@ -134,7 +136,7 @@
     <Compile Include="IO\LFile.cs" />
     <Compile Include="IO\FindConfig.cs" />
     <Compile Include="IO\PathList.cs" />
-    <Compile Include="IO\FileSystemInfo.cs" />
+    <Compile Include="IO\LFileSystemInfo.cs" />
     <Compile Include="IO\FileType.cs" />
     <Compile Include="IO\FindData.cs" />
     <Compile Include="IO\LPath.cs" />

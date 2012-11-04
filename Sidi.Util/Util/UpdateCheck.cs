@@ -109,7 +109,7 @@ namespace Sidi.Util
                 {
                     return updateInfo.VersionInfo.First(x => x.Name.Equals(assembly.GetName().Name));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception("No VersionInfo for {0}".F(assembly), ex);
                 }
@@ -129,7 +129,7 @@ namespace Sidi.Util
         public UpdateInfo UpdateInfo
         {
             get { return updateInfo; }
-            set 
+            set
             {
                 updateInfo = value;
                 log.Info("Update info changed.");
@@ -142,7 +142,7 @@ namespace Sidi.Util
         {
         }
 
-        
+
         public UpdateCheck(Assembly assembly, Uri updateInfoUri)
         {
             if (assembly == null)
@@ -180,18 +180,22 @@ namespace Sidi.Util
                 {
                     of[0].Invoke(new Action(delegate()
                     {
-                        UpdateForm u = new UpdateForm(this);
-                        u.ShowDialog();
+                        using (var u = new UpdateForm(this))
+                        {
+                            u.ShowDialog();
+                        }
                     }));
                 }
                 else
                 {
-                    UpdateForm u = new UpdateForm(this);
-                    u.ShowDialog();
+                    using (var u = new UpdateForm(this))
+                    {
+                        u.ShowDialog();
+                    }
                 }
             });
         }
-        
+
         public void CheckAsync(Action updateRequiredHandler)
         {
             this.updateRequiredHandler = updateRequiredHandler;
@@ -213,24 +217,26 @@ namespace Sidi.Util
 
         public void ReadUpdateInfo(bool async)
         {
-            WebClient web = new WebClient();
-            web.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
-            UriBuilder uriBuilder = new UriBuilder(updateInfoUri);
-            if (!updateInfoUri.IsFile)
+            using (WebClient web = new WebClient())
             {
-                AssemblyName an = assembly.GetName();
-                uriBuilder.Query = "name=" + an.Name + "&" + "version=" + an.Version.ToString();
-            }
-            uri = uriBuilder.Uri;
-            log.InfoFormat("Downloading update info from {0}", uri);
-            if (async)
-            {
-                web.DownloadDataCompleted += new DownloadDataCompletedEventHandler(web_DownloadDataCompleted);
-                web.DownloadDataAsync(uri);
-            }
-            else
-            {
-                Parse(web.DownloadData(uri));
+                web.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+                UriBuilder uriBuilder = new UriBuilder(updateInfoUri);
+                if (!updateInfoUri.IsFile)
+                {
+                    AssemblyName an = assembly.GetName();
+                    uriBuilder.Query = "name=" + an.Name + "&" + "version=" + an.Version.ToString();
+                }
+                uri = uriBuilder.Uri;
+                log.InfoFormat("Downloading update info from {0}", uri);
+                if (async)
+                {
+                    web.DownloadDataCompleted += new DownloadDataCompletedEventHandler(web_DownloadDataCompleted);
+                    web.DownloadDataAsync(uri);
+                }
+                else
+                {
+                    Parse(web.DownloadData(uri));
+                }
             }
         }
 

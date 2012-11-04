@@ -180,6 +180,7 @@ namespace Sidi.Persistence
             SetRowIdParam(command, GetRowId(parameters));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public SQLiteCommand CreateCommand(string sql)
         {
             var command = Connection.CreateCommand();
@@ -190,6 +191,7 @@ namespace Sidi.Persistence
             return command;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public SQLiteCommand CreateCommand(string sql, params object[] parameters)
         {
             var command = Connection.CreateCommand();
@@ -230,6 +232,7 @@ namespace Sidi.Persistence
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         void Init(SharedConnection connection, string a_table)
         {
             this.m_connection = new SharedConnection(connection);
@@ -310,6 +313,7 @@ namespace Sidi.Persistence
             }));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         void CreateTable()
         {
             string sql = String.Format("create table {0} ({1})", table, FieldDefinition);
@@ -343,6 +347,7 @@ namespace Sidi.Persistence
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         void CreateIndex(string[] fields, bool unique)
         {
             using (var c = Connection.CreateCommand())
@@ -363,6 +368,7 @@ namespace Sidi.Persistence
             c.ExecuteNonQuery();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         bool TableExists(string table)
         {
             try
@@ -380,6 +386,7 @@ namespace Sidi.Persistence
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         bool CheckTableSchema()
         {
             foreach (MemberInfo i in Members)
@@ -491,6 +498,7 @@ namespace Sidi.Persistence
         /// </summary>
         /// <param name="query">complete SQL select statement returning row ids</param>
         /// <returns>List of found items</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public IList<T> Query(string query)
         {
             using (var command = Connection.CreateCommand())
@@ -599,6 +607,12 @@ namespace Sidi.Persistence
             }
         }
 
+        /// <summary>
+        /// Finds an element that matches the condition
+        /// </summary>
+        /// <param name="query">part of SQL statement after the "where" keyword</param>
+        /// <returns>Found object</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public T Find(string query)
         {
             List<long> ids = new List<long>();
@@ -632,6 +646,12 @@ namespace Sidi.Persistence
             }
         }
 
+        /// <summary>
+        /// Executes a SQL select and returns a list of objects
+        /// </summary>
+        /// <param name="query">part of SQL select statement after "where"</param>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         IList<T> DoSelect(string query)
         {
             using (var select = Connection.CreateCommand())
@@ -824,6 +844,7 @@ namespace Sidi.Persistence
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public void Clear()
         {
             using (var clear = Connection.CreateCommand())
@@ -848,6 +869,7 @@ namespace Sidi.Persistence
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public int Count
         {
             get
@@ -887,6 +909,7 @@ namespace Sidi.Persistence
 
         #region IEnumerable<T> Members
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public IEnumerator<T> GetEnumerator()
         {
             using (var all = Connection.CreateCommand())
@@ -916,6 +939,11 @@ namespace Sidi.Persistence
             return new Collection<T>(path);
         }
 
+        /// <summary>
+        /// Executes an SQL statement.
+        /// </summary>
+        /// <param name="sql"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private void Sql(string sql)
         {
             using (var c = Connection.CreateCommand())

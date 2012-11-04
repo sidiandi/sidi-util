@@ -29,6 +29,43 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Visualization
 {
+    class LookupTree : Tree
+    {
+        public LookupTree(LookupTree parent)
+        : base(parent)
+        {
+        }
+
+        Dictionary<object, LookupTree> lookup = new Dictionary<object, LookupTree>();
+
+        public void Add(object item, object[] lineage, double size, int level)
+        {
+            if (level < lineage.Length - 1)
+            {
+                var pathPart = lineage[level];
+                ProvideChild(pathPart).Add(item, lineage, size, level + 1);
+            }
+            else
+            {
+                var pathPart = item;
+                var c = ProvideChild(pathPart);
+                c.Size += size;
+            }
+        }
+
+        LookupTree ProvideChild(object pathPart)
+        {
+            LookupTree c;
+            if (!lookup.TryGetValue(pathPart, out c))
+            {
+                c = new LookupTree(this);
+                c.Object = pathPart;
+                lookup[pathPart] = c;
+            }
+            return c;
+        }
+    }
+
     public class SimpleTreeMap : TreeMap
     {
         public SimpleTreeMap()
@@ -43,11 +80,13 @@ namespace Sidi.Visualization
             LabelPainter.InteractMode = Visualization.InteractionMode.MouseFocus;
             LabelPainter.Text = x => GetText(x.Object);
 
+            /*
             this.ItemMouseHover += (s,e) =>
                 {
                     toolTip.SetToolTip(this,
                         e.Layout.Tree.Up.Select(x => String.Format("{0}: {1}", x.Size, GetText(x.Object))).Join());
                 };
+             */
         }
 
         ToolTip toolTip = new ToolTip();
@@ -56,7 +95,9 @@ namespace Sidi.Visualization
         {
             if (treeUpdateRequired)
             {
-                this.Tree = BuildTree(Items, GroupBy, GetSize);
+                var tree = BuildTree(Items, GroupBy, GetSize);
+                tree.Sort(x => x.ToString());
+                this.Tree = tree;
                 treeUpdateRequired = false;
             }
 
@@ -96,44 +137,18 @@ namespace Sidi.Visualization
                 return null;
             }
 
-            var tree = new Tree(null);
+            var tree = new LookupTree(null);
             foreach (var i in items)
             {
                 var lin = lineage(i).Cast<object>().ToArray();
-                Add(tree, i, lin, size(i), 0);
+                tree.Add(i, lin, size(i), 0);
             }
             tree.UpdateSize();
-            for (; tree.Children.Count() == 1; tree = tree.Children.First())
+            for (; tree.Children.Count() == 1; tree = (LookupTree) tree.Children.First())
             {
             }
 
             return tree;
-        }
-
-        static void Add(Tree tree, object item, object[] lineage, double size, int level)
-        {
-            if (level < lineage.Length - 1)
-            {
-                var pathPart = lineage[level];
-                var c = tree.Children.FirstOrDefault(i => i.Object.Equals(pathPart));
-                if (c == null)
-                {
-                    c = new Tree(tree);
-                    c.Object = pathPart;
-                }
-                Add(c, item, lineage, size, level + 1);
-            }
-            else
-            {
-                var pathPart = item;
-                var c = tree.Children.FirstOrDefault(i => i.Object.Equals(pathPart));
-                if (c == null)
-                {
-                    c = new Tree(tree);
-                    c.Object = pathPart;
-                }
-                c.Size += size;
-            }
         }
 
         public Func<object, Color> GetColor

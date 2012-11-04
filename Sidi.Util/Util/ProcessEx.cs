@@ -95,7 +95,7 @@ namespace Sidi.Util
 
     }
 
-    [Serializable]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly"), Serializable]
     public class ProcessFailedException : Exception
     {
         Process process;

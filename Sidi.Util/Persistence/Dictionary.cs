@@ -127,7 +127,7 @@ namespace Sidi.Persistence
                 TValue result;
                 if (!TryGetValue(key, out result))
                 {
-                    throw new IndexOutOfRangeException();
+                    throw new KeyNotFoundException(key.ToString());
                 }
                 return result;
             }

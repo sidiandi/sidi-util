@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
@@ -39,7 +40,8 @@ namespace Sidi.Visualization
             }
 
             layout = new Layout(null) { Tree = root, Bounds = bounds.ToBounds() };
-            DoLayout = Squares;
+            // DoLayout = Squares;
+            DoLayout = DivideAndConquer;
             Update(layout);
         }
 
@@ -67,7 +69,7 @@ namespace Sidi.Visualization
                 var lc = new LayoutContext()
                 {
                     Layout = layout.Tree.Children.Select(x => new Layout(layout) { Tree = x }).ToArray(),
-                    Rectangle = layout.Bounds.Inflate(margin)
+                    Bounds = layout.Bounds.Inflate(margin)
                 };
                 
                 DoLayout(lc);
@@ -109,7 +111,7 @@ namespace Sidi.Visualization
 
         public class LayoutContext
         {
-            public Bounds Rectangle;
+            public Bounds Bounds;
             public Dimension Direction;
             public Layout[] Layout;
         }
@@ -129,16 +131,16 @@ namespace Sidi.Visualization
                 od = Dimension.X;
             }
 
-            double m = c.Rectangle.Extent(d) / c.Layout.First().Tree.Parent.Size;
-            double x = c.Rectangle[d, Bound.Min];
+            double m = c.Bounds.Extent(d) / c.Layout.First().Tree.Parent.Size;
+            double x = c.Bounds[d, Bound.Min];
             foreach (var tc in c.Layout)
             {
                 var r = tc.Bounds;
                 r[d, Bound.Min] = x;
                 x += tc.Tree.Size * m;
                 r[d, Bound.Max] =
-                r[od, Bound.Min] = c.Rectangle[od, Bound.Min];
-                r[od, Bound.Max] = c.Rectangle[od, Bound.Max];
+                r[od, Bound.Min] = c.Bounds[od, Bound.Min];
+                r[od, Bound.Max] = c.Bounds[od, Bound.Max];
             }
         }
 
@@ -175,7 +177,7 @@ namespace Sidi.Visualization
 
         public static void Squares(LayoutContext c)
         {
-            Squarify(c.Layout, c.Rectangle, c.Direction, 0, c.Layout.Length);
+            Squarify(c.Layout, c.Bounds, c.Direction, 0, c.Layout.Length);
         }
 
         static void Squarify(Layout[] layout, Bounds r, Dimension d, int b, int e)
@@ -313,5 +315,79 @@ namespace Sidi.Visualization
             throw new ArgumentException(d.ToString());
         }
 
+        public static void DivideAndConquer(LayoutContext c)
+        {
+            if (c.Layout.Length >= 2)
+            {
+                foreach (var i in Split2(c))
+                {
+                    DivideAndConquer(i);
+                }
+            }
+            else
+            {
+                c.Layout[0].Bounds = c.Bounds;
+            }
+        }
+
+        static LayoutContext[] Split2(LayoutContext c)
+        {
+            var splitDim = c.Bounds.Width > c.Bounds.Height ? Dimension.X : Dimension.Y;
+            double totalSize = 0;
+            var accumulatedSize = c.Layout.Select(x => { totalSize += x.Tree.Size; return totalSize; }).ToArray();
+            var error = accumulatedSize.Select(x => Math.Abs(x - totalSize / 2)).ToArray();
+
+            var minError = Double.MaxValue;
+            int splitIndex = 0;
+            for (; splitIndex < error.Length; ++splitIndex)
+            {
+                if (error[splitIndex] < minError)
+                {
+                    minError = error[splitIndex];
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // split at splitindex
+            var size0 = accumulatedSize[splitIndex - 1];
+            var splitX = c.Bounds[splitDim, Bound.Min] + c.Bounds.Extent(splitDim) * size0 / totalSize;
+
+            var r = new LayoutContext[]
+            {
+                new LayoutContext()
+                {
+                    Bounds = Split(c.Bounds, splitDim, splitX, 1),
+                    Layout = SubArray(c.Layout, 0, splitIndex)
+                },
+                new LayoutContext()
+                {
+                    Bounds = Split(c.Bounds, splitDim, splitX, 0),
+                    Layout = SubArray(c.Layout, splitIndex, c.Layout.Length)
+                }
+            };
+
+            //log.InfoFormat("{0} {1}", size0, r[0].Layout.Sum(x => x.Tree.Size));
+            //log.Info(r.Select(x => x.Bounds.Area / x.Layout.Sum(j => j.Tree.Size) ).Join(", "));
+            //log.Info(r.Select(x => x.Bounds).Join(", "));
+
+            return r;
+        }
+
+        static Bounds Split(Bounds b, Dimension dim, double x, int part)
+        {
+            var r = new Bounds(b.P0.X, b.P0.Y, b.P1.X, b.P1.Y);
+            r[dim, part == 0 ? Bound.Min : Bound.Max] = x;
+            return r;
+        }
+
+        static Layout[] SubArray(Layout[] a, int i0, int i1)
+        {
+            var r = new Layout[i1 - i0];
+            Array.Copy(a, i0, r, 0, i1 - i0);
+            return r;
+        }
     }
 }

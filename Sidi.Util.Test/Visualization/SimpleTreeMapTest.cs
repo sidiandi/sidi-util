@@ -141,15 +141,24 @@ namespace Sidi.Visualization
         [Test, Explicit("big")]
         public void Big()
         {
-            var items = Enumerable.Range(0, 1000000).Select(x => x.ToString("D8"));
+            var items = Enumerable.Range(0, 10000).Select(x => x.ToString("D8"));
 
             var tm = new TypedTreeMap<string>()
             {
                 Items = items.ToList(),
-                GetLineage = i => i,
+                GetLineage = i => new string[]{"Base"},
             };
 
             tm.RunFullScreen();
+        }
+
+        IEnumerable<string> SplitStr(string x)
+        {
+            int partSize = 2;
+            for (int i = 0; i < x.Length - partSize; i += partSize)
+            {
+                yield return x.Substring(i, partSize);
+            }
         }
     }
 }

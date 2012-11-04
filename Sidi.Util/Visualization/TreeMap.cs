@@ -113,6 +113,7 @@ namespace Sidi.Visualization
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static TreeMap FromTree(Tree tree)
         {
             return new TreeMap() { Tree = tree };
@@ -229,8 +230,10 @@ namespace Sidi.Visualization
 
         public void Highlight(PaintEventArgs e, Layout layoutNode, Color color)
         {
-            var b = new SolidBrush(Color.FromArgb(128, color));
-            e.Graphics.FillRectangle(b, layoutNode.Bounds.ToRectangleF());
+            using (var b = new SolidBrush(Color.FromArgb(128, color)))
+            {
+                e.Graphics.FillRectangle(b, layoutNode.Bounds.ToRectangleF());
+            }
         }
 
         public void Highlight(PaintEventArgs e, Color color, Func<Tree, Tree, bool> f)
@@ -252,10 +255,13 @@ namespace Sidi.Visualization
 
         void DrawWireFrame(PaintEventArgs e, Layout layout)
         {
-            e.Graphics.DrawRectangle(new Pen(Color.Red), layout.Bounds.ToRectangle());
-            foreach (var i in layout.Children)
+            using (var pen = new Pen(Color.Red))
             {
-                DrawWireFrame(e, i);
+                e.Graphics.DrawRectangle(pen, layout.Bounds.ToRectangle());
+                foreach (var i in layout.Children)
+                {
+                    DrawWireFrame(e, i);
+                }
             }
         }
         

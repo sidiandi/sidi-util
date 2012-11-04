@@ -22,6 +22,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Drawing;
+using Sidi.Forms;
 
 namespace Sidi.Visualization
 {
@@ -29,6 +30,10 @@ namespace Sidi.Visualization
     {
         public ZoomPanController(Control control)
         {
+            PanScale = 5.0f;
+
+            this.control = control;
+
             control.MouseWheel += (s, e) =>
                 {
                     float scale = (float) Math.Pow(2.0, ((double)e.Delta) * 0.001);
@@ -45,39 +50,92 @@ namespace Sidi.Visualization
                     control.Invalidate();
                 };
 
-            control.MouseClick += (s, e) =>
+            control.MouseDown += (s, e) =>
                 {
                     if (e.Button == MouseButtons.Middle)
                     {
-                        Transform = new Matrix();
-                        control.Invalidate();
+                        Reset();
+                    }
+                    else if (e.Button == MouseButtons.Left)
+                    {
+                        StartPan();
                     }
                 };
+
+            control.MouseUp += (s, e) =>
+                {
+                    StopPan();
+                };
         }
+
+        void StartPan()
+        {
+            mouseDelta = new MouseDelta();
+            mouseDelta.Move += (ms, me) =>
+                {
+                    Transform.Translate(me.Delta.X * PanScale, me.Delta.Y * PanScale, MatrixOrder.Append);
+                    control.Invalidate();
+                };
+        }
+
+        float PanScale { set; get; }
+
+        void StopPan()
+        {
+            if (mouseDelta != null)
+            {
+                mouseDelta.Dispose();
+                mouseDelta = null;
+            }
+        }
+
+        MouseDelta mouseDelta;
+        Control control;
 
         public Matrix Transform = new Matrix();
 
         public void Reset()
         {
             Transform = new Matrix();
+            control.Invalidate();
         }
 
+        
+
+        private bool disposed = false;
+            
+        //Implement IDisposable.
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+          Dispose(true);
+          GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
+          if (!disposed)
+          {
             if (disposing)
             {
-                if (Transform != null)
+                Transform.Dispose();
+                if (mouseDelta != null)
                 {
-                    Transform.Dispose();
-                    Transform = null;
+                    mouseDelta.Dispose();
                 }
             }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+          }
         }
+
+        // Use C# destructor syntax for finalization code.
+        ~ZoomPanController()
+        {
+          // Simply call Dispose(false).
+          Dispose(false);
+        }    
+    
+
     }
 }

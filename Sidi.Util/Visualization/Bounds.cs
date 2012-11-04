@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
+using System.Globalization;
 
 namespace Sidi.Visualization
 {
@@ -45,6 +46,11 @@ namespace Sidi.Visualization
         {
             P0 = new Point(l, t);
             P1 = new Point(r, b);
+        }
+
+        public override string ToString()
+        {
+            return String.Format(CultureInfo.InvariantCulture, "({0}),({1})", P0, P1);
         }
 
         public bool CoversPixel
@@ -161,6 +167,16 @@ namespace Sidi.Visualization
         {
             return P0.X <= p.X && p.X < P1.X &&
                 P0.Y <= p.Y && p.Y < P1.Y;
+        }
+
+        public Matrix CreateTransform(Point[] point)
+        {
+            using (var mf = new System.Drawing.Drawing2D.Matrix(
+                this.ToRectangleF(), 
+                point.Select(x => x.ToPointF()).ToArray()))
+            {
+                return mf.ToMatrixD();
+            }
         }
     }
 

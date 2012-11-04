@@ -54,6 +54,23 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
+        [Test]
+        public void DivideAndConquer()
+        {
+            var c = new Sidi.Visualization.LayoutManager.LayoutContext()
+            {
+                Bounds = new Bounds(0, 0, 1, 1),
+                Layout = Enumerable.Range(0, 100).Select(x => new Layout(null) { Tree = new Tree(null) { Size = 1 } }).ToArray(),
+            };
+                
+            LayoutManager.DivideAndConquer(c);
+
+            foreach (var l in c.Layout)
+            {
+                Console.WriteLine("{0}: {1}", l.Bounds.Area, l.Bounds);
+            }
+        }
+
         public void Display(Tree tree)
         {
             var c = new TreeMap() { Tree = tree };

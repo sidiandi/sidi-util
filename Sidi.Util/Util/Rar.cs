@@ -57,21 +57,23 @@ namespace Sidi.Util
 
         void RunRar(string arguments, string workingDirectory)
         {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.FileName = rarBin;
-            p.StartInfo.Arguments = arguments;
-            p.StartInfo.WorkingDirectory = workingDirectory;
-            p.StartInfo.CreateNoWindow = true;
-            p.Start();
-            StreamReader sr = p.StandardOutput;
-            for (; ; )
+            using (Process p = new Process())
             {
-                string line = sr.ReadLine();
-                if (line == null)
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.FileName = rarBin;
+                p.StartInfo.Arguments = arguments;
+                p.StartInfo.WorkingDirectory = workingDirectory;
+                p.StartInfo.CreateNoWindow = true;
+                p.Start();
+                StreamReader sr = p.StandardOutput;
+                for (; ; )
                 {
-                    break;
+                    string line = sr.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
                 }
             }
         }

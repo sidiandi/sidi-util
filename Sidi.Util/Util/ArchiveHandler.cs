@@ -96,6 +96,7 @@ namespace Sidi.Util
             throw new ArgumentOutOfRangeException(path);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public System.IO.Stream Get(Uri uri, string archive)
         {
             lock (this)
