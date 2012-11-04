@@ -43,6 +43,7 @@ namespace Sidi.Util
                 updateCheck.Message);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         private void buttonUpdate_Click(object sender, EventArgs e)
         {
             Process p = new Process();

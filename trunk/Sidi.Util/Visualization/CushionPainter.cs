@@ -37,6 +37,7 @@ namespace Sidi.Visualization
         const double Is = 215;
         double[] L = new double[] { 0.09759f, -0.19518f, 0.9759f };
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public CushionPainter(TreeMap control)
         {
             this.control = control;
@@ -69,17 +70,18 @@ namespace Sidi.Visualization
 
         TreeMap control;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public Bitmap Render(Size bitmapSize, Bounds rect)
         {
             var bitmap = new Bitmap(bitmapSize.Width, bitmapSize.Height, PixelFormat.Format24bppRgb);
 
-            //todo: rework
-            this.transform = new System.Drawing.Drawing2D.Matrix(rect.ToRectangleF(), new[]{
-                new PointF(0,0), 
-                new PointF(bitmapSize.Width, 0),
-                new PointF(0, bitmapSize.Height)
-            }).ToMatrixD();
-
+            this.transform = rect.CreateTransform(new[]
+            {
+                new System.Windows.Point(0,0), 
+                new System.Windows.Point(bitmapSize.Width, 0),
+                new System.Windows.Point(0, bitmapSize.Height)
+            });
+            
             this.rect = rect;
 
             var data = bitmap.LockBits(

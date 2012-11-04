@@ -1,13 +1,30 @@
-﻿using System;
+// Copyright (c) 2009, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+// 
+// This file is part of sidi-util.
+// 
+// sidi-util is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// sidi-util is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Sidi.IO
 {
-    public class FileSystemInfo : IEquatable<FileSystemInfo>
+    public class LFileSystemInfo : IEquatable<LFileSystemInfo>
     {
-        public FileSystemInfo(LPath path)
+        public LFileSystemInfo(LPath path)
         {
             this.path = path.GetFullPath();
             _findDataValid = this.path.GetFindData(out _findData);
@@ -22,7 +39,7 @@ namespace Sidi.IO
         FindData _findData;
         bool _findDataValid = false;
 
-        internal FileSystemInfo(LPath directory, FindData findData)
+        internal LFileSystemInfo(LPath directory, FindData findData)
         {
             _findData = findData;
             _findDataValid = true;
@@ -108,29 +125,29 @@ namespace Sidi.IO
             }
         }
 
-        public IList<FileSystemInfo> GetFileSystemInfos()
+        public IList<LFileSystemInfo> GetFileSystemInfos()
         {
             return LDirectory.GetChilds(path);
         }
 
-        public IList<FileSystemInfo> GetDirectories()
+        public IList<LFileSystemInfo> GetDirectories()
         {
             return GetDirectories("*");
         }
 
-        public IList<FileSystemInfo> GetDirectories(string searchPattern)
+        public IList<LFileSystemInfo> GetDirectories(string searchPattern)
         {
             return LDirectory.FindFile(FullName.CatDir(searchPattern))
                 .Where(x => x.IsDirectory)
                 .ToList();
         }
 
-        public IList<FileSystemInfo> GetFiles()
+        public IList<LFileSystemInfo> GetFiles()
         {
             return GetFiles("*");
         }
 
-        public IList<FileSystemInfo> GetFiles(string searchPattern)
+        public IList<LFileSystemInfo> GetFiles(string searchPattern)
         {
             return LDirectory.FindFile(FullName.CatDir(searchPattern))
                 .Where(x => !x.IsDirectory)
@@ -258,9 +275,9 @@ namespace Sidi.IO
 
         public override bool Equals(object obj)
         {
-            if (obj is FileSystemInfo)
+            if (obj is LFileSystemInfo)
             {
-                return Equals((FileSystemInfo)obj);
+                return Equals((LFileSystemInfo)obj);
             }
             else
             {
@@ -268,7 +285,7 @@ namespace Sidi.IO
             }
         }
 
-        public bool Equals(FileSystemInfo other)
+        public bool Equals(LFileSystemInfo other)
         {
             return FullName.Equals(other.FullName);
         }

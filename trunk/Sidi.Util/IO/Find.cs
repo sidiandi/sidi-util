@@ -1,4 +1,21 @@
-﻿using System;
+// Copyright (c) 2009, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+// 
+// This file is part of sidi-util.
+// 
+// sidi-util is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// sidi-util is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +36,7 @@ namespace Sidi.IO
             Output = x => true;
         }
 
-        public static IEnumerable<FileSystemInfo> AllFiles(LPath root)
+        public static IEnumerable<LFileSystemInfo> AllFiles(LPath root)
         {
             var e = new Find()
             {
@@ -29,7 +46,7 @@ namespace Sidi.IO
             return e.Depth();
         }
 
-        public static IEnumerable<FileSystemInfo> AllFiles(IEnumerable<LPath> roots)
+        public static IEnumerable<LFileSystemInfo> AllFiles(IEnumerable<LPath> roots)
         {
             var e = new Find()
             {
@@ -52,17 +69,17 @@ namespace Sidi.IO
         /// <summary>
         /// Set this function to decide which files should be returned.
         /// </summary>
-        public Func<FileSystemInfo, bool> Output { set; get; }
+        public Func<LFileSystemInfo, bool> Output { set; get; }
 
         /// <summary>
         /// Set this function to decide which directories should be followed.
         /// </summary>
-        public Func<FileSystemInfo, bool> Follow { set; get; }
+        public Func<LFileSystemInfo, bool> Follow { set; get; }
 
         /// <summary>
         /// Set this function to see every file, not matter if output or not.
         /// </summary>
-        public Action<FileSystemInfo> Visit { set; get; }
+        public Action<LFileSystemInfo> Visit { set; get; }
 
         /// <summary>
         /// Counts the visited files
@@ -89,10 +106,10 @@ namespace Sidi.IO
         /// Recurses all start roots depth-first
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<FileSystemInfo> Depth()
+        public IEnumerable<LFileSystemInfo> Depth()
         {
             Count = 0;
-            var stack = new List<FileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+            var stack = new List<LFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
 
             for (; stack.Count > 0; )
             {
@@ -117,10 +134,10 @@ namespace Sidi.IO
         /// Recurses all start roots breadth-first
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<FileSystemInfo> Breadth()
+        public IEnumerable<LFileSystemInfo> Breadth()
         {
             Count = 0;
-            var stack = new List<FileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+            var stack = new List<LFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
 
             for (; stack.Count > 0; )
             {
@@ -144,7 +161,7 @@ namespace Sidi.IO
 
         DateTime nextReport = DateTime.MinValue;
 
-        bool MustFollow(FileSystemInfo i)
+        bool MustFollow(LFileSystemInfo i)
         {
             var f = i.IsDirectory && Follow(i);
             if (f)
@@ -159,7 +176,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static bool OnlyFiles(FileSystemInfo i)
+        public static bool OnlyFiles(LFileSystemInfo i)
         {
             return !i.IsDirectory;
         }
@@ -169,7 +186,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static bool NoDotNoHidden(FileSystemInfo i)
+        public static bool NoDotNoHidden(LFileSystemInfo i)
         {
             return !i.Hidden && !i.Name.StartsWith(".");
         }

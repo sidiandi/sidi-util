@@ -42,6 +42,7 @@ namespace Sidi.Visualization
 
         public bool[] LevelVisible { get; set;  }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public LabelPainter(TreeMap treeMapControl)
         {
             this.treeMapControl = treeMapControl;
@@ -206,7 +207,6 @@ namespace Sidi.Visualization
 
                 byte a = Util.ClipByte(level * 32 + 128);
 
-                var white = new SolidBrush(Color.FromArgb(a, Color.White));
                 float fontSize = Math.Max(Font.Size * scale, 1.0f);
 
                 if (fontSize < MinFontSize)
@@ -214,15 +214,17 @@ namespace Sidi.Visualization
                     return false;
                 }
 
-                var font = new Font(FontFamily.GenericSansSerif, fontSize);
-
-                e.Graphics.DrawString(
-                text,
-                font,
-                white,
-                rect,
-                StringFormat
-                );
+                using (var white = new SolidBrush(Color.FromArgb(a, Color.White)))
+                using (var font = new Font(FontFamily.GenericSansSerif, fontSize))
+                {
+                    e.Graphics.DrawString(
+                        text,
+                        font,
+                        white,
+                        rect,
+                        StringFormat
+                        );
+                }
             }
 
             foreach (var c in n.Children.Cast<Layout>())
@@ -252,18 +254,19 @@ namespace Sidi.Visualization
             }
             byte a = 255;
 
-            var white = new SolidBrush(Color.FromArgb(a, Color.White));
             var fontSize = (float) Math.Max(Font.Size * scale, 1.0f);
 
-            var font = new Font(FontFamily.GenericSansSerif, fontSize);
-
-            graphics.DrawString(
-                text,
-                font,
-                white,
-                rect.ToRectangleF(),
-                StringFormat
-            );
+            using (var white = new SolidBrush(Color.FromArgb(a, Color.White)))
+            using (var font = new Font(FontFamily.GenericSansSerif, fontSize))
+            {
+                graphics.DrawString(
+                    text,
+                    font,
+                    white,
+                    rect.ToRectangleF(),
+                    StringFormat
+                );
+            }
             return true;
 
         }

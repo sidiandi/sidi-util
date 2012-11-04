@@ -114,7 +114,18 @@ namespace Sidi.Visualization
                     i.UpdateSize();
                 }
                 Size = ChildSize;
-                children = children.OrderByDescending(x => x.Size).ToList();
+            }
+        }
+
+        public void Sort(Func<Tree, IComparable> by)
+        {
+            if (children != null)
+            {
+                foreach (var c in children)
+                {
+                    c.Sort(by);
+                }
+                children = children.OrderBy(x => by(x)).ToList();
             }
         }
 

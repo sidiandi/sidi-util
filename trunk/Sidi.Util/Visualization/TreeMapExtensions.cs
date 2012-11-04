@@ -24,6 +24,7 @@ namespace Sidi.Visualization
 {
     public static class TreeMapExtensions
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static TypedTreeMap<T> CreateTreeMap<T>(this IEnumerable<T> items)
         {
             return new TypedTreeMap<T>()

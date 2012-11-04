@@ -1,4 +1,21 @@
-﻿using System;
+// Copyright (c) 2009, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+// 
+// This file is part of sidi-util.
+// 
+// sidi-util is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// sidi-util is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +30,11 @@ namespace Sidi.IO
     [Serializable]
     public class LPath : IXmlSerializable
     {
+        static LPath()
+        {
+            StringComparison = StringComparison.OrdinalIgnoreCase;
+        }
+        
         string path;
         static LPath empty = new LPath();
 
@@ -182,7 +204,7 @@ namespace Sidi.IO
 
         public LPath UniqueFileName()
         {
-            if (!new FileSystemInfo(this).Exists)
+            if (!new LFileSystemInfo(this).Exists)
             {
                 return this;
             }
@@ -190,7 +212,7 @@ namespace Sidi.IO
             for (int i = 1; i < 1000; ++i)
             {
                 var u = new LPath(String.Format("{0}.{1}", this, i));
-                if (!new FileSystemInfo(u).Exists)
+                if (!new LFileSystemInfo(u).Exists)
                 {
                     return u;
                 }
@@ -307,11 +329,11 @@ namespace Sidi.IO
             }
         }
 
-        public FileSystemInfo Info
+        public LFileSystemInfo Info
         {
             get
             {
-                return new FileSystemInfo(this.GetFullPath());
+                return new LFileSystemInfo(this.GetFullPath());
             }
         }
 
@@ -440,7 +462,7 @@ namespace Sidi.IO
             }
             else
             {
-                if (!newExtension.StartsWith(extensionSeparator, StringComparison.OrdinalIgnoreCase))
+                if (!newExtension.StartsWith(extensionSeparator, StringComparison))
                 {
                     newExtension = extensionSeparator + newExtension;
                 }
@@ -605,10 +627,10 @@ namespace Sidi.IO
 
         public override int GetHashCode()
         {
-            return Param.GetHashCode();
+            return Param.ToLower().GetHashCode();
         }
 
-        const StringComparison stringComparison = StringComparison.InvariantCultureIgnoreCase;
+        static public StringComparison StringComparison { get; set; }
 
         public static LPath Empty
         {
@@ -622,7 +644,7 @@ namespace Sidi.IO
         {
             if (obj is LPath)
             {
-                return Param.Equals(((LPath)obj).Param, stringComparison);
+                return Param.Equals(((LPath)obj).Param, StringComparison);
             }
             else
             {
@@ -630,9 +652,24 @@ namespace Sidi.IO
             }
         }
 
+        public bool Contains(string value)
+        {
+            return this.path.IndexOf(value, StringComparison) >= 0;
+        }
+
+        public bool EndsWith(string value)
+        {
+            return path.EndsWith(value, StringComparison);
+        }
+
+        public bool StartsWith(string value)
+        {
+            return path.StartsWith(value, StringComparison);
+        }
+
         public LPath RelativeTo(LPath root)
         {
-            if (!path.StartsWith(root.path, stringComparison))
+            if (!path.StartsWith(root.path, StringComparison))
             {
                 throw new ArgumentOutOfRangeException("root");
             }
