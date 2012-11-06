@@ -201,8 +201,21 @@ namespace Sidi.Cache
         {
             lock (this) { return dictionary.ContainsKey(key); }
         }
-        
-        
+
+        public bool TryGetValue(Key key, out Value value)
+        {
+            lock (this)
+            {
+                DictionaryItem item;
+                if (!dictionary.TryGetValue(key, out item))
+                {
+                    value = default(Value);
+                    return false;
+                }
+                value = item.value;
+                return true;
+            }
+        }
 
         private bool disposed = false;
             

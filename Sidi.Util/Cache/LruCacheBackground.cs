@@ -343,7 +343,9 @@ namespace Sidi.Cache
         {
             lock (this)
             {
-                return cache.Contains(key);
+                CacheEntry e;
+                var ret = cache.TryGetValue(key, out e);
+                return ret && e.m_state == State.Complete;
             }
         }
 
@@ -371,6 +373,14 @@ namespace Sidi.Cache
                 lock (this)
                 {
                     defaultValueWhileLoading = value;
+                }
+            }
+
+            get
+            {
+                lock (this)
+                {
+                    return defaultValueWhileLoading;
                 }
             }
         }
