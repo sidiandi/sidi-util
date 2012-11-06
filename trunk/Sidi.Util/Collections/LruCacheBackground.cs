@@ -80,10 +80,16 @@ namespace Sidi.Collections
         {
             private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+            public Shared()
+            {
+                ThreadCount = 4;
+            }
+
             public LruCache<Key, CacheEntry> m_cache;
             public Value m_defaultValueWhileLoading = default(Value);
-            public bool m_workerStarted = false;
+            public int m_workersStarted = 0;
             public List<LruCacheBackground<Key, Value>> m_instances = new List<LruCacheBackground<Key, Value>>();
+            public int ThreadCount { get; set; }
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
             public void Worker(object state)
@@ -135,7 +141,7 @@ namespace Sidi.Collections
                             break;
                         }
                     }
-                    m_workerStarted = false;
+                    --m_workersStarted;
                 }
             }
         }
@@ -292,11 +298,30 @@ namespace Sidi.Collections
                     }
                 }
 
-                if (m_shared.m_workerStarted == false)
+                if (m_shared.m_workersStarted <= 0)
                 {
-                    m_shared.m_workerStarted = true;
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(m_shared.Worker));
+                    var threadsToStart = Math.Min(ThreadCount, m_provideValueRequestQueue.Count);
+                    while (m_shared.m_workersStarted < threadsToStart)
+                    {
+                        m_shared.m_workersStarted++;
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(m_shared.Worker));
+                    }
                 }
+            }
+        }
+
+        public int ThreadCount
+        {
+            set
+            {
+                lock (m_shared)
+                {
+                    m_shared.ThreadCount = value;
+                }
+            }
+            get
+            {
+                return m_shared.ThreadCount;
             }
         }
 

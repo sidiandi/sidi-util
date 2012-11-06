@@ -45,12 +45,10 @@ namespace Sidi.Visualization
             var sb = Screen.PrimaryScreen.Bounds;
             var cachedTiles = sb.Width * sb.Height / tiles.Size.Width / tiles.Size.Height * 2;
 
-            tileBitmaps = new Collections.LruCacheBackground<Tile, Bitmap>(cachedTiles, tile =>
-                {
-                    return Render(
-                        tiles.Size, 
-                        tile.Bounds);
-                });
+            tileBitmaps = new Sidi.Collections.LruCacheBackground<Tile, Bitmap>(
+                cachedTiles, tile => Render(tiles.Size, tile.Bounds));
+
+            tileBitmaps.ThreadCount = System.Environment.ProcessorCount;
 
             tileBitmaps.EntryUpdated += (s, e) =>
                 {
@@ -65,7 +63,6 @@ namespace Sidi.Visualization
                 }
                 tileBitmaps.DefaultValueWhileLoading = emptyTile;
             }
-
         }
 
         TreeMap control;

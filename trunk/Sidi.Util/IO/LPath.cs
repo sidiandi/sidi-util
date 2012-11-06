@@ -202,17 +202,23 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// Appends a number (.02) to the file name so that the returned path points to a file 
+        /// in the same directory that does not exist yet
+        /// Example: C:\temp\myimage.jpg => C:\temp\myimage.1.jpg
+        /// </summary>
+        /// <returns></returns>
         public LPath UniqueFileName()
         {
-            if (!new LFileSystemInfo(this).Exists)
+            if (!Exists)
             {
                 return this;
             }
 
             for (int i = 1; i < 1000; ++i)
             {
-                var u = new LPath(String.Format("{0}.{1}", this, i));
-                if (!new LFileSystemInfo(u).Exists)
+                var u = Parent.CatDir(JoinFileName(new string[] { FileNameWithoutExtension, i.ToString(), ExtensionWithoutDot }));
+                if (!u.Exists)
                 {
                     return u;
                 }
@@ -543,6 +549,20 @@ namespace Sidi.IO
             }
         }
 
+        public IList<LPath> GetChildren(string pattern)
+        {
+            return LDirectory.FindFile(this.CatDir(pattern))
+                .Select(x => x.FullName)
+                .ToList();
+        }
+
+        public static IList<LPath> Get(LPath searchPath)
+        {
+            return LDirectory.FindFile(searchPath)
+                .Select(x => x.FullName)
+                .ToList();
+        }
+
         public string FileName
         {
             get
@@ -745,6 +765,46 @@ namespace Sidi.IO
             get
             {
                 return System.IO.Path.GetExtension(FileName);
+            }
+        }
+
+        public string[] FileNameParts
+        {
+            get
+            {
+                return FileName.Split(new string[] { extensionSeparator }, StringSplitOptions.None);
+            }
+        }
+        
+        /// <summary>
+        /// Joins parts with the extension separator (.)
+        /// null parts will be ignored.
+        /// </summary>
+        /// <param name="parts"></param>
+        /// <returns></returns>
+        public static LPath JoinFileName(params string[] parts)
+        {
+            return new LPath(parts.Where(x => x != null).Join(extensionSeparator));
+        }
+
+        /// <summary>
+        /// returns the extension of the file name without the . 
+        /// returns null if no extension exists
+        /// example: c:\image.jpg => jpg
+        /// </summary>
+        public string ExtensionWithoutDot
+        {
+            get
+            {
+                var p = FileNameParts;
+                if (p.Length <= 1)
+                {
+                    return null;
+                }
+                else
+                {
+                    return p[p.Length - 1];
+                }
             }
         }
 

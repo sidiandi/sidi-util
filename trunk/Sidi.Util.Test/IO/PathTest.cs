@@ -243,5 +243,30 @@ namespace Sidi.IO
             p = p.ChangeExtension(null);
             Assert.IsFalse(p.HasExtension);
         }
+
+        [Test]
+        public void UniqueFileName()
+        {
+            var p = TestFile("someFile.jpg");
+
+            var files = p.Parent.GetChildren(LPath.JoinFileName(p.FileNameWithoutExtension, "*"));
+            log.Info(files.Join());
+            foreach (var i in files)
+            {
+                i.EnsureNotExists();
+            }
+
+            Assert.AreEqual(p, p.Parent.CatDir(LPath.JoinFileName(p.FileNameParts)));
+            p.EnsureNotExists();
+            LFile.WriteAllText(p, "hello");
+            for (int i = 0; i < 10; ++i)
+            {
+                var p1 = p.UniqueFileName();
+                log.Info(p1);
+                Assert.IsFalse(p1.Exists);
+                LFile.WriteAllText(p1, "hello");
+                Assert.IsTrue(p1.IsFile);
+            }
+        }
     }
 }
