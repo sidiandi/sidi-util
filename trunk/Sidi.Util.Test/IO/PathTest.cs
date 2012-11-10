@@ -96,7 +96,7 @@ namespace Sidi.IO
             {
                 Console.WriteLine(p);
                 Assert.IsTrue(LDirectory.Exists(p));
-                Console.WriteLine(LDirectory.GetChilds(p).Join());
+                Console.WriteLine(p.Children.Join());
             }
         }
 
@@ -121,8 +121,8 @@ namespace Sidi.IO
             {
                 Console.WriteLine(i);
                 Console.WriteLine(i.Parts.Join("|"));
-                Console.WriteLine(LDirectory.GetChilds(i).Join());
-                Assert.IsTrue(LDirectory.Exists(i));
+                Console.WriteLine(i.Children.Join());
+                Assert.IsTrue(i.IsDirectory);
             }
         }
 

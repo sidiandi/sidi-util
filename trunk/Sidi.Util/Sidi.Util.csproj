@@ -94,6 +94,9 @@
     <Compile Include="Collections\Cache.cs" />
     <Compile Include="Collections\SelectList.cs" />
     <Compile Include="CommandLine\Action.cs" />
+    <Compile Include="CommandLine\ActionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="CommandLine\Attributes.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
     <Compile Include="CommandLine\ShowUserInterface2.cs" />

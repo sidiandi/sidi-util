@@ -38,7 +38,7 @@ namespace Sidi.IO
             var c = new LFileSystemInfo(drive);
             Assert.IsTrue(c.Exists);
             c.DumpProperties(Console.Out);
-            log.Info(c.GetFileSystemInfos().Join());
+            log.Info(c.GetChildren().Join());
         }
 
         [Test]

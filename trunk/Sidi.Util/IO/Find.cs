@@ -125,7 +125,7 @@ namespace Sidi.IO
 
                 if (MustFollow(i))
                 {
-                    stack.InsertRange(0, i.GetFileSystemInfos());
+                    stack.InsertRange(0, i.GetChildren());
                 }
             }
         }
@@ -154,7 +154,7 @@ namespace Sidi.IO
 
                 if (i.IsDirectory && Follow(i))
                 {
-                    stack.InsertRange(stack.Count, i.GetFileSystemInfos());
+                    stack.InsertRange(stack.Count, i.GetChildren());
                 }
             }
         }

@@ -69,7 +69,7 @@ namespace Sidi.IO
                     CreateSampleFile(root.CatDir(i.ToString()));
                 }
 
-                var e = new LFileSystemInfo(root).GetFileSystemInfos();
+                var e = new LFileSystemInfo(root).GetChildren();
                 Assert.IsTrue(e.Count() >= 10);
             }
 
@@ -91,9 +91,7 @@ namespace Sidi.IO
                 var lpCopy = lp.CatName(".copy");
                 LFile.Copy(lp, lpCopy);
                 Assert.IsTrue(LFile.Exists(lpCopy));
-
-                log.Info(LDirectory.GetChilds(lp.Parent));
-
+                log.Info(lp.Parent.Children);
                 log.Info(lp);
             }
 
@@ -129,7 +127,7 @@ namespace Sidi.IO
                 var lpCopy = lp.CatName(".link");
                 LFile.CreateHardLink(lpCopy, lp);
                 Assert.IsTrue(LFile.Exists(lpCopy));
-                log.Info(LDirectory.GetChilds(lp.Parent));
+                log.Info(lp.Parent.Children);
                 log.Info(lp);
                 Assert.IsTrue(LFile.EqualByTime(lp, lpCopy));
             }

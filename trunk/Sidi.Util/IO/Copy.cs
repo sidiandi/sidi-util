@@ -182,7 +182,7 @@ namespace Sidi.IO
                 }
 
                 log.Info(d.FullName);
-                foreach (LFileSystemInfo i in d.GetFileSystemInfos())
+                foreach (LFileSystemInfo i in d.GetChildren())
                 {
                     CopyRecursive(i.FullName, dest.CatDir(i.Name));
                 }

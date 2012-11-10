@@ -104,6 +104,14 @@ namespace Sidi.IO
             }
         }
 
+        public bool IsFile
+        {
+            get
+            {
+                return Exists && !IsDirectory;
+            }
+        }
+
         public bool Hidden
         {
             get
@@ -125,32 +133,37 @@ namespace Sidi.IO
             }
         }
 
-        public IList<LFileSystemInfo> GetFileSystemInfos()
+        public IList<LFileSystemInfo> GetChildren()
         {
-            return LDirectory.GetChilds(path);
+            return GetChildren(LPath.AllFilesWildcard);
+        }
+
+        public IList<LFileSystemInfo> GetChildren(string searchPattern)
+        {
+            return LDirectory.FindFile(this.FullName.CatDir(searchPattern)).ToList();
         }
 
         public IList<LFileSystemInfo> GetDirectories()
         {
-            return GetDirectories("*");
+            return GetDirectories(LPath.AllFilesWildcard);
         }
 
         public IList<LFileSystemInfo> GetDirectories(string searchPattern)
         {
-            return LDirectory.FindFile(FullName.CatDir(searchPattern))
+            return GetChildren(searchPattern)
                 .Where(x => x.IsDirectory)
                 .ToList();
         }
 
         public IList<LFileSystemInfo> GetFiles()
         {
-            return GetFiles("*");
+            return GetFiles(LPath.AllFilesWildcard);
         }
 
         public IList<LFileSystemInfo> GetFiles(string searchPattern)
         {
-            return LDirectory.FindFile(FullName.CatDir(searchPattern))
-                .Where(x => !x.IsDirectory)
+            return GetChildren(searchPattern)
+                .Where(x => x.IsFile)
                 .ToList();
         }
 

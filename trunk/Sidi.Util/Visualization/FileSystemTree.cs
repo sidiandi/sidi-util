@@ -52,7 +52,7 @@ namespace Sidi.Visualization
             var i = (Sidi.IO.LFileSystemInfo) t.Object;
             if (i.IsDirectory)
             {
-                foreach (var x in i.GetFileSystemInfos())
+                foreach (var x in i.GetChildren())
                 {
                     new Tree(t){ Object = x };
                 }
@@ -71,7 +71,7 @@ namespace Sidi.Visualization
             {
                 log.Info(i);
                 
-                foreach (var x in i.GetFileSystemInfos())
+                foreach (var x in i.GetChildren())
                 {
                     GetRecursive(t, x);
                 }

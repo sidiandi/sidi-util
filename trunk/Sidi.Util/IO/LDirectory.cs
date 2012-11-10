@@ -87,11 +87,6 @@ namespace Sidi.IO
             }
         }
 
-        public static IList<LFileSystemInfo> GetChilds(LPath directory)
-        {
-            return FindFile(directory.CatDir("*")).ToList();
-        }
-
         /// <summary>
         /// Enumerates found files. Make sure that the Enumerator is closed properly to free the Find handle.
         /// </summary>
