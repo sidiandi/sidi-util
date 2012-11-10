@@ -84,7 +84,7 @@ namespace Sidi.IO
 
         public static IEnumerable<string> Find(string d)
         {
-            return Find(d, "*");
+            return Find(d, LPath.AllFilesWildcard);
         }
 
         public static IEnumerable<string> Find(string d, string filter)

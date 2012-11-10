@@ -85,16 +85,16 @@ namespace Sidi.IO
         {
             LPath path = this;
 
-            if (LDirectory.Exists(path))
+            if (path.Exists)
             {
                 var thumbs = path.CatDir("Thumbs.db");
                 if (thumbs.Exists)
                 {
                     LFile.Delete(thumbs);
                 }
-                foreach (var d in LDirectory.GetChilds(path).Where(x => x.IsDirectory))
+                foreach (var d in path.GetDirectories())
                 {
-                    d.FullName.RemoveEmptyDirectories();
+                    d.RemoveEmptyDirectories();
                 }
 
                 try
@@ -543,19 +543,47 @@ namespace Sidi.IO
         {
             get
             {
-                return this.Info.GetFileSystemInfos()
-                    .Select(x => x.FullName)
-                    .ToList();
+                return GetChildren(LPath.AllFilesWildcard);
             }
         }
 
         public IList<LPath> GetChildren(string pattern)
         {
-            return LDirectory.FindFile(this.CatDir(pattern))
-                .Select(x => x.FullName)
-                .ToList();
+            return ToPathList(Info.GetChildren(pattern));
         }
 
+        public IList<LPath> GetFiles(string pattern)
+        {
+            return ToPathList(Info.GetFiles(pattern));
+        }
+
+        public IList<LPath> GetFiles()
+        {
+            return GetFiles(AllFilesWildcard);
+        }
+
+        public IList<LPath> GetDirectories(string pattern)
+        {
+            return ToPathList(Info.GetDirectories(pattern));
+        }
+
+        public IList<LPath> GetDirectories()
+        {
+            return GetDirectories(AllFilesWildcard);
+        }
+
+        IList<LPath> ToPathList(IList<LFileSystemInfo> list)
+        {
+            return list.Select(x => x.FullName).ToList();
+        }
+
+        public static readonly string AllFilesWildcard = "*";
+
+        /// <summary>
+        /// Gets all files that match the wildcard searchPath
+        /// </summary>
+        /// <param name="searchPath">search path that can contain wild cards</param>
+        /// <returns></returns>
         public static IList<LPath> Get(LPath searchPath)
         {
             return LDirectory.FindFile(searchPath)
@@ -725,7 +753,7 @@ namespace Sidi.IO
             {
                 if (fd.IsDirectory)
                 {
-                    foreach (var c in LDirectory.FindFile(ln.CatDir("*")).ToList())
+                    foreach (var c in LDirectory.FindFile(ln.CatDir(LPath.AllFilesWildcard)).ToList())
                     {
                         var cn = ln.CatDir(c.Name);
                         if (c.IsDirectory)

@@ -38,8 +38,8 @@ namespace Sidi.CommandLine.Test
         {
             var ui = new ShowUserInterface(null);
             var p = ParserTest.ParserWithAllTestApps();
-            var c = ui.ToDialog(p.GetAction("SayHelloTo"));
-            System.Windows.Forms.Application.Run(c);
+            var c = ui.ToDialog(p.GetAction("Greet"));
+            c.ShowAndExecute();
         }
 
         [Test, Explicit("ui")]

@@ -62,16 +62,22 @@ namespace Sidi.CommandLine
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public Form ToDialog(Action action)
+        public ActionDialog ToDialog(Action action)
         {
-            var at = new ActionTag(action);
+            if (action == null)
+            {
+                throw new ArgumentNullException("action");
+            }
 
-            var control = new Form()
+            var control = new ActionDialog()
             {
                 Text = action.Name,
                 Width = 640,
                 AutoSize = true,
+                ActionTag = new ActionTag(action)
             };
+
+            var at = control.ActionTag;
 
             var layout = new TableLayoutPanel()
             {
@@ -131,28 +137,23 @@ namespace Sidi.CommandLine
                 Dock = DockStyle.Fill,
             };
             
-            var button = new Button()
+            var acceptButton = new Button()
             {
-                Text = action.Name,
+                Text = "OK",
+                DialogResult = System.Windows.Forms.DialogResult.OK,
                 AutoSize = true,
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
                 Tag = at,
             };
-            at.Button = button;
-            button.Click += new EventHandler((s, e) =>
-                {
-                    if (at.Execute())
-                    {
-                        control.Close();
-                    }
-                });
-            buttonRow.Controls.Add(button);
+            at.Button = acceptButton;
+            buttonRow.Controls.Add(acceptButton);
 
             var cancelButton = new Button()
             {
                 Text = "Cancel",
                 AutoSize = true,
-                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
+                DialogResult = DialogResult.Cancel
             };
             buttonRow.Controls.Add(cancelButton);
             cancelButton.Click += new EventHandler((s, e) =>
@@ -161,7 +162,7 @@ namespace Sidi.CommandLine
             });
 
             layout.Controls.Add(buttonRow, 0, 2);
-            control.AcceptButton = button;
+            control.AcceptButton = acceptButton;
             control.CancelButton = cancelButton;
             return control;
         }
@@ -323,35 +324,6 @@ namespace Sidi.CommandLine
             return panel;
         }
 
-        class ActionTag
-        {
-            public ActionTag(Action action)
-            {
-                Action = action;
-            }
-            public List<TextBox> ParameterTextBoxes = new List<TextBox>();
-            public Action Action { get; private set; }
-            public Button Button { get; set; }
-
-            [SuppressMessage("Microsoft.Design", "CA1031")]
-            public bool Execute()
-            {
-                try
-                {
-                    var p = ParameterTextBoxes.Select(x => x.Text).ToList();
-                    Action.Handle(p, true);
-                    ClearError(Button);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
-                    SetError(Button, msg);
-                    return false;
-                }
-            }
-        }
-
         bool ExcludedFromUi(IParserItem item)
         {
             return ((
@@ -458,7 +430,7 @@ namespace Sidi.CommandLine
         {
             var action = (Action) parser.LookupParserItem(command);
             var dialog = ToDialog(action);
-            System.Windows.Forms.Application.Run(dialog);
+            dialog.ShowAndExecute();
         }
 
         List<TextBox> inputs = new List<TextBox>();

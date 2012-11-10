@@ -31,13 +31,11 @@ namespace Sidi.IMAP
         public EmlMailbox(LPath directory)
         {
             this.directory = directory;
-            if (!LDirectory.Exists(directory))
+            if (!directory.IsDirectory)
             {
                 throw new System.IO.IOException(directory.ToString());
             }
-            mails = LDirectory.GetChilds(directory)
-                .Where(x => !x.IsDirectory && x.Name.EndsWith(".eml", StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
+            mails = directory.Info.GetFiles("*.eml");
         }
         LPath directory;
         IList<LFileSystemInfo> mails;
