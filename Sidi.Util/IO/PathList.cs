@@ -47,6 +47,19 @@ namespace Sidi.IO
             return fileList;
         }
 
+        public static PathList Get(IDataObject data)
+        {
+            if (data.GetDataPresent(DataFormats.FileDrop))
+            {
+                return new PathList(((string[])data.GetData(DataFormats.FileDrop))
+                    .Select(x => new LPath(x)));
+            }
+            else
+            {
+                return new PathList();
+            }
+        }
+
         public static PathList Parse(string files)
         {
             if (files.Equals(":paste", StringComparison.InvariantCultureIgnoreCase))

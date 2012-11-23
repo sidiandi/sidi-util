@@ -72,7 +72,9 @@ namespace Sidi.IO
             Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
 
             ln = new LPath(@"\" + ln.NoPrefix);
-            Assert.AreEqual(new LPath(cd.PathRoot.ToString() + ln.ToString()), ln.GetFullPath());
+            Assert.AreEqual(
+                cd.GetPathRoot().CatName(ln.ToString()), 
+                ln.GetFullPath());
 
             ln = new LPath(".");
             Assert.AreEqual(LDirectory.Current, ln.GetFullPath());
@@ -140,13 +142,15 @@ namespace Sidi.IO
             Assert.AreNotEqual(invalidName, f);
             Assert.AreEqual(System.IO.Path.GetInvalidFileNameChars().Select(c => "_").Join(" "), f);
             Assert.AreEqual(validName, LPath.GetValidFilename(validName));
+            Assert.AreEqual("someName_", LPath.GetValidFilename("someName "));
+            Assert.AreEqual("someName___", LPath.GetValidFilename("someName..."));
         }
 
         [Test]
         public void PathRoot()
         {
             var n = Sidi.IO.LPath.GetTempPath();
-            Assert.AreEqual(System.IO.Path.GetPathRoot(n.NoPrefix), n.PathRoot.NoPrefix + @"\");
+            Assert.AreEqual(System.IO.Path.GetPathRoot(n.NoPrefix), n.GetPathRoot().NoPrefix + @"\");
         }
 
         [Test]
@@ -242,6 +246,20 @@ namespace Sidi.IO
             Assert.IsTrue(p.HasExtension);
             p = p.ChangeExtension(null);
             Assert.IsFalse(p.HasExtension);
+        }
+
+        [Test]
+        public void Absolute()
+        {
+            var rel = LPath.Join("a", "b", "c");
+            Assert.IsFalse(rel.IsAbsolute);
+            var abs = new LPath(@"C:\temp\something.txt");
+            Assert.IsTrue(abs.IsAbsolute);
+
+            var unc = new LPath(@"\\server\share\somedir\somefile");
+            Assert.IsTrue(unc.IsAbsolute);
+            Assert.IsTrue(unc.IsUnc);
+            Assert.AreEqual(new LPath(@"\\server\share"), unc.GetPathRoot());
         }
 
         [Test]

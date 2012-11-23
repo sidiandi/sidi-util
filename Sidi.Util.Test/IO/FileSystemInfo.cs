@@ -33,7 +33,7 @@ namespace Sidi.IO
         [Test]
         public void DriveRoot()
         {
-            var drive = LDirectory.Current.PathRoot;
+            var drive = LDirectory.Current.GetPathRoot();
             Assert.IsTrue(drive.IsRoot);
             var c = new LFileSystemInfo(drive);
             Assert.IsTrue(c.Exists);
