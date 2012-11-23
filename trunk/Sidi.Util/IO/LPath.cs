@@ -243,6 +243,10 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// Throws an excpetion when !IsAbsolute
+        /// </summary>
+        /// <returns>Root of the file system, e.g. C: or \\server\share</returns>
         public LPath GetPathRoot()
         {
             if (IsUnc)

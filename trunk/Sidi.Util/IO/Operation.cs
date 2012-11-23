@@ -19,6 +19,11 @@ namespace Sidi.IO
             Overwrite = false;
         }
         
+        /// <summary>
+        /// Moves files or directory trees. Falls back to copying if moving is not possible
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         public void Move(LPath from, LPath to)
         {
             if (!LPath.IsSameFileSystem(from, to))
@@ -35,6 +40,10 @@ namespace Sidi.IO
                 if (!Simulate)
                 {
                     to.EnsureParentDirectoryExists();
+                    if (Overwrite)
+                    {
+                        Delete(to);
+                    }
                     LDirectory.Move(from, to);
                 }
             }
@@ -44,11 +53,21 @@ namespace Sidi.IO
                 if (!Simulate)
                 {
                     to.EnsureParentDirectoryExists();
+                    if (Overwrite)
+                    {
+                        Delete(to);
+                    }
                     LFile.Move(from, to);
                 }
             }
         }
 
+        /// <summary>
+        /// Creates a hard link of a file or a directory tree containing hard links.
+        /// Falls back to copying if hard linking is not possible.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         public void Link(LPath from, LPath to)
         {
             if (!from.Exists)

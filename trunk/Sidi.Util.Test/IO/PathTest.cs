@@ -162,23 +162,6 @@ namespace Sidi.IO
             Assert.AreEqual(new LPath(), n.RelativeTo(n));
         }
 
-        /*
-        [Test, Explicit]
-        public void Dots()
-        {
-            var name = "Wir können auch anders...";
-            var p = TestFile("LongName").Long();
-            var d = p.CatDir(name);
-            log.Info(d);
-            d.EnsureNotExists();
-            Assert.IsFalse(d.Exists);
-            d.EnsureDirectoryExists();
-            Assert.IsTrue(Directory.Exists(d));
-            d.EnsureNotExists();
-            Assert.IsFalse(Directory.Exists(d));
-        }
-         */
-
         [Test]
         public void IsValid()
         {
