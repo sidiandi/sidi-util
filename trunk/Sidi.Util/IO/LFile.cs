@@ -339,7 +339,7 @@ namespace Sidi.IO
             if (!destination.Exists)
             {
                 destination.EnsureParentDirectoryExists();
-                if (source.PathRoot.Equals(destination.PathRoot))
+                if (LPath.IsSameFileSystem(source, destination))
                 {
                     CreateHardLink(destination, source);
                 }

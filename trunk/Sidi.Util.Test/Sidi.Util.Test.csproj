@@ -143,6 +143,7 @@
     <Compile Include="IO\FileListTest.cs" />
     <Compile Include="IO\FileSystemInfo.cs" />
     <Compile Include="IO\NamespaceCompatibilityTest.cs" />
+    <Compile Include="IO\OperationTest.cs" />
     <Compile Include="IO\PathTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />

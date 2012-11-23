@@ -45,16 +45,18 @@ namespace Sidi.IO
         const string shortUncPrefix = @"\\";
         const string extensionSeparator = ".";
 
-        static Regex invalidFilenameRegex = new Regex(
-            System.IO.Path.GetInvalidFileNameChars()
-            .Select(n => Regex.Escape(new String(n, 1)))
-            .Join("|"));
-
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
             .Where(x => x != '*' && x != '?')
             .Select(n => Regex.Escape(new String(n, 1)))
             .Join("|"));
+
+        static Regex invalidFilenameRegex = new Regex(
+            System.IO.Path.GetInvalidFileNameChars()
+            .Select(n => Regex.Escape(new String(n, 1)))
+            .Join("|"));
+
+        static Regex invalidFilenameEndRegex = new Regex("[ .]+$");
 
         public static implicit operator LPath(string text)
         {
@@ -110,7 +112,9 @@ namespace Sidi.IO
 
         public static string GetValidFilename(string x)
         {
-            return Truncate(invalidFilenameRegex.Replace(x, "_"), LPath.MaxFilenameLength);
+            x = invalidFilenameRegex.Replace(x, "_");
+            x = invalidFilenameEndRegex.Replace(x, m => Regex.Replace(m.Value, ".", "_"));
+            return Truncate(x, LPath.MaxFilenameLength);
         }
 
         static string Truncate(string x, int maxLength)
@@ -239,19 +243,48 @@ namespace Sidi.IO
             }
         }
 
-        public LPath PathRoot
+        public LPath GetPathRoot()
         {
-            get
+            if (IsUnc)
+            {
+                return new LPath(Parts.Take(4));
+            }
+
+            if (IsAbsolute)
             {
                 return new LPath(Parts.Take(1));
             }
+            else
+            {
+                throw new InvalidOperationException("path is not absolute");
+            }
+        }
+
+        public bool IsAbsolute
+        {
+            get
+            {
+                if (IsUnc)
+                {
+                    return true;
+                }
+                else
+                {
+                    return this.path.Length >= 2 && this.path[1].Equals(':');
+                }
+            }
+        }
+
+        public static bool IsSameFileSystem(LPath p1, LPath p2)
+        {
+            return p1.IsAbsolute && p2.IsAbsolute && p1.GetPathRoot().Equals(p2.GetPathRoot());
         }
 
         public string DriveLetter
         {
             get
             {
-                var r = PathRoot.ToString();
+                var r = GetPathRoot().ToString();
                 if (r.Length == 2 && r[1] == ':')
                 {
                     return r[0].ToString();

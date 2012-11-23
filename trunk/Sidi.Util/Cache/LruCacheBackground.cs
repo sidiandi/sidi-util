@@ -25,6 +25,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Cache
 {
+    public enum CacheState
+    {
+        Missing,
+        Loading,
+        Complete,
+        Exception
+    };
+
     public class LruCacheBackground<Key, Value> : IDisposable, ICache<Key, Value>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -41,7 +49,6 @@ namespace Sidi.Cache
             this.provideValue = new Action<ProvideValueArgs>(args =>
                 {
                     args.Value = provideValue(args.Key);
-                    args.ValueValid = true;
                 });
         }
 
@@ -55,7 +62,7 @@ namespace Sidi.Cache
 
             cache = new LruCache<Key, CacheEntry>(maxCount, x =>
                 {
-                    return new CacheEntry(State.Missing, default(Value));
+                    return new CacheEntry(CacheState.Missing, default(Value));
                 });
 
             defaultValueWhileLoading = x => default(Value);
@@ -87,8 +94,28 @@ namespace Sidi.Cache
             }
 
             public Key Key { get; private set; }
-            public Value Value;
-            public bool ValueValid;
+            public Value Value
+            {
+                set
+                {
+                    this.value = value;
+                    State = CacheState.Complete;
+                }
+
+                get
+                {
+                    return value;
+                }
+            }
+            Value value;
+
+            public void TryLater()
+            {
+                value = default(Value);
+                State = CacheState.Loading;
+            }
+
+            public CacheState State { get; private set; }
         }
         Action<ProvideValueArgs> provideValue;
         List<Thread> workers;
@@ -113,7 +140,6 @@ namespace Sidi.Cache
                 ProvideValue = arg =>
                     {
                         arg.Value = f(arg.Key);
-                        arg.ValueValid = true;
                     };
             }
         }
@@ -134,23 +160,15 @@ namespace Sidi.Cache
         /// Warning: this event will be fired by a background thread.
         public event EventHandler<EntryUpdatedEventArgs> EntryUpdated;
 
-        enum State
-        {
-            Missing,
-            Loading,
-            Complete,
-            Exception
-        };
-
         class CacheEntry : IDisposable
         {
             public CacheEntry(Value value)
             {
                 m_value = value;
-                m_state = State.Complete;
+                m_state = CacheState.Complete;
             }
 
-            public CacheEntry(State state, Value value)
+            public CacheEntry(CacheState state, Value value)
             {
                 this.m_value = value;
                 this.m_state = state;
@@ -158,17 +176,17 @@ namespace Sidi.Cache
 
             public CacheEntry(Exception ex)
             {
-                m_state = State.Exception;
+                m_state = CacheState.Exception;
                 exception = ex;
             }
 
-            public CacheEntry(State state)
+            public CacheEntry(CacheState state)
             {
                 m_state = state;
             }
 
             public Value m_value;
-            public State m_state;
+            public CacheState m_state;
             public Exception exception;
 
             #region IDisposable Members
@@ -252,9 +270,9 @@ namespace Sidi.Cache
                     {
                         var k = provideValueRequestQueue.Pop();
                         var ce = cache[k.Key];
-                        if (ce.m_state == State.Missing)
+                        if (ce.m_state == CacheState.Missing)
                         {
-                            ce.m_state = State.Loading;
+                            ce.m_state = CacheState.Loading;
                             Monitor.Exit(this);
                             try
                             {
@@ -262,17 +280,18 @@ namespace Sidi.Cache
                                 {
                                     var args = new ProvideValueArgs(k.Key);
                                     provideValue(args);
-                                    if (args.ValueValid)
+                                    if (args.State == CacheState.Complete)
                                     {
                                         ce = new CacheEntry(args.Value);
                                     }
                                     else
                                     {
-                                        ce.m_state = State.Missing;
+                                        ce.m_state = CacheState.Missing;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    log.Warn(String.Format("Error while loading value for key={0}", k.Key), ex);
                                     ce = new CacheEntry(ex);
                                 }
 
@@ -281,10 +300,10 @@ namespace Sidi.Cache
                             {
                                 Monitor.Enter(this);
                             }
-                            log.InfoFormat("key={0}, queue={1}", k.Key, provideValueRequestQueue.Count);
+                            // log.InfoFormat("key={0}, queue={1}", k.Key, provideValueRequestQueue.Count);
                             cache.Update(k.Key, ce);
 
-                            if (ce.m_state == State.Complete)
+                            if (ce.m_state == CacheState.Complete)
                             {
                                 Monitor.Exit(this);
                                 OnEntryUpdated(k.Key);
@@ -320,10 +339,10 @@ namespace Sidi.Cache
                 lock (this)
                 {
                     var ce = cache[key];
-                    if (ce.m_state == State.Missing)
+                    if (ce.m_state == CacheState.Missing)
                     {
                         Load(key);
-                        cache.Update(key, new CacheEntry(State.Missing, defaultValueWhileLoading(key)));
+                        cache.Update(key, new CacheEntry(CacheState.Missing, defaultValueWhileLoading(key)));
                         return cache[key].m_value;
                     }
                     else
@@ -345,7 +364,7 @@ namespace Sidi.Cache
             {
                 CacheEntry e;
                 var ret = cache.TryGetValue(key, out e);
-                return ret && e.m_state == State.Complete;
+                return ret && e.m_state == CacheState.Complete;
             }
         }
 

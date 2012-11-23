@@ -127,6 +127,7 @@ namespace Sidi.IO
                         {
                             var p = path.Parent;
                             CreateDirectoryInternal(p);
+                            log.InfoFormat("Create directory {0}", path);
                             NativeMethods.CreateDirectory(path.Param, IntPtr.Zero).CheckApiCall(path);
                         }
                         break;
