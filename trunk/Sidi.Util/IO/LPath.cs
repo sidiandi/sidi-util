@@ -28,7 +28,7 @@ using System.Reflection;
 namespace Sidi.IO
 {
     [Serializable]
-    public class LPath : IXmlSerializable
+    public class LPath : IXmlSerializable, IComparable
     {
         static LPath()
         {
@@ -894,6 +894,16 @@ namespace Sidi.IO
         public void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteString(path);
+        }
+
+        public int CompareTo(object obj)
+        {
+            var r = obj as LPath;
+            if (r == null)
+            {
+                throw new System.ArgumentException("obj");
+            }
+            return this.ToString().CompareTo(r.ToString());
         }
     }
 }

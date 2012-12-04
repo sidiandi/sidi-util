@@ -269,5 +269,13 @@ namespace Sidi.IO
                 Assert.IsTrue(p1.IsFile);
             }
         }
+
+        [Test]
+        public void Compare()
+        {
+            var p1 = new LPath("a");
+            var p2 = new LPath("b");
+            Assert.AreEqual(-1, p1.CompareTo(p2));
+        }
     }
 }
