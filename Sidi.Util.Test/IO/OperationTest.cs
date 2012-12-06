@@ -100,8 +100,9 @@ namespace Sidi.IO
         [Test, ExpectedException(typeof(System.IO.IOException))]
         public void NoOverwrite()
         {
-            var op = new Operation();
+            var op = new Operation() { Fast = false };
             op.Copy(sourceRoot, destRoot);
+            op.IsTreeIdentical(sourceRoot, destRoot);
             op.Copy(sourceRoot, destRoot);
         }
 
