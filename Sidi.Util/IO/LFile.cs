@@ -350,7 +350,7 @@ namespace Sidi.IO
             }
         }
 
-        public static bool EqualByTime(LPath f1, LPath f2)
+        public static bool EqualByTimeAndLength(LPath f1, LPath f2)
         {
             FindData d1;
             FindData d2;

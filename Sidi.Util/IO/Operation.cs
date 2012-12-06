@@ -17,6 +17,7 @@ namespace Sidi.IO
         {
             Simulate = false;
             Overwrite = false;
+            Fast = true;
         }
         
         /// <summary>
@@ -39,7 +40,7 @@ namespace Sidi.IO
                 log.InfoFormat("{0}move directory {1} to {2}", this, from, to);
                 if (!Simulate)
                 {
-                    to.EnsureParentDirectoryExists();
+                    EnsureParentDirectoryExists(to);
                     if (Overwrite)
                     {
                         Delete(to);
@@ -52,7 +53,7 @@ namespace Sidi.IO
                 log.InfoFormat("{0}move file {1} to {2}", this, from, to);
                 if (!Simulate)
                 {
-                    to.EnsureParentDirectoryExists();
+                    EnsureParentDirectoryExists(to);
                     if (Overwrite)
                     {
                         Delete(to);
@@ -77,7 +78,7 @@ namespace Sidi.IO
 
             if (!Simulate)
             {
-                to.EnsureParentDirectoryExists();
+                EnsureParentDirectoryExists(to);
             }
 
             LinkInternal(from, to);
@@ -89,24 +90,35 @@ namespace Sidi.IO
             {
                 if (!Simulate)
                 {
-                    to.EnsureDirectoryExists();
+                    EnsureDirectoryExists(to);
                 }
 
                 foreach (var c in from.Children)
                 {
-                    Copy(c, to.CatDir(c.FileName));
+                    LinkInternal(c, to.CatDir(c.FileName));
                 }
             }
             else
             {
-                log.InfoFormat("{0}link file {1} to {2}", this, from, to);
-                if (!Simulate)
-                {
-                    LFile.CreateHardLink(to, from);
-                }
+                LinkFile(from, to);
             }
         }
 
+        void LinkFile(LPath from, LPath to)
+        {
+            log.InfoFormat("{0}link file {1} to {2}", OptionsText, from, to);
+            if (!Simulate)
+            {
+                Count++;
+                LFile.CreateHardLink(to, from);
+            }
+        }
+
+        /// <summary>
+        /// Copies a file or directory tree.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         public void Copy(LPath from, LPath to)
         {
             if (!from.Exists)
@@ -116,36 +128,59 @@ namespace Sidi.IO
 
             if (!Simulate)
             {
-                to.EnsureParentDirectoryExists();
+                EnsureParentDirectoryExists(to);
             }
+
+            Count = 0;
 
             CopyInternal(from, to);
         }
 
-        public void CopyInternal(LPath from, LPath to)
+        public int Count { get; private set; }
+
+        void CopyInternal(LPath from, LPath to)
         {
             if (from.IsDirectory)
             {
                 if (!Simulate)
                 {
-                    to.EnsureDirectoryExists();
+                    EnsureDirectoryExists(to);
                 }
 
                 foreach (var c in from.Children)
                 {
-                    Copy(c, to.CatDir(c.FileName));
+                    CopyInternal(c, to.CatDir(c.FileName));
                 }
             }
             else
             {
-                log.InfoFormat("{0}copy file {1} to {2}", this, from, to);
-                if (!Simulate)
-                {
-                    LFile.Copy(from, to, Overwrite);
-                }
+                CopyFile(from, to);
             }
         }
 
+        void CopyFile(LPath from, LPath to)
+        {
+            if (NeedCopy(from, to))
+            {
+                log.InfoFormat("{0}copy file {1} to {2}", OptionsText, from, to);
+                if (!Simulate)
+                {
+                    Count++;
+                    LFile.Copy(from, to, Overwrite);
+                }
+            }
+            else
+            {
+                log.InfoFormat("{0}skip copy file {1} to {2}", OptionsText, from, to);
+            }
+        }
+
+        Func<LPath, LPath, bool> NeedCopy;
+
+        /// <summary>
+        /// Deletes directory tree and all subdirectories if they are empty
+        /// </summary>
+        /// <param name="tree"></param>
         public void DeleteEmptyDirectories(LPath tree)
         {
             if (tree.IsDirectory)
@@ -158,13 +193,27 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// Deletes file or directory tree and all files and subdirectories below.
+        /// </summary>
+        /// <param name="tree"></param>
         public void Delete(LPath tree)
+        {
+            Count = 0;
+            DeleteInternal(tree);
+        }
+
+        /// <summary>
+        /// Deletes file or directory tree and all files and subdirectories below.
+        /// </summary>
+        /// <param name="tree"></param>
+        public void DeleteInternal(LPath tree)
         {
             if (tree.IsDirectory)
             {
                 foreach (var c in tree.Children)
                 {
-                    Delete(c);
+                    DeleteInternal(c);
                 }
             }
             DeleteElement(tree);
@@ -177,6 +226,7 @@ namespace Sidi.IO
                 log.InfoFormat("{0}delete directory {1}", this, path);
                 if (!Simulate)
                 {
+                    Count++;
                     LDirectory.Delete(path);
                 }
             }
@@ -185,6 +235,7 @@ namespace Sidi.IO
                 log.InfoFormat("{0}delete file {1}", this, path);
                 if (!Simulate)
                 {
+                    Count++;
                     LFile.Delete(path);
                 }
             }
@@ -202,6 +253,7 @@ namespace Sidi.IO
                 var flags =
                     (Simulate ? new string[] { "Simulate" } : new string[] { })
                     .Concat((Overwrite ? new string[] { "Overwrite" } : new string[] { }))
+                    .Concat((Fast ? new string[] { "Fast" } : new string[] { }))
                     .Join(",");
 
                 if (String.IsNullOrEmpty(flags))
@@ -215,21 +267,71 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// Ensures that the parent directory of path exists.
+        /// </summary>
+        /// <param name="path"></param>
         public void EnsureParentDirectoryExists(LPath path)
         {
+            EnsureDirectoryExists(path.Parent);
         }
 
+        /// <summary>
+        /// Ensures that a directory exists at path.
+        /// </summary>
+        /// <param name="path"></param>
         public void EnsureDirectoryExists(LPath path)
         {
+            if (!path.IsDirectory)
+            {
+                log.InfoFormat("{0}create directory {1}", OptionsText, path);
+                if (!Simulate)
+                {
+                    LDirectory.Create(path);
+                }
+            }
         }
 
+        /// <summary>
+        /// When true, file system is not modified, but would-be modifications are logged.
+        /// </summary>
         public bool Simulate { set; get; }
 
+        /// <summary>
+        /// When true, overwrites existing files
+        /// </summary>
         public bool Overwrite { get; set; }
 
         /// <summary>
+        /// If true, copying is skipped when length and last modified time of 
+        /// source and target are identical
+        /// </summary>
+        public bool Fast
+        {
+            get
+            {
+                return fast;
+            }
+
+            set
+            {
+                fast = value;
+                if (fast)
+                {
+                    NeedCopy = (from, to) => !LFile.EqualByTimeAndLength(from, to);
+                }
+                else
+                {
+                    NeedCopy = (from, to) => true;
+                }
+            }
+        }
+
+        bool fast;
+
+        /// <summary>
         /// true, if p1 and p2 are on the same file system and can be moved
-        /// or linked efficiently 
+        /// or hard-linked efficiently 
         /// </summary>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
@@ -237,6 +339,55 @@ namespace Sidi.IO
         public bool CanMove(LPath p1, LPath p2)
         {
             return LPath.IsSameFileSystem(p1, p2);
+        }
+
+        /// <summary>
+        /// Copies from from to to. Tries to avoid making copies by 
+        /// hard-linking existing files from existing to to.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="existing"></param>
+        public void IncrementalCopy(LPath from, LPath to, LPath existing)
+        {
+            if (from.IsDirectory)
+            {
+                EnsureDirectoryExists(to);
+                foreach (var i in from.Children)
+                {
+                    var fn = i.FileName;
+                    IncrementalCopy(i, to.CatDir(fn), existing.CatDir(fn));
+                }
+            }
+            else
+            {
+                if (LFile.EqualByTimeAndLength(from, existing))
+                {
+                    LinkFile(from, to);
+                }
+                else
+                {
+                    CopyFile(from, to);
+                }
+            }
+        }
+
+        public bool IsTreeIdentical(LPath a, LPath b)
+        {
+            if (a.IsDirectory)
+            {
+                var ca = a.Children;
+                var cb = b.Children;
+                if (ca.Count != cb.Count)
+                {
+                    return false;
+                }
+                return ca.All(i => IsTreeIdentical(i, b.CatDir(i.FileName)));
+            }
+            else
+            {
+                return LFile.EqualByTimeAndLength(a, b);
+            }
         }
     }
 }
