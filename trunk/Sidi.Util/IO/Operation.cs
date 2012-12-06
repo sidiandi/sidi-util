@@ -110,6 +110,13 @@ namespace Sidi.IO
             if (!Simulate)
             {
                 Count++;
+                if (Overwrite)
+                {
+                    if (to.IsFile)
+                    {
+                        LFile.Delete(to);
+                    }
+                }
                 LFile.CreateHardLink(to, from);
             }
         }
