@@ -129,7 +129,7 @@ namespace Sidi.IO
                 Assert.IsTrue(LFile.Exists(lpCopy));
                 log.Info(lp.Parent.Children);
                 log.Info(lp);
-                Assert.IsTrue(LFile.EqualByTime(lp, lpCopy));
+                Assert.IsTrue(LFile.EqualByTimeAndLength(lp, lpCopy));
             }
 
             [Test]

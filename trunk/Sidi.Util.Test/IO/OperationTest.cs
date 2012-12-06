@@ -32,7 +32,7 @@ namespace Sidi.IO
             log.Info(source);
             Assert.IsFalse(source.IsFile);
 
-            op.EnsureDirectoryExists(source);
+            op.EnsureParentDirectoryExists(source);
             LFile.WriteAllText(source, "hello");
             Assert.IsTrue(source.IsFile);
         }
@@ -127,6 +127,27 @@ namespace Sidi.IO
             var op = new Operation() { Overwrite = true };
             op.Copy(sourceRoot, destRoot);
             op.Move(sourceRoot, destRoot);
+        }
+
+        [Test]
+        public void Fast()
+        {
+            var op = new Operation() { Fast = true, Overwrite = true };
+            op.Copy(sourceRoot, destRoot);
+            Assert.AreEqual(1, op.Count);
+            op.Copy(sourceRoot, destRoot);
+            Assert.AreEqual(0, op.Count);
+        }
+
+        [Test]
+        public void Incremental()
+        {
+            var op = new Operation() { Fast = true };
+            op.Copy(sourceRoot, destRoot);
+            var destRoot2 = destRoot.CatName("-2");
+            op.IncrementalCopy(sourceRoot, destRoot2, destRoot);
+            Assert.IsTrue(op.IsTreeIdentical(sourceRoot, destRoot));
+            Assert.IsTrue(op.IsTreeIdentical(sourceRoot, destRoot2));
         }
     }
 }
