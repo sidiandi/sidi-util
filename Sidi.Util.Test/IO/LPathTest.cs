@@ -277,5 +277,29 @@ namespace Sidi.IO
             var p2 = new LPath("b");
             Assert.AreEqual(-1, p1.CompareTo(p2));
         }
+
+        public class TestData
+        {
+            public TestData()
+            {
+                Path = new LPath("bla");
+            }
+
+            public LPath Path { set; get; }
+            public bool Test { set; get; }
+        }
+
+        [Test]
+        public void XmlSerialization()
+        {
+            var d = new TestData() { Path = Paths.BinDir, Test = true };
+            var s = new XmlSerializer(typeof(TestData));
+            var o = new StringWriter();
+            s.Serialize(o, d);
+            log.Info(o.ToString());
+            var p1 = (TestData)s.Deserialize(new StringReader(o.ToString()));
+            Assert.AreEqual(d.Path, p1.Path);
+            Assert.AreEqual(d.Test, p1.Test);
+        }
     }
 }

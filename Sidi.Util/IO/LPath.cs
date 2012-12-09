@@ -883,12 +883,14 @@ namespace Sidi.IO
 
         public System.Xml.Schema.XmlSchema GetSchema()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public void ReadXml(System.Xml.XmlReader reader)
         {
+            reader.ReadStartElement();
             path = reader.ReadString();
+            reader.ReadEndElement();
         }
 
         public void WriteXml(System.Xml.XmlWriter writer)
