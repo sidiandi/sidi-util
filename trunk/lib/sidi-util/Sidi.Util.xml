@@ -170,6 +170,97 @@
             <param name="uid"></param>
             <returns></returns>
         </member>
+        <member name="T:Sidi.IO.Operation">
+            <summary>
+            File System Operations
+            </summary>
+        </member>
+        <member name="M:Sidi.IO.Operation.Move(Sidi.IO.LPath,Sidi.IO.LPath)">
+            <summary>
+            Moves files or directory trees. Falls back to copying if moving is not possible
+            </summary>
+            <param name="from"></param>
+            <param name="to"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.Link(Sidi.IO.LPath,Sidi.IO.LPath)">
+            <summary>
+            Creates a hard link of a file or a directory tree containing hard links.
+            Falls back to copying if hard linking is not possible.
+            </summary>
+            <param name="from"></param>
+            <param name="to"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.Copy(Sidi.IO.LPath,Sidi.IO.LPath)">
+            <summary>
+            Copies a file or directory tree.
+            </summary>
+            <param name="from"></param>
+            <param name="to"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.DeleteEmptyDirectories(Sidi.IO.LPath)">
+            <summary>
+            Deletes directory tree and all subdirectories if they are empty
+            </summary>
+            <param name="tree"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.Delete(Sidi.IO.LPath)">
+            <summary>
+            Deletes file or directory tree and all files and subdirectories below.
+            </summary>
+            <param name="tree"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.DeleteInternal(Sidi.IO.LPath)">
+            <summary>
+            Deletes file or directory tree and all files and subdirectories below.
+            </summary>
+            <param name="tree"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.EnsureParentDirectoryExists(Sidi.IO.LPath)">
+            <summary>
+            Ensures that the parent directory of path exists.
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.EnsureDirectoryExists(Sidi.IO.LPath)">
+            <summary>
+            Ensures that a directory exists at path.
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:Sidi.IO.Operation.CanMove(Sidi.IO.LPath,Sidi.IO.LPath)">
+            <summary>
+            true, if p1 and p2 are on the same file system and can be moved
+            or hard-linked efficiently 
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.Operation.IncrementalCopy(Sidi.IO.LPath,Sidi.IO.LPath,Sidi.IO.LPath)">
+            <summary>
+            Copies from from to to. Tries to avoid making copies by 
+            hard-linking existing files from existing to to.
+            </summary>
+            <param name="from"></param>
+            <param name="to"></param>
+            <param name="existing"></param>
+        </member>
+        <member name="P:Sidi.IO.Operation.Simulate">
+            <summary>
+            When true, file system is not modified, but would-be modifications are logged.
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Operation.Overwrite">
+            <summary>
+            When true, overwrites existing files
+            </summary>
+        </member>
+        <member name="P:Sidi.IO.Operation.Fast">
+            <summary>
+            If true, copying is skipped when length and last modified time of 
+            source and target are identical
+            </summary>
+        </member>
         <member name="M:Sidi.IO.LDirectory.FindFileRaw(Sidi.IO.LPath)">
             <summary>
             Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
@@ -258,6 +349,12 @@
             Example: C:\temp\myimage.jpg => C:\temp\myimage.1.jpg
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:Sidi.IO.LPath.GetPathRoot">
+            <summary>
+            Throws an excpetion when !IsAbsolute
+            </summary>
+            <returns>Root of the file system, e.g. C: or \\server\share</returns>
         </member>
         <member name="M:Sidi.IO.LPath.ChangeExtension(System.String)">
             <summary>
