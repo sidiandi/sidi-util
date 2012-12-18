@@ -21,6 +21,7 @@ using System.Text;
 
 namespace Sidi.Util
 {
+    [Serializable]
     public class Interval : IEnumerable<int>
     {
         int m_begin;
