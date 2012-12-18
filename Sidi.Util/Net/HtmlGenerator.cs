@@ -115,7 +115,19 @@ namespace Sidi.Net
 
         public object TableRows<T>(IEnumerable<T> e, params Func<T, object>[] format)
         {
-            return e.Select(r => tr(format.Select(c => td(c(r)))));
+            return e.Select(r => tr(format.Select(c => 
+                {
+                    var cellContent = c(r);
+                    if (cellContent is String)
+                    {
+                        var cellString = (string)cellContent;
+                        if (String.IsNullOrEmpty(cellString))
+                        {
+                            cellContent = "&nbsp;";
+                        }
+                    }
+                    return td();
+                })));
         }
 
         public Func<Exception, Action<TextWriter>> Catch;
