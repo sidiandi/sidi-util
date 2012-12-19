@@ -17,6 +17,7 @@
     <OutputDir>$(OutputRoot)\Release</OutputDir>
     <TestDir>$(OutputRoot)\test</TestDir>
     <PackageDir>$(OutputRoot)\pack</PackageDir>
+    <StageDir>$(OutputRoot)\stage</StageDir>
     <PublishDir>$(OutputRoot)\publish</PublishDir>
     <DocDir>$(RootDir)\doc</DocDir>
     <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
@@ -95,6 +96,12 @@
         Files="@(ZipFiles)"
         WorkingDirectory="$(OutputDir)"
         ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
+  </Target>
+
+  <Target Name="CommitBinaries" >
+	<SvnCheckout LocalPath="$(StageDir)" RepositoryPath="https://sidi-util.googlecode.com/svn/trunk/lib/sidi-util" />
+    <Copy SourceFiles="@(ZipFiles)" DestinationFolder="$(StageDir)" />
+	<SvnCommit LocalPath="$(StageDir)" Targets="." Message="Binaries of $(Version)" />
   </Target>
 
   <Target Name="Upload" DependsOnTargets="Package">

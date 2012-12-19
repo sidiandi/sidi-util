@@ -66,7 +66,8 @@ namespace Sidi.Build
             Process p = new Process();
             p.StartInfo.FileName = Program;
             p.StartInfo.Arguments = String.Format("-r {0}", pdbFile.Quote());
-            return p.ReadLines();
+            var files = p.ReadLines().ToList();
+            return files.Take(files.Count - 1);
         }
 
         public void Extract(string pdbFile)
