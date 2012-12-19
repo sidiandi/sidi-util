@@ -52,10 +52,7 @@
   </Target>
 
   <Target Name="CreateVersion" DependsOnTargets="Package">
-    <SvnCommit
-        ToolPath="$(SvnBin)"
-  Targets="VersionInfo.cs"
-  Message="Automatic build of $(ProjectName)"
+    <SvnCommit ToolPath="$(SvnBin)" Targets="$(RootDir)" Message="Automatic build of $(ProjectName)"
 		/>
     <SvnCopy
         ToolPath="$(SvnBin)"
