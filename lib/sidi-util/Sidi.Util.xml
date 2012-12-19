@@ -397,9 +397,6 @@
             example: c:\image.jpg => jpg
             </summary>
         </member>
-        <member name="M:Sidi.IO.NativeMethods.GetForegroundWindow">
-            <summary>The GetForegroundWindow function returns a handle to the foreground window.</summary>
-        </member>
         <member name="F:Sidi.Net.Abnf.Match.Types">
             <summary>
             Used for Create
