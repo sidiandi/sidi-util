@@ -28,8 +28,6 @@ namespace Sidi.Util
             var shellWindows = ((IEnumerable)shell.Windows()).Cast<InternetExplorer>().ToDictionary(
                 x => (IntPtr)x.HWND, x => x);
 
-            SHDocVw.InternetExplorer foregroundWindow = null;
-
             return GetZOrder(IntPtr.Zero)
                 .Select(hwnd =>
                     {
