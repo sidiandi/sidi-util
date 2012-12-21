@@ -52,7 +52,10 @@
   </Target>
 
   <Target Name="CreateVersion" DependsOnTargets="Package">
-    <SvnCommit ToolPath="$(SvnBin)" Targets="$(RootDir)" Message="Automatic build of $(ProjectName)"
+    <SvnCommit
+        ToolPath="$(SvnBin)"
+  Targets="."
+  Message="Automatic build of $(ProjectName)"
 		/>
     <SvnCopy
         ToolPath="$(SvnBin)"
@@ -66,9 +69,6 @@
         Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=x86">
       <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
-    <CreateItem Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" >
-		<Output TaskParameter="Include" ItemName="BuildResults"/>
-	</CreateItem>
   </Target>
 
   <Target Name="SourceIndex" DependsOnTargets="Build">
@@ -88,20 +88,23 @@
   </Target>
 
   <Target Name="Package" DependsOnTargets="Update;Build;UnitTest;SourceIndex;Documentation">
+    <CreateItem Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" >
+		<Output TaskParameter="Include" ItemName="ZipFiles"/>
+	</CreateItem>
 	<MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
     <Zip
-        Files="@(BuildResults)"
+        Files="@(ZipFiles)"
         WorkingDirectory="$(OutputDir)"
         ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
   </Target>
 
-  <Target Name="CommitBinaries" DependsOnTargets="Package" >
-	<SvnCheckout LocalPath="$(StageDir)" RepositoryPath="https://sidi-util.googlecode.com/svn/trunk/lib/sidi-util" />
-    <Copy SourceFiles="@(BuildResults)" DestinationFolder="$(StageDir)" />
-	<SvnCommit Targets="$(StageDir)" Message="Binaries of $(Version)" />
+  <Target Name="CommitBinaries" DependsOnTargets="Release" >
+	<SvnCheckout LocalPath="$(StageDir)" RepositoryPath="$(SvnRoot)/trunk/lib/sidi-util" />
+    <Copy SourceFiles="@(ZipFiles)" DestinationFolder="$(StageDir)" />
+	<SvnCommit LocalPath="$(StageDir)" Targets="." Message="Binaries of $(Version)" />
   </Target>
 
-  <Target Name="Upload" DependsOnTargets="Package">
+  <Target Name="Upload" DependsOnTargets="Release">
     <GoogleCode.Upload
         ProjectName="$(ProjectName)"
         LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
@@ -110,14 +113,14 @@
             />
   </Target>
 
-  <Target Name="Nuget" DependsOnTargets="Build" >
+  <Target Name="Nuget" DependsOnTargets="Release" >
     <Copy SourceFiles="$(MSBuildProjectDirectory)\$(ProjectName).nuspec" DestinationFolder="$(PackageDir)" />
     <Copy SourceFiles="@(Targets)" DestinationFolder="$(PackageDir)\lib\net40" />
 	
 	<Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
   </Target>
   
-  <Target Name="Release" DependsOnTargets="Package" />
-  <Target Name="Publish" DependsOnTargets="CommitBinaries;Upload" />
+  <Target Name="Release" DependsOnTargets="CreateVersion;Package" />
+  <Target Name="Publish" DependsOnTargets="Upload;CommitBinaries" />
 
 </Project>
