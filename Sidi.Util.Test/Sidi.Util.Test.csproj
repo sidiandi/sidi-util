@@ -161,6 +161,7 @@
     <Compile Include="Util\Dump.cs" />
     <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\ListFormatTest.cs" />
+    <Compile Include="Util\ShellTest.cs" />
     <Compile Include="Util\SizeCount.cs" />
     <Compile Include="Util\StringExTest.cs" />
     <Compile Include="TestBase.cs" />
@@ -204,7 +205,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <COMReference Include="SHDocVw">
+      <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>robocopy /s $(ProjectDir)unit-test $(TargetDir)..\test
