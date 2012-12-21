@@ -350,6 +350,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Sidi.IO.LPath.Parse(System.String)">
+            <summary>
+            Parses an LPath instance from a string. Allows / and \ as directory separators.
+            </summary>
+            <param name="text"></param>
+            <returns></returns>
+        </member>
         <member name="M:Sidi.IO.LPath.GetPathRoot">
             <summary>
             Throws an excpetion when !IsAbsolute
@@ -396,6 +403,9 @@
             returns null if no extension exists
             example: c:\image.jpg => jpg
             </summary>
+        </member>
+        <member name="M:Sidi.IO.NativeMethods.GetForegroundWindow">
+            <summary>The GetForegroundWindow function returns a handle to the foreground window.</summary>
         </member>
         <member name="F:Sidi.Net.Abnf.Match.Types">
             <summary>
