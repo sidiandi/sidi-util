@@ -301,5 +301,14 @@ namespace Sidi.IO
             Assert.AreEqual(d.Path, p1.Path);
             Assert.AreEqual(d.Test, p1.Test);
         }
+
+        [Test]
+        public void Parse()
+        {
+            var p = new LPath(@"C:\temp\somefile");
+            Assert.AreEqual(p, LPath.Parse(@"C:\temp\somefile"));
+            Assert.AreEqual(p, LPath.Parse(@"C:/temp/somefile"));
+            Assert.AreEqual(new LPath(@"a\b\c"), LPath.Parse("a/b/c"));
+        }
     }
 }
