@@ -51,7 +51,7 @@
         AssemblyFileVersion="$(Version)" />
   </Target>
 
-  <Target Name="CreateVersion" DependsOnTargets="Package">
+  <Target Name="CreateVersion" DependsOnTargets="GetVersion">
     <SvnCommit
         ToolPath="$(SvnBin)"
   Targets="."
@@ -87,7 +87,7 @@
   <Target Name="Documentation" DependsOnTargets="Build">
   </Target>
 
-  <Target Name="Package" DependsOnTargets="Update;Build;UnitTest;SourceIndex;Documentation">
+  <Target Name="Package" DependsOnTargets="CreateVersion;Build;UnitTest;SourceIndex;Documentation">
     <CreateItem Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" >
 		<Output TaskParameter="Include" ItemName="ZipFiles"/>
 	</CreateItem>
