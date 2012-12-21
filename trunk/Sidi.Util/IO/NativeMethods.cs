@@ -148,6 +148,10 @@ namespace Sidi.IO
             public int bInheritHandle;
         }
 
+        /// <summary>The GetForegroundWindow function returns a handle to the foreground window.</summary>
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetForegroundWindow();
+        
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteFile(string lpFileName);
@@ -258,6 +262,23 @@ namespace Sidi.IO
             COPY_FILE_RESTARTABLE = 0x00000002,
             COPY_FILE_OPEN_SOURCE_FOR_WRITE = 0x00000004,
             COPY_FILE_ALLOW_DECRYPTED_DESTINATION = 0x00000008
+        }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetTopWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+        public enum GetWindow_Cmd : uint
+        {
+            GW_HWNDFIRST = 0,
+            GW_HWNDLAST = 1,
+            GW_HWNDNEXT = 2,
+            GW_HWNDPREV = 3,
+            GW_OWNER = 4,
+            GW_CHILD = 5,
+            GW_ENABLEDPOPUP = 6
         }
     }
 }

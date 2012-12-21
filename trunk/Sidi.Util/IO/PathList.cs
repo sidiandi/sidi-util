@@ -22,6 +22,7 @@ using System.Text;
 using System.Windows.Forms;
 using Sidi.Util;
 using Sidi.Extensions;
+using System.Collections;
 
 namespace Sidi.IO
 {
@@ -47,6 +48,12 @@ namespace Sidi.IO
             return fileList;
         }
 
+        public static PathList GetFilesSelectedInExplorer()
+        {
+            var s = new Shell();
+            return new PathList(s.SelectedFiles);
+        }
+
         public static PathList Get(IDataObject data)
         {
             if (data.GetDataPresent(DataFormats.FileDrop))
@@ -65,6 +72,11 @@ namespace Sidi.IO
             if (files.Equals(":paste", StringComparison.InvariantCultureIgnoreCase))
             {
                 return ReadClipboard();
+            }
+
+            if (files.Equals(":sel", StringComparison.OrdinalIgnoreCase))
+            {
+                return GetFilesSelectedInExplorer();
             }
 
             return new PathList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x)));
