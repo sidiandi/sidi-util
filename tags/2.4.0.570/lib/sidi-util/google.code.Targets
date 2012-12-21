@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SidiBuildAssembly>$(MSBuildExtensionsPath)\sidi-util\Sidi.Build.dll</SidiBuildAssembly>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\..\packages\MSBuildTasks.1.4.0.45\tools\MSBuild.Community.Tasks.Targets"/>
+  <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.CreateUpdateInfo" />
+  <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.GoogleCode.Upload" />
+  <UsingTask AssemblyFile="$(SidiBuildAssembly)" TaskName="Sidi.Build.SourceIndex" />
+
+  <PropertyGroup>
+    <RootDir>$(MSBuildProjectDirectory)</RootDir>
+    <SvnBin>$(RootDir)\lib\SlikSvn\bin</SvnBin>
+    <NUnitBin>$(RootDir)\lib\NUnit\bin\net-2.0</NUnitBin>
+	<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
+    <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
+    <OutputDir>$(OutputRoot)\Release</OutputDir>
+    <TestDir>$(OutputRoot)\test</TestDir>
+    <PackageDir>$(OutputRoot)\pack</PackageDir>
+    <StageDir>$(OutputRoot)\stage</StageDir>
+    <PublishDir>$(OutputRoot)\publish</PublishDir>
+    <DocDir>$(RootDir)\doc</DocDir>
+    <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
+    <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
+    <AnonymousSvnRoot>http://$(ProjectName).googlecode.com/svn</AnonymousSvnRoot>
+  </PropertyGroup>
+
+  <Target Name="Update" >
+    <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
+  </Target>
+
+  <Target Name="GetVersion" >
+    <SvnVersion
+        ToolPath="$(SvnBin)"
+        LocalPath=".">
+      <Output TaskParameter="Revision" PropertyName="Revision" />
+    </SvnVersion>
+    <CreateProperty
+        Value="$(Major).$(Minor).$(Build).$(Revision)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="Version" />
+    </CreateProperty>
+    <Message Text="Version is $(Version)" />
+    <AssemblyInfo CodeLanguage="CS"
+        AssemblyCopyright = "Copyright (c) Andreas Grimme 2010"
+        AssemblyCompany="sidi"
+        AssemblyProduct="sidi-util"
+        OutputFile="VersionInfo.cs"
+        AssemblyVersion="$(Version)"
+        AssemblyFileVersion="$(Version)" />
+  </Target>
+
+  <Target Name="CreateVersion" DependsOnTargets="GetVersion">
+    <SvnCommit
+        ToolPath="$(SvnBin)"
+  Targets="."
+  Message="Automatic build of $(ProjectName)"
+		/>
+    <SvnCopy
+        ToolPath="$(SvnBin)"
+            SourcePath="$(SvnRoot)/trunk"
+            DestinationPath="$(SvnRoot)/tags/$(Version)"
+            Message="Automatic build of $(ProjectName)" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="GetVersion">
+    <MSBuild
+        Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=x86">
+      <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
+    </MSBuild>
+  </Target>
+
+  <Target Name="SourceIndex" DependsOnTargets="Build">
+    <Sidi.Build.SourceIndex
+        Directory = "$(MSBuildProjectDirectory)"
+        Url = "$(AnonymousSvnRoot)/tags/$(Version)/"
+        Modules = "@(Targets)"
+            />
+  </Target>
+
+<Target Name="UnitTest" DependsOnTargets="Build">
+	<Exec Command="$(NUnitConsole) /labels @(Targets, ' ')" />
+	<RemoveDir Directories="$(TestDir)" />
+</Target>
+
+  <Target Name="Documentation" DependsOnTargets="Build">
+  </Target>
+
+  <Target Name="Package" DependsOnTargets="CreateVersion;Build;UnitTest;SourceIndex;Documentation">
+    <CreateItem Include="$(OutputDir)\**\*.*" Exclude="$(OutputDir)\unit-test\*.*" >
+		<Output TaskParameter="Include" ItemName="ZipFiles"/>
+	</CreateItem>
+	<MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')" />
+    <Zip
+        Files="@(ZipFiles)"
+        WorkingDirectory="$(OutputDir)"
+        ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
+  </Target>
+
+  <Target Name="CommitBinaries" DependsOnTargets="Release" >
+	<SvnCheckout LocalPath="$(StageDir)" RepositoryPath="$(SvnRoot)/trunk/lib/sidi-util" />
+    <Copy SourceFiles="@(ZipFiles)" DestinationFolder="$(StageDir)" />
+	<SvnCommit LocalPath="$(StageDir)" Targets="." Message="Binaries of $(Version)" />
+  </Target>
+
+  <Target Name="Upload" DependsOnTargets="Release">
+    <GoogleCode.Upload
+        ProjectName="$(ProjectName)"
+        LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
+        RemoteFile="$(ProjectName)-$(Version).zip"
+        Summary="Build for Version $(Version)"
+            />
+  </Target>
+
+  <Target Name="Nuget" DependsOnTargets="Release" >
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\$(ProjectName).nuspec" DestinationFolder="$(PackageDir)" />
+    <Copy SourceFiles="@(Targets)" DestinationFolder="$(PackageDir)\lib\net40" />
+	
+	<Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
+  </Target>
+  
+  <Target Name="Release" DependsOnTargets="CreateVersion;Package" />
+  <Target Name="Publish" DependsOnTargets="Upload;CommitBinaries" />
+
+</Project>

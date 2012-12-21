@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sidi.Util.Test</name>
+    </assembly>
+    <members>
+        <member name="T:Sidi.IO.EnumConfigTest">
+            <summary>
+            Command line parser interface for Sidi.IO.Enum
+            </summary>
+        </member>
+        <member name="T:Sidi.Test.NamespaceCompatibilityTest">
+            <summary>
+            Checks if Sidi.IO names do not collide with System.IO names
+            </summary>
+        </member>
+        <member name="M:Sidi.Test.NamespaceCompatibilityTest.TestNames">
+            <summary>
+            Test names of static classes
+            </summary>
+        </member>
+        <member name="M:Sidi.Net.HtmlGeneratorTest.GenerateCode">
+            <summary>
+            Generates attribute and tag for form HtmlGenerator.cs
+            </summary>
+        </member>
+        <member name="T:Sidi.Util.RegistrySerializerTest.Debugger">
+            <summary>
+            Registry settings for Visual Studio 2008 debugger
+            store at @"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\9.0\Debugger"
+            </summary>
+        </member>
+    </members>
+</doc>
