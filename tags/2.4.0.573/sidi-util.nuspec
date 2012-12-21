@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>sidi-util</id>
+    <version>1.0.0</version>
+    <authors>Andreas Grimme</authors>
+    <owners>Andreas Grimme</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-2.1-standalone.html</licenseUrl>
+    <projectUrl>http://code.google.com/p/sidi-util/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Collection of general purpose .NET utility classes</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2012 Andreas Grimme</copyright>
+    <tags></tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+</package>
