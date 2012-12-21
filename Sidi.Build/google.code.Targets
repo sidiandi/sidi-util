@@ -54,7 +54,7 @@
   <Target Name="CreateVersion" DependsOnTargets="Package">
     <SvnCommit
         ToolPath="$(SvnBin)"
-  Targets="VersionInfo.cs"
+  Targets="."
   Message="Automatic build of $(ProjectName)"
 		/>
     <SvnCopy
@@ -98,13 +98,13 @@
         ZipFileName="$(PackageDir)\$(ProjectName)-$(Version).zip" />
   </Target>
 
-  <Target Name="CommitBinaries" >
+  <Target Name="CommitBinaries" DependsOnTargets="Release" >
 	<SvnCheckout LocalPath="$(StageDir)" RepositoryPath="$(SvnRoot)/trunk/lib/sidi-util" />
     <Copy SourceFiles="@(ZipFiles)" DestinationFolder="$(StageDir)" />
 	<SvnCommit LocalPath="$(StageDir)" Targets="." Message="Binaries of $(Version)" />
   </Target>
 
-  <Target Name="Upload" DependsOnTargets="Package">
+  <Target Name="Upload" DependsOnTargets="Release">
     <GoogleCode.Upload
         ProjectName="$(ProjectName)"
         LocalFile="$(PackageDir)\$(ProjectName)-$(Version).zip"
@@ -113,14 +113,14 @@
             />
   </Target>
 
-  <Target Name="Nuget" DependsOnTargets="Build" >
+  <Target Name="Nuget" DependsOnTargets="Release" >
     <Copy SourceFiles="$(MSBuildProjectDirectory)\$(ProjectName).nuspec" DestinationFolder="$(PackageDir)" />
     <Copy SourceFiles="@(Targets)" DestinationFolder="$(PackageDir)\lib\net40" />
 	
 	<Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
   </Target>
   
-  <Target Name="Release" DependsOnTargets="Package" />
+  <Target Name="Release" DependsOnTargets="CreateVersion;Package" />
   <Target Name="Publish" DependsOnTargets="Upload;CommitBinaries" />
 
 </Project>
