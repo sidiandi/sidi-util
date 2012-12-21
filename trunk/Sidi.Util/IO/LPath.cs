@@ -230,9 +230,15 @@ namespace Sidi.IO
             throw new System.IO.IOException(String.Format("{0} cannot be made unique.", this));
         }
 
-        public static LPath Parse(string x)
+        /// <summary>
+        /// Parses an LPath instance from a string. Allows / and \ as directory separators.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static LPath Parse(string text)
         {
-            return new LPath(x);
+            text = text.Replace("/", LPath.DirectorySeparator);
+            return new LPath(text);
         }
 
         public bool Exists
