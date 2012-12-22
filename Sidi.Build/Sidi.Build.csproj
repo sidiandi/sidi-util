@@ -149,6 +149,7 @@
     </None>
     <None Include="google.code.Targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
     <None Include="Sidi.Build.Targets">
