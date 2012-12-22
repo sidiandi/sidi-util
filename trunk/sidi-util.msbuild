@@ -15,7 +15,7 @@
 	<PropertyGroup>
     <RootDir>$(MSBuildProjectDirectory)</RootDir>
     <SvnBin>$(RootDir)\lib\SlikSvn\bin</SvnBin>
-    <NUnitBin>$(RootDir)\lib\NUnit\bin\net-2.0</NUnitBin>
+    <NUnitBin>$(RootDir)\packages\NUnit.Runners.2.6.2\tools</NUnitBin>
     <NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
     <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
     <OutputDir>$(OutputRoot)\Release</OutputDir>
