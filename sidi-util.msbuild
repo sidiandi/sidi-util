@@ -84,11 +84,7 @@
   <Target Name="Release" DependsOnTargets="CreateVersion;Build;UnitTest" />
 
   <Target Name="NugetPack" DependsOnTargets="Release" >
-    <XmlUpdate
-        XmlFileName="$(NuSpec)"
-        XPath="//package/metadata/version"
-        Value="$(Version)" />
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(NuSpec) -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir)" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(NuSpec) -Version $(Version) -Verbose -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
   </Target>
 
   <Target Name="NugetPush" DependsOnTargets="NugetPack">
