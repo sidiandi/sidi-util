@@ -29,5 +29,6 @@
     <file src="Sidi.Util.xml" target="lib\net40" />
 	<file src="$RootDir$\Sidi.Util\**" target="src\Sidi.Util" />
 	<file src="$RootDir$\COPYING*" target="" />
+	<file src="$RootDir$\NOTICE.txt" target="" />
   </files>
 </package>
