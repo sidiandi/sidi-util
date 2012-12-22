@@ -113,11 +113,12 @@
             />
   </Target>
 
-  <Target Name="Nuget" DependsOnTargets="Release" >
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\$(ProjectName).nuspec" DestinationFolder="$(PackageDir)" />
-    <Copy SourceFiles="@(Targets)" DestinationFolder="$(PackageDir)\lib\net40" />
-	
-	<Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
+  <Target Name="Nuget" DependsOnTargets="GetVersion" >
+    <XmlUpdate
+        XmlFileName="$(RootDir)\$(ProjectName).nuspec"
+        XPath="//package/metadata/version"
+        Value="$(Version)" />
+	  <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(PackageDir)\$(ProjectName).nuspec" />
   </Target>
   
   <Target Name="Release" DependsOnTargets="CreateVersion;Package" />
