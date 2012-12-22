@@ -83,11 +83,11 @@
 
   <Target Name="Release" DependsOnTargets="CreateVersion;Build;UnitTest" />
 
-  <Target Name="NugetPack" DependsOnTargets="Release" >
+  <Target Name="NugetPack" DependsOnTargets="GetVersion" >
     <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(NuSpec) -Version $(Version) -Verbose -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
   </Target>
 
-  <Target Name="NugetPush" DependsOnTargets="NugetPack">
+  <Target Name="NugetPush" DependsOnTargets="Release;NugetPack">
     <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe push $(PackageDir)\$(ProjectName).$(Version).nupkg" />
   </Target>
 
