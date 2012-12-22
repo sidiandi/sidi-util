@@ -88,7 +88,7 @@
         XmlFileName="$(NuSpec)"
         XPath="//package/metadata/version"
         Value="$(Version)" />
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(NuSpec) -OutputDirectory $(PackageDir) -BasePath $(OutputDir)" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(NuSpec) -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir)" />
   </Target>
 
   <Target Name="NugetPush" DependsOnTargets="NugetPack">
