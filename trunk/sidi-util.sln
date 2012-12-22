@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		publish.cmd = publish.cmd
 		README.txt = README.txt
 		sidi-util.msbuild = sidi-util.msbuild
+		sidi-util.nuspec = sidi-util.nuspec
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
