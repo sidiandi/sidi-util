@@ -1,23 +1,16 @@
-sidi-util README file
+Copyright (c) 2012, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
 
+This file is part of sidi-util.
 
-INTRODUCTION
+sidi-util is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-sidi-util is a collection of many general purpose .NET utility classes.
+sidi-util is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
 
-sidi-util is compiled against Microsoft .NET Framework 4
-
-sidi-util web site: http://code.google.com/p/sidi-util/
-
-FILES
-
-Sidi.Util
-  The library itself
-
-Sidi.Util
-  NUnit tests for Sidi.Util classes
-
-PREREQUISITES
-
-http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx#ERB
-http://www.kynosarges.de/NDoc.html (Install at %ProgramFiles%\NDoc 2.0)
+You should have received a copy of the GNU Lesser General Public License
+along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
