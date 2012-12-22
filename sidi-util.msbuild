@@ -14,7 +14,7 @@
 
 	<PropertyGroup>
     <RootDir>$(MSBuildProjectDirectory)</RootDir>
-    <SvnBin>$(RootDir)\lib\SlikSvn\bin</SvnBin>
+    <SvnBin>$(RootDir)\tools\SlikSvn\bin</SvnBin>
     <NUnitBin>$(RootDir)\packages\NUnit.Runners.2.6.2\tools</NUnitBin>
     <NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
     <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
@@ -31,7 +31,10 @@
   </PropertyGroup>
 
   <Target Name="Update" >
-    <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
+    <SvnUpdate 
+      LocalPath="$(MSBuildProjectDirectory)" 
+        ToolPath="$(SvnBin)"
+      />
   </Target>
 
   <Target Name="GetVersion" >
@@ -59,8 +62,8 @@
   <Target Name="CreateVersion" DependsOnTargets="GetVersion">
     <SvnCommit
         ToolPath="$(SvnBin)"
-  Targets="."
-  Message="Automatic build of $(ProjectName)"
+        Targets="."
+        Message="Automatic build of $(ProjectName)"
 		/>
     <SvnCopy
         ToolPath="$(SvnBin)"
