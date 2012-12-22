@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+        <ProjectName>sidi-util</ProjectName>
+        <Major>2</Major>
+        <Minor>4</Minor>
+        <Build>0</Build>
+		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\packages</MSBuildExtensionsPath>
+		<MSBuildCommunityTasksPath>$(MSBuildExtensionsPath)\MSBuildTasks.1.4.0.45\tools</MSBuildCommunityTasksPath>
+	</PropertyGroup>
+    
+	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
+
+	<PropertyGroup>
+    <RootDir>$(MSBuildProjectDirectory)</RootDir>
+    <SvnBin>$(RootDir)\tools\SlikSvn\bin</SvnBin>
+    <NUnitBin>$(RootDir)\packages\NUnit.Runners.2.6.2\tools</NUnitBin>
+    <NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
+    <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
+    <OutputDir>$(OutputRoot)\Release</OutputDir>
+    <TestDir>$(OutputRoot)\test</TestDir>
+    <PackageDir>$(OutputRoot)\pack</PackageDir>
+    <StageDir>$(OutputRoot)\stage</StageDir>
+    <PublishDir>$(OutputRoot)\publish</PublishDir>
+    <DocDir>$(RootDir)\doc</DocDir>
+    <PackageFileName>$(PackageDir)\$(ProjectName)-$(Version).zip</PackageFileName>
+    <SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
+    <AnonymousSvnRoot>http://$(ProjectName).googlecode.com/svn</AnonymousSvnRoot>
+    <NuSpec>$(RootDir)\$(ProjectName).nuspec</NuSpec>
+  </PropertyGroup>
+
+  <Target Name="Update" >
+    <SvnUpdate 
+      LocalPath="$(MSBuildProjectDirectory)" 
+        ToolPath="$(SvnBin)"
+      />
+  </Target>
+
+  <Target Name="GetVersion" >
+    <SvnVersion
+        ToolPath="$(SvnBin)"
+        LocalPath=".">
+      <Output TaskParameter="Revision" PropertyName="Revision" />
+    </SvnVersion>
+    <CreateProperty
+        Value="$(Major).$(Minor).$(Build).$(Revision)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="Version" />
+    </CreateProperty>
+    <Message Text="Version is $(Version)" />
+    <AssemblyInfo CodeLanguage="CS"
+        AssemblyCopyright = "Copyright (c) Andreas Grimme 2010"
+        AssemblyCompany="sidi"
+        AssemblyProduct="sidi-util"
+        OutputFile="VersionInfo.cs"
+        AssemblyVersion="$(Version)"
+        AssemblyFileVersion="$(Version)" />
+  </Target>
+
+  <Target Name="CreateVersion" DependsOnTargets="GetVersion">
+    <SvnCommit
+        ToolPath="$(SvnBin)"
+        Targets="."
+        Message="Automatic build of $(ProjectName)"
+		/>
+    <SvnCopy
+        ToolPath="$(SvnBin)"
+            SourcePath="$(SvnRoot)/trunk"
+            DestinationPath="$(SvnRoot)/tags/$(Version)"
+            Message="Automatic build of $(ProjectName)" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="GetVersion">
+    <MSBuild
+        Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=x86">
+      <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
+    </MSBuild>
+  </Target>
+
+  <Target Name="UnitTest" DependsOnTargets="Build">
+    <Exec Command="$(NUnitConsole) /labels @(Targets, ' ')" />
+    <RemoveDir Directories="$(TestDir)" />
+  </Target>
+
+  <Target Name="Release" DependsOnTargets="CreateVersion;Build;UnitTest" />
+
+  <Target Name="NugetPack" DependsOnTargets="GetVersion" >
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe pack $(NuSpec) -Version $(Version) -Verbose -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
+  </Target>
+
+  <Target Name="NugetPush" DependsOnTargets="Release;NugetPack">
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe push $(PackageDir)\$(ProjectName).$(Version).nupkg" />
+  </Target>
+
+  <Target Name="Publish" DependsOnTargets="NugetPush" />
+
+</Project>
