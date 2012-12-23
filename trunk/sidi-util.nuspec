@@ -17,7 +17,6 @@
     <dependencies>
       <group targetFramework="net40">
         <dependency id="log4net" version="2.0.0" />
-        <dependency id="NUnit" version="2.6.2" />
         <dependency id="SharpZipLib" version="0.86.0" />
         <dependency id="System.Data.SQLite" version="1.0.82.0" />
       </group>
