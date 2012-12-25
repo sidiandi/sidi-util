@@ -215,7 +215,7 @@ namespace Sidi.IO
             }
         }
 
-        static DateTime ToDateTime(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
+        public static DateTime ToDateTime(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
         {
             ulong h = (uint)fileTime.dwHighDateTime;
             h <<= 32;
@@ -223,7 +223,7 @@ namespace Sidi.IO
             return DateTime.FromFileTime((long)(h | l));
         }
 
-        static DateTime ToDateTimeUtc(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
+        public static DateTime ToDateTimeUtc(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
         {
             ulong h = (uint) fileTime.dwHighDateTime;
             h <<= 32;

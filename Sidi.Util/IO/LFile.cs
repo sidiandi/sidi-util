@@ -364,6 +364,30 @@ namespace Sidi.IO
             }
         }
 
+        public static bool EqualByTimeAndLength(LPath f1, LPath f2, TimeSpan maxTimeDifference)
+        {
+            FindData d1;
+            FindData d2;
+            if (f1.GetFindData(out d1) && f2.GetFindData(out d2))
+            {
+                if (d1.Length == d2.Length)
+                {
+                    var d = LFileSystemInfo.ToDateTimeUtc(d1.ftLastWriteTime) -
+                        LFileSystemInfo.ToDateTimeUtc(d2.ftLastWriteTime);
+
+                    return Math.Abs(d.TotalSeconds) <= maxTimeDifference.TotalSeconds;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         static bool Equals(byte[] b1, byte[] b2, int count)
         {
             // Validate buffers are the same length.
