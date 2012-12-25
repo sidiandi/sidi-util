@@ -35,6 +35,7 @@ namespace Sidi.IO
             Simulate = false;
             Overwrite = false;
             Fast = true;
+            MaxFileTimeDifference = TimeSpan.FromSeconds(2);
         }
         
         /// <summary>
@@ -327,6 +328,11 @@ namespace Sidi.IO
         public bool Overwrite { get; set; }
 
         /// <summary>
+        /// Maximally allowed file time difference when comparing files for equality
+        /// </summary>
+        public TimeSpan MaxFileTimeDifference { get; set; }
+        
+        /// <summary>
         /// If true, copying is skipped when length and last modified time of 
         /// source and target are identical
         /// </summary>
@@ -342,7 +348,7 @@ namespace Sidi.IO
                 fast = value;
                 if (fast)
                 {
-                    NeedCopy = (from, to) => !LFile.EqualByTimeAndLength(from, to);
+                    NeedCopy = (from, to) => !LFile.EqualByTimeAndLength(from, to, MaxFileTimeDifference);
                 }
                 else
                 {
