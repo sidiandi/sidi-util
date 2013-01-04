@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 
 namespace Sidi.IO
 {
@@ -301,6 +302,79 @@ namespace Sidi.IO
         public bool Equals(LFileSystemInfo other)
         {
             return FullName.Equals(other.FullName);
+        }
+
+        NativeMethods.BY_HANDLE_FILE_INFORMATION GetByHandleFileInformation()
+        {
+            SafeFileHandle handle = NativeMethods.CreateFile(
+                this.FullName.Param, 
+                System.IO.FileAccess.Read, 
+                System.IO.FileShare.Read, IntPtr.Zero, 
+                System.IO.FileMode.Open, System.IO.FileAttributes.Archive, 
+                IntPtr.Zero);
+            try
+            {
+
+                var fileInfo = new NativeMethods.BY_HANDLE_FILE_INFORMATION();
+                NativeMethods.GetFileInformationByHandle(handle, out fileInfo)
+                    .CheckApiCall(this.FullName);
+                return fileInfo;
+            }
+            finally
+            {
+                NativeMethods.CloseHandle(handle);
+            }
+        }
+
+        public uint FileLinkCount
+        {
+            get
+            {
+                return GetByHandleFileInformation().NumberOfLinks;
+            }
+        }
+
+        public ulong FileIndex
+        {
+            get
+            {
+                var fileInfo = GetByHandleFileInformation();
+                return ((ulong)fileInfo.FileIndexHigh << 32) + (ulong)fileInfo.FileIndexLow;
+            }
+        }
+
+        static string[] GetFileSiblingHardLinks(string filepath)
+        {
+            List<string> result = new List<string>();
+            uint stringLength = 256;
+            StringBuilder sb = new StringBuilder(256);
+            NativeMethods.GetVolumePathName(filepath, sb, stringLength);
+            string volume = sb.ToString();
+            sb.Length = 0; stringLength = 256;
+            IntPtr findHandle = NativeMethods.FindFirstFileNameW(filepath, 0, ref stringLength, sb);
+            if (findHandle.ToInt32() != -1)
+            {
+                do
+                {
+                    StringBuilder pathSb = new StringBuilder(volume, 256);
+                    NativeMethods.PathAppend(pathSb, sb.ToString());
+                    result.Add(pathSb.ToString());
+                    sb.Length = 0; stringLength = 256;
+                } while (NativeMethods.FindNextFileNameW(findHandle, ref stringLength, sb));
+                NativeMethods.FindClose(findHandle);
+                return result.ToArray();
+            }
+            return null;
+        }
+
+        public IList<LPath> HardLinks
+        {
+            get
+            {
+                return GetFileSiblingHardLinks(FullName.ToString())
+                    .Select(x => new LPath(x))
+                    .ToList();
+            }
         }
     }
 }
