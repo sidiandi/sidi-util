@@ -184,15 +184,39 @@ namespace Sidi.IO
             GetFileExMaxInfoLevel
         }
 
+        [DllImport("kernel32.dll")]
+        internal static extern bool GetVolumePathName(string lpszFileName,
+            [Out] StringBuilder lpszVolumePathName, uint cchBufferLength);
+
+        [DllImport("shlwapi.dll", CharSet = CharSet.Auto)]
+        internal static extern bool PathAppend([In, Out] StringBuilder pszPath, string pszMore);
+
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern IntPtr FindFirstFileNameW(
+            string lpFileName,
+            uint dwFlags,
+            ref uint stringLength,
+            StringBuilder fileName);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern bool FindNextFileNameW(
+            IntPtr hFindStream,
+            ref uint stringLength,
+            StringBuilder fileName);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         internal static extern SafeFileHandle CreateFile(
             string lpFileName,
-            EFileAccess dwDesiredAccess,
-            EFileShare dwShareMode,
+            [MarshalAs(UnmanagedType.U4)] System.IO.FileAccess dwDesiredAccess,
+            [MarshalAs(UnmanagedType.U4)] System.IO.FileShare dwShareMode,
             IntPtr lpSecurityAttributes,
-            ECreationDisposition dwCreationDisposition,
-            EFileAttributes dwFlagsAndAttributes,
+            [MarshalAs(UnmanagedType.U4)] System.IO.FileMode dwCreationDisposition,
+            [MarshalAs(UnmanagedType.U4)] System.IO.FileAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool CloseHandle(SafeHandle hObject);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         internal static extern FindHandle FindFirstFile(string lpFileName, out FindData lpFindFileData);
@@ -280,5 +304,23 @@ namespace Sidi.IO
             GW_CHILD = 5,
             GW_ENABLEDPOPUP = 6
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct BY_HANDLE_FILE_INFORMATION
+        {
+            public uint FileAttributes;
+            public FILETIME CreationTime;
+            public FILETIME LastAccessTime;
+            public FILETIME LastWriteTime;
+            public uint VolumeSerialNumber;
+            public uint FileSizeHigh;
+            public uint FileSizeLow;
+            public uint NumberOfLinks;
+            public uint FileIndexHigh;
+            public uint FileIndexLow;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool GetFileInformationByHandle(SafeFileHandle handle, out BY_HANDLE_FILE_INFORMATION lpFileInformation);
     }
 }

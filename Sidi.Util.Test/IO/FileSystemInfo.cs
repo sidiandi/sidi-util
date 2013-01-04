@@ -56,5 +56,27 @@ namespace Sidi.IO
             dot.Info.DumpProperties(Console.Out);
             Assert.AreEqual(currentDirectory, dot.Info.FullName);
         }
+
+        [Test]
+        public void HardLinkSupport()
+        {
+            var testFile = TestFile("hardlinktest");
+            testFile.EnsureNotExists();
+            testFile.EnsureParentDirectoryExists();
+            LFile.WriteAllText(testFile, "hello");
+            var testFile1 = testFile.CatName(".hl");
+            testFile1.EnsureNotExists();
+            LFile.CreateHardLink(testFile1, testFile);
+            Assert.AreEqual(2, testFile.Info.FileLinkCount);
+
+            var hl = (List<LPath>) testFile.Info.HardLinks;
+
+            Assert.AreEqual(2, hl.Count);
+            Assert.Contains(testFile, hl);
+            Assert.Contains(testFile1, hl);
+
+            log.Info(testFile.Info.FileIndex);
+            Assert.AreEqual(testFile.Info.FileIndex, testFile1.Info.FileIndex);
+        }
     }
 }

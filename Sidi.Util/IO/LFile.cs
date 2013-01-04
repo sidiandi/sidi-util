@@ -86,33 +86,37 @@ namespace Sidi.IO
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode)
         {
-            NativeMethods.EFileAccess dwDesiredAccess = NativeMethods.EFileAccess.GenericAll;
-            NativeMethods.EFileShare dwShareMode = NativeMethods.EFileShare.None;
-            IntPtr lpSecurityAttributes = IntPtr.Zero;
-            NativeMethods.ECreationDisposition dwCreationDisposition = NativeMethods.ECreationDisposition.OpenExisting;
-            NativeMethods.EFileAttributes dwFlagsAndAttributes = 0;
-            IntPtr hTemplateFile = IntPtr.Zero;
-            System.IO.FileAccess access = System.IO.FileAccess.Read;
+            var desiredAccess = System.IO.FileAccess.ReadWrite;
+            var shareMode = System.IO.FileShare.None;
+            var lpSecurityAttributes = IntPtr.Zero;
+            var creationDisposition = System.IO.FileMode.Open;
+            var flagsAndAttributes = System.IO.FileAttributes.Normal;
+            var hTemplateFile = IntPtr.Zero;
+            var access = System.IO.FileAccess.Read;
 
             switch (fileMode)
             {
                 case System.IO.FileMode.Create:
-                    dwDesiredAccess = NativeMethods.EFileAccess.GenericWrite;
-                    dwCreationDisposition = NativeMethods.ECreationDisposition.CreateAlways;
+                    desiredAccess = System.IO.FileAccess.Write;
+                    creationDisposition = System.IO.FileMode.Create;
                     access = System.IO.FileAccess.ReadWrite;
                     break;
                 case System.IO.FileMode.Open:
-                    dwDesiredAccess = NativeMethods.EFileAccess.GenericRead;
-                    dwCreationDisposition = NativeMethods.ECreationDisposition.OpenExisting;
+                    desiredAccess = System.IO.FileAccess.Read;
+                    creationDisposition = System.IO.FileMode.Open;
                     access = System.IO.FileAccess.Read;
                     break;
                 default:
                     throw new NotImplementedException(fileMode.ToString());
             }
 
-            var h = NativeMethods.CreateFile(path.Param, dwDesiredAccess,
-                dwShareMode, lpSecurityAttributes, dwCreationDisposition,
-                dwFlagsAndAttributes,
+            var h = NativeMethods.CreateFile(
+                path.Param, 
+                desiredAccess,
+                shareMode, 
+                lpSecurityAttributes, 
+                creationDisposition,
+                flagsAndAttributes,
                 hTemplateFile);
 
             return new System.IO.FileStream(h, access);
