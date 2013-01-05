@@ -913,5 +913,16 @@ namespace Sidi.IO
             }
             return this.ToString().CompareTo(r.ToString());
         }
+
+        public LPath VolumePath
+        {
+            get
+            {
+                var sb = new StringBuilder(MaxPathLength);
+                NativeMethods.GetVolumePathName(this.Param, sb, (uint) sb.Capacity)
+                    .CheckApiCall(this);
+                return sb.ToString();
+            }
+        }
     }
 }
