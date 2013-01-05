@@ -12,8 +12,25 @@ namespace Sidi.IO
     /// </summary>
     public class HardLinkPreservingCopyOperation
     {
+        void CheckVolume(LPath path, ref LPath volume)
+        {
+            if (volume == null)
+            {
+                volume = path.VolumePath;
+            }
+            else
+            {
+                if (!volume.Equals(path.VolumePath))
+                {
+                    throw new Exception(String.Format("Volume of {2} must be {0} but is {1}", volume, path.VolumePath, path));
+                }
+            }
+        }
+
         public void Copy(LPath source, LPath destination)
         {
+            CheckVolume(source, ref sourceVolume);
+            CheckVolume(destination, ref destinationVolume);
             if (source.IsDirectory)
             {
                 var children = source.Children;
@@ -45,5 +62,7 @@ namespace Sidi.IO
         }
 
         Dictionary<ulong, LPath> sourceFileIdToDestinationPath = new Dictionary<ulong, LPath>();
+        LPath sourceVolume;
+        LPath destinationVolume;
     }
 }

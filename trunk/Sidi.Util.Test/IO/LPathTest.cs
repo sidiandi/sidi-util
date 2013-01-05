@@ -310,5 +310,12 @@ namespace Sidi.IO
             Assert.AreEqual(p, LPath.Parse(@"C:/temp/somefile"));
             Assert.AreEqual(new LPath(@"a\b\c"), LPath.Parse("a/b/c"));
         }
+
+        [Test]
+        public void VolumePath()
+        {
+            var t = TestFile("test");
+            log.Info(t.VolumePath);
+        }
     }
 }
