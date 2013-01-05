@@ -12,6 +12,8 @@ namespace Sidi.IO
     /// </summary>
     public class HardLinkPreservingCopyOperation
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         void CheckVolume(LPath path, ref LPath volume)
         {
             if (volume == null)
@@ -27,10 +29,23 @@ namespace Sidi.IO
             }
         }
 
+        Operation op = new Operation()
+        {
+            Fast = true,
+            Overwrite = true
+        };
+
         public void Copy(LPath source, LPath destination)
         {
             CheckVolume(source, ref sourceVolume);
             CheckVolume(destination, ref destinationVolume);
+
+            CopyRecursive(source, destination);
+
+        }
+
+        void CopyRecursive(LPath source, LPath destination)
+        {
             if (source.IsDirectory)
             {
                 var children = source.Children;
@@ -39,7 +54,7 @@ namespace Sidi.IO
                     destination.EnsureDirectoryExists();
                     foreach (var c in source.Children)
                     {
-                        Copy(c, destination.CatDir(c.FileName));
+                        CopyRecursive(c, destination.CatDir(c.FileName));
                     }
                 }
             }
@@ -50,12 +65,14 @@ namespace Sidi.IO
                 if (sourceFileIdToDestinationPath.TryGetValue(fi, out existingDestinationFile))
                 {
                     // re-create hard link
-                    
+                    log.InfoFormat("re-create link at {0} as {1} -> {2}",
+                        source,
+                        destination, existingDestinationFile);
                     LFile.CreateHardLink(destination, existingDestinationFile);
                 }
                 else
                 {
-                    LFile.Copy(source, destination);
+                    op.CopyFile(source, destination);
                     sourceFileIdToDestinationPath[fi] = destination;
                 }
             }
