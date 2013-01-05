@@ -183,7 +183,7 @@ namespace Sidi.IO
             }
         }
 
-        void CopyFile(LPath from, LPath to)
+        public void CopyFile(LPath from, LPath to)
         {
             if (NeedCopy(from, to))
             {

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
+using System.ComponentModel;
 
 namespace Sidi.IO
 {
@@ -306,23 +307,22 @@ namespace Sidi.IO
 
         NativeMethods.BY_HANDLE_FILE_INFORMATION GetByHandleFileInformation()
         {
-            SafeFileHandle handle = NativeMethods.CreateFile(
+            using (var handle = NativeMethods.CreateFile(
                 this.FullName.Param, 
                 System.IO.FileAccess.Read, 
                 System.IO.FileShare.Read, IntPtr.Zero, 
-                System.IO.FileMode.Open, System.IO.FileAttributes.Archive, 
-                IntPtr.Zero);
-            try
+                System.IO.FileMode.Open, System.IO.FileAttributes.Normal, 
+                IntPtr.Zero))
+                {
+            if (handle.IsInvalid)
             {
+                throw new Win32Exception(this.FullName);
+            }
 
                 var fileInfo = new NativeMethods.BY_HANDLE_FILE_INFORMATION();
                 NativeMethods.GetFileInformationByHandle(handle, out fileInfo)
                     .CheckApiCall(this.FullName);
                 return fileInfo;
-            }
-            finally
-            {
-                NativeMethods.CloseHandle(handle);
             }
         }
 
