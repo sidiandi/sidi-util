@@ -108,7 +108,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </Target>
 
   <Target Name="NugetPush" DependsOnTargets="Release;NugetPack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="nuget.exe push $(PackageDir)\$(ProjectName).$(Version).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(PackageDir)\$(ProjectName).$(Version).nupkg" />
   </Target>
 
   <Target Name="Publish" DependsOnTargets="NugetPush" />
