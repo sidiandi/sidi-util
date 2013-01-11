@@ -9,11 +9,24 @@ namespace Sidi.IO
     [TestFixture]
     public class HardLinkPreservingCopyOperationTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [Test]
         public void Test()
         {
-            var count = 10;
             var sourceDir = TestFile("copy-hardlink-test");
+
+            // determine target drive
+            var targetDrive = System.IO.DriveInfo.GetDrives()
+                .FirstOrDefault(x => x.DriveFormat.Equals("NTFS") && !sourceDir.StartsWith(x.RootDirectory.FullName));
+
+            if (targetDrive == null)
+            {
+                log.Warn("Test skipped. No target NTFS drive found.");
+                return;
+            }
+            
+            var count = 10;
             sourceDir.EnsureNotExists();
             sourceDir.EnsureDirectoryExists();
             var f = sourceDir.CatDir("orig");
@@ -24,7 +37,7 @@ namespace Sidi.IO
             }
             Assert.AreEqual(count + 1, f.Info.FileLinkCount);
 
-            var destinationDir = new LPath(@"E:\temp\copy-hardlink-test");
+            var destinationDir = new LPath(targetDrive.RootDirectory.FullName).CatDir(@"temp\copy-hardlink-test");
             destinationDir.EnsureNotExists();
             destinationDir.EnsureDirectoryExists();
 
@@ -35,6 +48,8 @@ namespace Sidi.IO
             var g = c.GroupBy(x => x.Info.FileIndex);
 
             Assert.AreEqual(1, g.Count());
+
+            destinationDir.EnsureNotExists();
         }
     }
 }

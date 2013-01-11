@@ -78,12 +78,5 @@ namespace Sidi.IO
             log.Info(testFile.Info.FileIndex);
             Assert.AreEqual(testFile.Info.FileIndex, testFile1.Info.FileIndex);
         }
-
-        [Test]
-        public void FileIndex2()
-        {
-            var p = new LPath(@"C:\temp\Rudolf Grimme\iPod Photo Cache\F09\T107.ithmb");
-            log.Info(p.Info.FileIndex);
-        }
     }
 }
