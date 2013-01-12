@@ -68,7 +68,10 @@ namespace Sidi.Extensions
                     i => new KeyValuePair<string, Func<string>>(i.Name, () => i.GetString(x))));
 
             list.Sort(list.Comparer(i => i.Key));
-            list.PrintTable(o, i => i.Key, i => i.Value());
+            list.ListFormat()
+                .AddColumn("Name", i => i.Key)
+                .AddColumn("Value", i => i.Value())
+                .RenderText(o);
         }
 
         public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e)
@@ -76,14 +79,28 @@ namespace Sidi.Extensions
             return new ListFormat<T>(e);
         }
 
-        public static void PrintTable<T>(this IEnumerable<T> e, TextWriter o, params Func<T, object>[] columns)
+        public static ListFormat<IGrouping<TKey, TSource>> ListCount<TSource, TKey>(this IEnumerable<IGrouping<TKey, TSource>> groups)
         {
-            var lf = e.ListFormat();
-            foreach (var f in columns)
-            {
-                lf.AddColumn(String.Empty, f);
-            }
-            lf.RenderText(o);
+            return groups.ListFormat()
+                .AddColumn("Key", x => x.Key)
+                .AddColumn("Count", x => x.Count());
+        }
+
+        public static ListFormat<KeyValuePair<string, int>> ListCountPercent<TSource, TKey>(this IEnumerable<IGrouping<TKey, TSource>> groups)
+        {
+            var kv = groups.Select(x => new KeyValuePair<string, int>(x.Key.ToString(), x.Count()))
+                .ToList();
+
+            var total = kv.Sum(x => x.Value);
+            kv.Insert(0, new KeyValuePair<string, int>("Total", total));
+
+            var pf = 100.0 / (double) total;
+
+            return kv
+                .ListFormat()
+                .AddColumn("Key", x => x.Key)
+                .AddColumn("Count", x => x.Value)
+                .AddColumn("Percent", x => String.Format("{0:F2}%", pf * x.Value));
         }
     }
 }

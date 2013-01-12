@@ -32,7 +32,7 @@ namespace Sidi.Forms
         public void Show()
         {
             var v = new GenericListView();
-            v.SetListFormat(Process.GetProcesses().ListFormat().Property("Id", "ProcessName"));
+            v.SetListFormat(Process.GetProcesses().ListFormat().Add("Id", "ProcessName"));
             v.UpdateDisplay();
             var f = v.AsForm("Test");
             System.Windows.Forms.Application.Run(f);
