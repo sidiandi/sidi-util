@@ -326,20 +326,20 @@ namespace Sidi.IO
             }
         }
 
-        public uint FileLinkCount
+        public int FileLinkCount
         {
             get
             {
-                return GetByHandleFileInformation().NumberOfLinks;
+                return (int) GetByHandleFileInformation().NumberOfLinks;
             }
         }
 
-        public ulong FileIndex
+        public long FileIndex
         {
             get
             {
                 var fileInfo = GetByHandleFileInformation();
-                return ((ulong)fileInfo.FileIndexHigh << 32) + (ulong)fileInfo.FileIndexLow;
+                return (long)(((ulong)fileInfo.FileIndexHigh << 32) + (ulong)fileInfo.FileIndexLow);
             }
         }
 
