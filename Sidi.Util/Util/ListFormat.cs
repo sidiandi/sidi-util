@@ -97,10 +97,39 @@ namespace Sidi.Util
             return this;
         }
 
-        public ListFormat<T> PropertyColumns()
+        public ListFormat<T> AllPublic()
         {
-            Add(typeof(T).GetProperties().Select(x => x.Name).ToArray());
+            return AllProperties().AllFields();
+        }
+
+        public ListFormat<T> Property(params string[] properties)
+        {
+            foreach (var m in properties.Select(f => typeof(T).GetProperty(f)))
+            {
+                var member = m;
+                AddColumn(m.Name, item => member.GetValue(item, new object[]{}).ToString());
+            }
             return this;
+        }
+
+        public ListFormat<T> AllProperties()
+        {
+            return Property(typeof(T).GetProperties().Select(x => x.Name).ToArray());
+        }
+
+        public ListFormat<T> Field(params string[] fields)
+        {
+            foreach (var m in fields.Select(f => typeof(T).GetField(f)))
+            {
+                var member = m;
+                AddColumn(m.Name, item => member.GetValue(item).ToString());
+            }
+            return this;
+        }
+
+        public ListFormat<T> AllFields()
+        {
+            return Field(typeof(T).GetFields().Select(x => x.Name).ToArray());
         }
 
         public IList<Column> Columns = new List<Column>();

@@ -56,7 +56,7 @@ namespace Sidi.Extensions
                 .ToDictionary(x => Path.GetRandomFileName(), x => Path.GetRandomFileName());
 
             d.ListFormat()
-                .PropertyColumns()
+                .AllPublic()
                 .RenderText();
         }
 
