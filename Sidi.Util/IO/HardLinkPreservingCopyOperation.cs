@@ -78,7 +78,7 @@ namespace Sidi.IO
             }
         }
 
-        Dictionary<ulong, LPath> sourceFileIdToDestinationPath = new Dictionary<ulong, LPath>();
+        Dictionary<long, LPath> sourceFileIdToDestinationPath = new Dictionary<long, LPath>();
         LPath sourceVolume;
         LPath destinationVolume;
     }
