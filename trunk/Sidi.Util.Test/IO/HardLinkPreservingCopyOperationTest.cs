@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using System.IO;
 
 namespace Sidi.IO
 {
@@ -11,6 +12,18 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        static string SafeGetDriveFormat(DriveInfo d)
+        {
+            try
+            {
+                return d.DriveFormat;
+            }
+            catch
+            {
+                return String.Empty;
+            }
+        }
+        
         [Test]
         public void Test()
         {
@@ -18,7 +31,7 @@ namespace Sidi.IO
 
             // determine target drive
             var targetDrive = System.IO.DriveInfo.GetDrives()
-                .FirstOrDefault(x => x.DriveFormat.Equals("NTFS") && !sourceDir.StartsWith(x.RootDirectory.FullName));
+                .FirstOrDefault(x => SafeGetDriveFormat(x).Equals("NTFS") && !sourceDir.StartsWith(x.RootDirectory.FullName));
 
             if (targetDrive == null)
             {
