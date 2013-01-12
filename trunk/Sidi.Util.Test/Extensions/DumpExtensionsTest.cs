@@ -35,7 +35,10 @@ namespace Sidi.Extensions
         {
             var files = new DirectoryInfo(TestFile(".")).GetFiles();
             var w = new StringWriter();
-            files.PrintTable(w, f => f.Name, f => f.LastWriteTimeUtc, f => f.Length);
+            files
+                .ListFormat()
+                .Add(f => f.Name, f => f.LastWriteTimeUtc, f => f.Length)
+                .RenderText(w);
             log.Info(w.ToString());    
         }
 
@@ -44,6 +47,36 @@ namespace Sidi.Extensions
         {
             Process p = Process.GetCurrentProcess();
             p.DumpProperties(Console.Out);
+        }
+
+        [Test]
+        public void DumpDictionary()
+        {
+            var d = Enumerable.Range(0, 20)
+                .ToDictionary(x => Path.GetRandomFileName(), x => Path.GetRandomFileName());
+
+            d.ListFormat()
+                .PropertyColumns()
+                .RenderText();
+        }
+
+        [Test]
+        public void DumpGroup()
+        {
+            var d = Enumerable.Range(0, 200)
+                .Select(x => Path.GetRandomFileName());
+
+            var group = d.GroupBy(x => x.Substring(0, 1));
+
+            group
+                .OrderBy(x => x.Key)
+                .ListCount()
+                .RenderText();
+
+            group
+                .OrderByDescending(x => x.Count())
+                .ListCountPercent()
+                .RenderText();
         }
     }
 }

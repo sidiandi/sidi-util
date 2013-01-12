@@ -73,9 +73,9 @@ namespace Sidi.Util
             return this;
         }
 
-        public ListFormat<T> Property(params string[] propertyNames)
+        public ListFormat<T> Add(params string[] propertyOrFieldNames)
         {
-            foreach (var caption in propertyNames)
+            foreach (var caption in propertyOrFieldNames)
             {
                 var p = typeof(T).GetProperty(caption);
                 if (p != null)
@@ -99,7 +99,7 @@ namespace Sidi.Util
 
         public ListFormat<T> PropertyColumns()
         {
-            Property(typeof(T).GetProperties().Select(x => x.Name).ToArray());
+            Add(typeof(T).GetProperties().Select(x => x.Name).ToArray());
             return this;
         }
 

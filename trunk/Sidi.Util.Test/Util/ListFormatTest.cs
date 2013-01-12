@@ -44,7 +44,7 @@ namespace Sidi.Util
 
             {
                 data.ListFormat()
-                    .Property("Name", "LastWriteTime")
+                    .Add("Name", "LastWriteTime")
                     .RenderText(Console.Out);
             }
 
