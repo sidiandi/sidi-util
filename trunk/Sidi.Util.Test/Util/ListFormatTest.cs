@@ -50,7 +50,7 @@ namespace Sidi.Util
 
             {
                 data.ListFormat()
-                    .PropertyColumns()
+                    .AllPublic()
                     .RenderText(Console.Out);
             }
         }
