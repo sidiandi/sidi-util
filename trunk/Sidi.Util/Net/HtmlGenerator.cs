@@ -126,7 +126,7 @@ namespace Sidi.Net
                             cellContent = "&nbsp;";
                         }
                     }
-                    return td();
+                    return td(cellContent);
                 })));
         }
 
