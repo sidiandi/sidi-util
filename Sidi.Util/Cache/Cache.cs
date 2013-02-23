@@ -25,7 +25,7 @@ using Sidi.Extensions;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace Sidi.Collections
+namespace Sidi.Cache
 {
     public class Cache
     {

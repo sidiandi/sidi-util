@@ -122,7 +122,7 @@
     <Compile Include="AsyncCalculationTest.cs" />
     <Compile Include="Cache\LruCacheBackgroundTest.cs" />
     <Compile Include="Cache\LruCacheTest.cs" />
-    <Compile Include="Collections\CacheTest.cs" />
+    <Compile Include="Cache\CacheTest.cs" />
     <Compile Include="CommandLine\ShowUserInterfaceTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="Extensions\DumpExtensionsTest.cs" />
@@ -219,6 +219,9 @@
     <Content Include="x86\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Collections\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
