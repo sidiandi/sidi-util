@@ -89,6 +89,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -234,6 +235,8 @@
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
     <Compile Include="Util\TileGeometry.cs" />
+    <Compile Include="Util\TimeInterval.cs" />
+    <Compile Include="Util\TimeIntervalParser.cs" />
     <Compile Include="Util\Tokenizer.cs" />
     <Compile Include="Util\UnixTime.cs" />
     <Compile Include="Util\UpdateCheck.cs" />

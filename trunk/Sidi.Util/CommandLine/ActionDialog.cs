@@ -68,12 +68,12 @@ namespace Sidi.CommandLine
                 var p = ParameterTextBoxes.Select(x => x.Text).ToList();
                 Action.Handle(p, true);
                 ShowUserInterface.ClearError(Button);
-            }
+            }                   
             catch (Exception ex)
             {
                 var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 ShowUserInterface.SetError(Button, msg);
-                throw;
+                
             }
         }
     }

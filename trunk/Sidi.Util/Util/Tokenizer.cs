@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace Sidi.Util
 {
@@ -28,6 +29,14 @@ namespace Sidi.Util
     public class Tokenizer
     {
         TextReader r;
+
+        public static string[] ToArray(string tokenString)
+        {
+            using (var sr = new StringReader(tokenString))
+            {
+                return new Tokenizer(sr).Tokens.ToArray();
+            }
+        }
 
         public Tokenizer(TextReader input)
         {

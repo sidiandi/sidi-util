@@ -172,7 +172,7 @@ namespace Sidi.CommandLine
         {
             var at = new ActionTag(action);
 
-            var control = new GroupBox()
+            var control = new Panel()
             {
                 Text = action.Name,
                 Dock = DockStyle.Fill,
@@ -186,6 +186,7 @@ namespace Sidi.CommandLine
                 Dock = DockStyle.Fill,
             };
             control.Controls.Add(layout);
+            int layoutRow = 0;
 
             var usage = new Label()
             {
@@ -194,8 +195,7 @@ namespace Sidi.CommandLine
                 AutoSize = true,
             };
 
-            layout.Controls.Add(usage, 0, 0);
-
+            layout.Controls.Add(usage, 0, layoutRow++);
 
             var paramsPanel = new TableLayoutPanel()
             {
@@ -203,6 +203,15 @@ namespace Sidi.CommandLine
                 ColumnCount = 2,
                 AutoSize = true,
             };
+
+            var button = new Button()
+            {
+                Text = action.Name,
+                AutoSize = true,
+                Tag = at,
+            };
+            at.Button = button;
+            button.Click += new EventHandler(button_Click);
 
             int row = 0;
             foreach (var p in action.MethodInfo.GetParameters())
@@ -220,6 +229,13 @@ namespace Sidi.CommandLine
                     Dock = DockStyle.Fill,
                 };
                 paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
+                paramInput.KeyDown += (s, e) =>
+                    {
+                        if (e.KeyCode == Keys.Enter)
+                        {
+                            button.PerformClick();        
+                        }
+                    };
                 paramInput.Tag = p;
                 paramsPanel.Controls.Add(paramInput, 1, row);
 
@@ -228,18 +244,73 @@ namespace Sidi.CommandLine
                 ++row;
             }
 
+            layout.Controls.Add(paramsPanel, 0, layoutRow++);
+
+            layout.Controls.Add(button, 0, layoutRow++);
+            return control;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        public Control ToControl(Option option)
+        {
+            var control = new Panel()
+            {
+                Text = option.Name,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+
+            var layout = new TableLayoutPanel()
+            {
+                ColumnCount = 1,
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+            };
+            control.Controls.Add(layout);
+
+            var usage = new Label()
+            {
+                Text = option.Usage,
+                Dock = DockStyle.Top,
+                AutoSize = true,
+            };
+
+            layout.Controls.Add(usage, 0, 0);
+
+            var paramsPanel = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                AutoSize = true,
+            };
+
+            int row = 0;
+            var paramLabel = new Label()
+            {
+                Text = "{0} [{1}]".F(option.Name, option.Type.GetInfo()),
+                AutoSize = true
+            };
+
+            paramsPanel.Controls.Add(paramLabel, 0, row);
+
+            var paramInput = new TextBox()
+            {
+                Dock = DockStyle.Fill,
+            };
+            paramInput.TextChanged += (s,e) =>
+                {
+                };
+
+            if (option.IsPassword)
+            {
+                paramInput.PasswordChar = '*';
+            }
+            paramInput.Tag = option;
+            paramInput.TextChanged += new EventHandler(paramInput_Leave);
+            paramsPanel.Controls.Add(paramInput, 1, row);
+
             layout.Controls.Add(paramsPanel, 0, 1);
 
-            var button = new Button()
-            {
-                Text = action.Name,
-                AutoSize = true,
-                Tag = at,
-            };
-            at.Button = button;
-            button.Click += new EventHandler(button_Click);
-
-            layout.Controls.Add(button, 0, 2);
             return control;
         }
 
@@ -288,7 +359,7 @@ namespace Sidi.CommandLine
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        Control ToControl(Option option)
+        Control ToControl_old(Option option)
         {
             var panel = new TableLayoutPanel()
             {
@@ -378,8 +449,26 @@ namespace Sidi.CommandLine
                 });
                 page.Controls.Add(c);
 
+                bool first = true;
                 foreach (var item in items.Where(x => x.Categories.Contains(category)))
                 {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+
+                        var separator = new Label()
+                        {
+                            AutoSize = false,
+                            Height = 2,
+                            Width = c.Width,
+                            Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right,
+                            BorderStyle = BorderStyle.Fixed3D
+                        };
+                        c.Controls.Add(separator);
+                    }
                     Control childControl = null;
                     if (item is Action)
                     {
