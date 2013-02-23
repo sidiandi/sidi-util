@@ -35,6 +35,7 @@ namespace Sidi.Collections
         {
             this.storeDirectory = storeDirectory;
             this.MaxAge = TimeSpan.MaxValue;
+            this.RememberExceptions = false;
         }
 
         LPath storeDirectory;
@@ -86,14 +87,17 @@ namespace Sidi.Collections
                 var cachedValue = reader(p);
                 if (cachedValue is Exception)
                 {
-                    throw (Exception)cachedValue;
+                    if (RememberExceptions)
+                    {
+                        throw (Exception)cachedValue;
+                    }
                 }
                 else
                 {
                     return (T)cachedValue;
                 }
             }
-            else
+
             {
                 try
                 {
@@ -104,7 +108,10 @@ namespace Sidi.Collections
                 }
                 catch (Exception e)
                 {
-                    writer(p, e);
+                    if (RememberExceptions)
+                    {
+                        writer(p, e);
+                    }
                     throw;
                 }
             }
@@ -137,13 +144,18 @@ namespace Sidi.Collections
             }
         }
 
+        /// <summary>
+        /// Returns a default instance, which stores values in local AppData
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static Cache Local(object id)
         {
             return new Cache(typeof(Cache).UserSetting("cache").CatDir(Digest(id)));
         }
 
         public TimeSpan MaxAge { set; get; }
-
+        public bool RememberExceptions { set; get; }
 
     }
 }
