@@ -22,7 +22,7 @@ using System.Text;
 using NUnit.Framework;
 using System.Reflection;
 
-namespace Sidi.Collections
+namespace Sidi.Cache
 {
     [TestFixture]
     public class CacheTest

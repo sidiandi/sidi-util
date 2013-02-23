@@ -97,7 +97,7 @@
     <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\LruCache.cs" />
     <Compile Include="Cache\LruCacheBackground.cs" />
-    <Compile Include="Collections\Cache.cs" />
+    <Compile Include="Cache\Cache.cs" />
     <Compile Include="Collections\SelectList.cs" />
     <Compile Include="CommandLine\Action.cs" />
     <Compile Include="CommandLine\ActionDialog.cs">
