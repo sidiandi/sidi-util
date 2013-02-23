@@ -22,6 +22,7 @@ using System.Text;
 using System.IO;
 using Excel = Microsoft.Office.Interop.Excel;
 using Sidi.Extensions;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Sidi.Util
 {
@@ -45,6 +46,18 @@ namespace Sidi.Util
                 catch
                 {
                     return String.Empty;
+                }
+            }
+
+            public object GetObject(T x)
+            {
+                try
+                {
+                    return f(x);
+                }
+                catch
+                {
+                    return null;
                 }
             }
 
@@ -226,6 +239,30 @@ namespace Sidi.Util
                 }
                 o.WriteLine();
             }
+        }
+
+        public Chart Chart()
+        {
+            var c = new Chart();
+            var ca = new ChartArea();
+            c.ChartAreas.Add(ca);
+            c.Legends.Add(new Legend());
+
+            var x = this.Columns[0];
+            var xValues = Data.Select(i => x.GetObject(i)).ToList();
+
+            foreach (var y in this.Columns.Skip(1))
+            {
+                var series = new Series(y.Name)
+                {
+                    ChartType = SeriesChartType.Line,
+                };
+                series.Points.DataBindXY(xValues,
+                    this.Data.Select(v => y.GetObject(v)).ToList());
+                c.Series.Add(series);
+            }
+            
+            return c;
         }
     }
 }

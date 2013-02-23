@@ -73,7 +73,10 @@ namespace Sidi.CommandLine.Test
             [Usage("Say hello to")]
             public void Greet(string name, string greeting, int times)
             {
-                Console.WriteLine("Hello, {0}", name);
+                for (int i = 0; i < times; ++i)
+                {
+                    Console.WriteLine("Hello, {0}", name);
+                }               
             }
 
             [Usage("Determines to whom to say hello.")]

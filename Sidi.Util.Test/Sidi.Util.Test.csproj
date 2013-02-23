@@ -115,6 +115,7 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
     <Compile Include="TestBase.cs" />
     <Compile Include="TokenizerUt.cs" />
     <Compile Include="UpdateCheckTest.cs" />
+    <Compile Include="Util\TimeIntervalTest.cs" />
     <Compile Include="Visualization\SimpleTreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTestData.cs" />

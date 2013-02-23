@@ -22,6 +22,8 @@ using System.Text;
 using NUnit.Framework;
 using System.IO;
 using Sidi.Extensions;
+using Sidi.Forms;
+using System.Diagnostics;
 
 namespace Sidi.Util
 {
@@ -53,6 +55,27 @@ namespace Sidi.Util
                     .AllPublic()
                     .RenderText(Console.Out);
             }
+        }
+
+        [Test, Explicit]
+        public void Chart()
+        {
+            var data = new DirectoryInfo(TestFile(".")).GetFiles();
+
+            data.ListFormat()
+                .AddColumn("LastModified", f => f.LastWriteTime)
+                .AddColumn("Size", f => f.Length)
+                .Chart().RunFullScreen();
+        }
+
+        [Test, Explicit]
+        public void ProcessChart()
+        {
+            var data = Process.GetProcesses();
+            data.ListFormat()
+                .AddColumn("Name", f => f.ToString())
+                .Property("Id")
+                .Chart().RunFullScreen();
         }
     }
 }

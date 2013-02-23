@@ -114,10 +114,7 @@ namespace Sidi.Net
                     }
                     if (p.ParameterType == typeof(List<string>))
                     {
-                        using (var sr = new StringReader(pv))
-                        {
-                            return new Tokenizer(sr).Tokens.ToArray();
-                        }
+                        return Tokenizer.ToArray(pv);
                     }
                     else
                     {
