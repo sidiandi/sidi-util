@@ -53,12 +53,14 @@ namespace Sidi.Cache
         }
 
         [Test]
-        public void Exception()
+        public void ExceptionRemembered()
         {
             var c = Cache.Local(MethodBase.GetCurrentMethod());
             c.Clear();
+            c.RememberExceptions = true;
 
             var d = 0;
+            var rd = 0;
             try
             {
                 var r = c.GetCached(d, () => 1 / d);
@@ -71,12 +73,42 @@ namespace Sidi.Cache
 
             try
             {
+                // this should not raise an exception
+                // but since RememberExceptions = true, 
+                // the cached DivideByZeroException will be returned.
+                var r = c.GetCached(d, () => 1 / 1); 
+                Assert.IsTrue(false);
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e is System.DivideByZeroException);
+            }
+        }
+
+        [Test]
+        public void ExceptionNotRemembered()
+        {
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
+            c.Clear();
+            c.RememberExceptions = false;
+
+            var d = 0;
+            var rd = 0;
+            try
+            {
                 var r = c.GetCached(d, () => 1 / d);
                 Assert.IsTrue(false);
             }
             catch (Exception e)
             {
                 Assert.IsTrue(e is System.DivideByZeroException);
+            }
+
+            // this should not raise an exception
+            // and since RememberExceptions = true, 
+            // the cached DivideByZeroException will not be returned.
+            {
+                var r = c.GetCached(d, () => 1 / 1);
             }
         }
     }
