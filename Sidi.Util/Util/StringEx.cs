@@ -301,5 +301,16 @@ namespace Sidi.Extensions
                 return String.Empty;
             }
         }
+
+        public static string SafeSubstring(this string x, int startIndex, int length)
+        {
+            var l = x.Length;
+            length = Math.Min(length, l - startIndex);
+            if (length <= 0)
+            {
+                return String.Empty;
+            }
+            return x.Substring(startIndex, length);
+        }
     }
 }

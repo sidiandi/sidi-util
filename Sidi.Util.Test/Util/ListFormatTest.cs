@@ -32,11 +32,16 @@ namespace Sidi.Util
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        FileInfo[] data;
+
+        public ListFormatTest()
+        {
+            data = new DirectoryInfo(TestFile(".")).GetFiles();
+        }
+
         [Test]
         public void Test()
         {
-            var data = new DirectoryInfo(TestFile(".")).GetFiles();
-
             {
                 data.ListFormat()
                     .AddColumn("Name", f => f.Name)
@@ -57,15 +62,42 @@ namespace Sidi.Util
             }
         }
 
+        [Test]
+        public void Width()
+        {
+            var lf = data.ListFormat()
+                .AllPublic();
+
+            foreach (var c in lf.Columns)
+            {
+                c.Width = 10;
+                c.AutoWidth = false;
+            }
+            lf.RenderText(Console.Out);
+        }
+
         [Test, Explicit]
         public void Chart()
         {
             var data = new DirectoryInfo(TestFile(".")).GetFiles();
 
             data.ListFormat()
+                .AddColumn("Created", f => f.CreationTime)
                 .AddColumn("LastModified", f => f.LastWriteTime)
                 .AddColumn("Size", f => f.Length)
                 .Chart().RunFullScreen();
+        }
+
+        [Test, Explicit]
+        public void Bubbles()
+        {
+            var data = Process.GetProcesses();
+
+            data.ListFormat()
+                .AddColumn("Created", p => p.StartTime)
+                .AddColumn("CPU", p => p.TotalProcessorTime.TotalHours)
+                .AddColumn("Size", p => p.VirtualMemorySize)
+                .Bubbles().RunFullScreen();
         }
 
         [Test, Explicit]
