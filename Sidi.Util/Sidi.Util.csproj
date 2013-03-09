@@ -160,6 +160,7 @@
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Util\ArchiveHandler.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
+    <Compile Include="Util\Base32.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
     <Compile Include="Util\ByteArrayEx.cs" />
     <Compile Include="CommandLine\ShowHelp.cs" />
