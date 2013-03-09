@@ -21,12 +21,55 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using System.Reflection;
+using Sidi.IO;
+using Sidi.Extensions;
 
 namespace Sidi.Cache
 {
     [TestFixture]
-    public class CacheTest
+    public class CacheTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        [Serializable]
+        class Key
+        {
+            public int Value;
+
+            public override int GetHashCode()
+            {
+                return 0;
+            }
+
+            public override bool Equals(object obj)
+            {
+                var r = (Key)obj;
+                return r != null && Value == r.Value;
+            }
+        }
+
+        [Test]
+        public void HashCodeCollision()
+        {
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
+            var key1 = new Key(){ Value = 1};
+            var key2 = new Key(){ Value = 2};
+            c.Clear();
+            Assert.AreEqual(1, c.GetCached(key1, () => 1));
+            Assert.AreEqual(2, c.GetCached(key2, () => 2));
+            var cacheDir = typeof(Cache).UserSetting("cache");
+        }
+        
+        [Test]
+        public void Clear()
+        {
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
+            c.Clear();
+            Assert.AreEqual(1, c.GetCached(1, () => 1));
+            c.Clear(1);
+            Assert.AreEqual(2, c.GetCached(1, () => 2));
+        }
+        
         [Test]
         public void DoCache()
         {

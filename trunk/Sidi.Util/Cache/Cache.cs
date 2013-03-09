@@ -24,6 +24,8 @@ using Sidi.Util;
 using Sidi.Extensions;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace Sidi.Cache
 {
@@ -31,8 +33,9 @@ namespace Sidi.Cache
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Cache(string storeDirectory)
+        public Cache(LPath storeDirectory)
         {
+            log.Debug(storeDirectory);
             this.storeDirectory = storeDirectory;
             this.MaxAge = TimeSpan.MaxValue;
             this.RememberExceptions = false;
@@ -122,6 +125,12 @@ namespace Sidi.Cache
             storeDirectory.EnsureNotExists();
         }
 
+        public void Clear(object id)
+        {
+            log.DebugFormat("Clear {0} from cache", id);
+            CachePath(id).EnsureNotExists();
+        }
+
         public bool IsCached(object key)
         {
             return CachePath(key).Exists;
@@ -132,6 +141,8 @@ namespace Sidi.Cache
             return storeDirectory.CatDir(Digest(key));
         }
 
+        static SHA1 sha = new SHA1CryptoServiceProvider(); 
+        
         static string Digest(object x)
         {
             if (x is MethodBase)
@@ -140,7 +151,11 @@ namespace Sidi.Cache
             }
             else
             {
-                return String.Format("{0:x}", x.GetHashCode());
+                var b = new BinaryFormatter();
+                var s = new MemoryStream();
+                b.Serialize(s, x);
+                var hash = sha.ComputeHash(s.ToArray());
+                return LPath.GetValidFilename(Base32.Encode(hash));
             }
         }
 
@@ -151,7 +166,21 @@ namespace Sidi.Cache
         /// <returns></returns>
         public static Cache Local(object id)
         {
-            return new Cache(typeof(Cache).UserSetting("cache").CatDir(Digest(id)));
+            Type type = null;
+            if (id is MethodBase)
+            {
+                type = ((MethodBase)id).DeclaringType;
+            }
+            else if (id is Type)
+            {
+                type = (Type)id;
+            }
+            else
+            {
+                type = id.GetType();
+            }
+
+            return new Cache(type.UserSetting("cache").CatDir(Digest(id)));
         }
 
         public TimeSpan MaxAge { set; get; }
