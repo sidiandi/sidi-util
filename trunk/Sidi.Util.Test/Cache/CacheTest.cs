@@ -152,5 +152,28 @@ namespace Sidi.Cache
                 var r = c.GetCached(d, () => 1 / 1);
             }
         }
+
+        [Test]
+        public void GetCachedFile()
+        {
+            var key = "hello";
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
+            c.Clear();
+            var file = c.GetCachedFile(key, () =>
+                {
+                    var f = TestFile("hello");
+                    LFile.WriteAllText(f, "hello");
+                    return f;
+                });
+
+            log.Info(file);
+            Assert.IsTrue(c.IsCached(key));
+            log.Info(c.GetCachedFile(key, () =>
+                {
+                    var f = TestFile("hello");
+                    LFile.WriteAllText(f, "hello");
+                    return f;
+                }));
+        }
     }
 }

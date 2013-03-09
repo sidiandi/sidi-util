@@ -312,5 +312,13 @@ namespace Sidi.Extensions
             }
             return x.Substring(startIndex, length);
         }
+
+        public static IEnumerable<string> SplitFixedWidth(this string x, int width)
+        {
+            for (int i = 0; i < x.Length; i += width)
+            {
+                yield return x.SafeSubstring(i, width);
+            }
+        }
     }
 }

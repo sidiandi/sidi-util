@@ -120,6 +120,13 @@ namespace Sidi.Cache
             }
         }
 
+        public LPath GetCachedFile(object key, Func<LPath> provider)
+        {
+            return GetCached(key, provider,
+                (cachePath) => cachePath,
+                (cachePath, path) => LFile.CopyOrHardLink((LPath)path, cachePath));
+        }
+        
         public void Clear()
         {
             storeDirectory.EnsureNotExists();
