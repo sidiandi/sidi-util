@@ -23,7 +23,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
         <Minor>4</Minor>
         <Build>0</Build>
 		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\packages</MSBuildExtensionsPath>
-		<MSBuildCommunityTasksPath>$(MSBuildExtensionsPath)\MSBuildTasks.1.4.0.45\tools</MSBuildCommunityTasksPath>
+		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
 	</PropertyGroup>
     
 	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />

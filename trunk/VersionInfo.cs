@@ -8,16 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-[assembly: AssemblyCopyright("Copyright (c) Andreas Grimme 2010")]
-[assembly: AssemblyCompany("sidi")]
-[assembly: AssemblyProduct("sidi-util")]
-[assembly: AssemblyVersion("2.4.0.687")]
-[assembly: AssemblyFileVersion("2.4.0.687")]
+[assembly: System.Reflection.AssemblyCopyright("Copyright (c) Andreas Grimme 2010")]
+[assembly: System.Reflection.AssemblyCompany("sidi")]
+[assembly: System.Reflection.AssemblyProduct("sidi-util")]
+[assembly: System.Reflection.AssemblyVersion("2.4.0.692")]
+[assembly: System.Reflection.AssemblyFileVersion("2.4.0.692")]
 
 
