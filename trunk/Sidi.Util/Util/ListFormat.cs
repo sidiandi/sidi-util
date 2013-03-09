@@ -37,6 +37,13 @@ namespace Sidi.Util
 
         public class Column
         {
+            public Column()
+            {
+                MaxWidth = 1000;
+                Width = -1;
+                AutoWidth = true;
+            }
+
             public string GetText(T x)
             {
                 try
@@ -64,11 +71,15 @@ namespace Sidi.Util
             public string Name { get; private set; }
             Func<T, object> f;
 
-            public Column(string name, Func<T, object> f)
+            public Column(string name, Func<T, object> f) : this()
             {
                 this.f = f;
                 Name = name;
             }
+
+            public int MaxWidth { get; set; }
+            public int Width { set; get; }
+            public bool AutoWidth { get; set; }
         }
 
         public ListFormat<T> AddColumn(string caption, Func<T, object> f)
@@ -147,7 +158,6 @@ namespace Sidi.Util
 
         public IList<Column> Columns = new List<Column>();
         public string ColumnSeparator = "|";
-        public int MaxColumnWidth = 60;
 
         public void RenderText()
         {
@@ -209,33 +219,60 @@ namespace Sidi.Util
                 .Select(i => Columns.Select(x => x.GetText(i)).ToArray())
                 .ToList();
 
-            int[] w = new int[Columns.Count];
-            for (int i = 0; i < w.Length; ++i)
+            // determine column widths
+            for (int c = 0; c < Columns.Count; ++c)
             {
-                w[i] = Math.Min(MaxColumnWidth, Math.Max(w[i], Columns[i].Name.Length));
-                foreach (var r in rows)
+                if (Columns[c].AutoWidth)
                 {
-                    w[i] = Math.Min(MaxColumnWidth, Math.Max(w[i], r[i].Length));
+                    Columns[c].Width = Math.Max(Columns[c].Width, Columns[c].Name.Length);
                 }
             }
-
-            // header
-            {
-                for (int c = 0; c < Columns.Count; ++c)
-                {
-                    o.Write(String.Format("{0,-" + w[c] + "}", Columns[c].Name));
-                    o.Write(ColumnSeparator);
-                }
-                o.WriteLine();
-            }
-
-            
             foreach (var i in rows)
             {
                 for (int c = 0; c < Columns.Count; ++c)
                 {
-                    o.Write(String.Format("{0,-" + w[c] + "}", i[c]));
-                    o.Write(ColumnSeparator);
+                    if (Columns[c].AutoWidth)
+                    {
+                        Columns[c].Width = Math.Max(Columns[c].Width, i[c].Length);
+                    }
+                }
+            }
+            for (int c = 0; c < Columns.Count; ++c)
+            {
+                if (Columns[c].AutoWidth)
+                {
+                    Columns[c].Width = Math.Min(Columns[c].Width, Columns[c].MaxWidth);
+                }
+            }
+
+            // print
+            var columnFormat = Columns.Select(x => String.Format("{{0,-{0}}}{1}", x.Width, ColumnSeparator)).ToArray();
+
+            // header
+            RenderMultiLine(o, Columns.Select(x => x.Name).ToArray(), columnFormat);
+
+            // rows
+            foreach (var rowData in rows)
+            {
+                RenderMultiLine(o, rowData, columnFormat);
+            }
+        }
+
+        void RenderMultiLine(TextWriter o, string[] rowData, string[] columnFormat)
+        {
+            // calculate number of required text rows
+            int textRows = 0;
+            for (int c = 0; c < Columns.Count; ++c)
+            {
+                textRows = Math.Max(textRows, (rowData[c].Length - 1) / Columns[c].Width + 1);
+            }
+
+            for (int tr = 0; tr < textRows; ++tr)
+            {
+                for (int c = 0; c < Columns.Count; ++c)
+                {
+                    var text = rowData[c].SafeSubstring(tr * Columns[c].Width, Columns[c].Width);
+                    o.Write(String.Format(columnFormat[c], text));
                 }
                 o.WriteLine();
             }
@@ -262,6 +299,36 @@ namespace Sidi.Util
                 c.Series.Add(series);
             }
             
+            return c;
+        }
+
+        public Chart Bubbles()
+        {
+            var c = new Chart();
+            var ca = new ChartArea();
+            c.ChartAreas.Add(ca);
+            c.Legends.Add(new Legend());
+
+            var xValues = Columns[0];
+            var yValue = Columns[1];
+            var bubbleSize = Columns[2];
+            
+            {
+                var series = new Series(yValue.Name)
+                {
+                    ChartType = SeriesChartType.Bubble,
+                    YValuesPerPoint = 2,
+                    XValueType = ChartValueType.DateTime,
+                    
+                };
+                series.Points.DataBindXY(
+                    this.Data.Select(v => xValues.GetObject(v)).ToList(),
+                    this.Data.Select(v => yValue.GetObject(v)).ToList(),
+                    this.Data.Select(v => bubbleSize.GetObject(v)).ToList()
+                    );
+                c.Series.Add(series);
+            }
+
             return c;
         }
     }

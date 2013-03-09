@@ -135,5 +135,19 @@ namespace Sidi.Extensions
                 yield return new KeyValuePair<K, V>(k, v.Current);
             }
         }
+
+        public static IEnumerable<T> DistinctBy<T, K>(this IEnumerable<T> data, Func<T, K> key)
+        {
+            var keys = new HashSet<K>();
+            foreach (var i in data)
+            {
+                var k = key(i);
+                if (!keys.Contains(k))
+                {
+                    keys.Add(k);
+                    yield return i;
+                }
+            }
+        }
     }
 }
