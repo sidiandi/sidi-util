@@ -96,7 +96,7 @@ namespace Sidi.Util
             data.ListFormat()
                 .AddColumn("Created", p => p.StartTime)
                 .AddColumn("CPU", p => p.TotalProcessorTime.TotalHours)
-                .AddColumn("Size", p => p.VirtualMemorySize)
+                .AddColumn("Size", p => p.VirtualMemorySize64)
                 .Bubbles().RunFullScreen();
         }
 

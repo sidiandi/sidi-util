@@ -60,7 +60,6 @@ namespace Sidi.Cache
             c.RememberExceptions = true;
 
             var d = 0;
-            var rd = 0;
             try
             {
                 var r = c.GetCached(d, () => 1 / d);
@@ -93,7 +92,6 @@ namespace Sidi.Cache
             c.RememberExceptions = false;
 
             var d = 0;
-            var rd = 0;
             try
             {
                 var r = c.GetCached(d, () => 1 / d);
