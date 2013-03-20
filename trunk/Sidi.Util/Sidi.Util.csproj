@@ -225,6 +225,7 @@
     <Compile Include="Pop3\Server.cs" />
     <Compile Include="..\VersionInfo.cs" />
     <Compile Include="Util\ListFormat.cs" />
+    <Compile Include="Util\LogScope.cs" />
     <Compile Include="Util\ProcessEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\RandomEx.cs" />
