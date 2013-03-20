@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sidi.Cache
+namespace Sidi.Caching
 {
     public interface ICache<Key, Value>
     {

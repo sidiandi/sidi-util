@@ -120,9 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCalculationTest.cs" />
-    <Compile Include="Cache\LruCacheBackgroundTest.cs" />
-    <Compile Include="Cache\LruCacheTest.cs" />
-    <Compile Include="Cache\CacheTest.cs" />
+    <Compile Include="Caching\LruCacheBackgroundTest.cs" />
+    <Compile Include="Caching\LruCacheTest.cs" />
+    <Compile Include="Caching\CacheTest.cs" />
     <Compile Include="CommandLine\ShowUserInterfaceTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="Extensions\DumpExtensionsTest.cs" />
