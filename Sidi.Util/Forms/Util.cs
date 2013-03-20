@@ -48,6 +48,11 @@ namespace Sidi.Forms
             Application.Run(f);
         }
 
+        static public void Invoke(this Control c, Action a)
+        {
+            c.Invoke((Delegate)a);
+        }
+
         static public TabPage AddTabPage(TabControl tabControl, Control c, string caption)
         {
             TabPage tabPage = new TabPage();

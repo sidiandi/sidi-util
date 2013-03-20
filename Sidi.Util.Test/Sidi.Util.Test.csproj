@@ -165,6 +165,7 @@
     <Compile Include="Util\Dump.cs" />
     <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\ListFormatTest.cs" />
+    <Compile Include="Util\LogScopeTest.cs" />
     <Compile Include="Util\ShellTest.cs" />
     <Compile Include="Util\SizeCount.cs" />
     <Compile Include="Util\StringExTest.cs" />
