@@ -22,7 +22,7 @@ using System.Text;
 using NUnit.Framework;
 using System.Threading;
 
-namespace Sidi.Cache
+namespace Sidi.Caching
 {
     [TestFixture]
     public class LruCacheTest : TestBase

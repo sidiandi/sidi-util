@@ -27,7 +27,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Sidi.Cache
+namespace Sidi.Caching
 {
     public class Cache
     {

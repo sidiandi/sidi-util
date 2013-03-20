@@ -24,7 +24,7 @@ using System.Reflection;
 using Sidi.IO;
 using Sidi.Extensions;
 
-namespace Sidi.Cache
+namespace Sidi.Caching
 {
     [TestFixture]
     public class CacheTest : TestBase

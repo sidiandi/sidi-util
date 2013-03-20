@@ -23,7 +23,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Sidi.Cache
+namespace Sidi.Caching
 {
     public enum CacheState
     {
