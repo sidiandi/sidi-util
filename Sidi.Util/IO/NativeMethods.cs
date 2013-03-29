@@ -152,7 +152,7 @@ namespace Sidi.IO
         [DllImport("user32.dll")]
         internal static extern IntPtr GetForegroundWindow();
         
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError=true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteFile(string lpFileName);
 
@@ -184,11 +184,11 @@ namespace Sidi.IO
             GetFileExMaxInfoLevel
         }
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool GetVolumePathName(string lpszFileName,
             [Out] StringBuilder lpszVolumePathName, uint cchBufferLength);
 
-        [DllImport("shlwapi.dll", CharSet = CharSet.Auto)]
+        [DllImport("shlwapi.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern bool PathAppend([In, Out] StringBuilder pszPath, string pszMore);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -224,10 +224,10 @@ namespace Sidi.IO
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         internal static extern bool FindNextFile(FindHandle hFindFile, out FindData lpFindFileData);
 
-        [DllImport("kernel32", CharSet = CharSet.Unicode)]
+        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError=true)]
         internal static extern bool FindClose(IntPtr hFindFile);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError=true)]
         internal static extern bool CopyFile(string lpExistingFileName, string lpNewFileName, bool bFailIfExists);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
