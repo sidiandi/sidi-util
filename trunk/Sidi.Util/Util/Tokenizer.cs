@@ -23,6 +23,42 @@ using System.Linq;
 
 namespace Sidi.Util
 {
+    public class ReadAheadTextReader : TextReader
+    {
+        TextReader underlyingReader;
+        
+        public ReadAheadTextReader(TextReader underlyingReader)
+        {
+            this.underlyingReader = underlyingReader;
+        }
+
+        int peek;
+        bool peekValid = false;
+
+        public override int Peek()
+        {
+            if (!peekValid)
+            {
+                peek = underlyingReader.Read();
+                peekValid = true;
+            }
+            return peek;
+        }
+
+        public override int Read()
+        {
+            if (peekValid)
+            {
+                peekValid = false;
+                return peek;
+            }
+            else
+            {
+                return underlyingReader.Read();
+            }
+        }
+    }
+
     /// <summary>
     /// Simple text tokenizer. Separates strings at whitespace. Understands # comments, and quoted strings.
     /// </summary>

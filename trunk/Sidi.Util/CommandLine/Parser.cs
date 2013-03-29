@@ -250,8 +250,6 @@ namespace Sidi.CommandLine
                 return;
             }
 
-            log.InfoFormat("Arguments: {0}", args.Join(" "));
-
             while (args.Count > 0)
             {
                 ParseSingleCommand(args);
