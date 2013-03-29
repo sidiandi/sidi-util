@@ -30,6 +30,10 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using Sidi.Extensions;
 using System.Diagnostics.CodeAnalysis;
+using log4net.Repository.Hierarchy;
+using log4net;
+using log4net.Appender;
+using log4net.Layout;
 
 namespace Sidi.CommandLine
 {
@@ -146,9 +150,30 @@ namespace Sidi.CommandLine
 
         void AddDefaultUserInterface()
         {
+            ConfigureDefaultLogging();
             Applications.Add(new ShowUserInterface(this));
             Applications.Add(new ShowHelp(this));
             Applications.Add(new ShowWebServer(this));
+        }
+
+        void ConfigureDefaultLogging()
+        {
+            var hierarchy = (Hierarchy)LogManager.GetRepository();
+            if (hierarchy.Configured)
+            {
+                return;
+            }
+
+            var pattern = new PatternLayout("%utcdate{ISO8601} [%thread] %level %logger %ndc - %message%newline");
+
+            var ca = new ConsoleAppender()
+            {
+                Target = "Console.Error",
+                Layout = pattern,
+            };
+
+            hierarchy.Root.AddAppender(ca);
+            hierarchy.Configured = true;
         }
 
         internal Parser()
@@ -296,7 +321,7 @@ namespace Sidi.CommandLine
                     if (value != null)
                     {
                         var valueString = value.ToString();
-                        log.InfoFormat("Restore persistent option {0}", o);
+                        log.DebugFormat("Restore persistent option {0}", o);
                         if (o.IsPassword)
                         {
                             valueString = valueString.Decrypt(preferencesPassword);
@@ -332,7 +357,7 @@ namespace Sidi.CommandLine
 
                     if (v != null)
                     {
-                        log.InfoFormat("Store persistent option {0} = {1}", o.Name, o.DisplayValue);
+                        log.DebugFormat("Store persistent option {0} = {1}", o.Name, o.DisplayValue);
                         Registry.SetValue(GetPreferencesKey(o), o.Name, v);
                     }
                 }
@@ -828,22 +853,31 @@ namespace Sidi.CommandLine
         {
             w.WriteLine(Info);
             w.WriteLine(String.Format("Usage: {0} action [parameters] action [parameters]", ApplicationName));
+            WriteUsageByCategory(w, Items.Where(x => !(x is ValueParser)));
+        }
 
-            var categories = Categories;
+        public void WriteUsageByCategory(TextWriter w, IEnumerable<IParserItem> items)
+        {
+            var g = items.SelectMany(i => i.Categories.Select(x => new { Category = x, Item = i }))
+                .GroupBy(x => x.Category)
+                .OrderBy(x => x.Key)
+                .ToList();
 
-            foreach (var category in categories)
+            foreach (var catItems in g)
             {
-                if (!String.IsNullOrEmpty(category))
+                if (!String.IsNullOrEmpty(catItems.Key))
                 {
                     w.WriteLine();
-                    w.WriteLine(category);
+                    w.WriteLine(catItems.Key);
                 }
 
-                var items = Items.Where(x => x.Categories.Contains(category) && !(x is ValueParser));
+                var oi = catItems
+                    .Select(x => x.Item)
+                    .OrderBy(x => x.Name);
 
-                if (items.Any())
+                if (oi.Any())
                 {
-                    foreach (var i in items)
+                    foreach (var i in oi)
                     {
                         w.WriteLine();
                         w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));

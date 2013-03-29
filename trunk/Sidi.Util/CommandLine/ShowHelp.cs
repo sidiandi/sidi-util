@@ -37,14 +37,12 @@ namespace Sidi.CommandLine
         [Category(Parser.categoryUserInterface)]
         public void Help(string searchString)
         {
-            foreach (var i in parser.Items)
-            {
-                if (Regex.IsMatch(i.UsageText, searchString, RegexOptions.IgnoreCase))
-                {
-                    Console.WriteLine();
-                    Console.WriteLine(i.UsageText);
-                }
-            }
+            parser.WriteUsageByCategory(
+                Console.Out,
+                parser.Items
+                .Where(x => !(x is ValueParser))
+                .Where(i => Regex.IsMatch(i.UsageText, searchString, RegexOptions.IgnoreCase))
+                );
         }
     }
 

@@ -202,5 +202,25 @@ namespace Sidi.IO
                 }
                 Assert.AreEqual(text, LFile.ReadAllText(d));
             }
+
+            [Test]
+            public void CannotDelete()
+            {
+                var p = TestFile("delete_me");
+                using (var w = LFile.StreamWriter(p))
+                {
+                    try
+                    {
+                        p.EnsureNotExists();
+                        Assert.IsTrue(false);
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                        log.Info(ex.ToString());
+                        var w32 = (Win32Exception)ex.InnerException;
+                        Assert.IsFalse(w32.Message.Contains("The operation completed successfully"));
+                    }
+                }
+            }
         }
 }

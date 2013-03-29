@@ -537,11 +537,14 @@ namespace Sidi.CommandLine
         [Category(Parser.categoryUserInterface)]
         public log4net.Core.Level LogLevel
         {
-            get { return logLevel; }
+            get
+            {
+                var hierarchy = (Hierarchy)LogManager.GetRepository();
+                return hierarchy.Root.Level;
+            }
+
             set
             {
-                logLevel = value;
-
                 var hierarchy = (Hierarchy)LogManager.GetRepository();
                 hierarchy.Root.Level = value;
             }
