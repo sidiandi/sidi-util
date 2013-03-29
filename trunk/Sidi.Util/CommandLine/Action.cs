@@ -31,12 +31,14 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Action(object application, MethodInfo method)
+        public Action(Parser parser, object application, MethodInfo method)
         {
             Application = application;
             MethodInfo = method;
+            this.parser = parser;
         }
 
+        Parser parser;
         public MethodInfo MethodInfo { private set; get; }
         public object Application { private set; get; }
         public string Name { get { return MethodInfo.Name; } }
@@ -117,8 +119,7 @@ namespace Sidi.CommandLine
                         }
                         else
                         {
-                            elements.Add(Parser.ParseValue(list.First(), type.GetElementType()));
-                            list.RemoveAt(0);
+                            elements.Add(parser.ParseValue(list, type.GetElementType()));
                         }
                     }
 
@@ -131,8 +132,7 @@ namespace Sidi.CommandLine
                 }
                 else
                 {
-                    var r = Parser.ParseValue(list.First(), type);
-                    list.RemoveAt(0);
+                    var r = parser.ParseValue(list, type);
                     return r;
                 }
             }

@@ -27,6 +27,8 @@ using System.Reflection;
 using System.ComponentModel;
 using Sidi.Extensions;
 using System.Diagnostics.CodeAnalysis;
+using log4net.Repository.Hierarchy;
+using log4net;
 
 namespace Sidi.CommandLine
 {
@@ -38,6 +40,7 @@ namespace Sidi.CommandLine
 
         public ShowUserInterface(Parser parser)
         {
+            LogLevel = log4net.Core.Level.Off;
             this.parser = parser;
         }
 
@@ -522,6 +525,28 @@ namespace Sidi.CommandLine
             dialog.ShowAndExecute();
         }
 
+        public static log4net.Core.Level ParseLevel(string stringRepresentation)
+        {
+            var levels = typeof(log4net.Core.Level).GetFields(BindingFlags.Static | BindingFlags.Public);
+            var selected = levels.First(i => Parser.IsMatch(stringRepresentation, i.Name));
+            return (log4net.Core.Level) selected.GetValue(null);
+        }
+
+        [Usage("Log level (off, error, warn, info, debug)"), Persistent]
+        [Category(Parser.categoryUserInterface)]
+        public log4net.Core.Level LogLevel
+        {
+            get { return logLevel; }
+            set
+            {
+                logLevel = value;
+
+                var hierarchy = (Hierarchy)LogManager.GetRepository();
+                hierarchy.Root.Level = value;
+            }
+        }
+        log4net.Core.Level logLevel;
+
         List<TextBox> inputs = new List<TextBox>();
 
         void Refresh()
@@ -543,7 +568,7 @@ namespace Sidi.CommandLine
             var p = (ParameterInfo)textBox.Tag;
             try
             {
-                Parser.ParseValue(textBox.Text, p.ParameterType);
+                parser.ParseValue(Tokenizer.ToList(textBox.Text), p.ParameterType);
                 ClearError(textBox);
             }
             catch (Exception ex)

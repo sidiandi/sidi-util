@@ -144,7 +144,7 @@ namespace Sidi.Net
                     }
                     else
                     {
-                        return new object[] { Sidi.CommandLine.Parser.ParseValue(pv, p.ParameterType) };
+                        return new object[] { Sidi.CommandLine.Parser.ParseValueBuiltIn(pv, p.ParameterType) };
                     }
                 })
                 .ToArray();

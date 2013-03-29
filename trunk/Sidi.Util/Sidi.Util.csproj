@@ -104,11 +104,13 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CommandLine\Attributes.cs" />
+    <Compile Include="CommandLine\LoggingOptions.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
     <Compile Include="CommandLine\ShowUserInterface2.cs" />
     <Compile Include="CommandLine\IParserItem.cs" />
     <Compile Include="CommandLine\Option.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
+    <Compile Include="CommandLine\ValueParser.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />

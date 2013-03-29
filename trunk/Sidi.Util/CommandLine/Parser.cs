@@ -146,8 +146,8 @@ namespace Sidi.CommandLine
 
         void AddDefaultUserInterface()
         {
-            Applications.Add(new ShowHelp(this));
             Applications.Add(new ShowUserInterface(this));
+            Applications.Add(new ShowHelp(this));
             Applications.Add(new ShowWebServer(this));
         }
 
@@ -435,12 +435,12 @@ namespace Sidi.CommandLine
             return StringComparer.InvariantCultureIgnoreCase.Compare(userInput, memberName) == 0;
         }
 
-        public bool IsMatch(string userInput, string memberName)
+        public static bool IsMatch(string userInput, string memberName)
         {
             return IsMatch(userInput, memberName, 0, 0);
         }
 
-        bool IsMatch(string a, string b, int ia, int ib)
+        static bool IsMatch(string a, string b, int ia, int ib)
         {
             if (ia >= a.Length)
             {
@@ -531,7 +531,19 @@ namespace Sidi.CommandLine
             return LookupParserItem(name, parserItems);
         }
 
-        public static object ParseValue(string stringRepresentation, Type type)
+        public object ParseValue(IList<string> args, Type type)
+        {
+            var vp = ValueParsers.FirstOrDefault(x => x.ValueType.Equals(type));
+            if (vp == null)
+            {
+                var value = ParseValueBuiltIn(args[0], type);
+                args.RemoveAt(0);
+                return value;
+            }
+            return vp.Handle(args, this.execute);
+        }
+        
+        public static object ParseValueBuiltIn(string stringRepresentation, Type type)
         {
             if (type == typeof(bool))
             {
@@ -634,7 +646,12 @@ namespace Sidi.CommandLine
                         })));
                         if (u != null)
                         {
-                            yield return new Action(application, i);
+                            yield return new Action(this, application, i);
+                        }
+
+                        if (ValueParser.IsSuitable(i))
+                        {
+                            yield return new ValueParser(this, application, i);
                         }
                     }
 
@@ -652,11 +669,22 @@ namespace Sidi.CommandLine
                             string u = Usage.Get(i);
                             if ((i is FieldInfo || i is PropertyInfo) && u != null)
                             {
-                                yield return new Option(application, i);
+                                yield return new Option(this, application, i);
                             }
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// All value parsers
+        /// </summary>
+        public IEnumerable<ValueParser> ValueParsers
+        {
+            get
+            {
+                return Items.OfType<ValueParser>();
             }
         }
 

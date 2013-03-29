@@ -31,11 +31,14 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Option(object application, MemberInfo memberInfo)
+        public Option(Parser parser, object application, MemberInfo memberInfo)
         {
             Application = application;
             MemberInfo = memberInfo;
+            this.parser = parser;
         }
+
+        Parser parser;
 
         public object Application { get; private set; }
         public MemberInfo MemberInfo { get; private set; }
@@ -139,18 +142,16 @@ namespace Sidi.CommandLine
             if (MemberInfo is FieldInfo)
             {
                 FieldInfo fi = (FieldInfo)MemberInfo;
-                object v = Parser.ParseValue(args[0], fi.FieldType);
+                object v = parser.ParseValue(args, fi.FieldType);
                 if (execute) fi.SetValue(Application, v);
-                args.RemoveAt(0);
                 log.InfoFormat("Option {0} = {1}", fi.Name, DisplayValue);
                 return null;
             }
             else if (MemberInfo is PropertyInfo)
             {
                 PropertyInfo pi = (PropertyInfo)MemberInfo;
-                object v = Parser.ParseValue(args[0], pi.PropertyType);
+                object v = parser.ParseValue(args, pi.PropertyType);
                 if (execute) pi.SetValue(Application, v, new object[] { });
-                args.RemoveAt(0);
                 log.InfoFormat("Option {0} = {1}", pi.Name, DisplayValue);
                 return null;
             }

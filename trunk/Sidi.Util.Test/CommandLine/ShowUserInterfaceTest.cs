@@ -24,8 +24,10 @@ using NUnit.Framework;
 namespace Sidi.CommandLine.Test
 {
     [TestFixture]
-    class ShowUserInterfaceTest
+    class ShowUserInterfaceTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [Test, Explicit("interactive")]
         public void UserInterface()
         {
@@ -55,6 +57,26 @@ namespace Sidi.CommandLine.Test
             var a = new Sidi.CommandLine.Test.ParserTest.TestAppWithStringList();
             var p = new Parser(a);
             new ShowUserInterface(p).UserInterface();
+        }
+
+        public class TestLog
+        {
+            [Usage("Test logging")]
+            public void TestLogging()
+            {
+                log.Debug(DateTime.Now);
+                log.Info(DateTime.Now);
+                log.Warn(DateTime.Now);
+                log.Error(DateTime.Now);
+            }
+        }
+
+        [Test]
+        public void Logging()
+        {
+            var a = new TestLog();
+            Parser.Run(a, new[] { "Log", "Debug", "TestLog" });
+            Parser.Run(a, new[] { "Log", "off", "TestLog" });
         }
     }
 }
