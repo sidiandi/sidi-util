@@ -519,7 +519,7 @@ namespace Sidi.CommandLine
 
         [Usage("Show dialog for the specified command")]
         [Category(Parser.categoryUserInterface)]
-        public void ShowDialog(string command)
+        public void Dialog(string command)
         {
             var action = (Action) parser.LookupParserItem(command);
             var dialog = ToDialog(action);
@@ -548,26 +548,42 @@ namespace Sidi.CommandLine
         }
         log4net.Core.Level logLevel;
 
+        class ShellSupport
+        {
+            [Usage("Exit interactive shell")]
+            public void Exit()
+            {
+                mustExit = true;
+                throw new CommandLineException("exit");
+            }
+
+            public bool mustExit = false;
+        }
+
         [Usage("Console to type commands")]
         [Category(Parser.categoryUserInterface)]
         public void Shell()
         {
+            var p = new Parser();
+            p.Applications.AddRange(parser.Applications);
+            var shellSupport = new ShellSupport();
+            p.Applications.Add(shellSupport);
             Console.WriteLine("type 'exit' to quit");
             var tokenizer = new Tokenizer(new ReadAheadTextReader(Console.In));
             var args = new EnumList<string>(tokenizer.Tokens.GetEnumerator());
             while (args.Any())
             {
-                if (Parser.IsMatch(args[0], "exit"))
-                {
-                    break;
-                }
-
                 try
                 {
-                    parser.Parse(args);
+                    p.Parse(args);
                 }
                 catch (Exception ex)
                 {
+                    if (shellSupport.mustExit)
+                    {
+                        break;
+                    }
+
                     log.Error(ex);
                     Console.WriteLine(ex.Message);
                     args.Clear();
