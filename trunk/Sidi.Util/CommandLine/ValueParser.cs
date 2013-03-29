@@ -38,7 +38,7 @@ namespace Sidi.CommandLine
 
         public string UsageText
         {
-            get { throw new NotImplementedException(); }
+            get { return String.Format("Can parse {0} values", ValueType); }
         }
 
         public string Name

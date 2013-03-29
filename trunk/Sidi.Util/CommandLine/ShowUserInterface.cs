@@ -40,7 +40,7 @@ namespace Sidi.CommandLine
 
         public ShowUserInterface(Parser parser)
         {
-            LogLevel = log4net.Core.Level.Off;
+            LogLevel = log4net.Core.Level.Error;
             this.parser = parser;
         }
 

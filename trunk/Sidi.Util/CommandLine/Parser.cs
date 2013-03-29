@@ -829,50 +829,23 @@ namespace Sidi.CommandLine
         public void WriteUsage(TextWriter w)
         {
             w.WriteLine(Info);
-            w.WriteLine(String.Format("Usage: {0} option1 value option2 value action [parameters]", ApplicationName));
+            w.WriteLine(String.Format("Usage: {0} action [parameters] action [parameters]", ApplicationName));
 
             var categories = Categories;
 
             foreach (var category in categories)
             {
-                var categoryText = category + " ";
-
-                var actions = Actions.Where(x => x.Categories.Contains(category));
-
-                if (actions.Any())
+                if (!String.IsNullOrEmpty(category))
                 {
                     w.WriteLine();
-                    w.WriteLine("{0}Actions", categoryText);
-
-                    foreach (Action a in actions)
-                    {
-                        w.WriteLine();
-                        w.WriteLine(a.UsageText.Indent(indent).Wrap(maxColumns));
-                    }
+                    w.WriteLine(category);
                 }
 
-                var options = Options.Where(x => x.Categories.Contains(category));
+                var items = Items.Where(x => x.Categories.Contains(category) && !(x is ValueParser));
 
-                if (options.Any())
+                if (items.Any())
                 {
-                    w.WriteLine();
-                    w.WriteLine("{0}Options", categoryText);
-
-                    foreach (Option i in options)
-                    {
-                        w.WriteLine();
-                        w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));
-                    }
-                }
-
-                var subCommands = SubCommands.Where(x => x.Categories.Contains(category));
-
-                if (subCommands.Any())
-                {
-                    w.WriteLine();
-                    w.WriteLine("{0}Subcommands", categoryText);
-
-                    foreach (SubCommand i in subCommands)
+                    foreach (var i in items)
                     {
                         w.WriteLine();
                         w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));
