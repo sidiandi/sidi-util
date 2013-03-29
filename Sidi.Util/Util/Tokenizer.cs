@@ -38,6 +38,14 @@ namespace Sidi.Util
             }
         }
 
+        public static List<string> ToList(string tokenString)
+        {
+            using (var sr = new StringReader(tokenString))
+            {
+                return new Tokenizer(sr).Tokens.ToList();
+            }
+        }
+
         public Tokenizer(TextReader input)
         {
             r = input;

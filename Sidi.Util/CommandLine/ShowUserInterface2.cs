@@ -435,7 +435,7 @@ namespace Sidi.CommandLine
             var p = (ParameterInfo)textBox.Tag;
             try
             {
-                Parser.ParseValue(textBox.Text, p.ParameterType);
+                parser.ParseValue(Tokenizer.ToList(textBox.Text), p.ParameterType);
                 ClearError(textBox);
             }
             catch (Exception ex)

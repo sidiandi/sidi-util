@@ -429,19 +429,18 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void IsMatch()
         {
-            Parser p = new Parser(new TestMultiLineUsage());
-            Assert.IsTrue(p.IsMatch("rfl", "RunFromLocal"));
-            Assert.IsFalse(p.IsMatch("rfl", "RunFromlocal"));
-            Assert.IsTrue(p.IsMatch("runfr", "RunFromLocal"));
-            Assert.IsTrue(p.IsMatch("runfromlocal", "RunFromLocal"));
-            Assert.IsTrue(p.IsMatch("rufro", "RunFromLocal"));
-            Assert.IsTrue(p.IsMatch("rfrlocal", "RunFromLocal"));
-            Assert.IsFalse(p.IsMatch("rfrlocale", "RunFromLocal"));
-            Assert.IsTrue(p.IsMatch("red", "RemoveEmptyDirectories"));
-            Assert.IsTrue(p.IsMatch("reed", "RemoveEmptyDirectories"));
-            Assert.IsTrue(p.IsMatch("remd", "RemoveEmptyDirectories"));
-            Assert.IsFalse(p.IsMatch("remod", "RemoveEmptyDirectories"));
-            Assert.IsTrue(p.IsMatch("remoed", "RemoveEmptyDirectories"));
+            Assert.IsTrue(Parser.IsMatch("rfl", "RunFromLocal"));
+            Assert.IsFalse(Parser.IsMatch("rfl", "RunFromlocal"));
+            Assert.IsTrue(Parser.IsMatch("runfr", "RunFromLocal"));
+            Assert.IsTrue(Parser.IsMatch("runfromlocal", "RunFromLocal"));
+            Assert.IsTrue(Parser.IsMatch("rufro", "RunFromLocal"));
+            Assert.IsTrue(Parser.IsMatch("rfrlocal", "RunFromLocal"));
+            Assert.IsFalse(Parser.IsMatch("rfrlocale", "RunFromLocal"));
+            Assert.IsTrue(Parser.IsMatch("red", "RemoveEmptyDirectories"));
+            Assert.IsTrue(Parser.IsMatch("reed", "RemoveEmptyDirectories"));
+            Assert.IsTrue(Parser.IsMatch("remd", "RemoveEmptyDirectories"));
+            Assert.IsFalse(Parser.IsMatch("remod", "RemoveEmptyDirectories"));
+            Assert.IsTrue(Parser.IsMatch("remoed", "RemoveEmptyDirectories"));
         }
 
         [Test]
@@ -638,7 +637,8 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void ParseValues()
         {
-            var ln = (LPath) Parser.ParseValue(@"C:\temp", typeof(LPath));
+            var p = new Parser();
+            var ln = (LPath) p.ParseValue(Tokenizer.ToList(@"C:\temp"), typeof(LPath));
             Assert.AreEqual(new LPath(@"C:\temp"), ln);
         }
 
