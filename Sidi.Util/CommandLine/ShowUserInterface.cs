@@ -29,6 +29,7 @@ using Sidi.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using log4net.Repository.Hierarchy;
 using log4net;
+using Sidi.Collections;
 
 namespace Sidi.CommandLine
 {
@@ -546,6 +547,33 @@ namespace Sidi.CommandLine
             }
         }
         log4net.Core.Level logLevel;
+
+        [Usage("Console to type commands")]
+        [Category(Parser.categoryUserInterface)]
+        public void Shell()
+        {
+            Console.WriteLine("type 'exit' to quit");
+            var tokenizer = new Tokenizer(new ReadAheadTextReader(Console.In));
+            var args = new EnumList<string>(tokenizer.Tokens.GetEnumerator());
+            while (args.Any())
+            {
+                if (Parser.IsMatch(args[0], "exit"))
+                {
+                    break;
+                }
+
+                try
+                {
+                    parser.Parse(args);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                    Console.WriteLine(ex.Message);
+                    args.Clear();
+                }
+            }
+        }
 
         List<TextBox> inputs = new List<TextBox>();
 
