@@ -671,5 +671,39 @@ namespace Sidi.CommandLine.Test
                 Assert.IsTrue(w.ToString().Contains(name));
             }
         }
+
+        class FieldTest
+        {
+            [Usage("test field 1")]
+            public int a = 1;
+
+            [Usage("test field 2")]
+            public int b = 2;
+        }
+
+        [Test]
+        public void Fields()
+        {
+            var ft = new FieldTest();
+            Assert.AreEqual(1, ft.a);
+            Parser.Run(ft, new string[] { "a", "2" });
+            Assert.AreEqual(2, ft.a);
+        }
+
+        [Test]
+        public void UnknownArgument()
+        {
+            var ft = new FieldTest();
+            var p = new Parser(ft);
+            var args = new List<string>(){ "unknown" };
+            try
+            {
+                p.Parse(args);
+            }
+            catch (Sidi.CommandLine.CommandLineException)
+            {
+            }
+            Assert.AreEqual(1, args.Count);
+        }
     }
 }

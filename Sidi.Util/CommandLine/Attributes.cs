@@ -57,7 +57,7 @@ namespace Sidi.CommandLine
     /// <summary>
     /// Properties marked with this attribute will be stored in the registry
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class PersistentAttribute : System.Attribute
     {
     }
@@ -65,7 +65,7 @@ namespace Sidi.CommandLine
     /// <summary>
     /// Properties marked with this attribute will not be displayed to the user
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class PasswordAttribute : System.Attribute
     {
     }
