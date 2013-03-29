@@ -150,8 +150,7 @@ namespace Sidi.CommandLine.Test
             Parser p = new Parser(new TestApp());
             var usage = StringExtensions.ToString(x => p.WriteUsage(x));
             log.Info(usage);
-            Assert.IsTrue(usage.Contains("Options"));
-            Assert.IsTrue(usage.Contains("Actions"));
+            Assert.IsTrue(usage.Contains("SayHello"));
         }
 
         [Test]
