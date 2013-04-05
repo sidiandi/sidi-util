@@ -189,7 +189,13 @@ namespace Sidi.CommandLine
 
         public static void Run(object application, string[] args)
         {
-            Parser parser = new Parser(application);    
+            Parser parser = new Parser(application);
+            parser.Run(args);
+        }
+
+        public void Run(string[] args)
+        {
+            var parser = this;
             try
             {
                 parser.LoadPreferences();
