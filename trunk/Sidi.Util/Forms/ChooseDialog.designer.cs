@@ -17,7 +17,7 @@
 
 namespace Sidi.Forms
 {
-    partial class ChooseOneDialog
+    partial class ChooseDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -45,17 +45,21 @@ namespace Sidi.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.listViewObjects = new GenericListView();
-            this.columnHeaderPath = new System.Windows.Forms.ColumnHeader();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChooseDialog));
+            this.listViewObjects = new Sidi.Forms.GenericListView();
+            this.columnHeaderPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listViewObjects
             // 
-            this.listViewObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.listViewObjects.AllowDrop = true;
+            this.listViewObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listViewObjects.FullRowSelect = true;
+            this.listViewObjects.Items = ((System.Collections.IList)(resources.GetObject("listViewObjects.Items")));
             this.listViewObjects.Location = new System.Drawing.Point(12, 12);
             this.listViewObjects.MultiSelect = false;
             this.listViewObjects.Name = "listViewObjects";
@@ -63,6 +67,7 @@ namespace Sidi.Forms
             this.listViewObjects.TabIndex = 14;
             this.listViewObjects.UseCompatibleStateImageBehavior = false;
             this.listViewObjects.View = System.Windows.Forms.View.Details;
+            this.listViewObjects.VirtualMode = true;
             this.listViewObjects.ItemActivate += new System.EventHandler(this.listViewObjects_ItemActivate);
             // 
             // columnHeaderPath
@@ -92,15 +97,17 @@ namespace Sidi.Forms
             this.buttonOK.Text = "&OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             // 
-            // ChooseOneDialog
+            // ChooseDialog
             // 
+            this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(927, 643);
             this.Controls.Add(this.listViewObjects);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
-            this.Name = "ChooseOneDialog";
+            this.Name = "ChooseDialog";
             this.Text = "Choose One";
             this.ResumeLayout(false);
 
@@ -108,7 +115,7 @@ namespace Sidi.Forms
 
         #endregion
 
-        private GenericListView listViewObjects;
+        public GenericListView listViewObjects;
         private System.Windows.Forms.ColumnHeader columnHeaderPath;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonOK;

@@ -27,9 +27,9 @@ using Sidi.Util;
 
 namespace Sidi.Forms
 {
-    public partial class ChooseOneDialog : System.Windows.Forms.Form
+    public partial class ChooseDialog : System.Windows.Forms.Form
     {
-        public ChooseOneDialog()
+        public ChooseDialog()
         {
             InitializeComponent();
             Columns = new IColumnInfo[] { new ColumnInfo<object>("Object", x => Sidi.Forms.Support.SafeToString(x)) };

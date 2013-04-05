@@ -115,11 +115,11 @@
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
-    <Compile Include="Forms\ChooseOneDialog.cs">
+    <Compile Include="Forms\ChooseDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ChooseOneDialog.designer.cs">
-      <DependentUpon>ChooseOneDialog.cs</DependentUpon>
+    <Compile Include="Forms\ChooseDialog.designer.cs">
+      <DependentUpon>ChooseDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\GenericListView.cs">
       <SubType>Component</SubType>
@@ -313,8 +313,8 @@
     <None Include="Sidi.Util.snk" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\ChooseOneDialog.resx">
-      <DependentUpon>ChooseOneDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\ChooseDialog.resx">
+      <DependentUpon>ChooseDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SelectObjectsDialog.resx">
       <DependentUpon>SelectObjectsDialog.cs</DependentUpon>

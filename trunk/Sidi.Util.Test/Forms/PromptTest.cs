@@ -25,7 +25,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Forms
 {
-    [TestFixture]
+    [TestFixture, RequiresSTA]
     public class PromptTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -41,8 +41,36 @@ namespace Sidi.Forms
         [Test, Explicit("interactive")]
         public void Choose()
         {
-            var p = Process.GetProcesses();
-            Prompt.ChooseOne(p.ListFormat().AddColumn("Name", x => x.ProcessName).AddColumn("id", x => x.Id));
+            var lf = Process.GetProcesses()
+                .ListFormat()
+                .AddColumn("Name", x => x.ProcessName)
+                .AddColumn("id", x => x.Id);
+
+            var selectedProcess = Prompt.ChooseOne(lf, "Process");
+            log.Info(selectedProcess);
+        }
+
+        [Test, Explicit("interactive")]
+        public void ChooseMany()
+        {
+            var lf = Process.GetProcesses()
+                .ListFormat()
+                .AddColumn("Name", x => x.ProcessName)
+                .AddColumn("id", x => x.Id);
+
+            var selectedProcess = Prompt.ChooseMany(lf);
+            selectedProcess.ListFormat().RenderText();
+        }
+
+        [Test, Explicit("interactive")]
+        public void Activate()
+        {
+            var lf = Process.GetProcesses()
+                .ListFormat()
+                .AddColumn("Name", x => x.ProcessName)
+                .AddColumn("id", x => x.Id);
+
+            Prompt.OnActivate(lf, p => log.Info(p));
         }
     }
 }

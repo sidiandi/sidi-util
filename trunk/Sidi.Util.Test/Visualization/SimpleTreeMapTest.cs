@@ -152,6 +152,20 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
+        [Test, Explicit("interactive")]
+        public void Empty2()
+        {
+            var items = Enumerable.Range(0, 0).Select(x => x.ToString("D8"));
+
+            var tm = new TypedTreeMap<string>()
+            {
+                Items = items.ToList(),
+                GetLineage = i => new string[] { "Base" },
+            };
+
+            tm.RunFullScreen();
+        }
+
         IEnumerable<string> SplitStr(string x)
         {
             int partSize = 2;

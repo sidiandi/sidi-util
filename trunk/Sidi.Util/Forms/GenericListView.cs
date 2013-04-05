@@ -40,7 +40,12 @@ namespace Sidi.Forms
         public void UpdateDisplay()
         {
             this.Columns.Clear();
-            this.Columns.AddRange(ColumnDefinition.Select(x => new System.Windows.Forms.ColumnHeader() { Text = x.Name }).ToArray());
+            this.Columns.AddRange(ColumnDefinition.Select(x => new System.Windows.Forms.ColumnHeader()
+            { 
+                Text = x.Name,
+                Width = -1,
+            }).ToArray());
+            this.Columns[Columns.Count - 1].Width = -2;
             this.VirtualListSize = Items.Count;
             this.VirtualMode = true;
             this.FullRowSelect = true;
@@ -58,7 +63,6 @@ namespace Sidi.Forms
         public GenericListView()
         : base()
         {
-            this.HoverSelection = true;
             this.AllowDrop = true;
             this.DragEnter += new System.Windows.Forms.DragEventHandler(GenericListView_DragEnter);
             this.DragOver += new DragEventHandler(GenericListView_DragOver);
