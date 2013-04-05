@@ -35,6 +35,7 @@ namespace Sidi.Forms
         string Value(object item);
     }
 
+    [Serializable]
     public class ColumnInfo<T> : IColumnInfo
     {
         string name;
@@ -141,26 +142,32 @@ namespace Sidi.Forms
             }
         }
 
-        public static T ChooseOne<T>(IEnumerable<T> list)
+        public static void OnActivate<T>(ListFormat<T> list, Action<T> action, string title = null)
         {
-            using (var d = new ChooseOneDialog())
+            using (var d = new ChooseDialog())
             {
-                d.Objects = list.Cast<object>();
-                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    return (T)d.SelectedObject;
-                }
-                else
-                {
-                    return default(T);
-                }
+                d.Text = title == null ? "Pick Item" : title;
+
+                d.Objects = list.Data.Cast<object>();
+                d.Columns = list.Columns.Select(c => new ColumnInfo<T>(c.Name, c.GetText)).ToList();
+                d.ObjectSelected += (s, e) =>
+                    {
+                        action((T)d.SelectedObject);
+                    };
+
+                d.ShowDialog();
             }
         }
 
-        public static T ChooseOne<T>(ListFormat<T> list)
+        public static T ChooseOne<T>(ListFormat<T> list, string title = null)
         {
-            using (var d = new ChooseOneDialog())
+            using (var d = new ChooseDialog())
             {
+                if (title != null)
+                {
+                    d.Text = title;
+                }
+                
                 d.Objects = list.Data.Cast<object>();
                 d.Columns = list.Columns.Select(c => new ColumnInfo<T>(c.Name, c.GetText)).ToList();
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -169,62 +176,27 @@ namespace Sidi.Forms
                 }
                 else
                 {
-                    return default(T);
+                    throw new Exception("Selection cancelled.");
                 }
             }
         }
 
-        public static void Choose<T>(IEnumerable<T> list, IEnumerable<IColumnInfo> columns, Action<T> action)
+        public static IList<T> ChooseMany<T>(ListFormat<T> list, string title = null)
         {
-            using (var d = new ChooseOneDialog())
+            using (var d = new ChooseDialog())
             {
-            d.Columns = columns;
-            d.Objects = list.Cast<object>();
-            d.ObjectSelected += new EventHandler((o, e) =>
-            {
-                var item = (T)d.SelectedObject;
-                action(item);
-            });
-            d.ShowDialog();
-            }
-        }
-        
-        public static T ChooseOne<T>(IEnumerable<T> list, IEnumerable<IColumnInfo> columns)
-        {
-            using (var d = new ChooseOneDialog())
-            {
-                d.Columns = columns;
-                d.Objects = list.Cast<object>();
-                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    return (T)d.SelectedObject;
-                }
-                else
-                {
-                    return default(T);
-                }
-            }
-        }
+                d.Text = title == null ? "Choose Many" : title;
 
-        public static IEnumerable<T> SelectObjects<T>(IEnumerable<T> objects, string caption)
-        {
-            return SelectObjects(objects.Cast<object>(), caption, x => x.ToString()).Cast<T>();
-        }
-        
-        public static IEnumerable<object> SelectObjects(IEnumerable<object> objects, string caption, Func<object, string> stringifier)
-        {
-            using (var d = new SelectObjectsDialog())
-            {
-                d.Text = caption;
-                d.Columns = new[] { new ColumnInfo<object>("Item", x => Sidi.Forms.Support.SafeToString(x)) };
-                d.Objects = objects;
+                d.Objects = list.Data.Cast<object>();
+                d.Columns = list.Columns.Select(c => new ColumnInfo<T>(c.Name, c.GetText)).ToList();
+                d.listViewObjects.MultiSelect = true;
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    return d.SelectedObjects;
+                    return d.listViewObjects.SelectedObjects.Cast<T>().ToList();
                 }
                 else
                 {
-                    return new List<object>();
+                    throw new Exception("Selection cancelled.");
                 }
             }
         }

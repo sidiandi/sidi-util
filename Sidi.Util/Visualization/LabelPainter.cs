@@ -164,6 +164,10 @@ namespace Sidi.Visualization
         public void Paint(PaintEventArgs e)
         {
             var layout = treeMapControl.LayoutManager;
+            if (layout == null)
+            {
+                return;
+            }
             double maxArea = layout.Root.Bounds.Area;
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             worldToScreenTransform = e.Graphics.Transform.ToMatrixD();

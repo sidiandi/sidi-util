@@ -102,14 +102,17 @@ namespace Sidi.Visualization
                 "Zoom Out", null, (s, e) => { ZoomOut(1); });
 
             var layout = this.GetLayoutAt(PointToClient(Control.MousePosition));
-            foreach (var i in layout.Up.Cast<Sidi.Visualization.Layout>())
+            if (layout != null)
             {
-                var tree = i.Tree;
-                strip.Items.Add(
-                    String.Format("View {0}", i.Tree.SafeToString()), null, (s, e) =>
-                        {
-                            Tree = tree;
-                        });
+                foreach (var i in layout.Up.Cast<Sidi.Visualization.Layout>())
+                {
+                    var tree = i.Tree;
+                    strip.Items.Add(
+                        String.Format("View {0}", i.Tree.SafeToString()), null, (s, e) =>
+                            {
+                                Tree = tree;
+                            });
+                }
             }
         }
 
@@ -361,11 +364,22 @@ namespace Sidi.Visualization
 
         public void ZoomIn(Point p, int levels)
         {
-            Tree = GetLayoutAt(p, levels).Tree;
+            var layout = GetLayoutAt(p, levels);
+            if (layout == null)
+            {
+                return;
+            }
+
+            Tree = layout.Tree;
         }
 
         public void ZoomOut(int levels)
         {
+            if (Tree == null)
+            {
+                return;
+            }
+
             var t = Tree;
             for (int i = 0; i < levels; ++i)
             {
