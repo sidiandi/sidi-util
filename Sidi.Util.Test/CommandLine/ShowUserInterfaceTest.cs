@@ -69,6 +69,11 @@ namespace Sidi.CommandLine.Test
 
         public class TestLog
         {
+            public TestLog()
+            {
+                Test = null;
+            }
+
             [Usage("Test logging")]
             public void DoLog()
             {
@@ -79,7 +84,7 @@ namespace Sidi.CommandLine.Test
             }
 
             [SubCommand]
-            public TestLog Test;
+            public TestLog Test { set; get; }
         }
 
         [Test]
