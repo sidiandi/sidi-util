@@ -63,6 +63,7 @@ namespace Sidi.Build.GoogleCode
     /// <summary>
     /// Upload a file to a project hosted at http://code.google.com 
     /// </summary>
+    [Usage("Configures authentication for uploads to http://code.google.com")]
     public class Upload : ITask
     {
         public Upload()

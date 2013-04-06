@@ -33,10 +33,15 @@ namespace Sidi.CommandLine
 
         public string Usage
         {
-            get { throw new NotImplementedException(); }
+            get { return String.Empty; }
         }
 
         public string UsageText
+        {
+            get { return String.Format("Can parse {0} values", ValueType); }
+        }
+
+        public string Syntax
         {
             get { return String.Format("Can parse {0} values", ValueType); }
         }

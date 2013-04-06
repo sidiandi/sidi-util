@@ -44,6 +44,14 @@ namespace Sidi.CommandLine.Test
             c.ShowAndExecute();
         }
 
+        [Test, Explicit("UI")]
+        public void Manual()
+        {
+            var ui = new ShowUserInterface(null);
+            var p = ParserTest.ParserWithAllTestApps();
+            p.Run(new []{"Manual"});
+        }
+
         [Test, Explicit("ui")]
         public void UI2()
         {
@@ -62,21 +70,27 @@ namespace Sidi.CommandLine.Test
         public class TestLog
         {
             [Usage("Test logging")]
-            public void TestLogging()
+            public void DoLog()
             {
                 log.Debug(DateTime.Now);
                 log.Info(DateTime.Now);
                 log.Warn(DateTime.Now);
                 log.Error(DateTime.Now);
             }
+
+            [SubCommand]
+            public TestLog Test;
         }
 
         [Test]
         public void Logging()
         {
             var a = new TestLog();
-            Parser.Run(a, new[] { "Log", "Debug", "TestLog" });
-            Parser.Run(a, new[] { "Log", "off", "TestLog" });
+            foreach (var level in new[]{"off", "error", "warn", "debug", "all" })
+            {
+                Parser.Run(a, new[] { "LogLevel", level, "DoLog" });
+                Parser.Run(a, new[] { "Test", "DoLog" });
+            }
         }
     }
 }

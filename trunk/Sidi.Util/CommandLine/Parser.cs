@@ -150,30 +150,10 @@ namespace Sidi.CommandLine
 
         void AddDefaultUserInterface()
         {
-            ConfigureDefaultLogging();
             Applications.Add(new ShowUserInterface(this));
             Applications.Add(new ShowHelp(this));
+            Applications.Add(new LogOptions());
             Applications.Add(new ShowWebServer(this));
-        }
-
-        void ConfigureDefaultLogging()
-        {
-            var hierarchy = (Hierarchy)LogManager.GetRepository();
-            if (hierarchy.Configured)
-            {
-                return;
-            }
-
-            var pattern = new PatternLayout("%utcdate{ISO8601} [%thread] %level %logger %ndc - %message%newline");
-
-            var ca = new ConsoleAppender()
-            {
-                Target = "Console.Error",
-                Layout = pattern,
-            };
-
-            hierarchy.Root.AddAppender(ca);
-            hierarchy.Configured = true;
         }
 
         internal Parser()
@@ -323,11 +303,13 @@ namespace Sidi.CommandLine
             {
                 try
                 {
-                    var value = Registry.GetValue(GetPreferencesKey(o), o.Name, null);
+                    var key = GetPreferencesKey(o);
+                    var valueName = o.Name;
+                    var value = Registry.GetValue(key, valueName, null);
                     if (value != null)
                     {
                         var valueString = value.ToString();
-                        log.DebugFormat("Restore persistent option {0}", o);
+                        log.DebugFormat("Load persistent option {0} from {1}\\{2}", o, key, valueName);
                         if (o.IsPassword)
                         {
                             valueString = valueString.Decrypt(preferencesPassword);
@@ -355,16 +337,18 @@ namespace Sidi.CommandLine
                 var value = o.GetValue();
                 if (value != null)
                 {
-                    var v = value.ToString();
+                    var valueString = value.ToString();
                     if (o.IsPassword)
                     {
-                        v = v.Encrypt(preferencesPassword);
+                        valueString = valueString.Encrypt(preferencesPassword);
                     }
 
-                    if (v != null)
+                    if (valueString != null)
                     {
-                        log.DebugFormat("Store persistent option {0} = {1}", o.Name, o.DisplayValue);
-                        Registry.SetValue(GetPreferencesKey(o), o.Name, v);
+                        var key = GetPreferencesKey(o);
+                        var valueName = o.Name;
+                        log.DebugFormat("Store persistent option {0} = {1} in {2}\\{3}", o.Name, o.DisplayValue, key, valueName);
+                        Registry.SetValue(key, valueName, valueString);
                     }
                 }
             }
@@ -392,18 +376,9 @@ namespace Sidi.CommandLine
             return parts.Join(@"\");
         }
 
-        public string GetPreferencesKey(Type at)
+        public string GetPreferencesKey(Type type)
         {
-            var k = PreferencesKey;
-            if (k == null)
-            {
-                k = CatReg(Registry.CurrentUser.ToString(), "Software");
-                var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(at).Company;
-                var product = GetAssemblyAttribute<AssemblyProductAttribute>(at).Product;
-                k = CatReg(k, company, product, at.FullName);
-            }
-            k = CatReg(k, at.FullName);
-            return k;
+            return CatReg(new[] { PreferencesKey }.Concat(type.FullName.Split('.')).ToArray());
         }
 
         T GetAssemblyAttribute<T>(Type t)
@@ -423,7 +398,28 @@ namespace Sidi.CommandLine
         /// Registry key for LoadPreferences and StorePreferences. 
         /// Default is HKEY_CURRENT_USER\Software\[your company]\[your product]
         /// </summary>
-        public string PreferencesKey { get; set; }
+        public string PreferencesKey
+        {
+            get
+            {
+                if (m_PreferencesKey == null)
+                {
+                    var k = CatReg(Registry.CurrentUser.ToString(), "Software");
+                    var applicationType = MainApplication.GetType();
+                    var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(applicationType).Company;
+                    var product = GetAssemblyAttribute<AssemblyProductAttribute>(applicationType).Product;
+                    k = CatReg(k, company, product);
+                    m_PreferencesKey = k;
+                }
+                return m_PreferencesKey;
+            }
+
+            set
+            {
+                m_PreferencesKey = value;
+            }
+        }
+        string m_PreferencesKey;
 
         bool HandleUnknown(IList<string> args)
         {
@@ -769,12 +765,6 @@ namespace Sidi.CommandLine
             {
                 using (var w = new StringWriter())
                 {
-                    w.WriteLine(
-                        String.Format("{0} - {1}",
-                        ApplicationName,
-                        Usage.Get(MainApplication.GetType()))
-                        );
-
                     Assembly assembly = MainApplication.GetType().Assembly;
 
                     List<string> infos = new List<string>();
@@ -858,32 +848,40 @@ namespace Sidi.CommandLine
         public void WriteUsage(TextWriter w)
         {
             w.WriteLine(Info);
-            w.WriteLine(String.Format("Usage: {0} action [parameters] action [parameters]", ApplicationName));
+            w.WriteLine();
+            w.WriteLine(String.Format("Usage: {0} action [parameters] action [parameters] ...", ApplicationName));
             WriteUsageByCategory(w, Items.Where(x => !(x is ValueParser)));
+        }
+
+        public IList<KeyValuePair<string, IList<IParserItem>>>
+            GroupByCategory(IEnumerable<IParserItem> items)
+        {
+            return items
+                .Where(x => !(x is ValueParser))
+                .SelectMany(i => i.Categories.Select(x => new { Category = x, Item = i }))
+                .GroupBy(x => x.Category)
+                .OrderBy(x => x.Key)
+                .Select(x => new KeyValuePair<string, IList<IParserItem>>(
+                    x.Key,
+                    x.Select(y => y.Item).OrderBy(y => y.Name).ToList()))
+                .ToList();
         }
 
         public void WriteUsageByCategory(TextWriter w, IEnumerable<IParserItem> items)
         {
-            var g = items.SelectMany(i => i.Categories.Select(x => new { Category = x, Item = i }))
-                .GroupBy(x => x.Category)
-                .OrderBy(x => x.Key)
-                .ToList();
+            var g = GroupByCategory(items);
 
             foreach (var catItems in g)
             {
-                if (!String.IsNullOrEmpty(catItems.Key))
+                if (catItems.Value.Any())
                 {
-                    w.WriteLine();
-                    w.WriteLine(catItems.Key);
-                }
+                    if (!String.IsNullOrEmpty(catItems.Key))
+                    {
+                        w.WriteLine();
+                        w.WriteLine(catItems.Key);
+                    }
 
-                var oi = catItems
-                    .Select(x => x.Item)
-                    .OrderBy(x => x.Name);
-
-                if (oi.Any())
-                {
-                    foreach (var i in oi)
+                    foreach (var i in catItems.Value)
                     {
                         w.WriteLine();
                         w.WriteLine(i.UsageText.Indent(indent).Wrap(maxColumns));

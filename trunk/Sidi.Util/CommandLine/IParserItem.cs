@@ -27,6 +27,7 @@ namespace Sidi.CommandLine
         string Usage { get; }
         string UsageText { get; }
         string Name { get; }
+        string Syntax { get; }
         object Application { get; }
         IEnumerable<string> Categories { get; }
         object Handle(IList<string> args, bool execute);
