@@ -16,9 +16,11 @@ namespace Sidi.Util
             this.start = DateTime.Now;
 
             var msg = String.Format(text, parameters);
-            msg = String.Format("begin: {0}", msg);
-            logger(msg);
+            context = log4net.ThreadContext.Stacks["NDC"].Push(msg);
+            logger("begin");
         }
+
+        IDisposable context;
 
         private bool disposed = false;
             
@@ -36,8 +38,9 @@ namespace Sidi.Util
             if (disposing)
             {
                 var msg = String.Format(text, parameters);
-                msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s: {1}", (DateTime.Now - start).TotalSeconds, msg);
+                msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s", (DateTime.Now - start).TotalSeconds, msg);
                 logger(msg);
+                context.Dispose();
             }
             // Free your own state (unmanaged objects).
             // Set large fields to null.

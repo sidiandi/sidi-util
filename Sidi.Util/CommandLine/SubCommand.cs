@@ -73,28 +73,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                MemberInfo i = MemberInfo;
-                if (i.MemberType == MemberTypes.Field)
-                {
-                    FieldInfo fieldInfo = (FieldInfo)i;
-                    return String.Format(
-                        Parser.CultureInfo,
-                        "{0} [{1}]",
-                        i.Name,
-                        fieldInfo.FieldType.GetInfo()
-                        );
-                }
-                else if (i.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo propertyInfo = (PropertyInfo)i;
-                    return String.Format(
-                        Parser.CultureInfo,
-                        "{0} [{1}]",
-                        i.Name,
-                        propertyInfo.PropertyType.GetInfo()
-                        );
-                }
-                throw new InvalidOperationException(i.GetType().ToString());
+                return this.Name + " [sub commands...]";
             }
         }
 
@@ -147,7 +126,10 @@ namespace Sidi.CommandLine
 
         public object Handle(IList<string> args, bool execute)
         {
-            var parser = new Parser(CommandInstance);
+            var parser = new Parser();
+            parser.Applications.Add(CommandInstance);
+            parser.Applications.Add(new ShowHelp(parser));
+
             log.InfoFormat("{0}", this);
             if (args.Any())
             {

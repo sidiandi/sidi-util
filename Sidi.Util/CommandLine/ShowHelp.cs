@@ -33,15 +33,26 @@ namespace Sidi.CommandLine
             this.parser = parser;
         }
 
-        [Usage("Shows help for all options and actions that match searchString")]
+        [Usage("Opens the manual")]
         [Category(Parser.categoryUserInterface)]
-        public void Help(string searchString)
+        public void Manual()
         {
+            Sidi.CommandLine.Manual.Show(parser);
+        }
+
+        [Usage("Shows help for all options and actions that match pattern")]
+        [Category(Parser.categoryUserInterface)]
+        public void Help(Regex pattern = null)
+        {
+            if (pattern == null)
+            {
+                pattern = new Regex(String.Empty);
+            }
+
             parser.WriteUsageByCategory(
                 Console.Out,
                 parser.Items
-                .Where(x => !(x is ValueParser))
-                .Where(i => Regex.IsMatch(i.UsageText, searchString, RegexOptions.IgnoreCase))
+                .Where(i => pattern.IsMatch(i.UsageText))
                 );
         }
     }

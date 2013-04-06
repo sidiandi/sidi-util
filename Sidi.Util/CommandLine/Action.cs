@@ -132,8 +132,15 @@ namespace Sidi.CommandLine
                 }
                 else
                 {
-                    var r = parser.ParseValue(list, type);
-                    return r;
+                    if (!parameter.IsOptional && list.Any())
+                    {
+                        var r = parser.ParseValue(list, type);
+                        return r;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             catch
@@ -169,14 +176,16 @@ namespace Sidi.CommandLine
                 }
             }
 
-            log.InfoFormat("Action {0}({1})", Name, parameterValues.Join(", "));
-            if (execute)
+            using (new LogScope(log.Info, "Action {0}({1})", Name, parameterValues.Join(", ")))
             {
-                return MethodInfo.Invoke(Application, parameterValues);
-            }
-            else
-            {
-                return null;
+                if (execute)
+                {
+                    return MethodInfo.Invoke(Application, parameterValues);
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
     }

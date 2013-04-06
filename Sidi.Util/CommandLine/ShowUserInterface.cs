@@ -27,7 +27,6 @@ using System.Reflection;
 using System.ComponentModel;
 using Sidi.Extensions;
 using System.Diagnostics.CodeAnalysis;
-using log4net.Repository.Hierarchy;
 using log4net;
 using Sidi.Collections;
 
@@ -41,7 +40,6 @@ namespace Sidi.CommandLine
 
         public ShowUserInterface(Parser parser)
         {
-            LogLevel = log4net.Core.Level.Error;
             this.parser = parser;
         }
 
@@ -362,43 +360,6 @@ namespace Sidi.CommandLine
             return control;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        Control ToControl_old(Option option)
-        {
-            var panel = new TableLayoutPanel()
-            {
-                ColumnCount = 2,
-                AutoSize = true,
-            };
-
-            var label = new Label()
-            {
-                Text = option.Usage,
-                AutoSize = true
-            };
-            panel.Controls.Add(label,0,0);
-
-            var paramLabel = new Label();
-            paramLabel.Text = option.Syntax;
-            paramLabel.AutoSize = true;
-            panel.Controls.Add(paramLabel,0,1);
-
-            var paramInput = new TextBox();
-            inputs.Add(paramInput);
-            if (option.IsPassword)
-            {
-                paramInput.PasswordChar = '*';
-            }
-            panel.Controls.Add(paramInput,1,1);
-            paramInput.Left = paramLabel.Right + margin;
-
-            paramInput.Text = Support.SafeToString(option.GetValue());
-            paramInput.Tag = option;
-            paramInput.TextChanged += new EventHandler(paramInput_Leave);
-
-            return panel;
-        }
-
         bool ExcludedFromUi(IParserItem item)
         {
             return ((
@@ -526,31 +487,6 @@ namespace Sidi.CommandLine
             dialog.ShowAndExecute();
         }
 
-        public static log4net.Core.Level ParseLevel(string stringRepresentation)
-        {
-            var levels = typeof(log4net.Core.Level).GetFields(BindingFlags.Static | BindingFlags.Public);
-            var selected = levels.First(i => Parser.IsMatch(stringRepresentation, i.Name));
-            return (log4net.Core.Level) selected.GetValue(null);
-        }
-
-        [Usage("Log level (off, error, warn, info, debug)"), Persistent]
-        [Category(Parser.categoryUserInterface)]
-        public log4net.Core.Level LogLevel
-        {
-            get
-            {
-                var hierarchy = (Hierarchy)LogManager.GetRepository();
-                return hierarchy.Root.Level;
-            }
-
-            set
-            {
-                var hierarchy = (Hierarchy)LogManager.GetRepository();
-                hierarchy.Root.Level = value;
-            }
-        }
-        log4net.Core.Level logLevel;
-
         class ShellSupport
         {
             [Usage("Exit interactive shell")]
@@ -572,10 +508,11 @@ namespace Sidi.CommandLine
             var shellSupport = new ShellSupport();
             p.Applications.Add(shellSupport);
             Console.WriteLine("type 'exit' to quit");
-            var tokenizer = new Tokenizer(new ReadAheadTextReader(Console.In));
-            var args = new EnumList<string>(tokenizer.Tokens.GetEnumerator());
-            while (args.Any())
+            for (;;)
             {
+                Console.Write("{0}>", p.ApplicationName);
+                var input = Console.ReadLine();
+                var args = Tokenizer.ToArray(input);
                 try
                 {
                     p.Parse(args);
@@ -589,7 +526,6 @@ namespace Sidi.CommandLine
 
                     log.Error(ex);
                     Console.WriteLine(ex.Message);
-                    args.Clear();
                 }
             }
         }
