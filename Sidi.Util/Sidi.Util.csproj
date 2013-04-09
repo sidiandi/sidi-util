@@ -242,6 +242,7 @@
     <Compile Include="Util\Stats.cs" />
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
+    <Compile Include="Util\TestBase.cs" />
     <Compile Include="Util\TileGeometry.cs" />
     <Compile Include="Util\TimeInterval.cs" />
     <Compile Include="Util\TimeIntervalParser.cs" />
