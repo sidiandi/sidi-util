@@ -108,6 +108,7 @@
     <Compile Include="CommandLine\LogOptions.cs" />
     <Compile Include="CommandLine\Manual.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
+    <Compile Include="CommandLine\ShellSupport.cs" />
     <Compile Include="CommandLine\ShowUserInterface2.cs" />
     <Compile Include="CommandLine\IParserItem.cs" />
     <Compile Include="CommandLine\Option.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
+    <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Forms\ChooseDialog.cs">
       <SubType>Form</SubType>
     </Compile>

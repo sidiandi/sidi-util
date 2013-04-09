@@ -20,7 +20,7 @@ namespace Sidi.CommandLine
             return (log4net.Core.Level)selected.GetValue(null);
         }
 
-        [Usage("Log level (off, error, warn, info, debug)"), Persistent]
+        [Usage("Log level (off, error, warn, info, debug, all)"), Persistent]
         [Category(Parser.categoryUserInterface)]
         public log4net.Core.Level LogLevel
         {

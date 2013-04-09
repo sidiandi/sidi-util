@@ -73,7 +73,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                return this.Name + " [sub commands...]";
+                return this.Name + " [subcommands...] ;";
             }
         }
 
@@ -201,8 +201,9 @@ namespace Sidi.CommandLine
                 string indent = "  ";
                 return String.Format(
                     Parser.CultureInfo,
-                    "{0}\r\n{1}",
-                    Name,
+                    @"{0}
+{1}",
+                    Syntax,
                     Usage.Indent(indent)
                     );
             }

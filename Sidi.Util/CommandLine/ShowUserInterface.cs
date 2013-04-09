@@ -487,47 +487,14 @@ namespace Sidi.CommandLine
             dialog.ShowAndExecute();
         }
 
-        class ShellSupport
-        {
-            [Usage("Exit interactive shell")]
-            public void Exit()
-            {
-                mustExit = true;
-                throw new CommandLineException("exit");
-            }
-
-            public bool mustExit = false;
-        }
-
         [Usage("Console to type commands")]
         [Category(Parser.categoryUserInterface)]
         public void Shell()
         {
-            var p = new Parser();
-            p.Applications.AddRange(parser.Applications);
             var shellSupport = new ShellSupport();
-            p.Applications.Add(shellSupport);
             Console.WriteLine("type 'exit' to quit");
-            for (;;)
-            {
-                Console.Write("{0}>", p.ApplicationName);
-                var input = Console.ReadLine();
-                var args = Tokenizer.ToArray(input);
-                try
-                {
-                    p.Parse(args);
-                }
-                catch (Exception ex)
-                {
-                    if (shellSupport.mustExit)
-                    {
-                        break;
-                    }
+            shellSupport.Shell(parser);
 
-                    log.Error(ex);
-                    Console.WriteLine(ex.Message);
-                }
-            }
         }
 
         List<TextBox> inputs = new List<TextBox>();
