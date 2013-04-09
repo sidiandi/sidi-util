@@ -121,6 +121,7 @@ namespace Sidi.CommandLine
         public List<object> Applications
         {
             get { return m_applications; }
+            set { m_applications = value; }
         }
 
         public List<IParserItem> SubParsers = new List<IParserItem>();
@@ -512,7 +513,7 @@ namespace Sidi.CommandLine
             return false;
         }
 
-        IParserItem LookupParserItem(string name, IEnumerable<IParserItem> parserItems)
+        public IParserItem LookupParserItem(string name, IEnumerable<IParserItem> parserItems)
         {
             if (DetectOptionPrefix(ref name))
             {
@@ -552,8 +553,7 @@ namespace Sidi.CommandLine
         /// <returns></returns>
         public IParserItem LookupParserItem(string name)
         {
-            IEnumerable<IParserItem> parserItems = Items.ToList();
-            return LookupParserItem(name, parserItems);
+            return LookupParserItem(name, Items);
         }
 
         public object ParseValue(IList<string> args, Type type)
@@ -849,7 +849,7 @@ namespace Sidi.CommandLine
         {
             w.WriteLine(Info);
             w.WriteLine();
-            w.WriteLine(String.Format("Usage: {0} action [parameters] action [parameters] ...", ApplicationName));
+            w.WriteLine(String.Format("Usage: {0} command [parameters] command [parameters] ...", ApplicationName));
             WriteUsageByCategory(w, Items.Where(x => !(x is ValueParser)));
         }
 

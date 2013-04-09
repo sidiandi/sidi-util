@@ -40,6 +40,13 @@ namespace Sidi.CommandLine
             Sidi.CommandLine.Manual.Show(parser);
         }
 
+        [Usage("Print usage")]
+        [Category(Parser.categoryUserInterface)]
+        public void Usage()
+        {
+            parser.ShowUsage();
+        }
+
         [Usage("Shows help for all options and actions that match pattern")]
         [Category(Parser.categoryUserInterface)]
         public void Help(Regex pattern = null)

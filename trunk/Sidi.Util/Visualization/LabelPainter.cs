@@ -56,7 +56,8 @@ namespace Sidi.Visualization
             StringFormat = new StringFormat()
             {
                 Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
+                LineAlignment = StringAlignment.Center,
+                Trimming = StringTrimming.None,
             };
 
             Font = new Font(FontFamily.GenericSansSerif, 10.0f);
@@ -109,6 +110,11 @@ namespace Sidi.Visualization
                 {
                     ToggleLevelVisibility(index);
                 }
+                treeMapControl.Invalidate();
+            }
+            else if (e.KeyCode == Keys.F)
+            {
+                ShowLabelFrame = !ShowLabelFrame;
                 treeMapControl.Invalidate();
             }
             else if (e.KeyCode == Keys.Space)
@@ -190,6 +196,8 @@ namespace Sidi.Visualization
 
         double alphaF;
 
+        public bool ShowLabelFrame { get; set; }
+
         bool PaintRecursive(PaintEventArgs e, Layout n, int level)
         {
             var rectArea = n.Bounds.Area;
@@ -248,6 +256,84 @@ namespace Sidi.Visualization
         /// <returns></returns>
         public bool DrawLabel(Graphics graphics, string text, Bounds rect)
         {
+            return DrawLabel1(graphics, text, rect);
+        }
+        
+        /// <summary>
+        /// Draws a label in world rectangle rect
+        /// </summary>
+        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="text"></param>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public bool DrawLabel2(Graphics graphics, string text, Bounds rect)
+        {
+            try
+            {
+                rect = worldToScreenTransform.Transform(rect);
+
+                var charDims = Enumerable.Range(0, text.Length)
+                    .Select(i => graphics.MeasureString(text.Substring(i, 1), this.Font))
+                    .ToArray();
+
+                float totalWidth = charDims.Sum(r => r.Width);
+                float totalHeight = charDims[0].Height;
+                int lineCount = Math.Max(1, (int)Math.Round(Math.Sqrt((totalWidth / totalHeight) / (rect.Width / rect.Height))));
+
+                var lines = Enumerable.Range(0, lineCount)
+                    .Select(i =>
+                        {
+                            int b = i * text.Length / lineCount;
+                            int e = (i + 1) * text.Length / lineCount;
+                            return text.Substring(b, e - b);
+                        })
+                        .ToArray();
+
+                var lineRect = rect.ToRectangleF();
+                lineRect.Height = (float)rect.Height / (float)lineCount;
+
+
+                var stringFormat = new StringFormat()
+                {
+                    LineAlignment = StringAlignment.Center,
+                    FormatFlags = StringFormatFlags.NoWrap,
+                    Trimming = StringTrimming.None,
+                };
+
+                byte alpha = 255;
+                using (var white = new SolidBrush(Color.FromArgb(alpha, Color.White)))
+                using (var font = new Font(FontFamily.GenericSansSerif, lineRect.Height * 0.8f))
+                {
+                    for (int i = 0; i < lines.Length; ++i)
+                    {
+                        graphics.DrawString(
+                            lines[i],
+                            font,
+                            white,
+                            lineRect,
+                            stringFormat
+                        );
+                        lineRect.Offset(0, lineRect.Height);
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Draws a label in world rectangle rect
+        /// </summary>
+        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="text"></param>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public bool DrawLabel1(Graphics graphics, string text, Bounds rect)
+        {
             rect = worldToScreenTransform.Transform(rect);
 
             var textSize = graphics.MeasureString(text, Font);
@@ -256,9 +342,55 @@ namespace Sidi.Visualization
             {
                 scale *= 2;
             }
+
             byte a = 255;
 
-            var fontSize = (float) Math.Max(Font.Size * scale, 1.0f);
+            var fontSize = (float)Math.Max(Font.Size * scale, 1.0f);
+
+            using (var white = new SolidBrush(Color.FromArgb(a, Color.White)))
+            using (var font = new Font(FontFamily.GenericSansSerif, fontSize))
+            {
+                graphics.DrawString(
+                    text,
+                    font,
+                    white,
+                    rect.ToRectangleF(),
+                    StringFormat
+                );
+                if (ShowLabelFrame)
+                {
+                    graphics.DrawRectangle(new Pen(white), rect.ToRectangle());
+                }
+            }
+            return true;
+
+        }
+
+        /// <summary>
+        /// Draws a label in world rectangle rect
+        /// </summary>
+        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="text"></param>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public bool DrawLabel3(Graphics graphics, string text, Bounds rect)
+        {
+            rect = worldToScreenTransform.Transform(rect);
+
+            var textSize = graphics.MeasureString(text, Font);
+            textSize.Width = Math.Max(textSize.Width, 1.0f);
+            textSize.Height = Math.Max(textSize.Height, 1.0f);
+            /*
+            var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
+            if ((scale * textSize.Height * 8) < rect.Height)
+            {
+                scale *= 2;
+            }
+            */
+            var scale = Math.Sqrt((rect.Width * rect.Height) / (textSize.Width * textSize.Height)) * 0.8f;
+            byte a = 255;
+
+            var fontSize = (float)Math.Max(Font.Size * scale, 1.0f);
 
             using (var white = new SolidBrush(Color.FromArgb(a, Color.White)))
             using (var font = new Font(FontFamily.GenericSansSerif, fontSize))
