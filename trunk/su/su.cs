@@ -8,6 +8,7 @@ using Sidi.Util;
 using NUnit.Framework;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+using Sidi.Tool;
 
 namespace su
 {
@@ -69,6 +70,12 @@ using Sidi.Extensions;
                 Parser.Run(application, args);
             }
         }
+
+        [SubCommand]
+        public Files File;
+
+        [SubCommand]
+        public Backup Backup;
 
         [TestFixture]
         public class Test
