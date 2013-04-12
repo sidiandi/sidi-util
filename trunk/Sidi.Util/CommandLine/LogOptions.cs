@@ -11,8 +11,10 @@ using log4net.Appender;
 
 namespace Sidi.CommandLine
 {
-    class LogOptions
+    [Usage("Adjust logging behavior")]
+    public class LogOptions
     {
+        [Usage("off, error, warn, info, debug, all")]
         public static log4net.Core.Level ParseLevel(string stringRepresentation)
         {
             var levels = typeof(log4net.Core.Level).GetFields(BindingFlags.Static | BindingFlags.Public);

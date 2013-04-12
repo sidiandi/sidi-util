@@ -124,6 +124,8 @@ namespace Sidi.CommandLine
             set { m_applications = value; }
         }
 
+        List<object> builtInApplications;
+
         public List<IParserItem> SubParsers = new List<IParserItem>();
 
         public object MainApplication
@@ -166,6 +168,7 @@ namespace Sidi.CommandLine
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
+            builtInApplications = new List<object>() { new BasicValueParsers() };
         }
 
         public static void Run(object application, string[] args)
@@ -570,6 +573,7 @@ namespace Sidi.CommandLine
         
         public static object ParseValueBuiltIn(string stringRepresentation, Type type)
         {
+            /*
             if (type == typeof(bool))
             {
                 return bool.Parse(stringRepresentation);
@@ -602,7 +606,9 @@ namespace Sidi.CommandLine
             {
                 return DateTime.Parse(stringRepresentation, cultureInfo).TimeOfDay;
             }
-            else if (type.IsEnum)
+                         */
+
+            if (type.IsEnum)
             {
                 return Enum.Parse(type, stringRepresentation);
             }
@@ -660,23 +666,26 @@ namespace Sidi.CommandLine
                     yield return s;
                 }
                 
-                foreach (var application in Applications)
+                foreach (var application in Applications.Concat(builtInApplications))
                 {
                     foreach (MethodInfo i in application.GetType().GetMethods())
                     {
-                        string u = Usage.Get(i);
-                        string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
-                        {
-                            return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                        })));
-                        if (u != null)
-                        {
-                            yield return new Action(this, application, i);
-                        }
-
                         if (ValueParser.IsSuitable(i))
                         {
                             yield return new ValueParser(this, application, i);
+                        }
+                        else
+                        {
+                            string u = Usage.Get(i);
+                            string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
+                            {
+                                return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
+                            })));
+                            if (u != null)
+                            {
+                                yield return new Action(this, application, i);
+                            }
+
                         }
                     }
 
