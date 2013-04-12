@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.ComponentModel;
+using System.IO;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine
 {
@@ -20,6 +22,7 @@ namespace Sidi.CommandLine
         {
             var p = m.GetParameters();
             return m.Name.StartsWith("Parse")
+                && m.IsStatic
                 && p.Length == 1
                 && p[0].ParameterType.Equals(typeof(string));
         }
@@ -33,17 +36,36 @@ namespace Sidi.CommandLine
 
         public string Usage
         {
-            get { return String.Empty; }
+            get { return Sidi.CommandLine.Usage.Get(MethodInfo); }
+        }
+
+        public IEnumerable<ExampleAttribute> Examples
+        {
+            get
+            {
+                return ExampleAttribute.Get(MethodInfo);
+            }
         }
 
         public string UsageText
         {
-            get { return String.Format("Can parse {0} values", ValueType); }
+            get
+            {
+                var s = new StringWriter();
+                s.Write(Usage);
+                var e = Examples;
+                if (e.Any())
+                {
+                    s.Write(". Examples: ");
+                    s.Write(e.Select(x => x.Value.Quote()).Join(", "));
+                }
+                return s.ToString();
+            }
         }
 
         public string Syntax
         {
-            get { return String.Format("Can parse {0} values", ValueType); }
+            get { return String.Format("[{0} value]", ValueType); }
         }
 
         public string Name

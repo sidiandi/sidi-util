@@ -105,6 +105,8 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CommandLine\Attributes.cs" />
+    <Compile Include="CommandLine\BasicValueParsers.cs" />
+    <Compile Include="CommandLine\ExampleAttribute.cs" />
     <Compile Include="CommandLine\LogOptions.cs" />
     <Compile Include="CommandLine\Manual.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />

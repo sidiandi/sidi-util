@@ -123,6 +123,7 @@
     <Compile Include="Caching\LruCacheBackgroundTest.cs" />
     <Compile Include="Caching\LruCacheTest.cs" />
     <Compile Include="Caching\CacheTest.cs" />
+    <Compile Include="CommandLine\BasicValueParserTest.cs" />
     <Compile Include="CommandLine\ShowUserInterfaceTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="Extensions\DumpExtensionsTest.cs" />
