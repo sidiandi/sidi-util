@@ -561,6 +561,39 @@ namespace Sidi.CommandLine
 
         public object ParseValue(IList<string> args, Type type)
         {
+            if (type.IsArray)
+            {
+                var elementType = type.GetElementType();
+                var values = new List<object>();
+                if (args.Any() && args.First().Equals("["))
+                {
+                    args.PopHead();
+                    while (!args.First().Equals("]"))
+                    {
+                        values.Add(ParseValue(args, elementType));
+                    }
+                    args.PopHead();
+                }
+                else
+                {
+                    while (args.Any())
+                    {
+                        if (args.First().Equals(ListTerminator))
+                        {
+                            args.PopHead();
+                            break;
+                        }
+                        values.Add(ParseValue(args, elementType));
+                    }
+                }
+                var array = Array.CreateInstance(elementType, values.Count);
+                for (int i = 0; i < values.Count; ++i)
+                {
+                    array.SetValue(values[i], i);
+                }
+                return array;
+            }
+            
             var vp = ValueParsers.FirstOrDefault(x => x.ValueType.Equals(type));
             if (vp == null)
             {
@@ -573,41 +606,6 @@ namespace Sidi.CommandLine
         
         public static object ParseValueBuiltIn(string stringRepresentation, Type type)
         {
-            /*
-            if (type == typeof(bool))
-            {
-                return bool.Parse(stringRepresentation);
-            }
-            if (type == typeof(int))
-            {
-                return int.Parse(stringRepresentation, cultureInfo);
-            }
-            else if (type == typeof(double))
-            {
-                return double.Parse(stringRepresentation, cultureInfo);
-            }
-            else if (type == typeof(string))
-            {
-                return stringRepresentation;
-            }
-            else if (type == typeof(DirectoryInfo))
-            {
-                return new DirectoryInfo(stringRepresentation);
-            }
-            else if (type == typeof(FileSystemInfo))
-            {
-                return Sidi.IO.FileUtil.GetFileSystemInfo(stringRepresentation);
-            }
-            else if (type == typeof(DateTime))
-            {
-                return DateTime.Parse(stringRepresentation, cultureInfo);
-            }
-            else if (type == typeof(TimeSpan))
-            {
-                return DateTime.Parse(stringRepresentation, cultureInfo).TimeOfDay;
-            }
-                         */
-
             if (type.IsEnum)
             {
                 return Enum.Parse(type, stringRepresentation);

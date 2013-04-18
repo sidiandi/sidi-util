@@ -27,10 +27,21 @@ namespace Sidi.CommandLine
                 log.Info(vp.UsageText);
                 foreach (var example in vp.Examples)
                 {
+                    log.InfoFormat("Parsing {0}", example.Value.Quote());
                     var r = vp.Handle(new List<string>() { example.Value }, true);
                     log.InfoFormat("Parsing {0} returns {1}", example.Value.Quote(), r);
                 }
             }
+        }
+
+        [Test]
+        public void Lists()
+        {
+            var p = new Parser();
+            var args = new[] { "[", "A", "B", "C", "]" }.ToList();
+            var list = (string[])  p.ParseValue(args, typeof(string[]));
+            Assert.AreEqual(0, args.Count);
+            Assert.AreEqual(3, list.Length);
         }
     }
 }

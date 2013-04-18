@@ -329,7 +329,8 @@ namespace Sidi.CommandLine.Test
         {
             var a = new TestAppWithStringList();
             var p = new Parser(a);
-            p.Parse(new string[]{ "AddList", "1", "2", "3"});
+            p.ShowUsage();
+            p.Parse(new string[]{ "AddList", "[", "1", "2", "3", "]"});
         }
 
         [Test]
@@ -373,7 +374,6 @@ namespace Sidi.CommandLine.Test
             }
             catch (CommandLineException e)
             {
-                log.Info(e.Message);
                 Assert.IsTrue(e.Message.Contains(p.GetAction("Add").Usage));
             }
         }

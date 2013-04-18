@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sidi.Util
 {
@@ -13,6 +14,12 @@ namespace Sidi.Util
             this.end = begin + duration;
         }
 
+        public TimeInterval(TimeSpan duration, DateTime end)
+        {
+            this.end = end;
+            this.begin = end - duration;
+        }
+
         public TimeInterval(DateTime t0, DateTime t1)
         {
             this.begin = t0;
@@ -21,7 +28,7 @@ namespace Sidi.Util
 
         public static TimeInterval Parse(string timeIntervalText)
         {
-            return TimeIntervalParser.Parse(timeIntervalText);
+            return Sidi.CommandLine.BasicValueParsers.ParseTimeInterval(new List<string>(){timeIntervalText});
         }
 
         public static TimeInterval MaxValue
@@ -135,6 +142,14 @@ namespace Sidi.Util
         public static TimeInterval Year(DateTime time)
         {
             return new TimeInterval(new DateTime(time.Year, 1, 1), new DateTime(time.Year + 1, 1, 1));
+        }
+
+        public static TimeInterval Year(DateTime time, int startMonth)
+        {
+            var d = time.Month < startMonth ? -1 : 0;
+            return new TimeInterval(
+                new DateTime(time.Year + d, startMonth, 1),
+                new DateTime(time.Year + d + 1, startMonth, 1));
         }
 
         public static TimeInterval Month(DateTime time)

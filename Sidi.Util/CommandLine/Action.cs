@@ -70,7 +70,7 @@ namespace Sidi.CommandLine
         {
             if (pi.ParameterType.IsArray)
             {
-                return String.Format("[{0}: list of {1}, termintated by ';']", pi.Name, pi.ParameterType.GetElementType().GetInfo());
+                return String.Format("[{0}: '[' {1} {1} ... ']' ]", pi.Name, pi.ParameterType.GetElementType().GetInfo());
             }
             else
             {
@@ -107,40 +107,14 @@ namespace Sidi.CommandLine
 
             try
             {
-                if (type.IsArray)
+                if (!parameter.IsOptional)
                 {
-                    var elements = new List<object>();
-                    for (; list.Any(); )
-                    {
-                        if (list.First().Equals(Parser.ListTerminator))
-                        {
-                            list.RemoveAt(0);
-                            break;
-                        }
-                        else
-                        {
-                            elements.Add(parser.ParseValue(list, type.GetElementType()));
-                        }
-                    }
-
-                    var a = Array.CreateInstance(type.GetElementType(), elements.Count);
-                    foreach (var i in elements.Counted())
-                    {
-                        a.SetValue(i.Value, i.Key);
-                    }
-                    return a;
+                    var r = parser.ParseValue(list, type);
+                    return r;
                 }
                 else
                 {
-                    if (!parameter.IsOptional && list.Any())
-                    {
-                        var r = parser.ParseValue(list, type);
-                        return r;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
             }
             catch

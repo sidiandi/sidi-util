@@ -38,5 +38,12 @@ namespace Sidi.Util
                 return true;
             }
         }
+
+        public static T PopHead<T>(this IList<T> list)
+        {
+            var h = list[0];
+            list.RemoveAt(0);
+            return h;
+        }
     }
 }
