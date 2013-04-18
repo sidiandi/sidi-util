@@ -6,6 +6,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.IO;
 using Sidi.Extensions;
+using Sidi.Util;
 
 namespace Sidi.CommandLine
 {
@@ -24,7 +25,7 @@ namespace Sidi.CommandLine
             return m.Name.StartsWith("Parse")
                 && m.IsStatic
                 && p.Length == 1
-                && p[0].ParameterType.Equals(typeof(string));
+                && (p[0].ParameterType.Equals(typeof(string)) || p[0].ParameterType.Equals(typeof(IList<string>)));
         }
 
         Parser parser;
@@ -93,8 +94,25 @@ namespace Sidi.CommandLine
 
         public object Handle(IList<string> args, bool execute)
         {
-            var result = this.MethodInfo.Invoke(null, new object[] { args[0] });
-            args.RemoveAt(0);
+            object result = null;
+            if (this.MethodInfo.GetParameters()[0].ParameterType.Equals(typeof(IList<string>)))
+            {
+                try
+                {
+                    result = this.MethodInfo.Invoke(null, new object[] { args });
+                }
+                catch
+                {
+                    var p = Tokenizer.ToList(args[0]);
+                    result = this.MethodInfo.Invoke(null, new object[] { p });
+                    args.PopHead();
+                }
+            }
+            else
+            {
+                result = this.MethodInfo.Invoke(null, new object[] { args[0] });
+                args.PopHead();
+            }
             return result;
         }
     }

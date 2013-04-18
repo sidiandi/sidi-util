@@ -20,5 +20,10 @@ namespace Sidi.CommandLine
         {
             return cap.GetCustomAttributes(typeof(ExampleAttribute), true).Cast<ExampleAttribute>();
         }
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }

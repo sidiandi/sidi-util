@@ -52,6 +52,17 @@ namespace Sidi.CommandLine
             };
         }
 
+        object ToDt(ValueParser vp)
+        {
+            return new[]
+            {
+                dt(vp.Name),
+                dd(
+                    p(vp.Usage), 
+                    vp.Examples.Select(ex => p("Example: ", ex.ToString().Quote())))
+            };
+        }
+
         object ToDt(Option option)
         {
             return new[]
@@ -84,7 +95,9 @@ namespace Sidi.CommandLine
                                 {
                                     Applications = { subCommand.CommandInstance }
                                 })
-                        })
+                        }),
+                    h2("Value Syntax"),
+                    dl(parser.ValueParsers.Select(item => ToDt(item)))
                 )
             );
         }

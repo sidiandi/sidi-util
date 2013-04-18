@@ -25,11 +25,8 @@ namespace Sidi.Util
         [Test]
         public void Parse()
         {
-            var t = TimeInterval.Parse("year 2012");
-            Assert.AreEqual(new TimeInterval(new DateTime(2012, 1, 1), new DateTime(2013, 1, 1)), t);
-
-            t = TimeInterval.Parse("from 2012-1-1 to 2012-2-1");
-            Assert.AreEqual(new TimeInterval(new DateTime(2012, 1, 1), new DateTime(2012, 2, 1)), t);
+            var t = TimeInterval.Month(DateTime.Now);
+            Assert.AreEqual(t, TimeInterval.Parse(t.ToString()));
         }
     }
 }
