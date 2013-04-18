@@ -250,11 +250,6 @@ namespace Sidi.Tool
             c.RunFullScreen();
         }
 
-        class Node
-        {
-            public string Name;
-        }
-
         public class NameTree : ITree
         {
             public NameTree(NameTree parent, string name)
