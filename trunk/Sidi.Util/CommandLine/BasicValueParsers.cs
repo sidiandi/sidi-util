@@ -227,7 +227,6 @@ namespace Sidi.CommandLine
         [Example("FinancialYear today")]
         [Example("last 90 days")]
         [Example("next 12 hours")]
-        [Example("this month")]
         [Example("begin 2013-03-01 end 2013-04-10")]
         [Example("[18.04.2013 03:35:04, 18.04.2013 15:35:04[")]
         // [Example("begin yesterday end tomorrow")]
