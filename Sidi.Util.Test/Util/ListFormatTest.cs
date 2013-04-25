@@ -60,6 +60,13 @@ namespace Sidi.Util
                     .AllPublic()
                     .RenderText(Console.Out);
             }
+
+            {
+                data.ListFormat()
+                    .AllFields()
+                    .AllProperties()
+                    .RenderDetails(Console.Out);
+            }
         }
 
         [Test]

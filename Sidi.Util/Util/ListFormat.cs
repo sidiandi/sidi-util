@@ -258,6 +258,26 @@ namespace Sidi.Util
             }
         }
 
+        public void RenderDetails(TextWriter o)
+        {
+            DefaultColumns();
+
+            var columnWidth = Columns.Max(x => x.Name.Length);
+
+            var rows = Data
+                .Select(i => Columns.Select(x => x.GetText(i)).ToArray());
+
+            var rowFormat = String.Format("{{0,-{0}}}: {{1}}", columnWidth);
+            foreach (var i in rows)
+            {
+                for (int c = 0; c < Columns.Count; ++c)
+                {
+                    o.WriteLine(rowFormat, Columns[c].Name, i[c]);
+                }
+                o.WriteLine();
+            }
+        }
+
         void RenderMultiLine(TextWriter o, string[] rowData, string[] columnFormat)
         {
             // calculate number of required text rows
