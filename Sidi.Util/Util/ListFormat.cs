@@ -128,10 +128,14 @@ namespace Sidi.Util
 
         public ListFormat<T> Property(params string[] properties)
         {
-            foreach (var m in properties.Select(f => typeof(T).GetProperty(f)))
+            foreach (var name in properties)
             {
-                var member = m;
-                AddColumn(m.Name, item => member.GetValue(item, new object[]{}).ToString());
+                var member = typeof(T).GetProperty(name);
+                if (member == null)
+                {
+                    throw new ArgumentOutOfRangeException("properties", name);
+                }
+                AddColumn(member.Name, item => member.GetValue(item, new object[]{}).ToString());
             }
             return this;
         }
