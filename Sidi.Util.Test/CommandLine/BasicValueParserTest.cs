@@ -22,7 +22,7 @@ namespace Sidi.CommandLine
         [Test]
         public void ParseExamples()
         {
-            foreach (var vp in new Parser().ValueParsers)
+            foreach (var vp in new Parser().AvailableValueParsers)
             {
                 log.Info(vp.UsageText);
                 foreach (var example in vp.Examples)

@@ -559,42 +559,39 @@ namespace Sidi.CommandLine
             return LookupParserItem(name, Items);
         }
 
+        Dictionary<Type, IValueParser> usedValueParsers = new Dictionary<Type, IValueParser>();
+
+        public IValueParser CreateValueParser(Type type)
+        {
+                if (type.IsEnum)
+                {
+                    return new EnumValueParser(type);
+                }
+                else if (type.IsArray)
+                {
+                    return new ArrayValueParser(type, this);
+                }
+
+                return new StandardValueParser(type);
+        }
+        
+        public IValueParser GetValueParser(Type type)
+        {
+            IValueParser p;
+            if (!usedValueParsers.TryGetValue(type, out p))
+            {
+                p = AvailableValueParsers.FirstOrDefault(x => x.ValueType.Equals(type));
+                if (p != null) goto found;
+                p = CreateValueParser(type);
+found:
+                usedValueParsers[type] = p;
+            }
+            return p;
+        }
+
         public object ParseValue(IList<string> args, Type type)
         {
-            if (type.IsArray)
-            {
-                var elementType = type.GetElementType();
-                var values = new List<object>();
-                if (args.Any() && args.First().Equals("["))
-                {
-                    args.PopHead();
-                    while (!args.First().Equals("]"))
-                    {
-                        values.Add(ParseValue(args, elementType));
-                    }
-                    args.PopHead();
-                }
-                else
-                {
-                    while (args.Any())
-                    {
-                        if (args.First().Equals(ListTerminator))
-                        {
-                            args.PopHead();
-                            break;
-                        }
-                        values.Add(ParseValue(args, elementType));
-                    }
-                }
-                var array = Array.CreateInstance(elementType, values.Count);
-                for (int i = 0; i < values.Count; ++i)
-                {
-                    array.SetValue(values[i], i);
-                }
-                return array;
-            }
-            
-            var vp = ValueParsers.FirstOrDefault(x => x.ValueType.Equals(type));
+            var vp = GetValueParser(type);
             if (vp == null)
             {
                 var value = ParseValueBuiltIn(args[0], type);
@@ -606,11 +603,6 @@ namespace Sidi.CommandLine
         
         public static object ParseValueBuiltIn(string stringRepresentation, Type type)
         {
-            if (type.IsEnum)
-            {
-                return Enum.Parse(type, stringRepresentation);
-            }
-
             var parse = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
             if (parse != null)
             {
@@ -652,71 +644,104 @@ namespace Sidi.CommandLine
             return (Action) LookupParserItem(actionName, Items.Where(x => x is Action));
         }
 
-        /// <summary>
-        /// All available actions and options
-        /// </summary>
-        public IEnumerable<IParserItem> Items
+        IList<IParserItem> items;
+
+        public IList<IParserItem> Items
         {
             get
             {
-                foreach (var s in SubParsers)
+                if (items == null)
                 {
-                    yield return s;
+                    items = new List<IParserItem>(FindItems());
                 }
-                
-                foreach (var application in Applications.Concat(builtInApplications))
-                {
-                    foreach (MethodInfo i in application.GetType().GetMethods())
-                    {
-                        if (ValueParser.IsSuitable(i))
-                        {
-                            yield return new ValueParser(this, application, i);
-                        }
-                        else
-                        {
-                            string u = Usage.Get(i);
-                            string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
-                            {
-                                return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                            })));
-                            if (u != null)
-                            {
-                                yield return new Action(this, application, i);
-                            }
+                return items;
+            }
+        }
 
+        /// <summary>
+        /// All available actions and options
+        /// </summary>
+        IEnumerable<IParserItem> FindItems()
+        {
+            foreach (var s in SubParsers)
+            {
+                yield return s;
+            }
+
+            foreach (var application in Applications.Concat(builtInApplications))
+            {
+                foreach (MethodInfo i in application.GetType().GetMethods())
+                {
+                    if (ValueParser.IsSuitable(i))
+                    {
+                        yield return new ValueParser(this, application, i);
+                    }
+                    else
+                    {
+                        string u = Usage.Get(i);
+                        string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
+                        {
+                            return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
+                        })));
+                        if (u != null)
+                        {
+                            yield return new Action(this, application, i);
+                        }
+
+                    }
+                }
+
+                foreach (MemberInfo i in application.GetType().GetMembers())
+                {
+                    if (SubCommand.IsSubCommand(i))
+                    {
+                        if ((i is FieldInfo || i is PropertyInfo))
+                        {
+                            yield return new SubCommand(application, i);
                         }
                     }
-
-                    foreach (MemberInfo i in application.GetType().GetMembers())
+                    else
                     {
-                        if (SubCommand.IsSubCommand(i))
+                        string u = Usage.Get(i);
+                        if ((i is FieldInfo || i is PropertyInfo) && u != null)
                         {
-                            if ((i is FieldInfo || i is PropertyInfo))
-                            {
-                                yield return new SubCommand(application, i);
-                            }
-                        }
-                        else
-                        {
-                            string u = Usage.Get(i);
-                            if ((i is FieldInfo || i is PropertyInfo) && u != null)
-                            {
-                                yield return new Option(this, application, i);
-                            }
+                            yield return new Option(this, application, i);
                         }
                     }
                 }
             }
         }
 
+        List<ValueParser> availableValueParsers;
+
         /// <summary>
         /// All value parsers
         /// </summary>
-        public IEnumerable<ValueParser> ValueParsers
+        public IList<ValueParser> AvailableValueParsers
         {
             get
             {
-                return Items.OfType<ValueParser>();
+                if (availableValueParsers == null)
+                {
+                    availableValueParsers = new List<ValueParser>(Applications
+                        .Concat(builtInApplications)
+                        .SelectMany(application => application.GetType().GetMethods()
+                            .Select(x => new { Application = application, Method = x }))
+                        .Where(i => ValueParser.IsSuitable(i.Method))
+                        .Select(i => new ValueParser(this, i.Application, i.Method)));
+                }
+                return availableValueParsers;
+            }
+        }
+
+        /// <summary>
+        /// Used value parsers
+        /// </summary>
+        public IEnumerable<IValueParser> UsedValueParsers
+        {
+            get
+            {
+                return usedValueParsers.Values;
             }
         }
 
@@ -857,7 +882,7 @@ namespace Sidi.CommandLine
             w.WriteLine(Info);
             w.WriteLine();
             w.WriteLine(String.Format("Usage: {0} command [parameters] command [parameters] ...", ApplicationName));
-            WriteUsageByCategory(w, Items.Where(x => !(x is ValueParser)));
+            WriteUsageByCategory(w, Items);
         }
 
         public IList<KeyValuePair<string, IList<IParserItem>>>

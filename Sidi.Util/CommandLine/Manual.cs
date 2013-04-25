@@ -29,6 +29,10 @@ namespace Sidi.CommandLine
             {
                 return ToDt((Option)item);
             }
+            else if (item is Action)
+            {
+                return ToDt((Action)item);
+            }
             else if (item is SubCommand)
             {
                 return ToDt((SubCommand)item);
@@ -52,24 +56,39 @@ namespace Sidi.CommandLine
             };
         }
 
-        object ToDt(ValueParser vp)
+        object ToDt(IValueParser vp)
         {
             return new[]
             {
-                dt(vp.Name),
-                dd(
-                    p(vp.Usage), 
-                    vp.Examples.Select(ex => p("Example: ", ex.ToString().Quote())))
+                dt(a(name(vp.Name), vp.Name)),
+                dd(p(
+                    vp.UsageText, 
+                    If(vp is StandardValueParser, () => new object[]{"See the ", a(href((vp as StandardValueParser).ReferenceUri), vp.Name, " documentation")}))
+                    ),
             };
+        }
+
+        object Format(IValueParser p)
+        {
+            return a(href("#" + p.Name), p.Syntax);
         }
 
         object ToDt(Option option)
         {
             return new[]
             {
-                dt(option.Syntax),
+                dt(option.Name, " [ ", Format(option.ValueParser), " ] "),
                 dd(p("default: ", option.DisplayValue, option.IsPersistent ? " (persistent)" : null),
                     p(option.Usage))
+            };
+        }
+
+        object ToDt(Action action)
+        {
+            return new[]
+            {
+                dt(action.Name, action.Parameters.Select(p => new object[]{ " [ ", p.ParameterInfo.Name, ": ", Format(p.ValueParser), " ] " })),
+                dd(this.p(action.Usage))
             };
         }
 
@@ -86,6 +105,7 @@ namespace Sidi.CommandLine
                     h1(parser.ApplicationName),
                     p(parser.VersionInfo),
                     p(Usage.Get(parser.MainApplication.GetType())),
+                    p("All commands can be abbreviated as long as they are unique, e.g. \"Manual\" can be writen as \"m\" "),
                     CommandList(parser),
                     parser.SubCommands.Select(subCommand =>
                         new[]
@@ -97,7 +117,7 @@ namespace Sidi.CommandLine
                                 })
                         }),
                     h2("Value Syntax"),
-                    dl(parser.ValueParsers.Select(item => ToDt(item)))
+                    dl(parser.UsedValueParsers.Select(item => ToDt(item)))
                 )
             );
         }

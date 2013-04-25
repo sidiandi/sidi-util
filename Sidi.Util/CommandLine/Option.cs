@@ -36,6 +36,7 @@ namespace Sidi.CommandLine
             Application = application;
             MemberInfo = memberInfo;
             this.parser = parser;
+            parser.GetValueParser(Type);
         }
 
         Parser parser;
@@ -66,27 +67,7 @@ namespace Sidi.CommandLine
             get
             {
                 MemberInfo i = MemberInfo;
-                if (i.MemberType == MemberTypes.Field)
-                {
-                    FieldInfo fieldInfo = (FieldInfo)i;
-                    return String.Format(
-                        Parser.CultureInfo,
-                        "{0} [{1}]",
-                        i.Name,
-                        fieldInfo.FieldType.GetInfo()
-                        );
-                }
-                else if (i.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo propertyInfo = (PropertyInfo)i;
-                    return String.Format(
-                        Parser.CultureInfo,
-                        "{0} [{1}]",
-                        i.Name,
-                        propertyInfo.PropertyType.GetInfo()
-                        );
-                }
-                throw new InvalidOperationException(i.GetType().ToString());
+                return String.Format(Parser.CultureInfo, "{0} [{1}]", Name, Type.GetInfo());
             }
         }
 
@@ -122,6 +103,14 @@ namespace Sidi.CommandLine
                     return propertyInfo.PropertyType;
                 }
                 throw new InvalidOperationException(i.MemberType.ToString());
+            }
+        }
+
+        public IValueParser ValueParser
+        {
+            get
+            {
+                return parser.GetValueParser(Type);
             }
         }
 
