@@ -10,7 +10,11 @@ using Sidi.Util;
 
 namespace Sidi.CommandLine
 {
-    public class ValueParser : IParserItem
+    public interface IValueParser : IParserItem
+    {
+    }
+
+    public class ValueParser : IValueParser
     {
         public ValueParser(Parser parser, object application, MethodInfo method)
         {
@@ -66,7 +70,7 @@ namespace Sidi.CommandLine
 
         public string Syntax
         {
-            get { return String.Format("[{0} value]", ValueType); }
+            get { return ValueType.Name; }
         }
 
         public string Name

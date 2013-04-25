@@ -36,6 +36,9 @@ namespace Sidi.CommandLine
             Application = application;
             MethodInfo = method;
             this.parser = parser;
+            foreach (var i in Parameters)
+            {
+            }
         }
 
         Parser parser;
@@ -54,15 +57,32 @@ namespace Sidi.CommandLine
             }
         }
 
+        public class Parameter
+        {
+            public IValueParser ValueParser;
+            public System.Reflection.ParameterInfo ParameterInfo;
+        }
+
+        public Parameter[] Parameters
+        {
+            get
+            {
+                return MethodInfo.GetParameters().Select(x => new Parameter()
+                {
+                    ValueParser = parser.GetValueParser(x.ParameterType),
+                    ParameterInfo = x,
+                }).ToArray();
+            }
+        }
+
         public string Syntax
         {
             get
             {
-                MethodInfo i = MethodInfo;
-                string parameters = i.GetParameters()
-                    .Select(pi => FormatParameter(pi))
+                string parameters = Parameters
+                    .Select(pi => pi.ValueParser.Syntax)
                     .Join(" ");
-                return String.Format("{0} {1}", i.Name, parameters);
+                return String.Format("{0} {1}", Name, parameters);
             }
         }
 

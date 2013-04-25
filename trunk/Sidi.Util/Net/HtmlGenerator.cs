@@ -183,6 +183,18 @@ namespace Sidi.Net
             });
         }
 
+        public object If(bool condition, Func<object> value)
+        {
+            if (condition)
+            {
+                return value();
+            }
+            else
+            {
+                return new object[] { };
+            }
+        }
+
         [SuppressMessage("Microsoft.Naming", "CA1709")]
         public Action<TextWriter> a(params object[] childs) { return Tag("a", childs); }
         [SuppressMessage("Microsoft.Naming", "CA1709")]
