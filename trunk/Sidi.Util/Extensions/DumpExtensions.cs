@@ -57,21 +57,22 @@ namespace Sidi.Extensions
 
         public static void DumpProperties(this object x, TextWriter o)
         {
-            var list = new List<KeyValuePair<string, Func<string>>>();
+            var list = new[] { x };
 
-            list.AddRange(
-                x.GetType().GetProperties().Select(
-                    i => new KeyValuePair<string, Func<string>>(i.Name, () => i.GetString(x))));
+            var lf = list.ListFormat();
 
-            list.AddRange(
-                x.GetType().GetFields().Select(
-                    i => new KeyValuePair<string, Func<string>>(i.Name, () => i.GetString(x))));
+            foreach (var i in x.GetType().GetProperties())
+            {
+                var property = i;
+                lf.AddColumn(i.Name, y => property.GetValue(y, new object[]{}));
+            }
+            foreach (var i in x.GetType().GetFields())
+            {
+                var field = i;
+                lf.AddColumn(i.Name, y => field.GetValue(y));
+            }
 
-            list.Sort(list.Comparer(i => i.Key));
-            list.ListFormat()
-                .AddColumn("Name", i => i.Key)
-                .AddColumn("Value", i => i.Value())
-                .RenderText(o);
+            lf.RenderDetails(o);
         }
 
         public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e)
