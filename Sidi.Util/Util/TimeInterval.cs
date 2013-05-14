@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Sidi.Util
 {
+    [Serializable]
     public class TimeInterval
     {
         public TimeInterval(DateTime begin, TimeSpan duration)
