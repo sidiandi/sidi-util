@@ -22,6 +22,7 @@ using System.Text;
 using System.ComponentModel;
 using Sidi.Util;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Sidi.IO
 {
@@ -110,14 +111,27 @@ namespace Sidi.IO
                     throw new NotImplementedException(fileMode.ToString());
             }
 
-            var h = NativeMethods.CreateFile(
-                path.Param, 
-                desiredAccess,
-                shareMode, 
-                lpSecurityAttributes, 
-                creationDisposition,
-                flagsAndAttributes,
-                hTemplateFile);
+            SafeFileHandle h;
+            try
+            {
+                h = NativeMethods.CreateFile(
+                    path.Param,
+                    desiredAccess,
+                    shareMode,
+                    lpSecurityAttributes,
+                    creationDisposition,
+                    flagsAndAttributes,
+                    hTemplateFile);
+
+                if (h.IsInvalid)
+                {
+                    throw new Win32Exception();
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
+            }
 
             return new System.IO.FileStream(h, access);
         }
