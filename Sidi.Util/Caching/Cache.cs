@@ -150,7 +150,7 @@ namespace Sidi.Caching
 
         static SHA1 sha = new SHA1CryptoServiceProvider(); 
         
-        static string Digest(object x)
+        public static string Digest(object x)
         {
             if (x is MethodBase)
             {
