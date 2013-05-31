@@ -244,6 +244,7 @@
     <Compile Include="Util\RandomEx.cs" />
     <Compile Include="Util\Rar.cs" />
     <Compile Include="Pop3\Session.cs" />
+    <Compile Include="Util\RegexIgnoreCase.cs" />
     <Compile Include="Util\RegistrySerializer.cs" />
     <Compile Include="Util\ShellAccess.cs" />
     <Compile Include="Util\Stats.cs" />

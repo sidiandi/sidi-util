@@ -127,8 +127,13 @@ namespace Sidi.CommandLine
         public object Handle(IList<string> args, bool execute)
         {
             var parser = new Parser();
-            parser.Applications.Add(CommandInstance);
-            parser.Applications.Add(new ShowHelp(parser));
+            parser.Applications.AddRange(new object[]
+                {
+                    CommandInstance,
+                    new ShowHelp(parser),
+                    new ShowUserInterface(parser),
+                    new ShowWebServer(parser)
+                });
 
             log.InfoFormat("{0}", this);
             if (args.Any())

@@ -120,7 +120,7 @@ namespace Sidi.Extensions
 
         public static string Join<T>(this IEnumerable<T> enumerable, string separator)
         {
-            return String.Join(separator, enumerable.SafeSelect(x => x.ToString()).ToArray());
+            return String.Join(separator, enumerable.SafeSelect(x => x.SafeToString()).ToArray());
         }
 
         public static string Join<T>(this IEnumerable<T> e)

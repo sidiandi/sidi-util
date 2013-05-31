@@ -29,6 +29,7 @@ using Sidi.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using log4net;
 using Sidi.Collections;
+using Sidi.IO;
 
 namespace Sidi.CommandLine
 {
@@ -472,7 +473,7 @@ namespace Sidi.CommandLine
 
         [Usage("Show an interactive user interface")]
         [Category(Parser.categoryUserInterface)]
-        public void UserInterface()
+        public void GraphicalUserInterface()
         {
             var main = ToDialog(parser);
             main.ShowDialog();
@@ -495,6 +496,14 @@ namespace Sidi.CommandLine
             Console.WriteLine("type 'exit' to quit");
             shellSupport.Shell(parser);
 
+        }
+
+        [Usage("Runs commands from a script file")]
+        [Category(Parser.categoryUserInterface)]
+        public void Script(LPath scriptFile)
+        {
+            string[] parameters = Tokenizer.FromFile(scriptFile);
+            parser.Parse(parameters);
         }
 
         List<TextBox> inputs = new List<TextBox>();

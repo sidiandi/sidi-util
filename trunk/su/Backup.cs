@@ -75,15 +75,9 @@ namespace Sidi.Tool
 
         FindConfig GetFileList()
         {
-            using (var r = LFile.Open(ConfigFile, System.IO.FileMode.Open))
-            {
-                // configure set of files
-                var e = new Sidi.IO.FindConfig();
-                var tokenizer = new Sidi.Util.Tokenizer(new System.IO.StreamReader(r));
-                var tokens = tokenizer.Tokens.ToArray();
-                Parser.Run(e, tokens);
-                return e;
-            }
+            var e = new Sidi.IO.FindConfig();
+            new Parser(e).Parse(Tokenizer.FromFile(ConfigFile));
+            return e;
         }
 
         [Usage("Create a new backup directory")]
@@ -208,9 +202,12 @@ namespace Sidi.Tool
             log.InfoFormat("Linked: {0}", linked);
             log.InfoFormat("Verified: {0}", verified);
 
-            log.ErrorFormat("{0} errors occured during backup:\r\n{1}",
-                errors.Count,
-                errors.Join());
+            if (errors.Any())
+            {
+                log.ErrorFormat("{0} errors occured during backup:\r\n{1}",
+                    errors.Count,
+                    errors.Join());
+            }
         }
 
         Random random = new Random();

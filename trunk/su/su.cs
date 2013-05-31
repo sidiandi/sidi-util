@@ -17,9 +17,9 @@ namespace su
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            Parser.Run(new su(), args);
+            return Parser.Run(new su(), args);
         }
 
         [Usage("Run a C# script")]
