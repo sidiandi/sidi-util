@@ -60,6 +60,7 @@ namespace Sidi.CommandLine
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class PersistentAttribute : System.Attribute
     {
+        public bool Global { get; private set; }
     }
 
     /// <summary>

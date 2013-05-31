@@ -121,25 +121,27 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        object GetParameter(ParameterInfo parameter, IList<string> list)
+        IEnumerable<object> GetValues(IList<string> args, IEnumerable<ParameterInfo> parameters)
         {
-            var type = parameter.ParameterType;
-
-            try
+            foreach (var p in parameters)
             {
-                if (!parameter.IsOptional)
+                object r = null; 
+                try
                 {
-                    var r = parser.ParseValue(list, type);
-                    return r;
+                    if (p.IsOptional && args.Count == 0)
+                    {
+                        r = p.DefaultValue;
+                    }
+                    else
+                    {
+                        r = parser.ParseValue(args, p.ParameterType);
+                    }
                 }
-                else
+                catch
                 {
-                    return null;
+                    throw new InvalidParameterException(p);
                 }
-            }
-            catch
-            {
-                throw new InvalidParameterException(parameter);
+                yield return r;
             }
         }
 
@@ -150,7 +152,7 @@ namespace Sidi.CommandLine
 
             try
             {
-                parameterValues = parameters.Select(p => GetParameter(p, args)).ToArray();
+                parameterValues = GetValues(args, parameters).ToArray();
             }
             catch (InvalidParameterException ipe)
             {

@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using Sidi.Util;
 
 namespace Sidi.CommandLine
 {
@@ -34,26 +35,26 @@ namespace Sidi.CommandLine
         }
 
         [Usage("Opens the manual")]
-        [Category(Parser.categoryUserInterface)]
+        [Category(Parser.categoryUsage)]
         public void Manual()
         {
             Sidi.CommandLine.Manual.Show(parser);
         }
 
         [Usage("Print usage")]
-        [Category(Parser.categoryUserInterface)]
+        [Category(Parser.categoryUsage)]
         public void Usage()
         {
             parser.ShowUsage();
         }
 
         [Usage("Shows help for all options and actions that match pattern")]
-        [Category(Parser.categoryUserInterface)]
-        public void Help(Regex pattern = null)
+        [Category(Parser.categoryUsage)]
+        public void Help(RegexIgnoreCase pattern = null)
         {
             if (pattern == null)
             {
-                pattern = new Regex(String.Empty);
+                pattern = new RegexIgnoreCase(String.Empty);
             }
 
             parser.WriteUsageByCategory(
@@ -63,5 +64,4 @@ namespace Sidi.CommandLine
                 );
         }
     }
-
 }

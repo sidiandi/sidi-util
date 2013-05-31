@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
+using Sidi.IO;
 
 namespace Sidi.Util
 {
@@ -158,6 +159,14 @@ namespace Sidi.Util
                             break;
                     }
                 }
+            }
+        }
+
+        public static string[] FromFile(LPath file)
+        {
+            using (var r = LFile.StreamReader(file))
+            {
+                return new Tokenizer(r).Tokens.ToArray();
             }
         }
     }

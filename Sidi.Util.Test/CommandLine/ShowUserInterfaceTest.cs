@@ -64,7 +64,7 @@ namespace Sidi.CommandLine.Test
         {
             var a = new Sidi.CommandLine.Test.ParserTest.TestAppWithStringList();
             var p = new Parser(a);
-            new ShowUserInterface(p).UserInterface();
+            new ShowUserInterface(p).GraphicalUserInterface();
         }
 
         public class TestLog

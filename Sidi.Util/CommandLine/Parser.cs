@@ -111,6 +111,7 @@ namespace Sidi.CommandLine
 
         public const string ListTerminator = ";";
         public const string categoryUserInterface = "User Interface";
+        public const string categoryUsage = "Usage";
         
         List<object> m_applications = new List<object>();
         static string[] optionPrefix = new string[] { "--", "-", "/" };
@@ -171,13 +172,13 @@ namespace Sidi.CommandLine
             builtInApplications = new List<object>() { new BasicValueParsers() };
         }
 
-        public static void Run(object application, string[] args)
+        public static int Run(object application, string[] args)
         {
             Parser parser = new Parser(application);
-            parser.Run(args);
+            return parser.Run(args);
         }
 
-        public void Run(string[] args)
+        public int Run(string[] args)
         {
             var parser = this;
             try
@@ -185,17 +186,19 @@ namespace Sidi.CommandLine
                 parser.LoadPreferences();
                 parser.Parse(args);
                 parser.StorePreferences();
+                return 0;
             }
             catch (CommandLineException exception)
             {
                 Console.WriteLine(exception.Message);
                 Console.WriteLine("Type \"{0}\" to get usage information.", parser.ApplicationName);
+                return 1;
             }
             catch (TargetInvocationException exception)
             {
                 log.Error(exception.InnerException);
-                Console.WriteLine();
-                Console.WriteLine("Error: " + exception.InnerException.Message);
+                Console.Error.WriteLine("Error: " + exception.InnerException.Message);
+                return 1;
             }
         }
 
@@ -313,12 +316,12 @@ namespace Sidi.CommandLine
                     if (value != null)
                     {
                         var valueString = value.ToString();
-                        log.DebugFormat("Load persistent option {0} from {1}\\{2}", o, key, valueName);
                         if (o.IsPassword)
                         {
                             valueString = valueString.Decrypt(preferencesPassword);
                         }
                         o.Handle(new string[] { valueString }.ToList(), true);
+                        log.DebugFormat("Loaded persistent option {0} from {1}\\{2}", o, key, valueName);
                     }
                 }
                 catch (Exception ex)
@@ -365,6 +368,11 @@ namespace Sidi.CommandLine
             }
         }
 
+        public static IEnumerable<string> GetNameParts(Type type)
+        {
+            return type.FullName.Split('.');
+        }
+
         /// <summary>
         /// The registry key for an option is HKEY_CURRENT_USER\Software\[Company]\[Product]\[Full application class name]
         /// </summary>
@@ -372,7 +380,12 @@ namespace Sidi.CommandLine
         /// <returns></returns>
         public string GetPreferencesKey(Option o)
         {
-            return GetPreferencesKey(o.Application.GetType());
+            IEnumerable<string> parts = new[] { PreferencesKey };
+
+            parts = parts.Concat(GetNameParts(MainApplication.GetType()));
+            parts = parts.Concat(GetNameParts(o.Application.GetType()));
+
+            return CatReg(parts.ToArray());
         }
 
         string CatReg(params string[] parts)
@@ -591,14 +604,21 @@ found:
 
         public object ParseValue(IList<string> args, Type type)
         {
-            var vp = GetValueParser(type);
-            if (vp == null)
+            try
             {
-                var value = ParseValueBuiltIn(args[0], type);
-                args.RemoveAt(0);
-                return value;
+                var vp = GetValueParser(type);
+                if (vp == null)
+                {
+                    var value = ParseValueBuiltIn(args[0], type);
+                    args.RemoveAt(0);
+                    return value;
+                }
+                return vp.Handle(args, this.execute);
             }
-            return vp.Handle(args, this.execute);
+            catch (Exception ex)
+            {
+                throw new CommandLineException(String.Format("Cannot interpret argument(s) \"{0}\" as value of type {1}", args.Join(" "), type));
+            }
         }
         
         public static object ParseValueBuiltIn(string stringRepresentation, Type type)

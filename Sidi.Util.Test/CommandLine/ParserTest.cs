@@ -705,5 +705,27 @@ namespace Sidi.CommandLine.Test
             }
             Assert.AreEqual(1, args.Count);
         }
+
+        public class DefaultParameterTest
+        {
+            [Usage("Say Hello")]
+            public void Hello(string name = "A")
+            {
+                this.Name = name;
+            }
+
+            public string Name { get; private set; }
+        }
+
+        [Test]
+        public void DefaultParameters()
+        {
+            var t = new DefaultParameterTest();
+            Parser.Run(t, new[] { "Hello", "B" });
+            Assert.AreEqual("B", t.Name);
+
+            Parser.Run(t, new[] { "Hello" });
+            Assert.AreEqual("A", t.Name);
+        }
     }
 }

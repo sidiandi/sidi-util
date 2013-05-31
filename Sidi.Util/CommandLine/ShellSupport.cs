@@ -12,6 +12,7 @@ namespace Sidi.CommandLine
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [Usage("Exit interactive shell")]
+        [System.ComponentModel.Category(Parser.categoryUserInterface)]
         public void Exit()
         {
             mustExit = true;
