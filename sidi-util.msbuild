@@ -104,7 +104,8 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   <Target Name="Release" DependsOnTargets="CreateVersion;Build;UnitTest" />
 
   <Target Name="NugetPack" DependsOnTargets="GetVersion" >
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(NuSpec) -Version $(Version) -Verbose -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
+    <!-- <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(NuSpec) -Version $(Version) -Verbose -Symbols -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" /> -->
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(NuSpec) -Version $(Version) -Verbose -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
   </Target>
 
   <Target Name="NugetPush" DependsOnTargets="Release;NugetPack">
