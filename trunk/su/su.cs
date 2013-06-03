@@ -77,7 +77,7 @@ using Sidi.Extensions;
         [SubCommand]
         public Backup Backup;
 
-        [TestFixture]
+        [TestFixture, Explicit]
         public class Test
         {
             [Test]
