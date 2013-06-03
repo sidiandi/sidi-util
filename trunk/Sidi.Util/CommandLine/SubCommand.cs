@@ -134,6 +134,7 @@ namespace Sidi.CommandLine
                     new ShowUserInterface(parser),
                     new ShowWebServer(parser)
                 });
+            parser.Applications.Add(new LogOptions());
 
             log.InfoFormat("{0}", this);
             if (args.Any())
