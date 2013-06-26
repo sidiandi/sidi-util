@@ -186,6 +186,11 @@ namespace Sidi.CommandLine
             }
         }
 
+        public PersistentAttribute GetPersistentAttribute()
+        {
+            return MemberInfo.GetCustomAttribute<PersistentAttribute>();
+        }
+
         public bool IsPassword
         {
             get

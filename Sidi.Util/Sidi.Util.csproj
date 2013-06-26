@@ -125,6 +125,7 @@
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
+    <Compile Include="Extensions\ReflectionExtension.cs" />
     <Compile Include="Forms\ChooseDialog.cs">
       <SubType>Form</SubType>
     </Compile>

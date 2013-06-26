@@ -60,7 +60,10 @@ namespace Sidi.CommandLine
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class PersistentAttribute : System.Attribute
     {
-        public bool Global { get; private set; }
+        /// <summary>
+        /// If set to true, the setting is stored once for all applications that use it.
+        /// </summary>
+        public bool Global { get; set; }
     }
 
     /// <summary>

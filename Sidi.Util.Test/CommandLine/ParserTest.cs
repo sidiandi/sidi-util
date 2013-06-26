@@ -471,6 +471,9 @@ namespace Sidi.CommandLine.Test
 
             [SubCommand]
             public PreferencesTestApplication Test;
+
+            [Usage("Global option"), Persistent(Global = true)]
+            public string GlobalOption;
         }
 
         [Test]
@@ -484,6 +487,7 @@ namespace Sidi.CommandLine.Test
 
             a.Name = "Donald";
             a.Password = "Secret";
+            a.GlobalOption = "Global";
 
             p.StorePreferences();
 
@@ -497,6 +501,13 @@ namespace Sidi.CommandLine.Test
             pb.LoadPreferences();
             Assert.AreEqual(a.Name, b.Name);
             Assert.AreEqual(a.Password, b.Password);
+            Assert.AreEqual(a.GlobalOption, b.GlobalOption);
+
+            var globalOption = (Option) pb.LookupParserItem("GlobalOption");
+            log.Info(pb.GetPreferencesKey(globalOption));
+
+            var localOption = (Option)pb.LookupParserItem("Name");
+            log.Info(pb.GetPreferencesKey(localOption));
         }
 
         [Test]
@@ -727,5 +738,6 @@ namespace Sidi.CommandLine.Test
             Parser.Run(t, new[] { "Hello" });
             Assert.AreEqual("A", t.Name);
         }
+
     }
 }

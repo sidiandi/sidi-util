@@ -381,8 +381,10 @@ namespace Sidi.CommandLine
         public string GetPreferencesKey(Option o)
         {
             IEnumerable<string> parts = new[] { PreferencesKey };
-
-            parts = parts.Concat(GetNameParts(MainApplication.GetType()));
+            if (!o.GetPersistentAttribute().Global)
+            {
+                parts = parts.Concat(GetNameParts(MainApplication.GetType()));
+            }
             parts = parts.Concat(GetNameParts(o.Application.GetType()));
 
             return CatReg(parts.ToArray());
