@@ -306,11 +306,17 @@ namespace Sidi.CommandLine
         [SuppressMessage("Microsoft.Design", "CA1031")]
         public void LoadPreferences()
         {
+            LoadPreferences(MainApplication);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031")]
+        public void LoadPreferences(object mainApplication)
+        {
             foreach (var o in Options.Where(x => x.IsPersistent))
             {
                 try
                 {
-                    var key = GetPreferencesKey(o);
+                    var key = GetPreferencesKey(o, mainApplication);
                     var valueName = o.Name;
                     var value = Registry.GetValue(key, valueName, null);
                     if (value != null)
@@ -339,6 +345,11 @@ namespace Sidi.CommandLine
 
         public void StorePreferences()
         {
+            StorePreferences(this.MainApplication);
+        }
+
+        public void StorePreferences(object mainApplication)
+        {
             foreach (var o in Options.Where(x => x.IsPersistent))
             {
                 var value = o.GetValue();
@@ -352,7 +363,7 @@ namespace Sidi.CommandLine
 
                     if (valueString != null)
                     {
-                        var key = GetPreferencesKey(o);
+                        var key = GetPreferencesKey(o, mainApplication);
                         var valueName = o.Name;
                         log.DebugFormat("Store persistent option {0} = {1} in {2}\\{3}", o.Name, o.DisplayValue, key, valueName);
                         Registry.SetValue(key, valueName, valueString);
@@ -364,7 +375,7 @@ namespace Sidi.CommandLine
             {
                 var p = new Parser();
                 p.Applications.Add(s.CommandInstance);
-                p.StorePreferences();
+                p.StorePreferences(mainApplication);
             }
         }
 
@@ -373,17 +384,22 @@ namespace Sidi.CommandLine
             return type.FullName.Split('.');
         }
 
+        public string GetPreferencesKey(Option o)
+        {
+            return GetPreferencesKey(o, MainApplication);
+        }
+
         /// <summary>
         /// The registry key for an option is HKEY_CURRENT_USER\Software\[Company]\[Product]\[Full application class name]
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
-        public string GetPreferencesKey(Option o)
+        public string GetPreferencesKey(Option o, object mainApplication)
         {
             IEnumerable<string> parts = new[] { PreferencesKey };
             if (!o.GetPersistentAttribute().Global)
             {
-                parts = parts.Concat(GetNameParts(MainApplication.GetType()));
+                parts = parts.Concat(GetNameParts(mainApplication.GetType()));
             }
             parts = parts.Concat(GetNameParts(o.Application.GetType()));
 
@@ -719,7 +735,14 @@ found:
                     {
                         if ((i is FieldInfo || i is PropertyInfo))
                         {
-                            yield return new SubCommand(application, i);
+                            var subCommand = new SubCommand(application, i);
+                            if (subCommand.IsInstanciated)
+                            {
+                                var p = new Parser();
+                                p.Applications.Add(subCommand.CommandInstance);
+                                p.LoadPreferences(this.MainApplication);
+                            }
+                            yield return subCommand;
                         }
                     }
                     else

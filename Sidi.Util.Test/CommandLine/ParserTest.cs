@@ -453,6 +453,16 @@ namespace Sidi.CommandLine.Test
             Assert.AreNotEqual(a.Current, b.Current);
         }
 
+        [Usage("options")]
+        public class SomeOptions
+        {
+            [Usage("user"), Persistent]
+            public string User;
+
+            [Usage("global"), Persistent(Global = true)]
+            public string GlobalOption;
+        }
+
         [Usage("Tests preferences")]
         public class PreferencesTestApplication
         {
@@ -472,6 +482,9 @@ namespace Sidi.CommandLine.Test
             [SubCommand]
             public PreferencesTestApplication Test;
 
+            [SubCommand]
+            public SomeOptions Options = new SomeOptions();
+
             [Usage("Global option"), Persistent(Global = true)]
             public string GlobalOption;
         }
@@ -488,6 +501,8 @@ namespace Sidi.CommandLine.Test
             a.Name = "Donald";
             a.Password = "Secret";
             a.GlobalOption = "Global";
+            a.Options.User = "User";
+            a.Options.GlobalOption = "global";
 
             p.StorePreferences();
 
@@ -502,12 +517,20 @@ namespace Sidi.CommandLine.Test
             Assert.AreEqual(a.Name, b.Name);
             Assert.AreEqual(a.Password, b.Password);
             Assert.AreEqual(a.GlobalOption, b.GlobalOption);
+            Assert.AreEqual(a.Options.User, b.Options.User);
+            Assert.AreEqual(a.Options.GlobalOption, b.Options.GlobalOption);
 
             var globalOption = (Option) pb.LookupParserItem("GlobalOption");
             log.Info(pb.GetPreferencesKey(globalOption));
 
             var localOption = (Option)pb.LookupParserItem("Name");
             log.Info(pb.GetPreferencesKey(localOption));
+
+            var c = new SomeOptions();
+            var pc = new Parser(c);
+            pc.LoadPreferences();
+            Assert.AreEqual(a.Options.GlobalOption, c.GlobalOption);
+            Assert.AreNotEqual(a.Options.User, c.User);
         }
 
         [Test]

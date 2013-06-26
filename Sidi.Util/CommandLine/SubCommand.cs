@@ -172,31 +172,47 @@ namespace Sidi.CommandLine
             }
         }
 
+        void Instanciate()
+        {
+            object instance = null;
+            if (MemberInfo is FieldInfo)
+            {
+                var fi = (FieldInfo)MemberInfo;
+                instance = Activator.CreateInstance(fi.FieldType);
+                fi.SetValue(Application, instance);
+            }
+            else if (MemberInfo is PropertyInfo)
+            {
+                var pi = (PropertyInfo)MemberInfo;
+                instance = Activator.CreateInstance(pi.PropertyType);
+                pi.SetValue(Application, instance, new object[] { });
+            }
+        }
+
+        public object ProvideCommandInstance()
+        {
+            var o = CommandInstance;
+            if (o == null)
+            {
+                throw new Exception();
+            }
+            return o;
+        }
+
         public object CommandInstance
         {
             get
             {
-                var i = GetValue();
-                if (i == null)
+                var instance = GetValue();
+                if (instance == null)
                 {
-                    if (MemberInfo is FieldInfo)
-                    {
-                        var fi = (FieldInfo)MemberInfo;
-                        i = Activator.CreateInstance(fi.FieldType);
-                        fi.SetValue(Application, i);
-                    }
-                    else if (MemberInfo is PropertyInfo)
-                    {
-                        var pi = (PropertyInfo)MemberInfo;
-                        i = Activator.CreateInstance(pi.PropertyType);
-
-                        pi.SetValue(Application, i, new object[] { });
-                    }
-
-                    new Parser(i).LoadPreferences();
+                    Instanciate();
+                    return CommandInstance;
                 }
-
-                return i;
+                else
+                {
+                    return instance;
+                }
             }
         }
 
