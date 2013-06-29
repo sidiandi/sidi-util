@@ -94,7 +94,7 @@ namespace Sidi.CommandLine
 
                     if (!(Application is LogOptions))
                     {
-                        _parser.Applications.Add(new LogOptions());
+                        _parser.Applications.Add(new LogOptions(_parser));
                     }
                 }
                 return _parser;
