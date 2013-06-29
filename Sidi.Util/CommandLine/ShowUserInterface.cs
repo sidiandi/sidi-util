@@ -309,6 +309,7 @@ namespace Sidi.CommandLine
                 paramInput.PasswordChar = '*';
             }
             paramInput.Tag = option;
+            paramInput.Text = option.GetValue().SafeToString();
             paramInput.TextChanged += new EventHandler(paramInput_Leave);
             paramsPanel.Controls.Add(paramInput, 1, row);
 
@@ -367,6 +368,7 @@ namespace Sidi.CommandLine
                     item.Application is ShowHelp ||
                     item.Application is ShowUserInterface ||
                     item.Application is ShowWebServer ||
+                    item.Application is LogOptions ||
                     false));
         }
 
@@ -548,6 +550,8 @@ namespace Sidi.CommandLine
         {
             c.BackColor = errorColor;
             tooltip.SetToolTip(c, message);
+            tooltip.ShowAlways = true;
+            tooltip.Show(message, c);
         }
 
         public static void ClearError(Control c)

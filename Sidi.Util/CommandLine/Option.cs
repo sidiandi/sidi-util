@@ -133,7 +133,7 @@ namespace Sidi.CommandLine
                 FieldInfo fi = (FieldInfo)MemberInfo;
                 object v = parser.ParseValue(args, fi.FieldType);
                 if (execute) fi.SetValue(Application, v);
-                log.InfoFormat("Option {0} = {1}", fi.Name, DisplayValue);
+                log.DebugFormat("Option {0} = {1}", fi.Name, DisplayValue);
                 return null;
             }
             else if (MemberInfo is PropertyInfo)
@@ -141,7 +141,7 @@ namespace Sidi.CommandLine
                 PropertyInfo pi = (PropertyInfo)MemberInfo;
                 object v = parser.ParseValue(args, pi.PropertyType);
                 if (execute) pi.SetValue(Application, v, new object[] { });
-                log.InfoFormat("Option {0} = {1}", pi.Name, DisplayValue);
+                log.DebugFormat("Option {0} = {1}", pi.Name, DisplayValue);
                 return null;
             }
             else

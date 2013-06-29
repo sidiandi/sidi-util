@@ -41,11 +41,11 @@ namespace Sidi.CommandLine
             Sidi.CommandLine.Manual.Show(parser);
         }
 
-        [Usage("Print usage")]
+        [Usage("Print detailed usage message")]
         [Category(Parser.categoryUsage)]
         public void Usage()
         {
-            parser.ShowUsage();
+            parser.WriteUsage(Console.Out);
         }
 
         [Usage("Shows help for all options and actions that match pattern")]

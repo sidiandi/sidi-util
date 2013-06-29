@@ -160,6 +160,8 @@ namespace Sidi.CommandLine.Test
             var usage = StringExtensions.ToString(x => p.WriteUsage(x));
             log.Info(usage);
             Assert.IsTrue(usage.Contains("SayHello"));
+
+            Assert.IsTrue(p.Info.StartsWith("TestApp - App usage"));
         }
 
         [Test]
@@ -783,6 +785,16 @@ namespace Sidi.CommandLine.Test
             var p = new Parser(new MyApp());
             p.Run(new string[] { });
             Assert.AreEqual("INFO", p.LogOptions.LogLevel.ToString());
+        }
+
+        [Test]
+        public void LogOptions()
+        {
+            var p = new Parser(new MyApp());
+            p.LogOptions.LogFile = true;
+            Assert.AreEqual(true, p.LogOptions.LogFile);
+            p.LogOptions.LogFile = false;
+            Assert.AreEqual(false, p.LogOptions.LogFile);
         }
     }
 }

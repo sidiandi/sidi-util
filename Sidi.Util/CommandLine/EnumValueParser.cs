@@ -50,7 +50,7 @@ namespace Sidi.CommandLine
 
         public object Handle(IList<string> args, bool execute)
         {
-            return Enum.Parse(type, args.PopHead());
+            return Enum.Parse(type, args.PopHead(), true);
         }
     }
 }

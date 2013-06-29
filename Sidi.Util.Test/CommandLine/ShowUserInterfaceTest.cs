@@ -32,7 +32,7 @@ namespace Sidi.CommandLine.Test
         public void UserInterface()
         {
             var p = ParserTest.ParserWithAllTestApps();
-            p.Parse(new string[] { "ui" });
+            p.Parse(new string[] { "gui" });
         }
 
         [Test, Explicit("UI")]

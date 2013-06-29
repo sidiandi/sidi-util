@@ -111,6 +111,7 @@ namespace Sidi.CommandLine
 
         public const string ListTerminator = ";";
         public const string categoryUserInterface = "User Interface";
+        public const string categoryLogging = "Logging";
         public const string categoryUsage = "Usage";
         
         List<object> m_applications = new List<object>();
@@ -174,7 +175,7 @@ namespace Sidi.CommandLine
         {
             Applications.Add(new ShowUserInterface(this));
             Applications.Add(new ShowHelp(this));
-            LogOptions = new LogOptions();
+            LogOptions = new LogOptions(this);
             Applications.Add(LogOptions);
             Applications.Add(new ShowWebServer(this));
         }
@@ -340,6 +341,7 @@ namespace Sidi.CommandLine
                 {
                     var key = GetPreferencesKey(o);
                     var valueName = o.Name;
+                    log.DebugFormat("Load persistent option {0} from {1}\\{2}", o, key, valueName);
                     var value = Registry.GetValue(key, valueName, null);
                     if (value != null)
                     {
@@ -349,7 +351,6 @@ namespace Sidi.CommandLine
                             valueString = valueString.Decrypt(preferencesPassword);
                         }
                         o.Handle(new string[] { valueString }.ToList(), true);
-                        log.DebugFormat("Loaded persistent option {0} from {1}\\{2}", o, key, valueName);
                     }
 
                     foreach (var s in SubCommands)
@@ -831,7 +832,7 @@ found:
                 {
                     return a.GetName().Name;
                 }
-                return MainApplication.GetType().Name;
+                return StartupApplication.GetType().Name;
             }
         }
 
@@ -864,7 +865,7 @@ found:
         {
             get
             {
-                var app = Applications.Last();
+                var app = StartupApplication;
                 var appType = app.GetType();
 
                 using (var i = new StringWriter())
@@ -872,7 +873,7 @@ found:
                     i.WriteLine(
                     String.Format("{0} - {1}",
                         ApplicationName,
-                        Usage.Get(app.GetType()))
+                        Usage.Get(appType))
                     );
 
                     Assembly assembly = appType.Assembly;
@@ -899,7 +900,7 @@ found:
         /// </summary>
         public void ShowUsage()
         {
-            WriteUsage(Console.Out);
+            WriteUsageShort(Console.Out);
         }
 
         static string indent = "  ";
@@ -925,8 +926,27 @@ found:
         {
             w.WriteLine(Info);
             w.WriteLine();
-            w.WriteLine(String.Format("Usage: {0} command [parameters] command [parameters] ...", ApplicationName));
+            w.WriteLine(String.Format("Syntax: {0} command [parameters] command [parameters] ...", ApplicationName));
+            w.WriteLine("All commands can be abbreviated, as long as they are distinct. Example: ShowFile can be abbreviated as sf");
             WriteUsageByCategory(w, Items);
+        }
+
+        /// <summary>
+        /// Writes usage information to a TextWriter
+        /// </summary>
+        /// <param name="w">Receives the usage message.</param>
+        public void WriteUsageShort(TextWriter w)
+        {
+            w.WriteLine(Info);
+            w.WriteLine();
+            w.WriteLine(String.Format("Syntax: {0} command [parameters] command [parameters] ...", ApplicationName));
+            WriteUsageByCategory(w, Items.Where(x => IncludeInShortUsage(x)));
+        }
+
+        static bool IncludeInShortUsage(IParserItem item)
+        {
+            return !item.Application.GetType().Namespace.StartsWith("Sidi.CommandLine") ||
+                item.Name.Equals("Usage");
         }
 
         public IList<KeyValuePair<string, IList<IParserItem>>>
