@@ -945,7 +945,7 @@ found:
 
         static bool IncludeInShortUsage(IParserItem item)
         {
-            return !item.Application.GetType().Namespace.StartsWith("Sidi.CommandLine") ||
+            return !item.Application.GetType().Namespace.Equals("Sidi.CommandLine") ||
                 item.Name.Equals("Usage");
         }
 
