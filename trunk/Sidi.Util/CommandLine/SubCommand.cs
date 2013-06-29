@@ -31,16 +31,82 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SubCommand(object application, MemberInfo memberInfo)
+        bool loadPreferencesOnInstanciation = false;
+        Parser parentParser;
+        Parser _parser;
+
+        public SubCommand(Parser parent, object application, MemberInfo memberInfo)
         {
+            parentParser = parent;
             Application = application;
             MemberInfo = memberInfo;
         }
 
-        public object Application { get; private set; }
+        public void LoadPreferences()
+        {
+            var c = GetValue();
+            if (c != null)
+            {
+                Parser.LoadPreferences();
+            }
+            else
+            {
+                loadPreferencesOnInstanciation = true;
+            }
+        }
+
+        public void StorePreferences()
+        {
+            if (GetValue() != null)
+            {
+                Parser.StorePreferences();
+            }
+        }
+
+        Parser Parser
+        {
+            get
+            {
+                var app = CommandInstance;
+
+                if (_parser == null)
+                {
+                    _parser = new Parser() { Parent = parentParser };
+                    _parser.Applications.AddRange(new object[]
+                    {
+                        CommandInstance,
+                    });
+
+                    if (!(Application is ShowHelp))
+                    {
+                        _parser.Applications.Add(new ShowHelp(_parser));
+                    }
+
+                    if (!(Application is ShowUserInterface))
+                    {
+                        _parser.Applications.Add(new ShowUserInterface(_parser));
+                    }
+
+                    if (!(Application is ShowWebServer))
+                    {
+                        _parser.Applications.Add(new ShowWebServer(_parser));
+                    }
+
+                    if (!(Application is LogOptions))
+                    {
+                        _parser.Applications.Add(new LogOptions());
+                    }
+                }
+                return _parser;
+            }
+        }
+
+        public object Application { get; set; }
+
         public MemberInfo MemberInfo { get; private set; }
 
         public string Name { get { return MemberInfo.Name; } }
+        
         public string Usage
         {
             get
@@ -77,7 +143,22 @@ namespace Sidi.CommandLine
             }
         }
 
-        public object GetValue()
+        public string UsageText
+        {
+            get
+            {
+                string indent = "  ";
+                return String.Format(
+                    Parser.CultureInfo,
+                    @"{0}
+{1}",
+                    Syntax,
+                    Usage.Indent(indent)
+                    );
+            }
+        }
+
+        object GetValue()
         {
             MemberInfo i = MemberInfo;
             if (i.MemberType == MemberTypes.Field)
@@ -93,7 +174,7 @@ namespace Sidi.CommandLine
             throw new InvalidDataException(i.MemberType.ToString());
         }
 
-        public Type Type
+        Type Type
         {
             get
             {
@@ -126,16 +207,6 @@ namespace Sidi.CommandLine
 
         public object Handle(IList<string> args, bool execute)
         {
-            var parser = new Parser();
-            parser.Applications.AddRange(new object[]
-                {
-                    CommandInstance,
-                    new ShowHelp(parser),
-                    new ShowUserInterface(parser),
-                    new ShowWebServer(parser)
-                });
-            parser.Applications.Add(new LogOptions());
-
             log.InfoFormat("{0}", this);
             if (args.Any())
             {
@@ -149,107 +220,95 @@ namespace Sidi.CommandLine
 
                     if (execute)
                     {
-                        parser.ParseSingleCommand(args);
+                        Parser.ParseSingleCommand(args);
                     }
                     else
                     {
-                        parser.CheckSingleCommand(args);
+                        Parser.CheckSingleCommand(args);
                     }
                 }
             }
             else
             {
-                parser.ShowUsage();
+                Parser.ShowUsage();
             }
             return null;
         }
 
-        public bool IsInstanciated
-        {
-            get
-            {
-                return GetValue() != null;
-            }
-        }
-
+        /*
         void Instanciate()
         {
-            object instance = null;
+            _CommandInstance = null;
             if (MemberInfo is FieldInfo)
             {
                 var fi = (FieldInfo)MemberInfo;
-                instance = Activator.CreateInstance(fi.FieldType);
-                fi.SetValue(Application, instance);
+                _CommandInstance = Activator.CreateInstance(fi.FieldType);
+                fi.SetValue(Application, _CommandInstance);
             }
             else if (MemberInfo is PropertyInfo)
             {
                 var pi = (PropertyInfo)MemberInfo;
-                instance = Activator.CreateInstance(pi.PropertyType);
-                pi.SetValue(Application, instance, new object[] { });
+                _CommandInstance = Activator.CreateInstance(pi.PropertyType);
+                pi.SetValue(Application, _CommandInstance, new object[] { });
             }
-        }
 
-        public object ProvideCommandInstance()
-        {
-            var o = CommandInstance;
-            if (o == null)
+            if (loadPreferencesOnInstanciation)
             {
-                throw new Exception();
+                LoadPreferences();
             }
-            return o;
         }
+        */
 
         public object CommandInstance
         {
             get
             {
-                var instance = GetValue();
-                if (instance == null)
+                var ci = GetValue();
+                if (ci != null)
                 {
-                    Instanciate();
-                    return CommandInstance;
+                    return ci;
                 }
-                else
+                
+                // try to instanciate automatically
+                // if value is null and property or field is 
+                // writable
+
+                if (MemberInfo is FieldInfo)
                 {
-                    return instance;
+                    var fi = (FieldInfo)MemberInfo;
+                    ci = Activator.CreateInstance(fi.FieldType);
+                    fi.SetValue(Application, ci);
+                    goto created;
                 }
-            }
-        }
 
-        public string UsageText
-        {
-            get
-            {
-                string indent = "  ";
-                return String.Format(
-                    Parser.CultureInfo,
-                    @"{0}
-{1}",
-                    Syntax,
-                    Usage.Indent(indent)
-                    );
-            }
-        }
+                if (MemberInfo is PropertyInfo)
+                {
+                    var pi = (PropertyInfo)MemberInfo;
+                    if (pi.CanWrite)
+                    {
+                        ci = Activator.CreateInstance(pi.PropertyType);
+                        pi.SetValue(Application, ci, new object[] { });
+                        log.DebugFormat("Created subcommand {0}.{1}", pi.DeclaringType.FullName, pi.Name);
+                        goto created;
+                    }
+                }
 
-        public bool IsPersistent
-        {
-            get
-            {
-                return MemberInfo.GetCustomAttributes(typeof(PersistentAttribute), true).Any();
-            }
-        }
+                throw new InvalidDataException("CommandInstance cannot be null");
 
-        public bool IsPassword
-        {
-            get
-            {
-                return MemberInfo.GetCustomAttributes(typeof(PasswordAttribute), true).Any();
+                created:
+
+                log.DebugFormat("Created subcommand {0}.{1}", MemberInfo.DeclaringType.FullName, MemberInfo.Name);
+                if (loadPreferencesOnInstanciation)
+                {
+                    LoadPreferences();
+                }
+                return ci;
             }
         }
 
         public static bool IsSubCommand(MemberInfo mi)
         {
-            return mi.GetCustomAttributes(typeof(SubCommandAttribute), true).Any();
+            return mi.GetCustomAttribute<SubCommandAttribute>() != null;
         }
     }
 

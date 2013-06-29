@@ -128,6 +128,15 @@ namespace Sidi.CommandLine.Test
         }
 
         [Test]
+        public void MainApplication()
+        {
+            var app = new TestApp();
+            var p = new Parser(app);
+            Assert.AreEqual(5, p.Applications.Count);
+            Assert.AreEqual(app, p.MainApplication);
+        }
+
+        [Test]
         public void Enum()
         {
             TestApp t = new TestApp();
@@ -701,7 +710,7 @@ namespace Sidi.CommandLine.Test
                 Console.SetOut(w);
                 Parser.Run(new MyApp(), new string[] { "Sub", });
                 Console.SetOut(consoleOut);
-
+                log.Info(w.ToString());
                 Assert.IsTrue(w.ToString().Contains(name));
             }
         }
@@ -762,5 +771,18 @@ namespace Sidi.CommandLine.Test
             Assert.AreEqual("A", t.Name);
         }
 
+        [Test]
+        public void LogLevelIsNotGlobal()
+        {
+            var a = new MyApp();
+            new Parser(a).Run(new string[] { "LogLevel", "ALL" });
+            new Parser(a).Run(new string[] { "LogLevel", "INFO" });
+
+            new Parser(new TestApp()).Run(new string[] { "LogLevel", "ALL" });
+            
+            var p = new Parser(new MyApp());
+            p.Run(new string[] { });
+            Assert.AreEqual("INFO", p.LogOptions.LogLevel.ToString());
+        }
     }
 }

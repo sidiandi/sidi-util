@@ -133,7 +133,22 @@ namespace Sidi.CommandLine
         {
             get
             {
-                return Applications.Last();
+                return Applications.First();
+            }
+        }
+
+        public object StartupApplication
+        {
+            get
+            {
+                if (Parent == null)
+                {
+                    return MainApplication;
+                }
+                else
+                {
+                    return Parent.StartupApplication;
+                }
             }
         }
 
@@ -148,17 +163,23 @@ namespace Sidi.CommandLine
         public Parser(params object[] applications)
         : this()
         {
-            AddDefaultUserInterface();
-            Applications.AddRange(applications);
+            if (applications.Any())
+            {
+                Applications.AddRange(applications);
+                AddDefaultUserInterface();
+            }
         }
 
-        void AddDefaultUserInterface()
+        public void AddDefaultUserInterface()
         {
             Applications.Add(new ShowUserInterface(this));
             Applications.Add(new ShowHelp(this));
-            Applications.Add(new LogOptions());
+            LogOptions = new LogOptions();
+            Applications.Add(LogOptions);
             Applications.Add(new ShowWebServer(this));
         }
+
+        public LogOptions LogOptions { get; private set; }
 
         internal Parser()
         {
@@ -172,12 +193,19 @@ namespace Sidi.CommandLine
             builtInApplications = new List<object>() { new BasicValueParsers() };
         }
 
+        public Parser Parent { get; set; }
+
         public static int Run(object application, string[] args)
         {
             Parser parser = new Parser(application);
             return parser.Run(args);
         }
 
+        /// <summary>
+        /// Loads preferences, executes args, stores preferences
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public int Run(string[] args)
         {
             var parser = this;
@@ -306,17 +334,11 @@ namespace Sidi.CommandLine
         [SuppressMessage("Microsoft.Design", "CA1031")]
         public void LoadPreferences()
         {
-            LoadPreferences(MainApplication);
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1031")]
-        public void LoadPreferences(object mainApplication)
-        {
             foreach (var o in Options.Where(x => x.IsPersistent))
             {
                 try
                 {
-                    var key = GetPreferencesKey(o, mainApplication);
+                    var key = GetPreferencesKey(o);
                     var valueName = o.Name;
                     var value = Registry.GetValue(key, valueName, null);
                     if (value != null)
@@ -328,6 +350,11 @@ namespace Sidi.CommandLine
                         }
                         o.Handle(new string[] { valueString }.ToList(), true);
                         log.DebugFormat("Loaded persistent option {0} from {1}\\{2}", o, key, valueName);
+                    }
+
+                    foreach (var s in SubCommands)
+                    {
+                        s.LoadPreferences();
                     }
                 }
                 catch (Exception ex)
@@ -345,11 +372,6 @@ namespace Sidi.CommandLine
 
         public void StorePreferences()
         {
-            StorePreferences(this.MainApplication);
-        }
-
-        public void StorePreferences(object mainApplication)
-        {
             foreach (var o in Options.Where(x => x.IsPersistent))
             {
                 var value = o.GetValue();
@@ -363,7 +385,7 @@ namespace Sidi.CommandLine
 
                     if (valueString != null)
                     {
-                        var key = GetPreferencesKey(o, mainApplication);
+                        var key = GetPreferencesKey(o);
                         var valueName = o.Name;
                         log.DebugFormat("Store persistent option {0} = {1} in {2}\\{3}", o.Name, o.DisplayValue, key, valueName);
                         Registry.SetValue(key, valueName, valueString);
@@ -371,11 +393,9 @@ namespace Sidi.CommandLine
                 }
             }
 
-            foreach (var s in SubCommands.Where(x => x.IsInstanciated))
+            foreach (var s in SubCommands)
             {
-                var p = new Parser();
-                p.Applications.Add(s.CommandInstance);
-                p.StorePreferences(mainApplication);
+                s.StorePreferences();
             }
         }
 
@@ -386,20 +406,10 @@ namespace Sidi.CommandLine
 
         public string GetPreferencesKey(Option o)
         {
-            return GetPreferencesKey(o, MainApplication);
-        }
-
-        /// <summary>
-        /// The registry key for an option is HKEY_CURRENT_USER\Software\[Company]\[Product]\[Full application class name]
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns></returns>
-        public string GetPreferencesKey(Option o, object mainApplication)
-        {
             IEnumerable<string> parts = new[] { PreferencesKey };
             if (!o.GetPersistentAttribute().Global)
             {
-                parts = parts.Concat(GetNameParts(mainApplication.GetType()));
+                parts = parts.Concat(GetNameParts(StartupApplication.GetType()));
             }
             parts = parts.Concat(GetNameParts(o.Application.GetType()));
 
@@ -409,11 +419,6 @@ namespace Sidi.CommandLine
         string CatReg(params string[] parts)
         {
             return parts.Join(@"\");
-        }
-
-        public string GetPreferencesKey(Type type)
-        {
-            return CatReg(new[] { PreferencesKey }.Concat(type.FullName.Split('.')).ToArray());
         }
 
         T GetAssemblyAttribute<T>(Type t)
@@ -735,13 +740,7 @@ found:
                     {
                         if ((i is FieldInfo || i is PropertyInfo))
                         {
-                            var subCommand = new SubCommand(application, i);
-                            if (subCommand.IsInstanciated)
-                            {
-                                var p = new Parser();
-                                p.Applications.Add(subCommand.CommandInstance);
-                                p.LoadPreferences(this.MainApplication);
-                            }
+                            var subCommand = new SubCommand(this, application, i);
                             yield return subCommand;
                         }
                     }
