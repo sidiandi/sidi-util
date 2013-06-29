@@ -66,8 +66,8 @@ namespace Sidi.CommandLine
     [Serializable]
     public class CommandLineException : Exception
     {
-        public CommandLineException(string reason)
-            : base(reason)
+        public CommandLineException(string reason, Exception innerException = null)
+            : base(reason, innerException)
         {
         }
 
@@ -641,7 +641,7 @@ found:
             }
             catch (Exception ex)
             {
-                throw new CommandLineException(String.Format("Cannot interpret argument(s) \"{0}\" as value of type {1}", args.Join(" "), type));
+                throw new CommandLineException(String.Format("Cannot interpret argument(s) \"{0}\" as value of type {1}", args.Join(" "), type), ex);
             }
         }
         
