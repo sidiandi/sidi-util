@@ -524,12 +524,25 @@ namespace Sidi.CommandLine
     {
         public ShowWebServer(Parser parser)
         {
-            WebServer = new WebServer(parser);
+            this.parser = parser;
         }
+
+        Parser parser;
 
         [Category(Parser.categoryUserInterface)]
         [SubCommand]
-        public WebServer WebServer;
+        public WebServer WebServer
+        {
+            get
+            {
+                if (_WebServer == null)
+                {
+                    _WebServer = new WebServer(parser);
+                }
+                return _WebServer;
+            }
+        }
+        WebServer _WebServer;
 
         private bool disposed = false;
             
