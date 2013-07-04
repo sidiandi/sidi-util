@@ -83,22 +83,20 @@ namespace Sidi.CommandLine
         [Example("in 4 weeks")]
         public static DateTime ParseDateTime(IList<string> args)
         {
-            try
+            DateTime v;
+            if (DateTime.TryParse(args[0], out v))
             {
-                var v = DateTime.Parse(args[0]);
                 args.PopHead();
                 return v;
             }
-            catch
+
+            var tsp = new DateTimeParser();
+            var p = new Parser()
             {
-                var tsp = new DateTimeParser();
-                var p = new Parser()
-                {
-                    Applications = new List<object> { tsp }
-                };
-                p.ParseSingleCommand(args);
-                return tsp.Value;
-            }
+                Applications = new List<object> { tsp }
+            };
+            p.ParseSingleCommand(args);
+            return tsp.Value;
         }
 
         class TimeSpanParser

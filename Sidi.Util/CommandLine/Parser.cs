@@ -718,7 +718,7 @@ found:
                 {
                     if (ValueParser.IsSuitable(i))
                     {
-                        yield return new ValueParser(this, application, i);
+                        // yield return new ValueParser(this, application, i);
                     }
                     else
                     {

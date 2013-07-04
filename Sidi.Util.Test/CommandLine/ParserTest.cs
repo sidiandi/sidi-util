@@ -70,6 +70,11 @@ namespace Sidi.CommandLine.Test
                 }
             }
 
+            [Usage("Test interference with double value parser")]
+            public void Double()
+            {
+            }
+
             [Usage("Say hello to")]
             public void Greet(string name, string greeting, int times)
             {
@@ -134,6 +139,13 @@ namespace Sidi.CommandLine.Test
             var p = new Parser(app);
             Assert.AreEqual(5, p.Applications.Count);
             Assert.AreEqual(app, p.MainApplication);
+        }
+
+        [Test]
+        public void Double()
+        {
+            var p = new Parser(new TestApp());
+            p.Parse(new []{"Do" });
         }
 
         [Test]
