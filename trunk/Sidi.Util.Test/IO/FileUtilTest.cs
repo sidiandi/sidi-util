@@ -23,6 +23,7 @@ using System.Diagnostics;
 using NUnit.Framework;
 using Sidi.IO;
 using System.IO;
+using Sidi.Test;
 #endregion
 
 namespace Sidi.Util

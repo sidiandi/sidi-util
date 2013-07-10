@@ -24,6 +24,7 @@ using System.IO;
 using NUnit.Framework;
 using Sidi.CommandLine;
 using Sidi.Extensions;
+using Sidi.Test;
 
 namespace Sidi.IO
 {

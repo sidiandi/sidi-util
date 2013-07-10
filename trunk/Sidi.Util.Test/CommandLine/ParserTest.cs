@@ -32,6 +32,7 @@ using System.Net;
 using Sidi.IO;
 using Sidi.Extensions;
 using System.IO;
+using Sidi.Test;
 
 namespace Sidi.CommandLine.Test
 {

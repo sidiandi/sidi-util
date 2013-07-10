@@ -22,6 +22,7 @@ using System.Text;
 using NUnit.Framework;
 using System.Diagnostics;
 using Sidi.Extensions;
+using Sidi.Test;
 
 namespace Sidi.Forms
 {

@@ -24,6 +24,7 @@ using System.IO;
 using Sidi.Extensions;
 using Sidi.Forms;
 using System.Diagnostics;
+using Sidi.Test;
 
 namespace Sidi.Util
 {

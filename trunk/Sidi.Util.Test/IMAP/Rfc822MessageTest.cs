@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using NUnit.Framework;
+using Sidi.Test;
 
 namespace Sidi.IMAP
 {

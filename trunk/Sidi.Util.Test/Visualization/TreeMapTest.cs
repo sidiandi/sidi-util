@@ -26,6 +26,7 @@ using System.Drawing;
 using Sidi.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Sidi.Test;
 
 namespace Sidi.Visualization
 {

@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Sidi.Extensions;
+using Sidi.Test;
 
 namespace Sidi.IO
 {

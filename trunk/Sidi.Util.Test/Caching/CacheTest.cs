@@ -23,6 +23,7 @@ using NUnit.Framework;
 using System.Reflection;
 using Sidi.IO;
 using Sidi.Extensions;
+using Sidi.Test;
 
 namespace Sidi.Caching
 {

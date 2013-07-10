@@ -246,7 +246,7 @@
     <Compile Include="Util\Stats.cs" />
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
-    <Compile Include="Util\TestBase.cs" />
+    <Compile Include="Test\TestBase.cs" />
     <Compile Include="Util\TileGeometry.cs" />
     <Compile Include="Util\TimeInterval.cs" />
     <Compile Include="Util\TimeIntervalParser.cs" />
@@ -332,15 +332,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="Microsoft.Office.Core">
-      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>3</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="SHDocVw">
       <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
       <VersionMajor>1</VersionMajor>

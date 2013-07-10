@@ -23,6 +23,7 @@ using System.ComponentModel;
 using NUnit.Framework;
 using Sidi.Util;
 using System.Threading;
+using Sidi.Test;
 
 namespace Sidi.IO
 {

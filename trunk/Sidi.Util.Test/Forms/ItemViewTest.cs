@@ -24,6 +24,7 @@ using NUnit.Framework;
 //Test Specific Imports
 using Sidi.Forms;
 using System.Windows.Forms;
+using Sidi.Test;
 
 namespace Sidi.Forms
 {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using System.IO;
+using Sidi.Test;
 
 namespace Sidi.IO
 {

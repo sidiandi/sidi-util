@@ -30,6 +30,7 @@ using cm = System.ComponentModel;
 using System.IO;
 using Sidi.Util;
 using System.Linq;
+using Sidi.Test;
 
 namespace Sidi.CommandLine.Test
 {
