@@ -80,7 +80,6 @@ namespace Sidi.CommandLine
         [Example("today")]
         [Example("yesterday")]
         [Example("tomorrow")]
-        [Example("in 4 weeks")]
         public static DateTime ParseDateTime(IList<string> args)
         {
             DateTime v;
