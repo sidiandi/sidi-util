@@ -91,11 +91,6 @@ namespace Sidi.CommandLine
                     {
                         _parser.Applications.Add(new ShowWebServer(_parser));
                     }
-
-                    if (!(Application is LogOptions))
-                    {
-                        _parser.Applications.Add(new LogOptions(_parser));
-                    }
                 }
                 return _parser;
             }
