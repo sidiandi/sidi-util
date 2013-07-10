@@ -61,10 +61,7 @@ namespace Sidi.CommandLine
             return new[]
             {
                 dt(a(name(vp.Name), vp.Name)),
-                dd(p(
-                    vp.UsageText, 
-                    If(vp is StandardValueParser, () => new object[]{"See the ", a(href((vp as StandardValueParser).ReferenceUri), vp.Name, " documentation")}))
-                    ),
+                dd(p(vp.UsageText)),
             };
         }
 
