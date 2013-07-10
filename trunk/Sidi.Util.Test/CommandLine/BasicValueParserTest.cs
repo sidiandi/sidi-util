@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Sidi.Extensions;
 using Sidi.Test;
+using System.Net;
 
 namespace Sidi.CommandLine
 {
@@ -44,6 +45,21 @@ namespace Sidi.CommandLine
             var list = (string[])  p.ParseValue(args, typeof(string[]));
             Assert.AreEqual(0, args.Count);
             Assert.AreEqual(3, list.Length);
+        }
+
+        public class SampleApp
+        {
+            [Usage("To demonstrate that IPAddress.Parse is used.")]
+            public IPAddress Address;
+        }
+            
+        [Test]
+        public void StaticParse()
+        {
+            var a = new SampleApp();
+            var ipString = "1.2.3.4";
+            Parser.Run(a, new[]{"Address", ipString});
+            Assert.AreEqual(new IPAddress(new byte[]{1,2,3,4}), a.Address);
         }
     }
 }
