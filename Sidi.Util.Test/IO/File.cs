@@ -22,6 +22,7 @@ using System.Text;
 using System.ComponentModel;
 using NUnit.Framework;
 using Sidi.Util;
+using Sidi.Test;
 
 namespace Sidi.IO
 {

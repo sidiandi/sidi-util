@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using Sidi.Test;
 
 namespace Sidi.Tool
 {

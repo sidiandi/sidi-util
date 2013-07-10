@@ -26,6 +26,7 @@ using NUnit.Framework;
 //Test Specific Imports
 //TODO - Add imports your going to test here
 using Sidi.Util;
+using Sidi.Test;
 
 namespace Sidi.Util
 {

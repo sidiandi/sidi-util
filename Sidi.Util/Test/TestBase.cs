@@ -29,7 +29,7 @@ using log4net.Appender;
 using log4net.Layout;
 using System.IO;
 
-namespace Sidi
+namespace Sidi.Test
 {
     public class TestBase
     {

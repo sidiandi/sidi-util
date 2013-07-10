@@ -29,6 +29,7 @@ using System.Linq;
 using L = Sidi.IO;
 using System.Linq.Expressions;
 using System.Data.SQLite;
+using Sidi.Test;
 
 namespace Sidi.Persistence
 {

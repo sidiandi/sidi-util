@@ -24,6 +24,7 @@ using Sidi.Util;
 using Sidi.IO;
 using System.IO;
 using Sidi.Extensions;
+using Sidi.Test;
 
 namespace Sidi.IMAP
 {

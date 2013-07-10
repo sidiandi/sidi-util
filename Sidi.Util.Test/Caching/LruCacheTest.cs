@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using System.Threading;
+using Sidi.Test;
 
 namespace Sidi.Caching
 {

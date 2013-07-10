@@ -26,6 +26,7 @@ using System.Threading;
 using NUnit.Framework;
 using Sidi.Util;
 using System.Diagnostics;
+using Sidi.Test;
 
 namespace Sidi.Util
 {

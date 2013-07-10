@@ -23,6 +23,7 @@ using NUnit.Framework;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Sidi.IO;
+using Sidi.Test;
 
 namespace Sidi.Build.Test
 {

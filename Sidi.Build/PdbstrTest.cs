@@ -24,6 +24,7 @@ using Sidi.IO;
 using L = Sidi.IO;
 using System.IO;
 using Sidi.Util;
+using Sidi.Test;
 
 namespace Sidi.Build.Test
 {

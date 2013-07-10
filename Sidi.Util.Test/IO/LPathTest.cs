@@ -25,6 +25,7 @@ using System.Xml.Serialization;
 using Sidi.Extensions;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using Sidi.Test;
 
 namespace Sidi.IO
 {

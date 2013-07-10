@@ -28,6 +28,7 @@ using System.IO;
 using System.Data.Common;
 using System.Linq;
 using Sidi.IO;
+using Sidi.Test;
 
 namespace Sidi.Persistence
 {

@@ -23,6 +23,7 @@ using NUnit.Framework;
 using System.IO;
 using Sidi.Util;
 using Sidi.Extensions;
+using Sidi.Test;
 
 namespace Sidi.Util
 {
