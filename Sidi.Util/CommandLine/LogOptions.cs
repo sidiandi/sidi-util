@@ -15,6 +15,8 @@ namespace Sidi.CommandLine
     [Usage("Adjust logging behavior")]
     public class LogOptions
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public LogOptions(Parser parser)
         {
             this.parser = parser;
@@ -75,12 +77,14 @@ namespace Sidi.CommandLine
                 {
                     if (lf == null)
                     {
+                        var exeFileName = Assembly.GetEntryAssembly().LocalPath().FileName;
                         var appType = this.parser.StartupApplication.GetType();
                         var file = Paths.Temp.CatDir(
-                                LPath.GetValidFilename(appType.FullName),
-                                LPath.GetValidFilename(String.Format("{1}_log_{0}.txt", DateTime.Now.ToString("o"), appType.Name)));
+                                "log",
+                                LPath.GetValidFilename(exeFileName),
+                                LPath.GetValidFilename(String.Format("{1}_{0}.txt", DateTime.Now.ToString("o"), exeFileName)));
                         file.EnsureParentDirectoryExists();
-
+                        log.InfoFormat("Log file: {0}", file);                
                         var newLf = new FileAppender()
                         {
                             AppendToFile = false,
