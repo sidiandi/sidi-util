@@ -27,7 +27,7 @@ namespace Sidi.CommandLine
 
         public string Usage
         {
-            get { return String.Format("list of {0}, enclosed with '[' and ']' or terminated with '{0}'", ElementType.Name, Parser.ListTerminator); }
+            get { return String.Format("list of {0}, enclosed with '[' and ']' or terminated with '{2}'", ElementType.Name, Parser.ListTerminator); }
         }
 
         public string UsageText
