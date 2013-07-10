@@ -26,6 +26,7 @@ namespace Sidi.CommandLine
             foreach (var vp in new Parser().AvailableValueParsers)
             {
                 log.Info(vp.UsageText);
+                log.Info(vp.MethodInfo);
                 foreach (var example in vp.Examples)
                 {
                     log.InfoFormat("Parsing {0}", example.Value.Quote());
