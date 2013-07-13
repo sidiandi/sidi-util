@@ -268,7 +268,15 @@ namespace Sidi.CommandLine
             {
                 Applications = new List<object> { valueParser }
             };
-            p.Parse(args);
+            while (args.Any())
+            {
+                if (args.First().Equals(Parser.ListTerminator))
+                {
+                    args.PopHead();
+                    break;
+                }
+                p.ParseSingleCommand(args);
+            }
             return valueParser.Value;
         }
 
