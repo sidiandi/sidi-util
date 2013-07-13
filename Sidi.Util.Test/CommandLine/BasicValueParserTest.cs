@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Sidi.Extensions;
 using Sidi.Test;
 using System.Net;
+using Sidi.Util;
 
 namespace Sidi.CommandLine
 {
@@ -51,6 +52,9 @@ namespace Sidi.CommandLine
         {
             [Usage("To demonstrate that IPAddress.Parse is used.")]
             public IPAddress Address;
+
+            [Usage("Time interval value")]
+            public TimeInterval Time;
         }
             
         [Test]
@@ -60,6 +64,15 @@ namespace Sidi.CommandLine
             var ipString = "1.2.3.4";
             Parser.Run(a, new[]{"Address", ipString});
             Assert.AreEqual(new IPAddress(new byte[]{1,2,3,4}), a.Address);
+        }
+
+        [Test]
+        public void ParseTimeInterval()
+        {
+            var a = new SampleApp();
+            var ipString = "1.2.3.4";
+            Parser.Run(a, new[] { "Time", "begin", "2013-05-01", "end", "2013-05-02", ";", "Address", ipString });
+            Assert.AreEqual(new TimeInterval(new DateTime(2013, 5, 1), new DateTime(2013, 5, 2)), a.Time);
         }
     }
 }
