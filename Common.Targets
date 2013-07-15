@@ -3,9 +3,10 @@
   <PropertyGroup>
     <OutputPath>$(SolutionDir)..\..\build\$(SolutionName)\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
-	<LibDir>$(SolutionDir)lib\</LibDir>
+    <LibDir>$(SolutionDir)lib\</LibDir>
     <NoWarn>1591</NoWarn>
-	</PropertyGroup>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
