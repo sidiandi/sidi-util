@@ -190,12 +190,35 @@ namespace Sidi.IO
             return new System.IO.FileStream(h, access);
         }
 
+        /// <summary>
+        /// Ensures that parent directory exists and opens file for writing
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static System.IO.FileStream OpenWrite(LPath path)
         {
-            return Open(path,
-                System.IO.FileMode.Create,
-                System.IO.FileAccess.ReadWrite,
-                System.IO.FileShare.Read);
+            try
+            {
+                return Open(path,
+                    System.IO.FileMode.Create,
+                    System.IO.FileAccess.ReadWrite,
+                    System.IO.FileShare.Read);
+            }
+            catch (System.IO.IOException ex)
+            {
+                if (!path.Parent.IsDirectory)
+                {
+                    path.EnsureParentDirectoryExists();
+                    return Open(path,
+                        System.IO.FileMode.Create,
+                        System.IO.FileAccess.ReadWrite,
+                        System.IO.FileShare.Read);
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         public static System.IO.FileStream OpenRead(LPath path)
