@@ -56,11 +56,19 @@ namespace Sidi.Test
 
         protected Sidi.IO.LPath TestFile(Sidi.IO.LPath relPath)
         {
-            var testFile = 
+            var testFile =
                 Paths.BinDir
                 .Parent
                 .CatDir("test", relPath);
             return testFile;
+        }
+
+        protected Sidi.IO.LPath NewTestFile(Sidi.IO.LPath relPath)
+        {
+            var tf = TestFile(relPath);
+            tf.EnsureNotExists();
+            tf.EnsureParentDirectoryExists();
+            return tf;
         }
     }
 }

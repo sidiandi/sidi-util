@@ -136,15 +136,74 @@ namespace Sidi.IO
             return new System.IO.FileStream(h, access);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        public static System.IO.FileStream Open(
+            LPath path, 
+            System.IO.FileMode fileMode, 
+            System.IO.FileAccess fileAccess,
+            System.IO.FileShare shareMode)
+        {
+            var lpSecurityAttributes = IntPtr.Zero;
+            var creationDisposition = System.IO.FileMode.Open;
+            var flagsAndAttributes = System.IO.FileAttributes.Normal;
+            var hTemplateFile = IntPtr.Zero;
+            var access = System.IO.FileAccess.Read;
+
+            switch (fileMode)
+            {
+                case System.IO.FileMode.Create:
+                    fileAccess = System.IO.FileAccess.Write;
+                    creationDisposition = System.IO.FileMode.Create;
+                    access = System.IO.FileAccess.ReadWrite;
+                    break;
+                case System.IO.FileMode.Open:
+                    fileAccess = System.IO.FileAccess.Read;
+                    creationDisposition = System.IO.FileMode.Open;
+                    access = System.IO.FileAccess.Read;
+                    break;
+                default:
+                    throw new NotImplementedException(fileMode.ToString());
+            }
+
+            SafeFileHandle h;
+            try
+            {
+                h = NativeMethods.CreateFile(
+                    path.Param,
+                    fileAccess,
+                    shareMode,
+                    lpSecurityAttributes,
+                    creationDisposition,
+                    flagsAndAttributes,
+                    hTemplateFile);
+
+                if (h.IsInvalid)
+                {
+                    throw new Win32Exception();
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
+            }
+
+            return new System.IO.FileStream(h, access);
+        }
+
         public static System.IO.FileStream OpenWrite(LPath path)
         {
-            path.EnsureParentDirectoryExists();
-            return Open(path, System.IO.FileMode.Create);
+            return Open(path,
+                System.IO.FileMode.Create,
+                System.IO.FileAccess.ReadWrite,
+                System.IO.FileShare.Read);
         }
 
         public static System.IO.FileStream OpenRead(LPath path)
         {
-            return Open(path, System.IO.FileMode.Open);
+            return Open(path,
+                System.IO.FileMode.Open,
+                System.IO.FileAccess.Read,
+                System.IO.FileShare.ReadWrite);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]

@@ -205,6 +205,29 @@ namespace Sidi.IO
             }
 
             [Test]
+            public void Reopen()
+            {
+                var random = new Random();
+                var relPath = new LPath(Enumerable.Range(0, 100)
+                    .Select(x => random.String(10)));
+                var rootDir = TestFile("opentest");
+                rootDir.EnsureNotExists();
+                var f = rootDir.CatDir(relPath);
+                var text = "Hello, world!";
+                using (var w = f.WriteText())
+                {
+                    w.WriteLine(text);
+                    w.Flush();
+                    using (var r = f.ReadText())
+                    {
+                        Assert.AreEqual(text, r.ReadLine());
+                    }
+                }
+                f.EnsureNotExists();
+                log.Info(f);
+            }
+
+            [Test]
             public void CannotDelete()
             {
                 var p = TestFile("delete_me");
