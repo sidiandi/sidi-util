@@ -924,5 +924,26 @@ namespace Sidi.IO
                 return sb.ToString();
             }
         }
+
+        public System.IO.StreamWriter WriteText()
+        {
+            return new System.IO.StreamWriter(OpenWrite());
+        }
+
+        public System.IO.StreamReader ReadText()
+        {
+            return new System.IO.StreamReader(OpenRead());
+        }
+
+        public System.IO.Stream OpenWrite()
+        {
+            EnsureParentDirectoryExists();
+            return LFile.OpenWrite(this); 
+        }
+
+        public System.IO.Stream OpenRead()
+        {
+            return LFile.OpenRead(this);
+        }
     }
 }
