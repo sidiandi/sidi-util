@@ -204,7 +204,7 @@ namespace Sidi.IO
                     System.IO.FileAccess.ReadWrite,
                     System.IO.FileShare.Read);
             }
-            catch (System.IO.IOException ex)
+            catch (System.IO.IOException)
             {
                 if (!path.Parent.IsDirectory)
                 {
