@@ -951,9 +951,12 @@ namespace Sidi.IO
             return new System.IO.StreamReader(OpenRead());
         }
 
+        /// <summary>
+        /// Ensures that parent directory exists and opens file for writing
+        /// </summary>
+        /// <returns></returns>
         public System.IO.Stream OpenWrite()
         {
-            EnsureParentDirectoryExists();
             return LFile.OpenWrite(this); 
         }
 
