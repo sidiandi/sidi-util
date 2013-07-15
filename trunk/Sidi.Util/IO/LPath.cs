@@ -788,6 +788,22 @@ namespace Sidi.IO
             }
         }
 
+        public void EnsureFileNotExists()
+        {
+            if (IsFile)
+            {
+                LFile.Delete(this);
+            }
+            if (Exists)
+            {
+                throw new Exception("Cannot delete {0}".F(this));
+            }
+        }
+
+        /// <summary>
+        /// Ensures that this path does not exist. Warning: will delete the whole directory tree if
+        /// path points to a directory.
+        /// </summary>
         public void EnsureNotExists()
         {
             var ln = this;

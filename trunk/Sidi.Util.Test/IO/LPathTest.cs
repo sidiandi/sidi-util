@@ -247,6 +247,23 @@ namespace Sidi.IO
         }
 
         [Test]
+        public void EnsureNotExists()
+        {
+            var tf = NewTestFile("file-to-delete");
+            LFile.WriteAllText(tf, "hello");
+            tf.EnsureFileNotExists();
+            Assert.IsFalse(tf.Exists);
+        }
+
+        [Test, ExpectedException]
+        public void EnsureNotExistsCannotDeleteDirectory()
+        {
+            var tf = NewTestFile("directory-to-delete");
+            tf.EnsureDirectoryExists();
+            tf.EnsureFileNotExists();
+        }
+
+        [Test]
         public void UniqueFileName()
         {
             var p = TestFile("someFile.jpg");
