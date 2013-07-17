@@ -5,7 +5,7 @@ using System.Text;
 using Excel = Microsoft.Office.Interop.Excel;
 using Sidi.Util;
 
-namespace Sidi.Extension
+namespace Sidi.Extensions
 {
     public static class ListFormatOfficeExtension
     {
