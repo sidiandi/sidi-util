@@ -24,6 +24,7 @@ using System.ComponentModel;
 
 namespace Sidi.IO
 {
+    [Serializable]
     public class LFileSystemInfo : IEquatable<LFileSystemInfo>
     {
         public LFileSystemInfo(LPath path)
@@ -173,7 +174,7 @@ namespace Sidi.IO
         { 
             get
             {
-                return ToDateTime(FindData.ftCreationTime);
+                return FindData.ftCreationTime.DateTime;
             }
         }
 
@@ -181,7 +182,7 @@ namespace Sidi.IO
         {
             get
             {
-                return ToDateTimeUtc(FindData.ftCreationTime);
+                return FindData.ftCreationTime.DateTimeUtc;
             }
         }
         
@@ -204,40 +205,24 @@ namespace Sidi.IO
         public DateTime LastAccessTime
         {
             get
-        {
-            return ToDateTime(FindData.ftLastAccessTime);
-        }
+            {
+                return FindData.ftLastAccessTime.DateTime;
+            }
         }
 
         public DateTime LastAccessTimeUtc
         {
             get
             {
-                return ToDateTime(FindData.ftLastAccessTime);
+                return FindData.ftLastAccessTime.DateTimeUtc;
             }
-        }
-
-        public static DateTime ToDateTime(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
-        {
-            ulong h = (uint)fileTime.dwHighDateTime;
-            h <<= 32;
-            ulong l = (uint)fileTime.dwLowDateTime;
-            return DateTime.FromFileTime((long)(h | l));
-        }
-
-        public static DateTime ToDateTimeUtc(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
-        {
-            ulong h = (uint) fileTime.dwHighDateTime;
-            h <<= 32;
-            ulong l = (uint)fileTime.dwLowDateTime;
-            return DateTime.FromFileTimeUtc((long)(h | l));
         }
 
         public DateTime LastWriteTime
         { 
             get
             {
-                return ToDateTime(FindData.ftLastWriteTime);
+                return FindData.ftLastWriteTime.DateTime;
             }
         }
 
@@ -245,7 +230,7 @@ namespace Sidi.IO
         {
             get
             {
-                return ToDateTimeUtc(FindData.ftLastWriteTime);
+                return FindData.ftLastWriteTime.DateTimeUtc;
             }
         }
 

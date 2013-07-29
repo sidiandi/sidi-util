@@ -159,6 +159,18 @@ namespace Sidi.Visualization
             }
         }
 
+        public IEnumerable<Tree> GetLineageAtMouse()
+        {
+            var layout = this.GetLayoutAt(PointToClient(Control.MousePosition));
+            if (layout != null)
+            {
+                foreach (var i in layout.Up.Cast<Sidi.Visualization.Layout>())
+                {
+                    yield return i.Tree;
+                }
+            }
+        }
+
         Layout GetLayoutAt(Point p)
         {
             if (LayoutManager == null)

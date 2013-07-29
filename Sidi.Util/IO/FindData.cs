@@ -25,12 +25,51 @@ using System.Runtime.InteropServices;
 namespace Sidi.IO
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [Serializable]
     internal struct FindData
     {
+        // Summary:
+        //     Represents the number of 100-nanosecond intervals since January 1, 1601.
+        //     This structure is a 64-bit value.
+        [Serializable]
+        internal struct FILETIME
+        {
+            //
+            // Summary:
+            //     Specifies the low 32 bits of the FILETIME.
+            public uint dwLowDateTime;
+
+            // Summary:
+            //     Specifies the high 32 bits of the FILETIME.
+            public uint dwHighDateTime;
+
+            public DateTime DateTime
+            {
+                get
+                {
+                    ulong h = dwHighDateTime;
+                    h <<= 32;
+                    ulong l = dwLowDateTime;
+                    return DateTime.FromFileTime((long)(h | l));
+                }
+            }
+
+            public DateTime DateTimeUtc
+            {
+                get
+                {
+                    ulong h = dwHighDateTime;
+                    h <<= 32;
+                    ulong l = dwLowDateTime;
+                    return DateTime.FromFileTimeUtc((long)(h | l));
+                }
+            }
+        }
+
         internal System.IO.FileAttributes Attributes;
-        internal ComTypes.FILETIME ftCreationTime;
-        internal ComTypes.FILETIME ftLastAccessTime;
-        internal ComTypes.FILETIME ftLastWriteTime;
+        internal FILETIME ftCreationTime;
+        internal FILETIME ftLastAccessTime;
+        internal FILETIME ftLastWriteTime;
         internal int nFileSizeHigh;
         internal int nFileSizeLow;
         internal int dwReserved0;

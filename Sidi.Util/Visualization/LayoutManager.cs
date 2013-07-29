@@ -333,45 +333,29 @@ namespace Sidi.Visualization
         static LayoutContext[] Split2(LayoutContext c)
         {
             var splitDim = c.Bounds.Width > c.Bounds.Height ? Dimension.X : Dimension.Y;
-            double totalSize = 0;
-            var accumulatedSize = c.Layout.Select(x => { totalSize += x.Tree.Size; return totalSize; }).ToArray();
-            var error = accumulatedSize.Select(x => Math.Abs(x - totalSize / 2)).ToArray();
 
-            var minError = Double.MaxValue;
-            int splitIndex = 0;
-            for (; splitIndex < error.Length; ++splitIndex)
-            {
-                if (error[splitIndex] < minError)
-                {
-                    minError = error[splitIndex];
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            // split at splitindex
-            var size0 = accumulatedSize[splitIndex - 1];
-            var splitX = c.Bounds[splitDim, Bound.Min] + c.Bounds.Extent(splitDim) * size0 / totalSize;
+            var p = c.Layout.Split(x => x.Tree.Size);
+            var splitX = c.Bounds[splitDim, Bound.Min] + c.Bounds.Extent(splitDim) * p[0].Sum / (p[0].Sum + p[1].Sum);
 
             var r = new LayoutContext[]
             {
                 new LayoutContext()
                 {
-                    Bounds = Split(c.Bounds, splitDim, splitX, 1),
-                    Layout = SubArray(c.Layout, 0, splitIndex)
+                    Bounds = Split(c.Bounds, splitDim, splitX, 0),
+                    Layout = p[0].Items,
                 },
                 new LayoutContext()
                 {
-                    Bounds = Split(c.Bounds, splitDim, splitX, 0),
-                    Layout = SubArray(c.Layout, splitIndex, c.Layout.Length)
+                    Bounds = Split(c.Bounds, splitDim, splitX, 1),
+                    Layout = p[1].Items
                 }
             };
 
-            //log.InfoFormat("{0} {1}", size0, r[0].Layout.Sum(x => x.Tree.Size));
-            //log.Info(r.Select(x => x.Bounds.Area / x.Layout.Sum(j => j.Tree.Size) ).Join(", "));
-            //log.Info(r.Select(x => x.Bounds).Join(", "));
+            /*
+            log.InfoFormat("{0} {1}", p[0].Sum, r[0].Layout.Sum(x => x.Tree.Size));
+            log.Info(r.Select(x => x.Bounds.Area / x.Layout.Sum(j => j.Tree.Size) ).Join(", "));
+            log.Info(r.Select(x => x.Bounds).Join(", "));
+            */
 
             return r;
         }
@@ -379,7 +363,7 @@ namespace Sidi.Visualization
         static Bounds Split(Bounds b, Dimension dim, double x, int part)
         {
             var r = new Bounds(b.P0.X, b.P0.Y, b.P1.X, b.P1.Y);
-            r[dim, part == 0 ? Bound.Min : Bound.Max] = x;
+            r[dim, part == 1 ? Bound.Min : Bound.Max] = x;
             return r;
         }
 

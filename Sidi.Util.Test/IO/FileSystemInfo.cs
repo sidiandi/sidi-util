@@ -23,6 +23,8 @@ using NUnit.Framework;
 using Sidi.Util;
 using Sidi.Extensions;
 using Sidi.Test;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Sidi.IO
 {
@@ -79,5 +81,29 @@ namespace Sidi.IO
             log.Info(testFile.Info.FileIndex);
             Assert.AreEqual(testFile.Info.FileIndex, testFile1.Info.FileIndex);
         }
+
+        static T TestSerialization<T>(T x)
+        {
+            var b = new BinaryFormatter();
+            var m = new MemoryStream();
+            b.Serialize(m, x);
+            m.Seek(0, SeekOrigin.Begin);
+            var x1 = (T) b.Deserialize(m);
+            Assert.AreEqual(x, x1);
+            return x1;
+        }
+
+        [Test]
+        public void Serialize()
+        {
+            var info = TestFile("dir.txt").Info;
+            var infoSerialized = TestSerialization(info);
+            var t0 = info.LastWriteTime;
+            var t1 = infoSerialized.LastWriteTime;
+            Assert.AreEqual(t0, t1);
+            log.Debug(t0);
+        }
+
+
     }
 }

@@ -176,6 +176,7 @@
     <Compile Include="Visualization\SimpleTreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTestData.cs" />
+    <Compile Include="Visualization\UtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
