@@ -2,8 +2,8 @@
 <Project ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <OutputPath>$(SolutionDir)..\..\build\$(SolutionName)\$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)\</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)..\..\build\$(SolutionName)\$(Configuration)-$(Platform)</OutputPath>
+    <IntermediateOutputPath>$(TEMP)\build\$(AssemblyName)\obj\$(Configuration)-$(Platform)\</IntermediateOutputPath>
     <LibDir>$(SolutionDir)lib\</LibDir>
     <NoWarn>1591</NoWarn>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
