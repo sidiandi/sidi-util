@@ -91,7 +91,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
   <Target Name="Build" DependsOnTargets="GetVersion">
     <MSBuild
-        Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=AnyCPU">
+        Projects="$(ProjectName).sln" Properties="Configuration=Release;Platform=Any CPU">
       <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
   </Target>
