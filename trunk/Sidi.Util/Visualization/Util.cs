@@ -19,11 +19,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sidi.Extensions;
 
 namespace Sidi.Visualization
 {
-    static class Util
+    public static class Util
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static byte ClipByte(double x)
         {
             return (byte)Math.Max(0, Math.Min(byte.MaxValue, x));
@@ -46,6 +49,57 @@ namespace Sidi.Visualization
                 }
             }
             return i1;
+        }
+
+        public class SplitPart<T>
+        {
+            public T[] Items;
+            public double Sum;
+        }
+        
+        /// <summary>
+        /// Returns an position index to split scalars
+        /// so that the two lists have approximately same sums
+        /// </summary>
+        /// <param name="scalars"></param>
+        /// <returns></returns>
+        public static SplitPart<T>[] Split<T>(this IEnumerable<T> list, Func<T, double> scalar)
+        {
+            double totalSize = 0.0;
+            var items = list.ToList();
+            // array of accumulated scalars
+            var accumulated = items.Select(x => { totalSize += scalar(x); return totalSize; }).ToArray();
+            double halfSize = totalSize * 0.5;
+            
+            // search to find minimum error
+            int i = 1;
+            var e0 = halfSize;
+            for (; i < (accumulated.Length - 1); ++i)
+            {
+                var e = Math.Abs(accumulated[i] - halfSize);
+                if (e < e0)
+                {
+                    e0 = e;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return new []
+            {
+                new SplitPart<T>()
+                {
+                    Items = items.Take(i).ToArray(),
+                    Sum = accumulated[i-1],
+                },
+                new SplitPart<T>()
+                {
+                    Items = items.Skip(i).ToArray(),
+                    Sum = accumulated[accumulated.Length-1] - accumulated[i-1]
+                }
+            };
         }
     }
 }

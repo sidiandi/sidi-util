@@ -56,15 +56,8 @@ namespace Sidi.Caching
                     var b = new BinaryFormatter();
                     using (var stream = LFile.OpenRead(path))
                     {
-                        var cacheContent= b.Deserialize(stream);
-                        if (cacheContent is Exception)
-                        {
-                            throw (Exception) cacheContent;
-                        }
-                        else
-                        {
-                            return (T)cacheContent;
-                        }
+                        var cacheContent = b.Deserialize(stream);
+                        return cacheContent;
                     }
                 },
                 (path, t) =>
@@ -81,24 +74,46 @@ namespace Sidi.Caching
                 });
         }
 
+        /// <summary>
+        /// Returns if the cacheEntry is valid for key
+        /// </summary>
+        /// <param name="cacheEntry"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool IsValid(LPath cacheEntry, object key)
+        {
+            if (!Valid(cacheEntry, key))
+            {
+                return false;
+            }
+
+            return (DateTime.UtcNow - cacheEntry.Info.LastWriteTimeUtc) < MaxAge;
+        }
+
+        public static Func<LPath, object, bool> Valid = (p, k) => true;
+
         public T GetCached<T>(object key, Func<T> provider, Func<LPath, object> reader, Action<LPath, object> writer)
         {
             var p = CachePath(key);
-            if (p.Exists && (DateTime.UtcNow - p.Info.LastWriteTimeUtc) < MaxAge)
+            if (p.IsFile && IsValid(p, key))
             {
                 log.InfoFormat("Cache hit: {0} = {1}", key, p);
-                var cachedValue = reader(p);
-                if (cachedValue is Exception)
+                object cachedValue = null;
+                try
                 {
-                    if (RememberExceptions)
-                    {
-                        throw (Exception)cachedValue;
-                    }
+                    cachedValue = reader(p);
                 }
-                else
+                catch (Exception ex)
                 {
-                    return (T)cachedValue;
+                    log.Warn(key, ex);
                 }
+
+                if (cachedValue is Exception && RememberExceptions)
+                {
+                    throw (Exception)cachedValue;
+                }
+
+                return (T)cachedValue;
             }
 
             {
@@ -126,7 +141,7 @@ namespace Sidi.Caching
                 (cachePath) => cachePath,
                 (cachePath, path) => LFile.CopyOrHardLink((LPath)path, cachePath));
         }
-        
+
         public void Clear()
         {
             storeDirectory.EnsureNotExists();
@@ -148,8 +163,8 @@ namespace Sidi.Caching
             return storeDirectory.CatDir(Digest(key));
         }
 
-        static SHA1 sha = new SHA1CryptoServiceProvider(); 
-        
+        static SHA1 sha = new SHA1CryptoServiceProvider();
+
         public static string Digest(object x)
         {
             if (x is MethodBase)

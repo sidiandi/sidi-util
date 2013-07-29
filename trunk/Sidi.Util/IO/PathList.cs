@@ -26,6 +26,7 @@ using System.Collections;
 
 namespace Sidi.IO
 {
+    [Serializable]
     public class PathList : List<LPath>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

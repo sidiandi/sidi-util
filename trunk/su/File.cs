@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Sidi.Forms;
 using System.Data;
 using Sidi.IO;
+using System.Reflection;
 
 namespace Sidi.Tool
 {
@@ -239,13 +240,29 @@ namespace Sidi.Tool
         [Usage("Show a directory as a cushion tree map")]
         public void TreeMap(PathList files)
         {
-            var items = Find.AllFiles(files);
+            var cache = Sidi.Caching.Cache.Local(MethodBase.GetCurrentMethod());
+            cache.MaxAge = TimeSpan.FromDays(1);
+            var items = cache.GetCached(files, () => Find.AllFiles(files).ToList());
+
             var c = items.CreateTreeMap();
             c.GetLineage = i => i.FullName.Parts;
             c.GetSize = i => i.Length;
-            c.SetPercentileColorScale(i => i.LastWriteTime, ColorScale.GreenYellowRed);
+            c.SetPercentileColorScale(i => i.LastWriteTime, ColorScale.BlueRed);
             c.GetText = i => i.Name;
             c.Activate = i => Process.Start(i.FullName);
+            c.ContextMenuStrip.Opening += (s, e) =>
+                {
+                    var strip = c.ContextMenuStrip;
+                    foreach (var tree in c.GetLineageAtMouse())
+                    {
+                        strip.Items.Add(
+                            String.Format("Open {0}", tree.SafeToString()), null, (s1, e1) =>
+                            {
+                                var p = LPath.Join(tree.Lineage.Select(x => (string)x).ToArray());
+                                Process.Start(p);
+                            });
+                    }
+                };
 
             c.RunFullScreen();
         }

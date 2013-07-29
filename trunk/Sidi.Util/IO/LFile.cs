@@ -472,9 +472,7 @@ namespace Sidi.IO
             {
                 if (d1.Length == d2.Length)
                 {
-                    var d = LFileSystemInfo.ToDateTimeUtc(d1.ftLastWriteTime) -
-                        LFileSystemInfo.ToDateTimeUtc(d2.ftLastWriteTime);
-
+                    var d = d1.ftLastWriteTime.DateTimeUtc - d2.ftLastWriteTime.DateTimeUtc;
                     return Math.Abs(d.TotalSeconds) <= maxTimeDifference.TotalSeconds;
                 }
                 else

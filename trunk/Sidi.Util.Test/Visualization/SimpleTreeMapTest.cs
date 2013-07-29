@@ -108,7 +108,6 @@ namespace Sidi.Visualization
                 GetText = x => x.FileName,
             };
 
-            // tm.SetPercentileColorScale(i => i.Info.LastWriteTime, Sidi.Visualization.ColorScale.GreenYellowRed());
             tm.SetPercentileColorScale(i => i.Info.LastWriteTime, Sidi.Visualization.ColorScale.GetColorScale(256, Color.Gray, Color.Red));
 
             tm.RunFullScreen();
