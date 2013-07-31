@@ -42,7 +42,7 @@ namespace Sidi.Build
                 string[] searchPath = new string[]
                 {
                     L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Windows Kits\8.0\Debuggers\x86"),
-                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows (x86)"),
+                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Debugging Tools for Windows (x86)"),
                     L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows")
                 };
 
