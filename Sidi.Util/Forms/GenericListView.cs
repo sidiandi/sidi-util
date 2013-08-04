@@ -45,7 +45,10 @@ namespace Sidi.Forms
                 Text = x.Name,
                 Width = -1,
             }).ToArray());
-            this.Columns[Columns.Count - 1].Width = -2;
+            if (Columns.Count > 0)
+            {
+                this.Columns[Columns.Count - 1].Width = -2;
+            }
             this.VirtualListSize = Items.Count;
             this.VirtualMode = true;
             this.FullRowSelect = true;
