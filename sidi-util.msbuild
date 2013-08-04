@@ -34,7 +34,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <NUnitBin>$(RootDir)\packages\NUnit.Runners.2.6.2\tools</NUnitBin>
     <NUnitConsole>$(NUnitBin)\nunit-console.exe</NUnitConsole>
     <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
-    <OutputDir>$(OutputRoot)\Release</OutputDir>
+    <OutputDir>$(OutputRoot)\Release-AnyCPU</OutputDir>
     <TestDir>$(OutputRoot)\test</TestDir>
     <PackageDir>$(OutputRoot)\pack</PackageDir>
     <StageDir>$(OutputRoot)\stage</StageDir>
