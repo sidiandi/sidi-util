@@ -269,8 +269,9 @@ namespace Sidi.Tool
             public void Run()
             {
                 var root = TestFile("Backup-Root");
-
                 root.EnsureNotExists();
+                Assert.IsFalse(root.Exists);
+
                 Backup b = new Backup();
                 b.Store = root;
                 b.Create();
@@ -287,7 +288,7 @@ namespace Sidi.Tool
                 b.Full();
                 b.Full();
 
-                // root.EnsureNotExists();
+                root.EnsureNotExists();
             }
         }
     }
