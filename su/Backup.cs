@@ -268,7 +268,7 @@ namespace Sidi.Tool
             [Test]
             public void Run()
             {
-                var root = Sidi.IO.Paths.BinDir.CatDir(@"test\Backup-Root");
+                var root = TestFile("Backup-Root");
 
                 root.EnsureNotExists();
                 Backup b = new Backup();
