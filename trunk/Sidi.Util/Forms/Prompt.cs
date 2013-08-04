@@ -161,6 +161,8 @@ namespace Sidi.Forms
 
         public static T ChooseOne<T>(ListFormat<T> list, string title = null)
         {
+            list.DefaultColumns();
+
             using (var d = new ChooseDialog())
             {
                 if (title != null)
@@ -185,6 +187,7 @@ namespace Sidi.Forms
         {
             using (var d = new ChooseDialog())
             {
+                list.DefaultColumns();
                 d.Text = title == null ? "Choose Many" : title;
 
                 d.Objects = list.Data.Cast<object>();

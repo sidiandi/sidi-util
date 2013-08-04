@@ -64,6 +64,14 @@ namespace Sidi.Forms
         }
 
         [Test, Explicit("interactive")]
+        public void ChooseManyEmptyList()
+        {
+            var lf = new string[] { };
+            var selected = Prompt.ChooseMany(lf.ListFormat());
+            Assert.IsTrue(selected.Count == 0);
+        }
+
+        [Test, Explicit("interactive")]
         public void Activate()
         {
             var lf = Process.GetProcesses()
