@@ -38,7 +38,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public object Application
+        public Application Application
         {
             get { return null; }
         }

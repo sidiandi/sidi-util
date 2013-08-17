@@ -16,7 +16,7 @@ namespace Sidi.CommandLine
 
     public class ValueParser : IValueParser
     {
-        public ValueParser(Parser parser, object application, MethodInfo method)
+        public ValueParser(Parser parser, Application application, MethodInfo method)
         {
             Application = application;
             MethodInfo = method;
@@ -37,7 +37,7 @@ namespace Sidi.CommandLine
         // must be like static bool Parse(string stringRepresentation, out <Type> result)
         public MethodInfo MethodInfo { private set; get; }
 
-        public object Application { private set; get; }
+        public Application Application { private set; get; }
 
         public string Usage
         {

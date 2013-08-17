@@ -31,7 +31,7 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Option(Parser parser, object application, MemberInfo memberInfo)
+        public Option(Parser parser, Application application, MemberInfo memberInfo)
         {
             Application = application;
             MemberInfo = memberInfo;
@@ -41,7 +41,7 @@ namespace Sidi.CommandLine
 
         Parser parser;
 
-        public object Application { get; private set; }
+        public Application Application { get; private set; }
         public MemberInfo MemberInfo { get; private set; }
 
         public string Name { get { return MemberInfo.Name; } }

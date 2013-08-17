@@ -45,7 +45,7 @@ namespace Sidi.CommandLine
             get { return String.Format("'[' {0} {0} ... ']'", ElementType.Name, ElementType.Name); }
         }
 
-        public object Application
+        public Application Application
         {
             get { throw new NotImplementedException(); }
         }

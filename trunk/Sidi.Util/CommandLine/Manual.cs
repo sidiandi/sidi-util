@@ -110,7 +110,7 @@ namespace Sidi.CommandLine
                             h2(a(name(subCommand.Name), "Subcommand ", subCommand.Name)),
                             CommandList(new Parser
                                 {
-                                    Applications = { subCommand.CommandInstance }
+                                    Applications = { subCommand.CommandApplication }
                                 })
                         }),
                     h2("Value Syntax"),

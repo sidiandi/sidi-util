@@ -139,7 +139,7 @@ namespace Sidi.CommandLine.Test
             var app = new TestApp();
             var p = new Parser(app);
             Assert.AreEqual(5, p.Applications.Count);
-            Assert.AreEqual(app, p.MainApplication);
+            Assert.AreEqual(app, p.MainApplication.Instance);
         }
 
         [Test]
