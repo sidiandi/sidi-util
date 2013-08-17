@@ -35,7 +35,7 @@ namespace Sidi.CommandLine
         Parser parentParser;
         Parser _parser;
 
-        public SubCommand(Parser parent, object application, MemberInfo memberInfo)
+        public SubCommand(Parser parent, Application application, MemberInfo memberInfo)
         {
             parentParser = parent;
             Application = application;
@@ -63,33 +63,41 @@ namespace Sidi.CommandLine
             }
         }
 
+        public Application CommandApplication
+        {
+            get
+            {
+                if (_CommandApplication == null)
+                {
+                    _CommandApplication = new Application(CommandInstance);
+                }
+                return _CommandApplication;
+            }
+        }
+        Application _CommandApplication;
+
         Parser Parser
         {
             get
             {
-                var app = CommandInstance;
-
                 if (_parser == null)
                 {
                     _parser = new Parser() { Parent = parentParser };
-                    _parser.Applications.AddRange(new object[]
-                    {
-                        CommandInstance,
-                    });
+                    _parser.Applications.Add(CommandApplication);
 
                     if (!(Application is ShowHelp))
                     {
-                        _parser.Applications.Add(new ShowHelp(_parser));
+                        _parser.Applications.Add(new Application(new ShowHelp(_parser)));
                     }
 
                     if (!(Application is ShowUserInterface))
                     {
-                        _parser.Applications.Add(new ShowUserInterface(_parser));
+                        _parser.Applications.Add(new Application(new ShowUserInterface(_parser)));
                     }
 
                     if (!(Application is ShowWebServer))
                     {
-                        _parser.Applications.Add(new ShowWebServer(_parser));
+                        _parser.Applications.Add(new Application(new ShowWebServer(_parser)));
                     }
 
                     var persistent = MemberInfo.GetCustomAttribute<PersistentAttribute>();
@@ -102,7 +110,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public object Application { get; set; }
+        public Application Application { get; set; }
 
         public MemberInfo MemberInfo { get; private set; }
 

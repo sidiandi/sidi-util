@@ -51,7 +51,7 @@ namespace Sidi.CommandLine
             get { return type.Name; }
         }
 
-        public object Application
+        public Application Application
         {
             get { return null; }
         }

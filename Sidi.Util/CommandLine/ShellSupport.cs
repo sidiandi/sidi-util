@@ -28,7 +28,7 @@ namespace Sidi.CommandLine
             Parsers.Add(parser);
             var p = new Parser();
             p.Applications.AddRange(parser.Applications);
-            p.Applications.Add(this);
+            p.Applications.Add(new Application(this));
 
             for (; ; )
             {

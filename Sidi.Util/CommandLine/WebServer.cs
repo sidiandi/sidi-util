@@ -428,7 +428,7 @@ namespace Sidi.CommandLine
                         cs.Http = c.Http;
                         cs.Base = c.Path(subCommand.Name);
                         cs.Parser = new Parser();
-                        cs.Parser.Applications.Add(subCommand.CommandInstance);
+                        cs.Parser.Applications.Add(subCommand.CommandApplication);
                         cs.RelPath = c.RelPathParts.Skip(1).Join("/");
                         cs.Parent = c;
                         Handle(cs);

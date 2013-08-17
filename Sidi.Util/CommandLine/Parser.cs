@@ -113,24 +113,24 @@ namespace Sidi.CommandLine
         public const string categoryUserInterface = "User Interface";
         public const string categoryLogging = "Logging";
         public const string categoryUsage = "Usage";
-        
-        List<object> m_applications = new List<object>();
+
+        List<Application> m_applications = new List<Application>();
         static string[] optionPrefix = new string[] { "--", "-", "/" };
         static CultureInfo cultureInfo;
 
         public static CultureInfo CultureInfo { get { return cultureInfo; } }
 
-        public List<object> Applications
+        public List<Application> Applications
         {
             get { return m_applications; }
             set { m_applications = value; }
         }
 
-        List<object> builtInApplications;
+        List<Application> builtInApplications;
 
         public List<IParserItem> SubParsers = new List<IParserItem>();
 
-        public object MainApplication
+        public Application MainApplication
         {
             get
             {
@@ -166,18 +166,18 @@ namespace Sidi.CommandLine
         {
             if (applications.Any())
             {
-                Applications.AddRange(applications);
+                Applications.AddRange(applications.Select(x => new Application(x)));
                 AddDefaultUserInterface();
             }
         }
 
         public void AddDefaultUserInterface()
         {
-            Applications.Add(new ShowUserInterface(this));
-            Applications.Add(new ShowHelp(this));
+            Applications.Add(new Application(new ShowUserInterface(this)));
+            Applications.Add(new Application(new ShowHelp(this)));
             LogOptions = new LogOptions(this);
-            Applications.Add(LogOptions);
-            Applications.Add(new ShowWebServer(this));
+            Applications.Add(new Application(LogOptions) { ProgramSpecificPreferences = true });
+            Applications.Add(new Application(new ShowWebServer(this)));
         }
 
         public LogOptions LogOptions { get; private set; }
@@ -191,7 +191,8 @@ namespace Sidi.CommandLine
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
-            builtInApplications = new List<object>() { new BasicValueParsers() };
+            builtInApplications = new object[] { new BasicValueParsers() }
+                .Select(x => new Application(x)).ToList();
         }
 
         public Parser Parent { get; set; }
@@ -414,11 +415,18 @@ namespace Sidi.CommandLine
             if (ApplicationSpecificPreferences != null)
             {
                 applicationSpecific = ApplicationSpecificPreferences.Value;
+                goto done;
             }
-            else
+
+            if (o.Application.ProgramSpecificPreferences != null)
             {
-                applicationSpecific = o.GetPersistentAttribute().ApplicationSpecific;
+                applicationSpecific = o.Application.ProgramSpecificPreferences.Value;
+                goto done;
             }
+
+            applicationSpecific = o.GetPersistentAttribute().ApplicationSpecific;
+            
+            done:
 
             if (applicationSpecific)
             {
@@ -746,54 +754,10 @@ found:
         /// </summary>
         IEnumerable<IParserItem> FindItems()
         {
-            foreach (var s in SubParsers)
-            {
-                yield return s;
-            }
-
-            foreach (var application in Applications.Concat(builtInApplications))
-            {
-                foreach (MethodInfo i in application.GetType().GetMethods())
-                {
-                    if (ValueParser.IsSuitable(i))
-                    {
-                        // yield return new ValueParser(this, application, i);
-                    }
-                    else
-                    {
-                        string u = Usage.Get(i);
-                        string parameters = String.Join(" ", Array.ConvertAll(i.GetParameters(), new Converter<ParameterInfo, string>(delegate(ParameterInfo pi)
-                        {
-                            return String.Format("[{1} {0}]", pi.Name, pi.ParameterType.GetInfo());
-                        })));
-                        if (u != null)
-                        {
-                            yield return new Action(this, application, i);
-                        }
-
-                    }
-                }
-
-                foreach (MemberInfo i in application.GetType().GetMembers())
-                {
-                    if (SubCommand.IsSubCommand(i))
-                    {
-                        if ((i is FieldInfo || i is PropertyInfo))
-                        {
-                            var subCommand = new SubCommand(this, application, i);
-                            yield return subCommand;
-                        }
-                    }
-                    else
-                    {
-                        string u = Usage.Get(i);
-                        if ((i is FieldInfo || i is PropertyInfo) && u != null)
-                        {
-                            yield return new Option(this, application, i);
-                        }
-                    }
-                }
-            }
+            return SubParsers
+                .Concat(
+                    Applications.Concat(builtInApplications)
+                    .SelectMany(x => x.FindItems(this)));
         }
 
         List<ValueParser> availableValueParsers;
@@ -807,12 +771,9 @@ found:
             {
                 if (availableValueParsers == null)
                 {
-                    availableValueParsers = new List<ValueParser>(Applications
-                        .Concat(builtInApplications)
-                        .SelectMany(application => application.GetType().GetMethods()
-                            .Select(x => new { Application = application, Method = x }))
-                        .Where(i => ValueParser.IsSuitable(i.Method))
-                        .Select(i => new ValueParser(this, i.Application, i.Method)));
+                    availableValueParsers = Applications.Concat(builtInApplications)
+                        .SelectMany(a => a.GetValueParsers(this))
+                        .ToList();
                 }
                 return availableValueParsers;
             }
@@ -1132,6 +1093,14 @@ found:
             {
                 Marshal.FreeHGlobal(argv);
             }
+        }
+
+        public static Parser SingleApplication(object instance)
+        {
+            return new Parser()
+            {
+                Applications = new List<Application>(){ new Application(instance) }
+            };
         }
     }
 }
