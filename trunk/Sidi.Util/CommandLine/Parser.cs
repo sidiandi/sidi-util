@@ -405,10 +405,22 @@ namespace Sidi.CommandLine
             return type.FullName.Split('.');
         }
 
+        public bool? ApplicationSpecificPreferences;
+
         public string GetPreferencesKey(Option o)
         {
             IEnumerable<string> parts = new[] { PreferencesKey };
-            if (!o.GetPersistentAttribute().Global)
+            bool applicationSpecific;
+            if (ApplicationSpecificPreferences != null)
+            {
+                applicationSpecific = ApplicationSpecificPreferences.Value;
+            }
+            else
+            {
+                applicationSpecific = o.GetPersistentAttribute().ApplicationSpecific;
+            }
+
+            if (applicationSpecific)
             {
                 parts = parts.Concat(GetNameParts(StartupApplication.GetType()));
             }
@@ -449,7 +461,7 @@ namespace Sidi.CommandLine
                     var applicationType = MainApplication.GetType();
                     var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(applicationType).Company;
                     var product = GetAssemblyAttribute<AssemblyProductAttribute>(applicationType).Product;
-                    k = CatReg(k, company, product);
+                    k = CatReg(k, company, product, Profile);
                     m_PreferencesKey = k;
                 }
                 return m_PreferencesKey;
@@ -461,6 +473,33 @@ namespace Sidi.CommandLine
             }
         }
         string m_PreferencesKey;
+
+        public string Profile
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(m_profile))
+                {
+                    return m_profile;
+                }
+
+                if (this.Parent == null)
+                {
+                    return defaultProfile;
+                }
+                else
+                {
+                    return Parent.Profile;
+                }
+            }
+
+            set
+            {
+                m_profile = value;
+            }
+        }
+        string m_profile;
+        const string defaultProfile = "default";
 
         bool HandleUnknown(IList<string> args)
         {

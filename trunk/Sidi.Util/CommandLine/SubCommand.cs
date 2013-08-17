@@ -91,6 +91,12 @@ namespace Sidi.CommandLine
                     {
                         _parser.Applications.Add(new ShowWebServer(_parser));
                     }
+
+                    var persistent = MemberInfo.GetCustomAttribute<PersistentAttribute>();
+                    if (persistent != null)
+                    {
+                        _parser.ApplicationSpecificPreferences = persistent.ApplicationSpecific;
+                    }
                 }
                 return _parser;
             }
