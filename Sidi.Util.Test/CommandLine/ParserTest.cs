@@ -480,10 +480,10 @@ namespace Sidi.CommandLine.Test
         [Usage("options")]
         public class SomeOptions
         {
-            [Usage("user"), Persistent]
-            public string User;
+            [Usage("user"), Persistent(ApplicationSpecific = true)]
+            public string LocalOption;
 
-            [Usage("global"), Persistent(Global = true)]
+            [Usage("global"), Persistent]
             public string GlobalOption;
         }
 
@@ -508,53 +508,53 @@ namespace Sidi.CommandLine.Test
 
             [SubCommand]
             public SomeOptions Options = new SomeOptions();
+        }
 
-            [Usage("Global option"), Persistent(Global = true)]
-            public string GlobalOption;
+        [Usage("Tests preferences")]
+        public class PreferencesTestApplication2
+        {
+            [SubCommand]
+            public SomeOptions Options = new SomeOptions();
+        }
+
+        [Usage("Tests preferences")]
+        public class PreferencesTestApplication3
+        {
+            [SubCommand, Persistent(ApplicationSpecific=true)]
+            public SomeOptions Options = new SomeOptions();
         }
 
         [Test]
         public void Preferences()
         {
             var a = new PreferencesTestApplication();
-
             var p = new Parser(a);
-
-            log.Info(p.PreferencesKey);
 
             a.Name = "Donald";
             a.Password = "Secret";
-            a.GlobalOption = "Global";
-            a.Options.User = "User";
-            a.Options.GlobalOption = "global";
+            a.Options.LocalOption = "User";
+            a.Options.GlobalOption = "Global";
 
             p.StorePreferences();
 
-            var b = new PreferencesTestApplication();
-
+            var b = new PreferencesTestApplication2();
             var pb = new Parser(b);
-
-            var k = pb.GetPreferencesKey(pb.Options.First());
-            log.Info(k);
-
             pb.LoadPreferences();
-            Assert.AreEqual(a.Name, b.Name);
-            Assert.AreEqual(a.Password, b.Password);
-            Assert.AreEqual(a.GlobalOption, b.GlobalOption);
-            Assert.AreEqual(a.Options.User, b.Options.User);
+            Assert.AreNotEqual(a.Options.LocalOption, b.Options.LocalOption);
             Assert.AreEqual(a.Options.GlobalOption, b.Options.GlobalOption);
 
-            var globalOption = (Option) pb.LookupParserItem("GlobalOption");
-            log.Info(pb.GetPreferencesKey(globalOption));
-
-            var localOption = (Option)pb.LookupParserItem("Name");
-            log.Info(pb.GetPreferencesKey(localOption));
-
-            var c = new SomeOptions();
+            var c = new PreferencesTestApplication3();
             var pc = new Parser(c);
             pc.LoadPreferences();
-            Assert.AreEqual(a.Options.GlobalOption, c.GlobalOption);
-            Assert.AreNotEqual(a.Options.User, c.User);
+            Assert.AreNotEqual(a.Options.LocalOption, c.Options.LocalOption);
+            Assert.AreNotEqual(a.Options.GlobalOption, c.Options.GlobalOption);
+
+            var d = new PreferencesTestApplication2();
+            var pd = new Parser(c);
+            pd.Profile = "new-profile";
+            pd.LoadPreferences();
+            Assert.AreNotEqual(a.Options.LocalOption, c.Options.LocalOption);
+            Assert.AreNotEqual(a.Options.GlobalOption, c.Options.GlobalOption);
         }
 
         [Test]

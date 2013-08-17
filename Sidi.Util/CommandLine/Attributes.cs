@@ -61,9 +61,10 @@ namespace Sidi.CommandLine
     public class PersistentAttribute : System.Attribute
     {
         /// <summary>
-        /// If set to true, the setting is stored once for all applications that use it.
+        /// If set to true, the setting is stored separately for every
+        /// executable file that is using this setting
         /// </summary>
-        public bool Global { get; set; }
+        public bool ApplicationSpecific { get; set; }
     }
 
     /// <summary>
