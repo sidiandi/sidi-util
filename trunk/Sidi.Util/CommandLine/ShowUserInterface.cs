@@ -353,7 +353,7 @@ namespace Sidi.CommandLine
 
             button.Click += new EventHandler((s, e) =>
             {
-                var p = new Parser(subcommand.CommandInstance);
+                var p = new Parser(subcommand.CommandApplication.Instance);
                 var subCommandDialog = ToDialog(p);
                 subCommandDialog.ShowDialog();
             });
@@ -464,7 +464,7 @@ namespace Sidi.CommandLine
             foreach (var subCommand in parser.SubCommands.Where(x => !ExcludedFromUi(x)))
             {
                 var scPage = new TabPage(subCommand.Name);
-                var scControl = ToTabControl(new Parser(subCommand.CommandInstance));
+                var scControl = ToTabControl(new Parser(subCommand.CommandApplication.Instance));
                 scControl.Dock = DockStyle.Fill;
                 scPage.Controls.Add(scControl);
                 t.TabPages.Add(scPage);

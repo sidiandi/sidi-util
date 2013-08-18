@@ -217,7 +217,7 @@ namespace Sidi.CommandLine
 
             link.Click += new EventHandler((s, e) =>
             {
-                var p = new Parser(subcommand.CommandInstance);
+                var p = new Parser(subcommand.CommandApplication.Instance);
                 var subCommandDialog = ToDialog(p);
                 subCommandDialog.ShowDialog();
             });
@@ -360,7 +360,7 @@ namespace Sidi.CommandLine
                     Padding = new Padding(8),
                 };
 
-                var c = ToControl(new Parser(subCommand.CommandInstance));
+                var c = ToControl(new Parser(subCommand.CommandApplication.Instance));
                 page.Controls.Add(c);
                 t.TabPages.Add(page);
             }

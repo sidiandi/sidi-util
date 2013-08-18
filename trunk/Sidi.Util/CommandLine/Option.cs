@@ -77,12 +77,12 @@ namespace Sidi.CommandLine
             if (i.MemberType == MemberTypes.Field)
             {
                 FieldInfo fieldInfo = (FieldInfo)i;
-                return fieldInfo.GetValue(Application);
+                return fieldInfo.GetValue(Application.Instance);
             }
             else if (i.MemberType == MemberTypes.Property)
             {
                 PropertyInfo propertyInfo = (PropertyInfo)i;
-                return propertyInfo.GetValue(Application, new object[] { });
+                return propertyInfo.GetValue(Application.Instance, new object[] { });
             }
             throw new InvalidDataException(i.MemberType.ToString());
         }
@@ -132,7 +132,7 @@ namespace Sidi.CommandLine
             {
                 FieldInfo fi = (FieldInfo)MemberInfo;
                 object v = parser.ParseValue(args, fi.FieldType);
-                if (execute) fi.SetValue(Application, v);
+                if (execute) fi.SetValue(Application.Instance, v);
                 log.DebugFormat("Option {0} = {1}", fi.Name, DisplayValue);
                 return null;
             }
@@ -140,7 +140,7 @@ namespace Sidi.CommandLine
             {
                 PropertyInfo pi = (PropertyInfo)MemberInfo;
                 object v = parser.ParseValue(args, pi.PropertyType);
-                if (execute) pi.SetValue(Application, v, new object[] { });
+                if (execute) pi.SetValue(Application.Instance, v, new object[] { });
                 log.DebugFormat("Option {0} = {1}", pi.Name, DisplayValue);
                 return null;
             }

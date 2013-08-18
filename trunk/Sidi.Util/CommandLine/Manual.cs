@@ -101,7 +101,7 @@ namespace Sidi.CommandLine
                 (
                     h1(parser.ApplicationName),
                     p(parser.VersionInfo),
-                    p(Usage.Get(parser.MainApplication.GetType())),
+                    p(Usage.Get(parser.MainApplication.Instance.GetType())),
                     p("All commands can be abbreviated as long as they are unique, e.g. \"Manual\" can be writen as \"m\" "),
                     CommandList(parser),
                     parser.SubCommands.Select(subCommand =>

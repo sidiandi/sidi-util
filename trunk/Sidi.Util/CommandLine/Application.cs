@@ -16,6 +16,11 @@ namespace Sidi.CommandLine
         public object Instance { get; private set; }
         public bool? ProgramSpecificPreferences { get; set; }
 
+        public override string ToString()
+        {
+            return Instance.GetType().ToString();
+        }
+
         /// <summary>
         /// All available actions and options
         /// </summary>

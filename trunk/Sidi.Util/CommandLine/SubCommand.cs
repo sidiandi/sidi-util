@@ -70,6 +70,11 @@ namespace Sidi.CommandLine
                 if (_CommandApplication == null)
                 {
                     _CommandApplication = new Application(CommandInstance);
+                    var persistent = MemberInfo.GetCustomAttribute<PersistentAttribute>();
+                    if (persistent != null)
+                    {
+                        _CommandApplication.ProgramSpecificPreferences = persistent.ApplicationSpecific;
+                    }
                 }
                 return _CommandApplication;
             }
@@ -85,27 +90,28 @@ namespace Sidi.CommandLine
                     _parser = new Parser() { Parent = parentParser };
                     _parser.Applications.Add(CommandApplication);
 
-                    if (!(Application is ShowHelp))
+                    var instance = CommandApplication.Instance;
+                    if (!(instance is ShowHelp))
                     {
                         _parser.Applications.Add(new Application(new ShowHelp(_parser)));
                     }
 
-                    if (!(Application is ShowUserInterface))
+                    if (!(instance is ShowUserInterface))
                     {
                         _parser.Applications.Add(new Application(new ShowUserInterface(_parser)));
                     }
 
-                    if (!(Application is ShowWebServer))
+                    if (!(instance is ShowWebServer))
                     {
                         _parser.Applications.Add(new Application(new ShowWebServer(_parser)));
                     }
 
-                    var persistent = MemberInfo.GetCustomAttribute<PersistentAttribute>();
-                    if (persistent != null)
+                    if (loadPreferencesOnInstanciation)
                     {
-                        _parser.ApplicationSpecificPreferences = persistent.ApplicationSpecific;
+                        LoadPreferences();
                     }
                 }
+
                 return _parser;
             }
         }
@@ -173,12 +179,12 @@ namespace Sidi.CommandLine
             if (i.MemberType == MemberTypes.Field)
             {
                 FieldInfo fieldInfo = (FieldInfo)i;
-                return fieldInfo.GetValue(Application);
+                return fieldInfo.GetValue(Application.Instance);
             }
             else if (i.MemberType == MemberTypes.Property)
             {
                 PropertyInfo propertyInfo = (PropertyInfo)i;
-                return propertyInfo.GetValue(Application, new object[] { });
+                return propertyInfo.GetValue(Application.Instance, new object[] { });
             }
             throw new InvalidDataException(i.MemberType.ToString());
         }
@@ -244,31 +250,7 @@ namespace Sidi.CommandLine
             return null;
         }
 
-        /*
-        void Instanciate()
-        {
-            _CommandInstance = null;
-            if (MemberInfo is FieldInfo)
-            {
-                var fi = (FieldInfo)MemberInfo;
-                _CommandInstance = Activator.CreateInstance(fi.FieldType);
-                fi.SetValue(Application, _CommandInstance);
-            }
-            else if (MemberInfo is PropertyInfo)
-            {
-                var pi = (PropertyInfo)MemberInfo;
-                _CommandInstance = Activator.CreateInstance(pi.PropertyType);
-                pi.SetValue(Application, _CommandInstance, new object[] { });
-            }
-
-            if (loadPreferencesOnInstanciation)
-            {
-                LoadPreferences();
-            }
-        }
-        */
-
-        public object CommandInstance
+        object CommandInstance
         {
             get
             {
@@ -286,7 +268,7 @@ namespace Sidi.CommandLine
                 {
                     var fi = (FieldInfo)MemberInfo;
                     ci = Activator.CreateInstance(fi.FieldType);
-                    fi.SetValue(Application, ci);
+                    fi.SetValue(Application.Instance, ci);
                     goto created;
                 }
 
@@ -296,7 +278,7 @@ namespace Sidi.CommandLine
                     if (pi.CanWrite)
                     {
                         ci = Activator.CreateInstance(pi.PropertyType);
-                        pi.SetValue(Application, ci, new object[] { });
+                        pi.SetValue(Application.Instance, ci, new object[] { });
                         log.DebugFormat("Created subcommand {0}.{1}", pi.DeclaringType.FullName, pi.Name);
                         goto created;
                     }
@@ -307,10 +289,6 @@ namespace Sidi.CommandLine
                 created:
 
                 log.DebugFormat("Created subcommand {0}.{1}", MemberInfo.DeclaringType.FullName, MemberInfo.Name);
-                if (loadPreferencesOnInstanciation)
-                {
-                    LoadPreferences();
-                }
                 return ci;
             }
         }

@@ -713,17 +713,50 @@ namespace Sidi.CommandLine.Test
         }
 
         [Test]
+        public void FindItems()
+        {
+            var a = new MyApp();
+            var p = Parser.SingleApplication(a);
+            var items = p.MainApplication.FindItems(p)
+                .ToList();
+
+            Assert.IsTrue(items.Any());
+            var sc = (SubCommand) items.First();
+            Assert.AreEqual("Sub", sc.Name);
+            
+            var scParser = new Parser();
+            var scItems = sc.CommandApplication.FindItems(scParser)
+                .ToList();
+
+            Assert.IsTrue(scItems.Any());
+            log.Info(scItems.Join());
+        }
+
+        [Test]
+        public void SubCommand()
+        {
+            var p = Parser.SingleApplication(new MyApp());
+            p.AddDefaultUserInterface();
+            p.Parse(new[] { "Sub", "Name", "Donald" });
+        }
+
+        [Test]
+        public void RunSubCommand()
+        {
+            Parser.Run(new MyApp(), new[] { "Sub", "Name", "Donald" });
+        }
+
+        [Test]
         public void PersistenceInSubcommands()
         {
             var name = "Donald";
             Parser.Run(new MyApp(), new string[]{"Sub", "Name", name});
 
-            var a = new MyApp();
             using (var w = new StringWriter())
             {
                 var consoleOut = Console.Out;
                 Console.SetOut(w);
-                Parser.Run(new MyApp(), new string[] { "Sub", });
+                Parser.Run(new MyApp(), new string[] { "Sub" });
                 Console.SetOut(consoleOut);
                 log.Info(w.ToString());
                 Assert.IsTrue(w.ToString().Contains(name));

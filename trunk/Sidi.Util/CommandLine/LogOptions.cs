@@ -78,7 +78,7 @@ namespace Sidi.CommandLine
                     if (lf == null)
                     {
                         var exeFileName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-                        var appType = this.parser.StartupApplication.GetType();
+                        var appType = this.parser.StartupApplication.Instance.GetType();
                         var file = Paths.Temp.CatDir(
                                 "log",
                                 LPath.GetValidFilename(exeFileName),
