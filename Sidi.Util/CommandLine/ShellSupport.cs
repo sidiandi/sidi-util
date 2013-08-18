@@ -32,7 +32,7 @@ namespace Sidi.CommandLine
 
             for (; ; )
             {
-                Console.Write("{0}>", Parsers.Select(x => x.MainApplication.GetType().Name).Join(">"));
+                Console.Write("{0}>", Parsers.Select(x => x.MainApplication.Instance.GetType().Name).Join(">"));
                 var input = Console.ReadLine();
                 var args = Tokenizer.ToArray(input);
 
@@ -43,7 +43,9 @@ namespace Sidi.CommandLine
                     var subCommand = (SubCommand)p.LookupParserItem(args[0], p.SubCommands);
                     if (subCommand != null)
                     {
-                        Shell(new Parser(subCommand.CommandInstance));
+                        var scp = new Parser();
+                        scp.Applications.Add(subCommand.CommandApplication);
+                        Shell(scp);
                         continue;
                     }
                 }

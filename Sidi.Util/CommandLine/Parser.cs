@@ -138,7 +138,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public object StartupApplication
+        public Application StartupApplication
         {
             get
             {
@@ -430,9 +430,9 @@ namespace Sidi.CommandLine
 
             if (applicationSpecific)
             {
-                parts = parts.Concat(GetNameParts(StartupApplication.GetType()));
+                parts = parts.Concat(GetNameParts(StartupApplication.Instance.GetType()));
             }
-            parts = parts.Concat(GetNameParts(o.Application.GetType()));
+            parts = parts.Concat(GetNameParts(o.Application.Instance.GetType()));
 
             return CatReg(parts.ToArray());
         }
@@ -466,7 +466,7 @@ namespace Sidi.CommandLine
                 if (m_PreferencesKey == null)
                 {
                     var k = CatReg(Registry.CurrentUser.ToString(), "Software");
-                    var applicationType = MainApplication.GetType();
+                    var applicationType = MainApplication.Instance.GetType();
                     var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(applicationType).Company;
                     var product = GetAssemblyAttribute<AssemblyProductAttribute>(applicationType).Product;
                     k = CatReg(k, company, product, Profile);
@@ -754,10 +754,18 @@ found:
         /// </summary>
         IEnumerable<IParserItem> FindItems()
         {
-            return SubParsers
+            var items = SubParsers
                 .Concat(
                     Applications.Concat(builtInApplications)
-                    .SelectMany(x => x.FindItems(this)));
+                    .SelectMany(x => x.FindItems(this)))
+                    .ToList();
+
+            if (!items.Any())
+            {
+                throw new Exception();
+            }
+
+            return items;
         }
 
         List<ValueParser> availableValueParsers;
@@ -832,7 +840,7 @@ found:
                 {
                     return a.GetName().Name;
                 }
-                return StartupApplication.GetType().Name;
+                return StartupApplication.Instance.GetType().Name;
             }
         }
 
@@ -842,7 +850,7 @@ found:
             {
                 using (var w = new StringWriter())
                 {
-                    Assembly assembly = MainApplication.GetType().Assembly;
+                    Assembly assembly = MainApplication.Instance.GetType().Assembly;
 
                     List<string> infos = new List<string>();
 
@@ -945,7 +953,7 @@ found:
 
         static bool IncludeInShortUsage(IParserItem item)
         {
-            return !item.Application.GetType().Namespace.Equals("Sidi.CommandLine") ||
+            return !item.Application.Instance.GetType().Namespace.Equals("Sidi.CommandLine") ||
                 item.Name.Equals("Usage");
         }
 
@@ -992,10 +1000,10 @@ found:
             Console.WriteLine(
                 String.Format("{0} - {1}",
                 applicationName,
-                Usage.Get(MainApplication.GetType()))
+                Usage.Get(MainApplication.Instance.GetType()))
                 );
 
-            Assembly assembly = MainApplication.GetType().Assembly;
+            Assembly assembly = MainApplication.Instance.GetType().Assembly;
 
             List<string> infos = new List<string>();
 
@@ -1017,7 +1025,7 @@ found:
                 w.WriteLine("Actions");
                 w.WriteLine();
 
-                foreach (MethodInfo i in m_application.GetType().GetMethods())
+                foreach (MethodInfo i in m_application.Instance.GetType().GetMethods())
                 {
                     string u = Usage.Get(i);
                     string parameters = i.GetParameters()
@@ -1034,7 +1042,7 @@ found:
                 w.WriteLine("Options");
                 w.WriteLine();
 
-                foreach (MemberInfo i in m_application.GetType().GetMembers())
+                foreach (MemberInfo i in m_application.Instance.GetType().GetMembers())
                 {
                     if (i.MemberType == MemberTypes.Field)
                     {
