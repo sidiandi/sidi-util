@@ -31,130 +31,116 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        bool loadPreferencesOnInstanciation = false;
+        MemberInfo memberInfo;
         Parser parentParser;
-        Parser _parser;
+        bool needLoadPreferences = false;
 
-        public SubCommand(Parser parent, Application application, MemberInfo memberInfo)
-        {
-            parentParser = parent;
-            Application = application;
-            MemberInfo = memberInfo;
-        }
-
-        public void LoadPreferences()
-        {
-            var c = GetValue();
-            if (c != null)
-            {
-                Parser.LoadPreferences();
-            }
-            else
-            {
-                loadPreferencesOnInstanciation = true;
-            }
-        }
-
-        public void StorePreferences()
-        {
-            if (GetValue() != null)
-            {
-                Parser.StorePreferences();
-            }
-        }
-
-        public Application CommandApplication
+        bool IsInitialized
         {
             get
             {
-                if (_CommandApplication == null)
-                {
-                    _CommandApplication = new Application(CommandInstance);
-                    var persistent = MemberInfo.GetCustomAttribute<PersistentAttribute>();
-                    if (persistent != null)
-                    {
-                        _CommandApplication.ProgramSpecificPreferences = persistent.ApplicationSpecific;
-                    }
-                }
-                return _CommandApplication;
+                return _parser != null;
             }
         }
-        Application _CommandApplication;
 
-        Parser Parser
+        public Parser Parser
         {
             get
             {
                 if (_parser == null)
                 {
-                    _parser = new Parser() { Parent = parentParser };
-                    _parser.Applications.Add(CommandApplication);
+                    // get member instance
+                    object instance = null;
+                    bool instanceCreated = false;
 
-                    var instance = CommandApplication.Instance;
-                    if (!(instance is ShowHelp))
+                    if (IsMemberInitialized)
                     {
-                        _parser.Applications.Add(new Application(new ShowHelp(_parser)));
+                        instance = memberInfo.GetValue(Application.Instance);
+                    }
+                    else
+                    {
+                        // auto create instance
+                        log.DebugFormat("auto-create of {0} instance", memberInfo);
+                        instance =  Activator.CreateInstance(memberInfo.GetMemberType());
+                        memberInfo.SetValue(Application.Instance, instance);
+                        instanceCreated = true;
                     }
 
-                    if (!(instance is ShowUserInterface))
+                    // create parser
+                    _parser = new Parser()
                     {
-                        _parser.Applications.Add(new Application(new ShowUserInterface(_parser)));
-                    }
+                        Parent = this.parentParser
+                    };
+                    _parser.Applications.Add(new Application(instance));
 
-                    if (!(instance is ShowWebServer))
-                    {
-                        _parser.Applications.Add(new Application(new ShowWebServer(_parser)));
-                    }
-
-                    if (loadPreferencesOnInstanciation)
+                    if (instanceCreated && needLoadPreferences)
                     {
                         LoadPreferences();
                     }
                 }
-
                 return _parser;
             }
         }
+        Parser _parser;
 
-        public Application Application { get; set; }
+        public SubCommand(Parser parser, Application application, MemberInfo memberInfo)
+        {
+            this.memberInfo = memberInfo;
+            this.Application = application;
+            this.parentParser = parser;
+        }
 
-        public MemberInfo MemberInfo { get; private set; }
+        bool IsMemberInitialized
+        {
+            get
+            {
+                return memberInfo.GetValue(Application.Instance) != null;
+            }
+        }
 
-        public string Name { get { return MemberInfo.Name; } }
-        
+        public void StorePreferences()
+        {
+            if (IsMemberInitialized)
+            {
+                Parser.StorePreferences();
+            }
+        }
+
+        public void LoadPreferences()
+        {
+            if (IsMemberInitialized)
+            {
+                Parser.LoadPreferences();
+            }
+            else
+            {
+                needLoadPreferences = true;
+            }
+        }
+
+        public static bool IsSubCommand(MemberInfo member)
+        {
+            return (member is FieldInfo || member is PropertyInfo) &&
+                member.GetCustomAttribute<SubCommandAttribute>() != null;
+        }
+
         public string Usage
         {
             get
             {
-                var u = Sidi.CommandLine.Usage.Get(MemberInfo);
-                if (u != null)
+                var usage = Sidi.CommandLine.Usage.Get(memberInfo);
+                if (usage != null)
                 {
-                    return u;
+                    return usage;
                 }
-                u = Sidi.CommandLine.Usage.Get(Type);
-                if (u != null)
+
+                usage = Sidi.CommandLine.Usage.Get(memberInfo.GetMemberType());
+                if (usage != null)
                 {
-                    return u;
+                    return usage;
                 }
-                return String.Empty;
-            }
-        }
 
-        public IEnumerable<string> Categories
-        {
-            get
-            {
-                var c = MemberInfo.GetCustomAttributes(typeof(CategoryAttribute), true)
-                    .Select(x => ((CategoryAttribute)x).Category);
-                return c.Any() ? c : new string[] { String.Empty };
-            }
-        }
-
-        public string Syntax
-        {
-            get
-            {
-                return this.Name + " [subcommands...] ;";
+                throw new InvalidDataException("No usage text for {0}".F(memberInfo));
             }
         }
 
@@ -162,141 +148,55 @@ namespace Sidi.CommandLine
         {
             get
             {
-                string indent = "  ";
-                return String.Format(
-                    Parser.CultureInfo,
-                    @"{0}
-{1}",
-                    Syntax,
-                    Usage.Indent(indent)
-                    );
+                return String.Format("{0} [subcommands...] {1}\r\n{2}",
+                    Name,
+                    Parser.ListTerminator,
+                    Usage.Indent("  "));
             }
         }
 
-        object GetValue()
-        {
-            MemberInfo i = MemberInfo;
-            if (i.MemberType == MemberTypes.Field)
-            {
-                FieldInfo fieldInfo = (FieldInfo)i;
-                return fieldInfo.GetValue(Application.Instance);
-            }
-            else if (i.MemberType == MemberTypes.Property)
-            {
-                PropertyInfo propertyInfo = (PropertyInfo)i;
-                return propertyInfo.GetValue(Application.Instance, new object[] { });
-            }
-            throw new InvalidDataException(i.MemberType.ToString());
-        }
-
-        Type Type
+        public string Name
         {
             get
             {
-                MemberInfo i = MemberInfo;
-                if (i.MemberType == MemberTypes.Field)
-                {
-                    FieldInfo fieldInfo = (FieldInfo)i;
-                    return fieldInfo.FieldType;
-                }
-                else if (i.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo propertyInfo = (PropertyInfo)i;
-                    return propertyInfo.PropertyType;
-                }
-                throw new InvalidOperationException(i.MemberType.ToString());
+                return memberInfo.Name;
             }
         }
 
-        public void PrintScriptFileSample(TextWriter w)
+        public string Syntax
         {
-            w.Write("# "); w.WriteLine(Usage);
-            w.Write("# "); w.WriteLine(Syntax);
-            w.WriteLine();
+            get { throw new NotImplementedException(); }
         }
 
-        public override string ToString()
+        public Application Application { get; private set; }
+
+        public IEnumerable<string> Categories
         {
-            return String.Format("Subcommand {0}", Name);
+            get
+            {
+                var a = memberInfo.GetCustomAttributes<CategoryAttribute>().Select(x => x.Category);
+                return a.Any() ? a : new[] { String.Empty };
+            }
         }
 
         public object Handle(IList<string> args, bool execute)
         {
-            log.InfoFormat("{0}", this);
-            if (args.Any())
-            {
-                while (args.Any())
-                {
-                    if (args.First() == Parser.ListTerminator)
-                    {
-                        args.RemoveAt(0);
-                        break;
-                    }
-
-                    if (execute)
-                    {
-                        Parser.ParseSingleCommand(args);
-                    }
-                    else
-                    {
-                        Parser.CheckSingleCommand(args);
-                    }
-                }
-            }
-            else
+            if (!args.Any())
             {
                 Parser.ShowUsage();
+                return null;
+            }
+
+            for (; args.Any(); )
+            {
+                if (args.First().Equals(Parser.ListTerminator))
+                {
+                    args.PopHead();
+                    break;
+                }
+                Parser.ParseSingleCommand(args);
             }
             return null;
         }
-
-        object CommandInstance
-        {
-            get
-            {
-                var ci = GetValue();
-                if (ci != null)
-                {
-                    return ci;
-                }
-                
-                // try to instanciate automatically
-                // if value is null and property or field is 
-                // writable
-
-                if (MemberInfo is FieldInfo)
-                {
-                    var fi = (FieldInfo)MemberInfo;
-                    ci = Activator.CreateInstance(fi.FieldType);
-                    fi.SetValue(Application.Instance, ci);
-                    goto created;
-                }
-
-                if (MemberInfo is PropertyInfo)
-                {
-                    var pi = (PropertyInfo)MemberInfo;
-                    if (pi.CanWrite)
-                    {
-                        ci = Activator.CreateInstance(pi.PropertyType);
-                        pi.SetValue(Application.Instance, ci, new object[] { });
-                        log.DebugFormat("Created subcommand {0}.{1}", pi.DeclaringType.FullName, pi.Name);
-                        goto created;
-                    }
-                }
-
-                throw new InvalidDataException("CommandInstance cannot be null");
-
-                created:
-
-                log.DebugFormat("Created subcommand {0}.{1}", MemberInfo.DeclaringType.FullName, MemberInfo.Name);
-                return ci;
-            }
-        }
-
-        public static bool IsSubCommand(MemberInfo mi)
-        {
-            return mi.GetCustomAttribute<SubCommandAttribute>() != null;
-        }
     }
-
 }

@@ -37,15 +37,13 @@ namespace Sidi.CommandLine
                 var args = Tokenizer.ToArray(input);
 
                 // special treatment for subcommands
-                // if the only arg is a subcommand, we "change dir" into this subcommand.
+                // if the only arg is a subcommand, we "change dirctory" into this subcommand.
                 if (args.Length == 1)
                 {
                     var subCommand = (SubCommand)p.LookupParserItem(args[0], p.SubCommands);
                     if (subCommand != null)
                     {
-                        var scp = new Parser();
-                        scp.Applications.Add(subCommand.CommandApplication);
-                        Shell(scp);
+                        Shell(subCommand.Parser);
                         continue;
                     }
                 }

@@ -104,6 +104,12 @@
     <Compile Include="Forms\ChooseDialog.designer.cs">
       <DependentUpon>ChooseDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ControlTree.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\ControlTree.Designer.cs">
+      <DependentUpon>ControlTree.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\GenericListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -297,6 +303,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Forms\ChooseDialog.resx">
       <DependentUpon>ChooseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ControlTree.resx">
+      <DependentUpon>ControlTree.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SelectObjectsDialog.resx">
       <DependentUpon>SelectObjectsDialog.cs</DependentUpon>
