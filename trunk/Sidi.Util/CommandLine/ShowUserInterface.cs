@@ -219,6 +219,7 @@ namespace Sidi.CommandLine
             int row = 0;
             foreach (var p in action.MethodInfo.GetParameters())
             {
+                var parameter = p;
                 var paramLabel = new Label()
                 {
                     Text = "{0} [{1}]".F(p.Name, p.ParameterType.GetInfo()),
@@ -231,7 +232,7 @@ namespace Sidi.CommandLine
                 {
                     Dock = DockStyle.Fill,
                 };
-                paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
+                // paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
                 paramInput.KeyDown += (s, e) =>
                     {
                         if (e.KeyCode == Keys.Enter)
@@ -241,6 +242,13 @@ namespace Sidi.CommandLine
                     };
                 paramInput.Tag = p;
                 paramsPanel.Controls.Add(paramInput, 1, row);
+                refreshActions.Add(() =>
+                    {
+                        if (parameterCache.ContainsKey(parameter.Name))
+                        {
+                            paramInput.Text = parameterCache[parameter.Name];
+                        }
+                    });
 
                 at.ParameterTextBoxes.Add(paramInput);
 
@@ -309,8 +317,16 @@ namespace Sidi.CommandLine
                 paramInput.PasswordChar = '*';
             }
             paramInput.Tag = option;
-            paramInput.Text = option.GetValue().SafeToString();
-            paramInput.TextChanged += new EventHandler(paramInput_Leave);
+
+            System.Action refreshAction = () =>
+                {
+                    paramInput.Text = option.GetValue().SafeToString();
+                };
+            refreshAction();
+            refreshActions.Add(refreshAction);
+
+            paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
+            paramInput.Leave += new EventHandler(paramInput_Leave);
             paramsPanel.Controls.Add(paramInput, 1, row);
 
             layout.Controls.Add(paramsPanel, 0, 1);
@@ -378,8 +394,8 @@ namespace Sidi.CommandLine
 
             var mouseWheelSupport = new MouseWheelSupport(main);
 
-            main.Width = 640;
-            main.Height = 480;
+            main.Width = 800;
+            main.Height = 600;
             main.Text = parser.ApplicationName;
 
             var t = ToTabControl(parser);
@@ -522,33 +538,14 @@ namespace Sidi.CommandLine
             parser.Parse(parameters);
         }
 
-        List<TextBox> inputs = new List<TextBox>();
+        List<System.Action> refreshActions = new List<System.Action>();
+        Dictionary<string, string> parameterCache = new Dictionary<string, string>();
 
         void Refresh()
         {
-            foreach (var i in inputs)
+            foreach (var i in refreshActions)
             {
-                if (i.Tag is Option)
-                {
-                    var option = ((Option)i.Tag);
-                    i.Text = Support.SafeToString(option.GetValue());
-                }
-            }
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1031")]
-        void paramInput_TextChanged(object sender, EventArgs e)
-        {
-            var textBox = (TextBox)sender;
-            var p = (ParameterInfo)textBox.Tag;
-            try
-            {
-                parser.ParseValue(Tokenizer.ToList(textBox.Text), p.ParameterType);
-                ClearError(textBox);
-            }
-            catch (Exception ex)
-            {
-                SetError(textBox, ex.Message);
+                i();
             }
         }
 
@@ -556,6 +553,13 @@ namespace Sidi.CommandLine
         {
             var button = (Button)sender;
             var at = (ActionTag) button.Tag;
+
+            foreach (var textBox in at.ParameterTextBoxes)
+            {
+                var p = (ParameterInfo) textBox.Tag;
+                parameterCache[p.Name] = textBox.Text;
+            }
+
             at.Execute();
             Refresh();
         }
@@ -587,6 +591,12 @@ namespace Sidi.CommandLine
 
         [SuppressMessage("Microsoft.Design", "CA1031")]
         void paramInput_Leave(object sender, EventArgs e)
+        {
+            Refresh();
+        }
+        
+        [SuppressMessage("Microsoft.Design", "CA1031")]
+        void paramInput_TextChanged(object sender, EventArgs e)
         {
             var textBox = (TextBox) sender;
             var option = (Option)textBox.Tag;
