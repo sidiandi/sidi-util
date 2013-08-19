@@ -91,18 +91,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                MemberInfo i = MemberInfo;
-                if (i.MemberType == MemberTypes.Field)
-                {
-                    FieldInfo fieldInfo = (FieldInfo)i;
-                    return fieldInfo.FieldType;
-                }
-                else if (i.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo propertyInfo = (PropertyInfo)i;
-                    return propertyInfo.PropertyType;
-                }
-                throw new InvalidOperationException(i.MemberType.ToString());
+                return MemberInfo.GetMemberType();
             }
         }
 

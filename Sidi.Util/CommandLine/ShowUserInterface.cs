@@ -353,8 +353,7 @@ namespace Sidi.CommandLine
 
             button.Click += new EventHandler((s, e) =>
             {
-                var p = new Parser(subcommand.CommandApplication.Instance);
-                var subCommandDialog = ToDialog(p);
+                var subCommandDialog = ToDialog(subcommand.Parser);
                 subCommandDialog.ShowDialog();
             });
 
@@ -391,19 +390,48 @@ namespace Sidi.CommandLine
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        TabControl ToTabControl(Parser parser)
+        Control ToTabControl(Parser parser)
         {
-            var t = new TabControl();
+            var t = new ControlTree();
             t.Dock = DockStyle.Fill;
-
+            AddToControlTree(t, parser, null);
+            t.treeView.ExpandAll();
+            return t;
+        }
+        
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        void AddToControlTree(ControlTree t, Parser parser, Control parentPage)
+        {
             var items = parser.Items
                 .Where(item => !(ExcludedFromUi(item) || item is SubCommand));
             var categories = items.SelectMany(i => i.Categories).Distinct().ToList();
 
-            foreach (var category in categories)
+            // main page
+            var mainPage = new Control()
             {
-                var page = new TabPage(String.IsNullOrEmpty(category) ? "General" : category);
+                Text = parser.MainApplication.Instance.GetType().Name
+            };
+            AddToPage(mainPage, items.Where(x => x.Categories.Contains(String.Empty)));
+            t.AddPage(mainPage, parentPage);
 
+            foreach (var category in categories.Where(x => !String.IsNullOrEmpty(x)))
+            {
+                var categoryPage = new Control()
+                {
+                    Text = String.IsNullOrEmpty(category) ? "General" : category
+                };
+                AddToPage(categoryPage, items.Where(x => x.Categories.Contains(category)));
+                t.AddPage(categoryPage, mainPage);
+            }
+
+            foreach (var subCommand in parser.SubCommands.Where(x => !ExcludedFromUi(x)))
+            {
+                AddToControlTree(t, subCommand.Parser, mainPage);
+            }
+        }
+
+        void AddToPage(Control page, IEnumerable<IParserItem> items)
+        {
                 var c = new TableLayoutPanel()
                 {
                     ColumnCount = 1,
@@ -418,7 +446,7 @@ namespace Sidi.CommandLine
                 page.Controls.Add(c);
 
                 bool first = true;
-                foreach (var item in items.Where(x => x.Categories.Contains(category)))
+                foreach (var item in items)
                 {
                     if (first)
                     {
@@ -457,21 +485,7 @@ namespace Sidi.CommandLine
                         c.Controls.Add(childControl);
                     }
                 }
-
-                t.TabPages.Add(page);
             }
-
-            foreach (var subCommand in parser.SubCommands.Where(x => !ExcludedFromUi(x)))
-            {
-                var scPage = new TabPage(subCommand.Name);
-                var scControl = ToTabControl(new Parser(subCommand.CommandApplication.Instance));
-                scControl.Dock = DockStyle.Fill;
-                scPage.Controls.Add(scControl);
-                t.TabPages.Add(scPage);
-            }
-
-            return t;
-        }
 
         [Usage("Show an interactive user interface")]
         [Category(Parser.categoryUserInterface)]

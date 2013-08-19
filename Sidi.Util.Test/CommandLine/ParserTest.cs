@@ -275,6 +275,7 @@ namespace Sidi.CommandLine.Test
 
             var w = new System.IO.StringWriter();
             parser.PrintSampleScript(w);
+            log.Info(w.ToString());
             Assert.IsTrue(w.ToString().Contains("marker_for_test_aoifq7ft48q"));
         }
 
@@ -532,8 +533,8 @@ namespace Sidi.CommandLine.Test
 
             a.Name = "Donald";
             a.Password = "Secret";
-            a.Options.LocalOption = "User";
-            a.Options.GlobalOption = "Global";
+            a.Options.LocalOption = System.IO.Path.GetRandomFileName();
+            a.Options.GlobalOption = System.IO.Path.GetRandomFileName();
 
             p.StorePreferences();
 
@@ -547,14 +548,14 @@ namespace Sidi.CommandLine.Test
             var pc = new Parser(c);
             pc.LoadPreferences();
             Assert.AreNotEqual(a.Options.LocalOption, c.Options.LocalOption);
-            Assert.AreNotEqual(a.Options.GlobalOption, c.Options.GlobalOption);
+            Assert.AreEqual(a.Options.GlobalOption, c.Options.GlobalOption);
 
             var d = new PreferencesTestApplication2();
             var pd = new Parser(c);
             pd.Profile = "new-profile";
             pd.LoadPreferences();
-            Assert.AreNotEqual(a.Options.LocalOption, c.Options.LocalOption);
-            Assert.AreNotEqual(a.Options.GlobalOption, c.Options.GlobalOption);
+            Assert.AreNotEqual(a.Options.LocalOption, d.Options.LocalOption);
+            Assert.AreNotEqual(a.Options.GlobalOption, d.Options.GlobalOption);
         }
 
         [Test]
@@ -699,6 +700,7 @@ namespace Sidi.CommandLine.Test
             Assert.AreEqual(new LPath(@"C:\temp"), ln);
         }
 
+        [Usage("Some sub command")]
         class MySubCommand
         {
             [Usage("Name"), Persistent]
@@ -712,24 +714,11 @@ namespace Sidi.CommandLine.Test
             public MySubCommand Sub = null;
         }
 
-        [Test]
-        public void FindItems()
+        [Usage("Tests persistence of options in subcommands")]
+        class MyOtherApp
         {
-            var a = new MyApp();
-            var p = Parser.SingleApplication(a);
-            var items = p.MainApplication.FindItems(p)
-                .ToList();
-
-            Assert.IsTrue(items.Any());
-            var sc = (SubCommand) items.First();
-            Assert.AreEqual("Sub", sc.Name);
-            
-            var scParser = new Parser();
-            var scItems = sc.CommandApplication.FindItems(scParser)
-                .ToList();
-
-            Assert.IsTrue(scItems.Any());
-            log.Info(scItems.Join());
+            [SubCommand]
+            public MySubCommand Sub = null;
         }
 
         [Test]
@@ -749,18 +738,20 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void PersistenceInSubcommands()
         {
-            var name = "Donald";
+            var name = System.IO.Path.GetRandomFileName();
             Parser.Run(new MyApp(), new string[]{"Sub", "Name", name});
 
-            using (var w = new StringWriter())
-            {
-                var consoleOut = Console.Out;
-                Console.SetOut(w);
-                Parser.Run(new MyApp(), new string[] { "Sub" });
-                Console.SetOut(consoleOut);
-                log.Info(w.ToString());
-                Assert.IsTrue(w.ToString().Contains(name));
-            }
+            var a = new MyApp();
+            var p = new Parser(a);
+            p.LoadPreferences();
+            p.Parse(new string[] { "Sub" });
+            Assert.AreEqual(name, a.Sub.Name);
+
+            var b = new MyOtherApp();
+            var pb = new Parser(b);
+            pb.LoadPreferences();
+            pb.Parse(new string[] { "Sub" });
+            Assert.AreEqual(name, b.Sub.Name);
         }
 
         class FieldTest
@@ -822,11 +813,8 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void LogLevelIsNotGlobal()
         {
-            var a = new MyApp();
-            new Parser(a).Run(new string[] { "LogLevel", "ALL" });
-            new Parser(a).Run(new string[] { "LogLevel", "INFO" });
-
-            new Parser(new TestApp()).Run(new string[] { "LogLevel", "ALL" });
+            Parser.Run(new MyApp(), new string[] { "LogLevel", "INFO" });
+            Parser.Run(new TestApp(), new string[] { "LogLevel", "ALL" });
             
             var p = new Parser(new MyApp());
             p.Run(new string[] { });

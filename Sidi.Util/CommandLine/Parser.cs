@@ -873,7 +873,7 @@ found:
         {
             get
             {
-                var app = StartupApplication;
+                var app = StartupApplication.Instance;
                 var appType = app.GetType();
 
                 using (var i = new StringWriter())
@@ -1020,12 +1020,12 @@ found:
             w.WriteLine(infos.Join(", "));
             w.WriteLine();
 
-            foreach (var m_application in Applications)
+            foreach (var application in Applications)
             {
                 w.WriteLine("Actions");
                 w.WriteLine();
 
-                foreach (MethodInfo i in m_application.Instance.GetType().GetMethods())
+                foreach (MethodInfo i in application.Instance.GetType().GetMethods())
                 {
                     string u = Usage.Get(i);
                     string parameters = i.GetParameters()
@@ -1042,12 +1042,12 @@ found:
                 w.WriteLine("Options");
                 w.WriteLine();
 
-                foreach (MemberInfo i in m_application.Instance.GetType().GetMembers())
+                foreach (MemberInfo i in application.Instance.GetType().GetMembers())
                 {
                     if (i.MemberType == MemberTypes.Field)
                     {
                         FieldInfo fieldInfo = (FieldInfo)i;
-                        object defaultValue = fieldInfo.GetValue(m_application);
+                        object defaultValue = i.GetValue(application.Instance);
                         string u = Usage.Get(i);
                         if (u != null)
                         {
@@ -1063,7 +1063,7 @@ found:
                     else if (i.MemberType == MemberTypes.Property)
                     {
                         PropertyInfo propertyInfo = (PropertyInfo)i;
-                        object defaultValue = propertyInfo.GetValue(m_application, new object[] { });
+                        object defaultValue = i.GetValue(application.Instance);
                         string u = Usage.Get(i);
                         if (u != null)
                         {

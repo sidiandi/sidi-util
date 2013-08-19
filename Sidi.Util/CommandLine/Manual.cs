@@ -108,10 +108,7 @@ namespace Sidi.CommandLine
                         new[]
                         {
                             h2(a(name(subCommand.Name), "Subcommand ", subCommand.Name)),
-                            CommandList(new Parser
-                                {
-                                    Applications = { subCommand.CommandApplication }
-                                })
+                            CommandList(subCommand.Parser)
                         }),
                     h2("Value Syntax"),
                     dl(parser.UsedValueParsers.Select(item => ToDt(item)))
