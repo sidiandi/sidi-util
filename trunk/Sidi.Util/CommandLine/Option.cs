@@ -31,9 +31,9 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Option(Parser parser, Application application, MemberInfo memberInfo)
+        public Option(Parser parser, ItemSource source, MemberInfo memberInfo)
         {
-            Application = application;
+            Source = source;
             MemberInfo = memberInfo;
             this.parser = parser;
             parser.GetValueParser(Type);
@@ -41,7 +41,7 @@ namespace Sidi.CommandLine
 
         Parser parser;
 
-        public Application Application { get; private set; }
+        public ItemSource Source { get; private set; }
         public MemberInfo MemberInfo { get; private set; }
 
         public string Name { get { return MemberInfo.Name; } }
@@ -77,12 +77,12 @@ namespace Sidi.CommandLine
             if (i.MemberType == MemberTypes.Field)
             {
                 FieldInfo fieldInfo = (FieldInfo)i;
-                return fieldInfo.GetValue(Application.Instance);
+                return fieldInfo.GetValue(Source.Instance);
             }
             else if (i.MemberType == MemberTypes.Property)
             {
                 PropertyInfo propertyInfo = (PropertyInfo)i;
-                return propertyInfo.GetValue(Application.Instance, new object[] { });
+                return propertyInfo.GetValue(Source.Instance, new object[] { });
             }
             throw new InvalidDataException(i.MemberType.ToString());
         }
@@ -121,7 +121,7 @@ namespace Sidi.CommandLine
             {
                 FieldInfo fi = (FieldInfo)MemberInfo;
                 object v = parser.ParseValue(args, fi.FieldType);
-                if (execute) fi.SetValue(Application.Instance, v);
+                if (execute) fi.SetValue(Source.Instance, v);
                 log.DebugFormat("Option {0} = {1}", fi.Name, DisplayValue);
                 return null;
             }
@@ -129,7 +129,7 @@ namespace Sidi.CommandLine
             {
                 PropertyInfo pi = (PropertyInfo)MemberInfo;
                 object v = parser.ParseValue(args, pi.PropertyType);
-                if (execute) pi.SetValue(Application.Instance, v, new object[] { });
+                if (execute) pi.SetValue(Source.Instance, v, new object[] { });
                 log.DebugFormat("Option {0} = {1}", pi.Name, DisplayValue);
                 return null;
             }

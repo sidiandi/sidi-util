@@ -38,7 +38,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public Application Application
+        public ItemSource Source
         {
             get { return null; }
         }

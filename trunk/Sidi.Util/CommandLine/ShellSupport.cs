@@ -27,12 +27,12 @@ namespace Sidi.CommandLine
         {
             Parsers.Add(parser);
             var p = new Parser();
-            p.Applications.AddRange(parser.Applications);
-            p.Applications.Add(new Application(this));
+            p.ItemSources.AddRange(parser.ItemSources);
+            p.ItemSources.Add(new ItemSource(this));
 
             for (; ; )
             {
-                Console.Write("{0}>", Parsers.Select(x => x.MainApplication.Instance.GetType().Name).Join(">"));
+                Console.Write("{0}>", Parsers.Select(x => x.MainSource.Instance.GetType().Name).Join(">"));
                 var input = Console.ReadLine();
                 var args = Tokenizer.ToArray(input);
 

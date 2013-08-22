@@ -6,9 +6,9 @@ using System.Reflection;
 
 namespace Sidi.CommandLine
 {
-    public class Application
+    public class ItemSource
     {
-        public Application(object instance)
+        public ItemSource(object instance)
         {
             this.Instance = instance;
         }
