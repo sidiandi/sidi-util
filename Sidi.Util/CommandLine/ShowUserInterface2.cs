@@ -311,7 +311,7 @@ namespace Sidi.CommandLine
             };
 
             var items = parser.Items
-                .Where(item => !((item is SubCommand) || (item.Application is ShowHelp || item.Application is ShowUserInterface || item.Application is ShowWebServer)));
+                .Where(item => !((item is SubCommand) || (item.Source is ShowHelp || item.Source is ShowUserInterface || item.Source is ShowWebServer)));
             var categories = items.SelectMany(i => i.Categories).Distinct().ToList();
 
             foreach (var category in categories)
@@ -352,7 +352,7 @@ namespace Sidi.CommandLine
             }
 
             foreach (var subCommand in parser.SubCommands
-                .Where(item => !((item.Application is ShowHelp || item.Application is ShowUserInterface || item.Application is ShowWebServer))))
+                .Where(item => !((item.Source is ShowHelp || item.Source is ShowUserInterface || item.Source is ShowWebServer))))
             {
                 var page = new TabPage(subCommand.Name)
                 {

@@ -380,10 +380,10 @@ namespace Sidi.CommandLine
         bool ExcludedFromUi(IParserItem item)
         {
             return ((
-                    item.Application is ShowHelp ||
-                    item.Application is ShowUserInterface ||
-                    item.Application is ShowWebServer ||
-                    item.Application is LogOptions ||
+                    item.Source is ShowHelp ||
+                    item.Source is ShowUserInterface ||
+                    item.Source is ShowWebServer ||
+                    item.Source is LogOptions ||
                     false));
         }
 
@@ -425,7 +425,7 @@ namespace Sidi.CommandLine
             // main page
             var mainPage = new Control()
             {
-                Text = parser.MainApplication.Instance.GetType().Name
+                Text = parser.MainSource.Instance.GetType().Name
             };
             AddToPage(mainPage, items.Where(x => x.Categories.Contains(String.Empty)));
             t.AddPage(mainPage, parentPage);

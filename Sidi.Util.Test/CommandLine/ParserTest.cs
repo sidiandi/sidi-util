@@ -138,8 +138,8 @@ namespace Sidi.CommandLine.Test
         {
             var app = new TestApp();
             var p = new Parser(app);
-            Assert.AreEqual(5, p.Applications.Count);
-            Assert.AreEqual(app, p.MainApplication.Instance);
+            Assert.AreEqual(5, p.ItemSources.Count);
+            Assert.AreEqual(app, p.MainSource.Instance);
         }
 
         [Test]
@@ -724,7 +724,7 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void SubCommand()
         {
-            var p = Parser.SingleApplication(new MyApp());
+            var p = Parser.SingleSource(new MyApp());
             p.AddDefaultUserInterface();
             p.Parse(new[] { "Sub", "Name", "Donald" });
         }

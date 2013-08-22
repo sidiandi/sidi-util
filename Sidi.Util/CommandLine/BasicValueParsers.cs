@@ -90,7 +90,7 @@ namespace Sidi.CommandLine
             }
 
             var tsp = new DateTimeParser();
-            var p = Parser.SingleApplication(tsp);
+            var p = Parser.SingleSource(tsp);
             p.ParseSingleCommand(args);
             return tsp.Value;
         }
@@ -155,7 +155,7 @@ namespace Sidi.CommandLine
             catch
             {
                 var tsp = new TimeSpanParser();
-                var p = Parser.SingleApplication(tsp);
+                var p = Parser.SingleSource(tsp);
                 var args2 = args.Take(2).Reverse().ToList();
                 p.ParseSingleCommand(args2);
                 if (args2.Count == 0)
@@ -258,7 +258,7 @@ namespace Sidi.CommandLine
             }
 
             var valueParser = new TimeIntervalParser();
-            var p = Parser.SingleApplication(valueParser);
+            var p = Parser.SingleSource(valueParser);
             while (args.Any())
             {
                 if (args.First().Equals(Parser.ListTerminator))

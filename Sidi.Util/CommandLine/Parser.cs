@@ -114,41 +114,41 @@ namespace Sidi.CommandLine
         public const string categoryLogging = "Logging";
         public const string categoryUsage = "Usage";
 
-        List<Application> m_applications = new List<Application>();
+        List<ItemSource> m_itemSources = new List<ItemSource>();
         static string[] optionPrefix = new string[] { "--", "-", "/" };
         static CultureInfo cultureInfo;
 
         public static CultureInfo CultureInfo { get { return cultureInfo; } }
 
-        public List<Application> Applications
+        public List<ItemSource> ItemSources
         {
-            get { return m_applications; }
-            set { m_applications = value; }
+            get { return m_itemSources; }
+            set { m_itemSources = value; }
         }
 
-        List<Application> builtInApplications;
+        List<ItemSource> builtInSources;
 
         public List<IParserItem> SubParsers = new List<IParserItem>();
 
-        public Application MainApplication
+        public ItemSource MainSource
         {
             get
             {
-                return Applications.First();
+                return ItemSources.First();
             }
         }
 
-        public Application StartupApplication
+        public ItemSource StartupSource
         {
             get
             {
                 if (Parent == null)
                 {
-                    return MainApplication;
+                    return MainSource;
                 }
                 else
                 {
-                    return Parent.StartupApplication;
+                    return Parent.StartupSource;
                 }
             }
         }
@@ -161,23 +161,23 @@ namespace Sidi.CommandLine
             cultureInfo.DateTimeFormat = dtfi;
         }
 
-        public Parser(params object[] applications)
+        public Parser(params object[] sources)
         : this()
         {
-            if (applications.Any())
+            if (sources.Any())
             {
-                Applications.AddRange(applications.Select(x => new Application(x)));
+                ItemSources.AddRange(sources.Select(x => new ItemSource(x)));
                 AddDefaultUserInterface();
             }
         }
 
         public void AddDefaultUserInterface()
         {
-            Applications.Add(new Application(new ShowUserInterface(this)));
-            Applications.Add(new Application(new ShowHelp(this)));
+            ItemSources.Add(new ItemSource(new ShowUserInterface(this)));
+            ItemSources.Add(new ItemSource(new ShowHelp(this)));
             LogOptions = new LogOptions(this);
-            Applications.Add(new Application(LogOptions) { ProgramSpecificPreferences = true });
-            Applications.Add(new Application(new ShowWebServer(this)));
+            ItemSources.Add(new ItemSource(LogOptions) { ProgramSpecificPreferences = true });
+            ItemSources.Add(new ItemSource(new ShowWebServer(this)));
         }
 
         public LogOptions LogOptions { get; private set; }
@@ -191,15 +191,15 @@ namespace Sidi.CommandLine
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyy-MM-dd";
             cultureInfo.DateTimeFormat = dtfi;
-            builtInApplications = new object[] { new BasicValueParsers() }
-                .Select(x => new Application(x)).ToList();
+            builtInSources = new object[] { new BasicValueParsers() }
+                .Select(x => new ItemSource(x)).ToList();
         }
 
         public Parser Parent { get; set; }
 
-        public static int Run(object application, string[] args)
+        public static int Run(object itemSource, string[] args)
         {
-            Parser parser = new Parser(application);
+            Parser parser = new Parser(itemSource);
             return parser.Run(args);
         }
 
@@ -306,7 +306,7 @@ namespace Sidi.CommandLine
 
         public void ParseSingleCommand(IList<string> args)
         {
-            foreach (var i in Applications)
+            foreach (var i in ItemSources)
             {
                 if (i is CommandLineHandler)
                 {
@@ -418,9 +418,9 @@ namespace Sidi.CommandLine
                 goto done;
             }
 
-            if (o.Application.ProgramSpecificPreferences != null)
+            if (o.Source.ProgramSpecificPreferences != null)
             {
-                applicationSpecific = o.Application.ProgramSpecificPreferences.Value;
+                applicationSpecific = o.Source.ProgramSpecificPreferences.Value;
                 goto done;
             }
 
@@ -430,9 +430,9 @@ namespace Sidi.CommandLine
 
             if (applicationSpecific)
             {
-                parts = parts.Concat(GetNameParts(StartupApplication.Instance.GetType()));
+                parts = parts.Concat(GetNameParts(StartupSource.Instance.GetType()));
             }
-            parts = parts.Concat(GetNameParts(o.Application.Instance.GetType()));
+            parts = parts.Concat(GetNameParts(o.Source.Instance.GetType()));
 
             return CatReg(parts.ToArray());
         }
@@ -466,7 +466,7 @@ namespace Sidi.CommandLine
                 if (m_PreferencesKey == null)
                 {
                     var k = CatReg(Registry.CurrentUser.ToString(), "Software");
-                    var applicationType = MainApplication.Instance.GetType();
+                    var applicationType = MainSource.Instance.GetType();
                     var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(applicationType).Company;
                     var product = GetAssemblyAttribute<AssemblyProductAttribute>(applicationType).Product;
                     k = CatReg(k, company, product, Profile);
@@ -511,7 +511,7 @@ namespace Sidi.CommandLine
 
         bool HandleUnknown(IList<string> args)
         {
-            foreach (var i in Applications)
+            foreach (var i in ItemSources)
             {
                 if (i is CommandLineHandler)
                 {
@@ -756,7 +756,7 @@ found:
         {
             var items = SubParsers
                 .Concat(
-                    Applications.Concat(builtInApplications)
+                    ItemSources.Concat(builtInSources)
                     .SelectMany(x => x.FindItems(this)))
                     .ToList();
 
@@ -779,7 +779,7 @@ found:
             {
                 if (availableValueParsers == null)
                 {
-                    availableValueParsers = Applications.Concat(builtInApplications)
+                    availableValueParsers = ItemSources.Concat(builtInSources)
                         .SelectMany(a => a.GetValueParsers(this))
                         .ToList();
                 }
@@ -840,7 +840,7 @@ found:
                 {
                     return a.GetName().Name;
                 }
-                return StartupApplication.Instance.GetType().Name;
+                return StartupSource.Instance.GetType().Name;
             }
         }
 
@@ -850,7 +850,7 @@ found:
             {
                 using (var w = new StringWriter())
                 {
-                    Assembly assembly = MainApplication.Instance.GetType().Assembly;
+                    Assembly assembly = MainSource.Instance.GetType().Assembly;
 
                     List<string> infos = new List<string>();
 
@@ -873,7 +873,7 @@ found:
         {
             get
             {
-                var app = StartupApplication.Instance;
+                var app = StartupSource.Instance;
                 var appType = app.GetType();
 
                 using (var i = new StringWriter())
@@ -953,7 +953,7 @@ found:
 
         static bool IncludeInShortUsage(IParserItem item)
         {
-            return !item.Application.Instance.GetType().Namespace.Equals("Sidi.CommandLine") ||
+            return !item.Source.Instance.GetType().Namespace.Equals("Sidi.CommandLine") ||
                 item.Name.Equals("Usage");
         }
 
@@ -996,14 +996,14 @@ found:
 
         public void PrintSampleScript(TextWriter w)
         {
-            string applicationName = Applications.Last().GetType().Name;
+            string applicationName = ItemSources.Last().GetType().Name;
             Console.WriteLine(
                 String.Format("{0} - {1}",
                 applicationName,
-                Usage.Get(MainApplication.Instance.GetType()))
+                Usage.Get(MainSource.Instance.GetType()))
                 );
 
-            Assembly assembly = MainApplication.Instance.GetType().Assembly;
+            Assembly assembly = MainSource.Instance.GetType().Assembly;
 
             List<string> infos = new List<string>();
 
@@ -1020,12 +1020,12 @@ found:
             w.WriteLine(infos.Join(", "));
             w.WriteLine();
 
-            foreach (var application in Applications)
+            foreach (var source in ItemSources)
             {
                 w.WriteLine("Actions");
                 w.WriteLine();
 
-                foreach (MethodInfo i in application.Instance.GetType().GetMethods())
+                foreach (MethodInfo i in source.Instance.GetType().GetMethods())
                 {
                     string u = Usage.Get(i);
                     string parameters = i.GetParameters()
@@ -1042,12 +1042,12 @@ found:
                 w.WriteLine("Options");
                 w.WriteLine();
 
-                foreach (MemberInfo i in application.Instance.GetType().GetMembers())
+                foreach (MemberInfo i in source.Instance.GetType().GetMembers())
                 {
                     if (i.MemberType == MemberTypes.Field)
                     {
                         FieldInfo fieldInfo = (FieldInfo)i;
-                        object defaultValue = i.GetValue(application.Instance);
+                        object defaultValue = i.GetValue(source.Instance);
                         string u = Usage.Get(i);
                         if (u != null)
                         {
@@ -1063,7 +1063,7 @@ found:
                     else if (i.MemberType == MemberTypes.Property)
                     {
                         PropertyInfo propertyInfo = (PropertyInfo)i;
-                        object defaultValue = i.GetValue(application.Instance);
+                        object defaultValue = i.GetValue(source.Instance);
                         string u = Usage.Get(i);
                         if (u != null)
                         {
@@ -1103,11 +1103,11 @@ found:
             }
         }
 
-        public static Parser SingleApplication(object instance)
+        public static Parser SingleSource(object instance)
         {
             return new Parser()
             {
-                Applications = new List<Application>(){ new Application(instance) }
+                ItemSources = new List<ItemSource>(){ new ItemSource(instance) }
             };
         }
     }

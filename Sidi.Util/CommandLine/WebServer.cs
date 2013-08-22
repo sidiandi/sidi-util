@@ -53,8 +53,8 @@ namespace Sidi.CommandLine
                 if (_parser == null)
                 {
                     _parser = new Parser();
-                    _parser.Applications.AddRange(
-                        originalParser.Applications
+                    _parser.ItemSources.AddRange(
+                        originalParser.ItemSources
                         .Where(a =>
                         {
                             var ns = a.GetType().Namespace;
@@ -82,7 +82,7 @@ namespace Sidi.CommandLine
             {
                 if (prefix == null)
                 {
-                    return "http://{0}/{1}/".F(System.Environment.MachineName, originalParser.MainApplication.Instance.GetType().Name);
+                    return "http://{0}/{1}/".F(System.Environment.MachineName, originalParser.MainSource.Instance.GetType().Name);
                 }
                 else
                 {
@@ -174,7 +174,7 @@ namespace Sidi.CommandLine
                 cs.Add(i);
             }
             cs.Reverse();
-            return cs.Select(x => a(href(x.Base), x.Parser.MainApplication.Instance.GetType().Name));
+            return cs.Select(x => a(href(x.Base), x.Parser.MainSource.Instance.GetType().Name));
         }
 
         void Overview(Context c)

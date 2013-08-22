@@ -79,7 +79,7 @@
     <Compile Include="CommandLine\ActionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CommandLine\Application.cs" />
+    <Compile Include="CommandLine\ItemSource.cs" />
     <Compile Include="CommandLine\ArrayValueParser.cs" />
     <Compile Include="CommandLine\Attributes.cs" />
     <Compile Include="CommandLine\BasicValueParsers.cs" />

@@ -55,14 +55,14 @@ namespace Sidi.CommandLine
 
                     if (IsMemberInitialized)
                     {
-                        instance = memberInfo.GetValue(Application.Instance);
+                        instance = memberInfo.GetValue(Source.Instance);
                     }
                     else
                     {
                         // auto create instance
                         log.DebugFormat("auto-create of {0} instance", memberInfo);
                         instance =  Activator.CreateInstance(memberInfo.GetMemberType());
-                        memberInfo.SetValue(Application.Instance, instance);
+                        memberInfo.SetValue(Source.Instance, instance);
                         instanceCreated = true;
                     }
 
@@ -71,7 +71,7 @@ namespace Sidi.CommandLine
                     {
                         Parent = this.parentParser
                     };
-                    _parser.Applications.Add(new Application(instance));
+                    _parser.ItemSources.Add(new ItemSource(instance));
 
                     if (instanceCreated && needLoadPreferences)
                     {
@@ -83,10 +83,10 @@ namespace Sidi.CommandLine
         }
         Parser _parser;
 
-        public SubCommand(Parser parser, Application application, MemberInfo memberInfo)
+        public SubCommand(Parser parser, ItemSource source, MemberInfo memberInfo)
         {
             this.memberInfo = memberInfo;
-            this.Application = application;
+            this.Source = source;
             this.parentParser = parser;
         }
 
@@ -94,7 +94,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                return memberInfo.GetValue(Application.Instance) != null;
+                return memberInfo.GetValue(Source.Instance) != null;
             }
         }
 
@@ -168,7 +168,7 @@ namespace Sidi.CommandLine
             get { throw new NotImplementedException(); }
         }
 
-        public Application Application { get; private set; }
+        public ItemSource Source { get; private set; }
 
         public IEnumerable<string> Categories
         {
