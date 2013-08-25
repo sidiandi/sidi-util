@@ -223,6 +223,15 @@ namespace Sidi.Util
             }
         }
 
+        public override string ToString()
+        {
+            using (var w = new StringWriter())
+            {
+                RenderText(w);
+                return w.ToString();
+            }
+        }
+
         public void RenderDetails(TextWriter o)
         {
             DefaultColumns();
