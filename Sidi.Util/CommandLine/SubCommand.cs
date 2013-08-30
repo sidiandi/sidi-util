@@ -72,6 +72,7 @@ namespace Sidi.CommandLine
                         Parent = this.parentParser
                     };
                     _parser.ItemSources.Add(new ItemSource(instance));
+                    _parser.AddDefaultUserInterfaceForSubCommands();
 
                     if (instanceCreated && needLoadPreferences)
                     {
