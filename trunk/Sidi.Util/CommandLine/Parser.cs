@@ -180,6 +180,16 @@ namespace Sidi.CommandLine
             ItemSources.Add(new ItemSource(new ShowWebServer(this)));
         }
 
+        public void AddDefaultUserInterfaceForSubCommands()
+        {
+            ItemSources.Add(new ItemSource(new ShowUserInterface(this)));
+            ItemSources.Add(new ItemSource(new ShowHelp(this)));
+            if (!this.Parent.ItemSources.Any(x => x.Instance is WebServer))
+            {
+                ItemSources.Add(new ItemSource(new ShowWebServer(this)));
+            }
+        }
+
         public LogOptions LogOptions { get; private set; }
 
         internal Parser()
@@ -306,13 +316,9 @@ namespace Sidi.CommandLine
 
         public void ParseSingleCommand(IList<string> args)
         {
-            foreach (var i in ItemSources)
+            foreach (var i in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler>())
             {
-                if (i is CommandLineHandler)
-                {
-                    CommandLineHandler h = (CommandLineHandler)i;
-                    h.BeforeParse(args);
-                }
+                i.BeforeParse(args);
             }
 
             if (args.Count == 0)
@@ -511,15 +517,11 @@ namespace Sidi.CommandLine
 
         bool HandleUnknown(IList<string> args)
         {
-            foreach (var i in ItemSources)
+            foreach (var h in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler>())
             {
-                if (i is CommandLineHandler)
-                {
-                    CommandLineHandler h = (CommandLineHandler)i;
-                    int c = args.Count;
-                    h.UnknownArgument(args);
-                    return args.Count != c;
-                }
+                int c = args.Count;
+                h.UnknownArgument(args);
+                return args.Count != c;
             }
             return false;
         }

@@ -830,5 +830,38 @@ namespace Sidi.CommandLine.Test
             p.LogOptions.LogFile = false;
             Assert.AreEqual(false, p.LogOptions.LogFile);
         }
+
+        [Usage("Tests handling of unknown commands")]
+        public class CommandLineHandlerTestApp : CommandLineHandler
+        {
+            public int beforeParseCalls = 0;
+
+            public void BeforeParse(IList<string> args)
+            {
+                beforeParseCalls++;
+            }
+
+            public void UnknownArgument(IList<string> args)
+            {
+                unknownArgument = args.PopHead();
+            }
+
+            public string unknownArgument;
+
+            [Usage("Command")]
+            public void DoSomething()
+            {
+            }
+        }
+
+        [Test]
+        public void CommandLineHandler()
+        {
+            var a = new CommandLineHandlerTestApp();
+            var p = new Parser(a);
+            p.Run(new[]{"Hello", "DoSomething"});
+            Assert.AreEqual(2, a.beforeParseCalls);
+            Assert.AreEqual("Hello", a.unknownArgument);
+        }
     }
 }
