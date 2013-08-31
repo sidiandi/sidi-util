@@ -32,8 +32,24 @@ namespace Sidi.IMAP
         public DateTime Date;
         public TimeSpan TimeZone;
 
-        public static readonly string[] months = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        static readonly string[] months = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
+        public override string ToString()
+        {
+                var t = Date;
+                return String.Format(
+                    "{0:D2}-{1}-{2:D4} {3:D2}:{4:D2}:{5:D2} {6}{7:D2}{8:D2}",
+                    t.Day,
+                    Rfc822DateTime.months[t.Month-1],
+                    t.Year,
+                    t.Hour,
+                    t.Minute,
+                    t.Second,
+                    TimeZone.TotalSeconds < 0 ? "-" : "+",
+                    Math.Abs(TimeZone.Hours),
+                    Math.Abs(TimeZone.Minutes));
+        }
+        
         public static Rfc822DateTime Parse(string date)
         {
             var p = new ArgParser(date);

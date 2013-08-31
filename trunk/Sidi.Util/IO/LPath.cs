@@ -925,7 +925,7 @@ namespace Sidi.IO
             var r = obj as LPath;
             if (r == null)
             {
-                throw new System.ArgumentException("obj");
+                throw new System.ArgumentException("Parameter must be of Type LPath", "obj");
             }
             return this.ToString().CompareTo(r.ToString());
         }

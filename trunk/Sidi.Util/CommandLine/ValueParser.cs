@@ -56,15 +56,17 @@ namespace Sidi.CommandLine
         {
             get
             {
-                var s = new StringWriter();
-                s.Write(Usage);
-                var e = Examples;
-                if (e.Any())
+                using (var s = new StringWriter())
                 {
-                    s.Write(". Examples: ");
-                    s.Write(e.Select(x => x.Value.Quote()).Join(", "));
+                    s.Write(Usage);
+                    var e = Examples;
+                    if (e.Any())
+                    {
+                        s.Write(". Examples: ");
+                        s.Write(e.Select(x => x.Value.Quote()).Join(", "));
+                    }
+                    return s.ToString();
                 }
-                return s.ToString();
             }
         }
 

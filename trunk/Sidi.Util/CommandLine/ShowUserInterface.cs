@@ -379,11 +379,12 @@ namespace Sidi.CommandLine
 
         bool ExcludedFromUi(IParserItem item)
         {
+            var o = item.Source.Instance;
             return ((
-                    item.Source is ShowHelp ||
-                    item.Source is ShowUserInterface ||
-                    item.Source is ShowWebServer ||
-                    item.Source is LogOptions ||
+                    o is ShowHelp ||
+                    o is ShowUserInterface ||
+                    o is ShowWebServer ||
+                    o is LogOptions ||
                     false));
         }
 
@@ -446,6 +447,7 @@ namespace Sidi.CommandLine
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000: DisposeObjectsBeforeLosingScope")]
         void AddToPage(Control page, IEnumerable<IParserItem> items)
         {
                 var c = new TableLayoutPanel()
@@ -470,7 +472,6 @@ namespace Sidi.CommandLine
                     }
                     else
                     {
-
                         var separator = new Label()
                         {
                             AutoSize = false,

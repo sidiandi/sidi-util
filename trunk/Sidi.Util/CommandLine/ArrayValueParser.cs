@@ -42,17 +42,14 @@ namespace Sidi.CommandLine
 
         public string Syntax
         {
-            get { return String.Format("'[' {0} {0} ... ']'", ElementType.Name, ElementType.Name); }
+            get { return String.Format("'[' {0} {0} ... ']'", ElementType.Name); }
         }
 
-        public ItemSource Source
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public ItemSource Source { get { return null; }}
 
         public IEnumerable<string> Categories
         {
-            get { throw new NotImplementedException(); }
+            get { return new string[] { }; }
         }
 
         public object Handle(IList<string> args, bool execute)

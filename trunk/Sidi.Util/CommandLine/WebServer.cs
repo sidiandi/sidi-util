@@ -558,7 +558,7 @@ namespace Sidi.CommandLine
           {
             if (disposing)
             {
-                WebServer.Dispose();
+                _WebServer.Dispose();
             }
             // Free your own state (unmanaged objects).
             // Set large fields to null.

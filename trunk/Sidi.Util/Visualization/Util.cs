@@ -61,7 +61,8 @@ namespace Sidi.Visualization
         /// Returns an position index to split scalars
         /// so that the two lists have approximately same sums
         /// </summary>
-        /// <param name="scalars"></param>
+        /// <param name="list">List of items</param>
+        /// <param name="scalar">Function to retrieve the scalar value</param>
         /// <returns></returns>
         public static SplitPart<T>[] Split<T>(this IEnumerable<T> list, Func<T, double> scalar)
         {

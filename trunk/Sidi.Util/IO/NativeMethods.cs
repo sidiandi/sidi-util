@@ -184,11 +184,11 @@ namespace Sidi.IO
             GetFileExMaxInfoLevel
         }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern bool GetVolumePathName(string lpszFileName,
             [Out] StringBuilder lpszVolumePathName, uint cchBufferLength);
 
-        [DllImport("shlwapi.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern bool PathAppend([In, Out] StringBuilder pszPath, string pszMore);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -204,7 +204,7 @@ namespace Sidi.IO
             ref uint stringLength,
             StringBuilder fileName);
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern SafeFileHandle CreateFile(
             string lpFileName,
             [MarshalAs(UnmanagedType.U4)] System.IO.FileAccess dwDesiredAccess,

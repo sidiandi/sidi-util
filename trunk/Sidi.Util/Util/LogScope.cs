@@ -37,8 +37,7 @@ namespace Sidi.Util
           {
             if (disposing)
             {
-                var msg = String.Format(text, parameters);
-                msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s", (DateTime.Now - start).TotalSeconds, msg);
+                var msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s", (DateTime.Now - start).TotalSeconds);
                 logger(msg);
                 context.Dispose();
             }

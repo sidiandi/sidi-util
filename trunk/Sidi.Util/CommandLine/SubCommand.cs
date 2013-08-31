@@ -141,7 +141,7 @@ namespace Sidi.CommandLine
                     return usage;
                 }
 
-                throw new InvalidDataException("No usage text for {0}".F(memberInfo));
+                return "No usage text for {0}".F(memberInfo);
             }
         }
 
@@ -166,7 +166,11 @@ namespace Sidi.CommandLine
 
         public string Syntax
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return String.Format("{0} [subcommands...] {1}",
+                    Name, Parser.ListTerminator);
+            }
         }
 
         public ItemSource Source { get; private set; }

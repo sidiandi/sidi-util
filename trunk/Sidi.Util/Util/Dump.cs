@@ -108,7 +108,7 @@ namespace Sidi.Util
         /// </summary>
         public string Indent = "  ";
 
-        public static HashSet<Type> acceptableTypes = new HashSet<Type>(new[]
+        static HashSet<Type> acceptableTypes = new HashSet<Type>(new[]
         {
             typeof(System.String),
             typeof(Sidi.IO.LPath)

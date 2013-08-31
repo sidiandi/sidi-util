@@ -29,7 +29,7 @@ namespace Sidi.Util
         /// </summary>
         private UnixTime() { }
 
-        public static DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0);
+        static DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0);
 
         // Time_t is an int representing the number of seconds since
         // Midnight UTC 1 Jan 1970 on the Gregorian Calendar.
