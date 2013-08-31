@@ -28,24 +28,18 @@ namespace Sidi.Visualization
     /// </summary>
     public class ColorScale
     {
-        public static Color[] BlueRed
+        public static Color[] GetBlueRed()
         {
-            get
-            {
-                int lutLength = 256;
-                return GetColorScale(lutLength, Color.Blue, Color.Red);
-            }
+            int lutLength = 256;
+            return GetColorScale(lutLength, Color.Blue, Color.Red);
         }
 
-        public static Color[] GreenYellowRed
+        public static Color[] GetGreenYellowRed()
         {
-            get
-            {
-                int lutLength = 256;
-                return
-                    GetColorScale(lutLength / 2, Color.Green, Color.Yellow).Concat(
-                    GetColorScale(lutLength / 2, Color.Yellow, Color.Red)).ToArray();
-            }
+            int lutLength = 256;
+            return
+                GetColorScale(lutLength / 2, Color.Green, Color.Yellow).Concat(
+                GetColorScale(lutLength / 2, Color.Yellow, Color.Red)).ToArray();
         }
 
         public static Color[] GetColorScale(int length, Color c0, Color c1)

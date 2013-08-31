@@ -247,7 +247,7 @@ namespace Sidi.Tool
             var c = items.CreateTreeMap();
             c.GetLineage = i => i.FullName.Parts;
             c.GetSize = i => i.Length;
-            c.SetPercentileColorScale(i => i.LastWriteTime, ColorScale.BlueRed);
+            c.SetPercentileColorScale(i => i.LastWriteTime, ColorScale.GetBlueRed());
             c.GetText = i => i.Name;
             c.Activate = i => Process.Start(i.FullName);
             c.ContextMenuStrip.Opening += (s, e) =>

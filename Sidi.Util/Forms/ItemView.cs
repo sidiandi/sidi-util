@@ -391,7 +391,7 @@ namespace Sidi.Forms
             SetClippedValue(vScrollBar, Offset.Y);
         }
 
-        void ClipValue(ScrollBar sb)
+        static void ClipValue(ScrollBar sb)
         {
             int v = sb.Value;
             if (v > sb.Maximum - sb.LargeChange)
@@ -404,7 +404,7 @@ namespace Sidi.Forms
             }
         }
 
-        void SetClippedValue(ScrollBar sb, int v)
+        static void SetClippedValue(ScrollBar sb, int v)
         {
             if (v > sb.Maximum - sb.LargeChange)
             {
@@ -1079,12 +1079,12 @@ namespace Sidi.Forms
             OnSelectionChanged();
         }
 
-        bool ShiftPressed
+        static bool ShiftPressed
         {
             get { return (ModifierKeys & Keys.Shift) == Keys.Shift; }
         }
 
-        bool ControlPressed
+        static bool ControlPressed
         {
             get { return (ModifierKeys & Keys.Control) == Keys.Control; }
         }

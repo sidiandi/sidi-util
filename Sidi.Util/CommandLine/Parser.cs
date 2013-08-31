@@ -171,6 +171,7 @@ namespace Sidi.CommandLine
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000: DisposeObjectsBeforeLosingScope")]
         public void AddDefaultUserInterface()
         {
             ItemSources.Add(new ItemSource(new ShowUserInterface(this)));
@@ -180,6 +181,7 @@ namespace Sidi.CommandLine
             ItemSources.Add(new ItemSource(new ShowWebServer(this)));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000: DisposeObjectsBeforeLosingScope")]
         public void AddDefaultUserInterfaceForSubCommands()
         {
             ItemSources.Add(new ItemSource(new ShowUserInterface(this)));

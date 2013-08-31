@@ -263,18 +263,7 @@ namespace Sidi.IMAP
             else if (x is Rfc822DateTime)
             {
                 var d = (Rfc822DateTime)x;
-                var t = d.Date;
-                return ArgString(String.Format(
-                    "{0:D2}-{1}-{2:D4} {3:D2}:{4:D2}:{5:D2} {6}{7:D2}{8:D2}",
-                    t.Day,
-                    Rfc822DateTime.months[t.Month-1],
-                    t.Year,
-                    t.Hour,
-                    t.Minute,
-                    t.Second,
-                    d.TimeZone.TotalSeconds < 0 ? "-" : "+",
-                    Math.Abs(d.TimeZone.Hours),
-                    Math.Abs(d.TimeZone.Minutes)));
+                return ArgString(d.ToString());
             }
             else if (x.GetType().IsEnum)
             {

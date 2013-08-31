@@ -64,12 +64,6 @@ namespace Sidi.Forms
         ///<param name="hMem">Pointer to the memory block to be freed.</param>
         [DllImport("ole32.dll", CharSet = CharSet.Unicode)]
         internal static extern void CoTaskMemFree(IntPtr hMem);
-        ///<summary>The lstrcat function appends one string to another.</summary>
-        ///<param name="lpString1">Pointer to a null-terminated string. The buffer must be large enough to contain both strings.</param>
-        ///<param name="lpString2">Pointer to the null-terminated string to be appended to the string specified in the lpString1 parameter.</param>
-        ///<returns>If the function succeeds, the return value is a pointer to the buffer.<br>If the function fails, the return value is IntPtr.Zero.</br></returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        internal static extern IntPtr lstrcat(string lpString1, string lpString2);
         ///<summary>Displays a dialog box that enables the user to select a shell folder.</summary>
         ///<param name="lpbi">Address of a BROWSEINFO structure that contains information used to display the dialog box.</param>
         ///<returns>Returns the address of an item identifier list that specifies the location of the selected folder relative to the root of the namespace. If the user chooses the Cancel button in the dialog box, the return value is IntPtr.Zero.</returns>

@@ -53,13 +53,6 @@ namespace Sidi.CommandLine.Test
             p.Run(new []{"Manual"});
         }
 
-        [Test, Explicit("ui")]
-        public void UI2()
-        {
-            var p = ParserTest.ParserWithAllTestApps();
-            new ShowUserInterface2(p).UserInterface();
-        }
-
         [Test, Explicit("UI")]
         public void SubCommandUi()
         {
