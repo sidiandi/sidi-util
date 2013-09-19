@@ -80,7 +80,7 @@ namespace Sidi.IO
                 return GetFilesSelectedInExplorer();
             }
 
-            return new PathList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x)));
+            return new PathList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x.Unquote())));
         }
 
         public override string ToString()
