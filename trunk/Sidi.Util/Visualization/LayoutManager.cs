@@ -317,10 +317,6 @@ namespace Sidi.Visualization
 
         public static void DivideAndConquer(LayoutContext c)
         {
-            if (c.Layout[0].Tree.Object.ToString().Contains("Solnce.Happy.Hardcore.720p.XX"))
-            {
-            }
-
             if (c.Layout.Length >= 2)
             {
                 foreach (var i in Split2(c))
