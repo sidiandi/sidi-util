@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using Sidi.Util;
 using Sidi.Extensions;
 using System.Collections;
+using System.Collections.Specialized;
 
 namespace Sidi.IO
 {
@@ -47,6 +48,16 @@ namespace Sidi.IO
                 .Cast<string>()
                 .Select(x => new Sidi.IO.LPath(x)));
             return fileList;
+        }
+
+        public void WriteClipboard()
+        {
+            var files = new StringCollection();
+            foreach (var i in this)
+            {
+                files.Add(i);
+            }
+            Clipboard.SetFileDropList(files);
         }
 
         public static PathList GetFilesSelectedInExplorer()

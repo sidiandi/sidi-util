@@ -237,6 +237,12 @@ namespace Sidi.IO
         /// <returns></returns>
         public static LPath Parse(string text)
         {
+            if (text.Equals(":paste", StringComparison.InvariantCultureIgnoreCase) ||
+                text.Equals(":sel", StringComparison.OrdinalIgnoreCase))
+            {
+                return PathList.Parse(text).First();
+            }
+
             text = text.Replace("/", LPath.DirectorySeparator);
             return new LPath(text);
         }

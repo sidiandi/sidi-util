@@ -32,9 +32,23 @@ using Sidi.Test;
 
 namespace Sidi.Visualization
 {
-    [TestFixture]
+    [TestFixture, Explicit("interactive")]
     public class SimpleTreeMapTest : TestBase
     {
+        [Test]
+        public void FilesTreeMap()
+        {
+            var items = Find.AllFiles(new LPath(@"V:\new"));
+            var c = items.CreateTreeMap();
+            c.GetLineage = i => i.FullName.Parts;
+            c.GetSize = i => i.Length;
+            c.SetPercentileColorScale(i => i.LastWriteTime, Sidi.Visualization.ColorScale.GetGreenYellowRed());
+            c.GetText = i => i.Name;
+            c.Activate = i => Process.Start(i.FullName);
+
+            c.RunFullScreen();
+        }
+
         [Test, Explicit("interactive")]
         public void Simple()
         {

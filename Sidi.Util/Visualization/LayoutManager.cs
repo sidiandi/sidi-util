@@ -317,6 +317,10 @@ namespace Sidi.Visualization
 
         public static void DivideAndConquer(LayoutContext c)
         {
+            if (c.Layout[0].Tree.Object.ToString().Contains("Solnce.Happy.Hardcore.720p.XX"))
+            {
+            }
+
             if (c.Layout.Length >= 2)
             {
                 foreach (var i in Split2(c))
@@ -328,6 +332,17 @@ namespace Sidi.Visualization
             {
                 c.Layout[0].Bounds = c.Bounds;
             }
+            
+            for (var d = Dimension.X; d <= Dimension.Y; ++d)
+            {
+                for (var b = Bound.Min; b <= Bound.Max; ++b)
+                {
+                    if (Double.IsNaN(c.Bounds[d, b]))
+                    {
+                        throw new InvalidOperationException(c.Bounds.ToString());
+                    }
+                }
+            }
         }
 
         static LayoutContext[] Split2(LayoutContext c)
@@ -335,7 +350,16 @@ namespace Sidi.Visualization
             var splitDim = c.Bounds.Width > c.Bounds.Height ? Dimension.X : Dimension.Y;
 
             var p = c.Layout.Split(x => x.Tree.Size);
-            var splitX = c.Bounds[splitDim, Bound.Min] + c.Bounds.Extent(splitDim) * p[0].Sum / (p[0].Sum + p[1].Sum);
+            var den = (p[0].Sum + p[1].Sum);
+            double splitX;
+            if (den <= double.Epsilon)
+            {
+                splitX = c.Bounds[splitDim, Bound.Min] + c.Bounds.Extent(splitDim) * 0.5;
+            }
+            else
+            {
+                splitX = c.Bounds[splitDim, Bound.Min] + c.Bounds.Extent(splitDim) * p[0].Sum / den;
+            }
 
             var r = new LayoutContext[]
             {
