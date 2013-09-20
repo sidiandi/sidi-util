@@ -31,57 +31,6 @@ using Sidi.Extensions;
 
 namespace Sidi.Persistence
 {
-    public static class MemberInfoExtensions
-    {
-        public static void SetValue(this MemberInfo member, object target, object value)
-        {
-            if (member is FieldInfo)
-            {
-                ((FieldInfo)member).SetValue(target, value);
-            }
-            else if (member is PropertyInfo)
-            {
-                ((PropertyInfo)member).SetValue(target, value, new object[]{});
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        public static Type FieldType(this MemberInfo member)
-        {
-            if (member is FieldInfo)
-            {
-                return ((FieldInfo)member).FieldType;
-            }
-            else if (member is PropertyInfo)
-            {
-                return ((PropertyInfo)member).PropertyType;
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        public static object GetValue(this MemberInfo member, object item)
-        {
-            if (member is FieldInfo)
-            {
-                return ((FieldInfo)member).GetValue(item);
-            }
-            else if (member is PropertyInfo)
-            {
-                return ((PropertyInfo)member).GetValue(item, new object[] { });
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-        }
-    }
-    
     public class CollectionBase
     {
         protected SharedConnection m_connection;
@@ -769,46 +718,48 @@ namespace Sidi.Persistence
         {
             try
             {
+                var mt = i.GetMemberType();
+
                 if (reader.IsDBNull(index))
                 {
                     i.SetValue(item, null);
                 }
-                else if (i.FieldType() == typeof(string))
+                else if (mt == typeof(string))
                 {
                     i.SetValue(item, reader.GetString(index));
                 }
-                else if (i.FieldType() == typeof(DateTime))
+                else if (mt == typeof(DateTime))
                 {
                     i.SetValue(item, reader.GetDateTime(index));
                 }
-                else if (i.FieldType() == typeof(bool))
+                else if (mt == typeof(bool))
                 {
                     i.SetValue(item, reader.GetBoolean(index));
                 }
-                else if (i.FieldType() == typeof(decimal))
+                else if (mt == typeof(decimal))
                 {
                     i.SetValue(item, reader.GetDecimal(index));
                 }
-                else if (i.FieldType() == typeof(short))
+                else if (mt == typeof(short))
                 {
                     i.SetValue(item, reader.GetInt16(index));
                 }
-                else if (i.FieldType() == typeof(int))
+                else if (mt == typeof(int))
                 {
                     i.SetValue(item, reader.GetInt32(index));
                 }
-                else if (i.FieldType() == typeof(long))
+                else if (mt == typeof(long))
                 {
                     i.SetValue(item, reader.GetInt64(index));
                 }
-                else if (i.FieldType() == typeof(Guid))
+                else if (mt == typeof(Guid))
                 {
                     i.SetValue(item, reader.GetGuid(index));
                 }
                 else if (reader.GetFieldType(index) == typeof(string))
                 {
                     // FieldType must be constructible from string
-                    var stringConstructor = i.FieldType().GetConstructor(new Type[] { typeof(string) });
+                    var stringConstructor = mt.GetConstructor(new Type[] { typeof(string) });
                     var value = stringConstructor.Invoke(new object[] { reader.GetString(index) });
                     i.SetValue(item, value);
                 }
@@ -819,7 +770,7 @@ namespace Sidi.Persistence
             }
             catch (Exception ex)
             {
-                log.Warn(String.Format("{0}", i.FieldType()), ex);
+                log.Warn(String.Format("{0}", i.GetMemberType()), ex);
                 throw;
             }
         }
