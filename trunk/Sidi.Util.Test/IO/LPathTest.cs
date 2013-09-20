@@ -99,7 +99,6 @@ namespace Sidi.IO
             {
                 Console.WriteLine(p);
                 Assert.IsTrue(LDirectory.Exists(p));
-                Console.WriteLine(p.Children.Join());
             }
         }
 
@@ -327,6 +326,15 @@ namespace Sidi.IO
             Assert.AreEqual(p, LPath.Parse(@"C:\temp\somefile"));
             Assert.AreEqual(p, LPath.Parse(@"C:/temp/somefile"));
             Assert.AreEqual(new LPath(@"a\b\c"), LPath.Parse("a/b/c"));
+        }
+
+        [Test, RequiresSTA]
+        public void ParseClipboard()
+        {
+            var paths = new PathList(new []{ new LPath(@"C:\temp\somefile") });
+            paths.WriteClipboard();
+            var p = LPath.Parse(":paste");
+            Assert.AreEqual(paths.First(), p);
         }
 
         [Test]
