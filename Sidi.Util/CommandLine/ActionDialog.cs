@@ -71,9 +71,9 @@ namespace Sidi.CommandLine
             }                   
             catch (Exception ex)
             {
+                
                 var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 ShowUserInterface.SetError(Button, msg);
-                
             }
         }
     }
