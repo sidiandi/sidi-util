@@ -63,8 +63,6 @@ namespace Sidi.CommandLine
                 }
             }
 
-            public LPath Value { get; set; }
-
             [Usage("Use directory currently open in Windows Explorer")]
             public void Current()
             {
