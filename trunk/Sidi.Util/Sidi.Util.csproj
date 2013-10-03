@@ -152,7 +152,6 @@
     <Compile Include="IO\LPath.cs" />
     <Compile Include="IO\PathTypeConverter.cs" />
     <Compile Include="IO\NativeMethods.cs" />
-    <Compile Include="Net\Abnf.cs" />
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServer.cs" />
