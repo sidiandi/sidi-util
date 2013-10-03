@@ -20,7 +20,7 @@ namespace Sidi.CommandLine
             get { return Value; }
         }
 
-        Type IValueContainer.ValueType
+        public Type IValueContainer.ValueType
         {
             get { return typeof(T); }
         }
