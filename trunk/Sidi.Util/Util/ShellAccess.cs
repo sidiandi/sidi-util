@@ -60,13 +60,17 @@ namespace Sidi.Util
         {
             get
             {
-                IntPtr handle = NativeMethods.GetForegroundWindow();
-
                 var w = GetForegroundWindow();
                 var items = ((Shell32.IShellFolderViewDual2)w.Document).SelectedItems();
                 return items.Cast<Shell32.FolderItem>()
                     .Select(i => new LPath(i.Path));
             }
+        }
+
+        public LPath GetOpenDirectory()
+        {
+            var w = GetForegroundWindow();
+            return new LPath(new Uri(w.LocationURL).LocalPath);
         }
     }
 }

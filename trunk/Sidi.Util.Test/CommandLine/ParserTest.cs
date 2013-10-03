@@ -271,7 +271,6 @@ namespace Sidi.CommandLine.Test
         public void TestDescription()
         {
             Parser parser = new Parser(new TestAppWithDescription());
-            parser.Parse(new string[] { "--SomeOption", "hello", "SomeAction" });
 
             var w = new System.IO.StringWriter();
             parser.PrintSampleScript(w);
@@ -372,6 +371,18 @@ namespace Sidi.CommandLine.Test
             var a = new TestAppWithStringList();
             var p = new Parser(a);
             p.Parse(new string[] { "Add", "1", "1", "Subtract", "3", "1" });
+        }
+
+        [Test]
+        public void ParseBraces()
+        {
+            var a = new TestAppWithStringList();
+            var p = new Parser(a);
+            var args = new List<string>() { "Add", "1", "1", "(Subtract", "3", "1", "Add", "1", "1)", "Add", "1", "1" };
+            p.ParseSingleCommand(args);
+            Assert.AreEqual("(Subtract", args.First());
+            p.ParseBraces(args);
+            Assert.AreEqual("Add", args.First());
         }
 
         [Test]
@@ -621,6 +632,7 @@ namespace Sidi.CommandLine.Test
         {
             var a = new AmbiguousOption();
             var p = new Parser(a);
+            p.Prefix[typeof(Option)] = new string[] { "--" };
             p.Parse(new string[] { "--ru", "1"});
         }
 

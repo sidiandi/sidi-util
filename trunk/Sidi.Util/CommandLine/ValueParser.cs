@@ -12,6 +12,7 @@ namespace Sidi.CommandLine
 {
     public interface IValueParser : IParserItem
     {
+        Type ValueType { get; }
     }
 
     public class ValueParser : IValueParser
@@ -120,6 +121,70 @@ namespace Sidi.CommandLine
                 args.PopHead();
             }
             return result;
+        }
+    }
+
+    public class ComplexValueParser : IValueParser
+    {
+        public ComplexValueParser(Type parser)
+        {
+            this.parser = parser;
+        }
+
+        Type parser;
+
+        public Type ValueType
+        {
+            get
+            {
+                var p = Activator.CreateInstance(parser);
+                return ((IValueContainer)p).ValueType;
+            }
+        }
+
+        public string Usage
+        {
+            get
+            {
+                var p = Activator.CreateInstance(parser);
+                using (var w = new StringWriter())
+                {
+                    Parser.SingleSource(p).WriteUsage(w);
+                    return w.ToString();
+                }
+            }
+        }
+
+        public string UsageText
+        {
+            get { return Usage; }
+        }
+
+        public string Name
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string Syntax
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ItemSource Source
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IEnumerable<string> Categories
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public object Handle(IList<string> args, bool execute)
+        {
+            var p = Activator.CreateInstance(parser);
+            Parser.SingleSource(p).ParseBraces(args);
+            return ((IValueContainer)p).Value;
         }
     }
 }

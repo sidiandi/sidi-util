@@ -11,7 +11,7 @@ namespace Sidi.CommandLine
     {
         public StandardValueParser(Type type)
         {
-            this.type = type;
+            this.ValueType = type;
 
             var parse = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
             if (parse != null)
@@ -29,26 +29,26 @@ namespace Sidi.CommandLine
         ok: ;
         }
 
-        Type type;
+        public Type ValueType { get; private set; }
 
         public string Usage
         {
-            get { return String.Format("{0} value", type.Name); }
+            get { return String.Format("{0} value", ValueType.Name); }
         }
 
         public string UsageText
         {
-            get { return String.Format("{0} value", type.Name); }
+            get { return String.Format("{0} value", ValueType.Name); }
         }
 
         public string Name
         {
-            get { return type.Name; }
+            get { return ValueType.Name; }
         }
 
         public string Syntax
         {
-            get { return type.Name; }
+            get { return ValueType.Name; }
         }
 
         public ItemSource Source
@@ -65,7 +65,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                return new Uri(String.Format(@"http://msdn.microsoft.com/library/{0}.aspx", type.FullName));
+                return new Uri(String.Format(@"http://msdn.microsoft.com/library/{0}.aspx", ValueType.FullName));
             }
         }
 
@@ -73,19 +73,19 @@ namespace Sidi.CommandLine
         {
             var stringRepresentation = args.PopHead();
 
-            var parse = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
+            var parse = ValueType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
             if (parse != null)
             {
                 return parse.Invoke(null, new object[] { stringRepresentation });
             }
 
-            var ctor = type.GetConstructor(new Type[] { typeof(string) });
+            var ctor = ValueType.GetConstructor(new Type[] { typeof(string) });
             if (ctor != null)
             {
                 return ctor.Invoke(new object[] { stringRepresentation });
             }
 
-            throw new InvalidCastException(type.ToString() + " is not supported");
+            throw new InvalidCastException(ValueType.ToString() + " is not supported");
         }
     }
 }

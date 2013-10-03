@@ -63,6 +63,12 @@ namespace Sidi.CommandLine
         void UnknownArgument(IList<string> args);
     }
 
+    public interface CommandLineHandler2
+    {
+        void BeforeParse(IList<string> args, Parser parser);
+        void UnknownArgument(IList<string> args, Parser parser);
+    }
+
     [Serializable]
     public class CommandLineException : Exception
     {
@@ -115,7 +121,7 @@ namespace Sidi.CommandLine
         public const string categoryUsage = "Usage";
 
         List<ItemSource> m_itemSources = new List<ItemSource>();
-        static string[] optionPrefix = new string[] { "--", "-", "/" };
+        public Dictionary<Type, string[]> Prefix = new Dictionary<Type, string[]>();
         static CultureInfo cultureInfo;
 
         public static CultureInfo CultureInfo { get { return cultureInfo; } }
@@ -198,6 +204,9 @@ namespace Sidi.CommandLine
         {
             var dumper = new Dump() { MaxLevel = 1 };
             ProcessResult = result => { };
+
+            Prefix = new Dictionary<Type, string[]>();
+            Prefix[typeof(Option)] = new string[] { "--", "-", "/", String.Empty };
             
             cultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
@@ -321,6 +330,11 @@ namespace Sidi.CommandLine
             foreach (var i in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler>())
             {
                 i.BeforeParse(args);
+            }
+
+            foreach (var i in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler2>())
+            {
+                i.BeforeParse(args, this);
             }
 
             if (args.Count == 0)
@@ -525,14 +539,15 @@ namespace Sidi.CommandLine
                 h.UnknownArgument(args);
                 return args.Count != c;
             }
-            return false;
-        }
 
-        string NextArg(IList<string> args)
-        {
-            string a = args[0];
-            args.RemoveAt(0);
-            return a;
+            foreach (var h in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler2>())
+            {
+                int c = args.Count;
+                h.UnknownArgument(args, this);
+                return args.Count != c;
+            }
+
+            return false;
         }
 
         void Error(string msg, object o)
@@ -550,6 +565,37 @@ namespace Sidi.CommandLine
         public bool IsExactMatch(string userInput, string memberName)
         {
             return StringComparer.InvariantCultureIgnoreCase.Compare(userInput, memberName) == 0;
+        }
+
+        string[] GetPrefixes(IParserItem item)
+        {
+            string[] prefix;
+            if (!Prefix.TryGetValue(item.GetType(), out prefix))
+            {
+                prefix = new string[] { String.Empty };
+            }
+            return prefix;
+        }
+
+        public bool IsExactMatch(string userInput, IParserItem item)
+        {
+            string name;
+            if (!DetectPrefix(userInput, GetPrefixes(item), out name))
+            {
+                return false;
+            }
+
+            return IsExactMatch(name, item.Name);
+        }
+
+        public bool IsMatch(string userInput, IParserItem item)
+        {
+            string name;
+            if (!DetectPrefix(userInput, GetPrefixes(item), out name))
+            {
+                return false;
+            }
+            return IsMatch(name, item.Name);
         }
 
         public static bool IsMatch(string userInput, string memberName)
@@ -591,33 +637,29 @@ namespace Sidi.CommandLine
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        bool DetectOptionPrefix(ref string name)
+        bool DetectPrefix(string name, string[] prefixes, out string trimmedName)
         {
-            foreach (var p in optionPrefix)
+            foreach (var p in prefixes)
             {
                 if (name.StartsWith(p))
                 {
-                    name = name.Substring(p.Length);
+                    trimmedName = name.Substring(p.Length);
                     return true;
                 }
             }
+            trimmedName = name;
             return false;
         }
 
         public IParserItem LookupParserItem(string name, IEnumerable<IParserItem> parserItems)
         {
-            if (DetectOptionPrefix(ref name))
-            {
-                parserItems = parserItems.OfType<Option>().Cast<IParserItem>();
-            }
-
-            var exact = parserItems.FirstOrDefault(x => IsExactMatch(name, x.Name));
+            var exact = parserItems.FirstOrDefault(x => IsExactMatch(name, x));
             if (exact != null)
             {
                 return exact;
             }
 
-            var hits = parserItems.Where(x => IsMatch(name, x.Name)).ToList();
+            var hits = parserItems.Where(x => IsMatch(name, x)).ToList();
             if (hits.Count == 1)
             {
                 return hits.First();
@@ -677,6 +719,17 @@ found:
             return p;
         }
 
+        public T ParseValue<T>(IList<string> args)
+        {
+            return (T)ParseValue(args, typeof(T));
+        }
+
+        public T ParseValue<T>(string text)
+        {
+            var args = new List<string>(){ text };
+            return (T)ParseValue(args, typeof(T));
+        }
+
         public object ParseValue(IList<string> args, Type type)
         {
             try
@@ -721,7 +774,7 @@ found:
                 return false;
             }
 
-            NextArg(args);
+            args.PopHead();
             var result = parserItem.Handle(args, execute);
             ProcessResult(result);
             return true;
@@ -772,12 +825,12 @@ found:
             return items;
         }
 
-        List<ValueParser> availableValueParsers;
+        List<IValueParser> availableValueParsers;
 
         /// <summary>
         /// All value parsers
         /// </summary>
-        public IList<ValueParser> AvailableValueParsers
+        public IList<IValueParser> AvailableValueParsers
         {
             get
             {
@@ -1113,6 +1166,48 @@ found:
             {
                 ItemSources = new List<ItemSource>(){ new ItemSource(instance) }
             };
+        }
+
+        public void ParseBraces(IList<string> args)
+        {
+            var braceOpen = "(";
+            var braceClose = ")";
+            if (args[0].StartsWith(braceOpen))
+            {
+                args[0] = args[0].Substring(braceOpen.Length);
+                if (args[0].Length == 0)
+                {
+                    args.RemoveAt(0);
+                }
+                for (int i = 0; i < args.Count; ++i)
+                {
+                    if (args[i].EndsWith(braceClose))
+                    {
+                        args[i] = args[i].Substring(0, args[i].Length - braceOpen.Length);
+                        args.Insert(i + 1, braceClose);
+                        if (args[i].Length == 0)
+                        {
+                            args.RemoveAt(i);
+                        }
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                ParseSingleCommand(args);
+                return;
+            }
+
+            while (args.Any())
+            {
+                if (args.First().Equals(braceClose))
+                {
+                    args.PopHead();
+                    break;
+                }
+                ParseSingleCommand(args);
+            }
         }
     }
 }

@@ -91,6 +91,11 @@ namespace Sidi.IO
                 return GetFilesSelectedInExplorer();
             }
 
+            if (files.StartsWith(":current", StringComparison.OrdinalIgnoreCase))
+            {
+                return new PathList() { new Shell().GetOpenDirectory() };
+            }
+
             return new PathList(files.Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x.Unquote())));
         }
 
