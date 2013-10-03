@@ -47,7 +47,7 @@ namespace Sidi.CommandLine
         }
 
         [Usage("Parse file system paths, e.g. C:\\temp\\hello.txt")]
-        public class LPathParser : ValueContainer<LPath>, CommandLineHandler
+        public class LPathParser : ValueContainer<LPath>, CommandLineHandler2
         {
             [Usage("Prompt for file")]
             public void Ask()
@@ -80,11 +80,12 @@ namespace Sidi.CommandLine
             {
             }
 
-            public void BeforeParse(IList<string> args)
+            public void BeforeParse(IList<string> args, Parser p)
             {
+                p.Prefix[typeof(CommandLine.Action)] = new[] { ":" };
             }
 
-            public void UnknownArgument(IList<string> args)
+            public void UnknownArgument(IList<string> args, Parser p)
             {
                 Value = LPath.Parse(args.PopHead());
             }
