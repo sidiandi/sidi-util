@@ -119,15 +119,15 @@ namespace Sidi.CommandLine
 
                 paramsPanel.Controls.Add(paramLabel, 0, row);
 
-                var paramInput = new TextBox()
+                var textBoxParameter = new TextBox()
                 {
                     Dock = DockStyle.Fill,
                 };
-                paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
-                paramInput.Tag = p;
-                paramsPanel.Controls.Add(paramInput, 1, row);
+                textBoxParameter.Tag = p;
+                textBoxParameter.TextChanged += new EventHandler(textBoxParameter_TextChanged);
+                paramsPanel.Controls.Add(textBoxParameter, 1, row);
 
-                at.ParameterTextBoxes.Add(paramInput);
+                at.ParameterTextBoxes.Add(textBoxParameter);
 
                 ++row;
             }
@@ -168,6 +168,22 @@ namespace Sidi.CommandLine
             control.AcceptButton = acceptButton;
             control.CancelButton = cancelButton;
             return control;
+        }
+
+        void textBoxParameter_TextChanged(object sender, EventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            var parameter = (ParameterInfo)textBox.Tag;
+            try
+            {
+                var args = new List<String>() { textBox.Text };
+                this.parser.ParseValue(args, parameter.ParameterType);
+                ClearError(textBox);
+            }
+            catch (Exception ex)
+            {
+                SetError(textBox, ex.ToString());
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -228,29 +244,29 @@ namespace Sidi.CommandLine
 
                 paramsPanel.Controls.Add(paramLabel, 0, row);
 
-                var paramInput = new TextBox()
+                var textBoxParameter = new TextBox()
                 {
                     Dock = DockStyle.Fill,
                 };
-                // paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
-                paramInput.KeyDown += (s, e) =>
+                textBoxParameter.TextChanged +=new EventHandler(textBoxParameter_TextChanged);
+                textBoxParameter.KeyDown += (s, e) =>
                     {
                         if (e.KeyCode == Keys.Enter)
                         {
                             button.PerformClick();        
                         }
                     };
-                paramInput.Tag = p;
-                paramsPanel.Controls.Add(paramInput, 1, row);
+                textBoxParameter.Tag = p;
+                paramsPanel.Controls.Add(textBoxParameter, 1, row);
                 refreshActions.Add(() =>
                     {
                         if (parameterCache.ContainsKey(parameter.Name))
                         {
-                            paramInput.Text = parameterCache[parameter.Name];
+                            textBoxParameter.Text = parameterCache[parameter.Name];
                         }
                     });
 
-                at.ParameterTextBoxes.Add(paramInput);
+                at.ParameterTextBoxes.Add(textBoxParameter);
 
                 ++row;
             }
@@ -304,34 +320,46 @@ namespace Sidi.CommandLine
 
             paramsPanel.Controls.Add(paramLabel, 0, row);
 
-            var paramInput = new TextBox()
+            var textBoxOption = new TextBox()
             {
                 Dock = DockStyle.Fill,
             };
-            paramInput.TextChanged += (s,e) =>
-                {
-                };
 
             if (option.IsPassword)
             {
-                paramInput.PasswordChar = '*';
+                textBoxOption.PasswordChar = '*';
             }
-            paramInput.Tag = option;
+            textBoxOption.Tag = option;
 
             System.Action refreshAction = () =>
                 {
-                    paramInput.Text = option.GetValue().SafeToString();
+                    textBoxOption.Text = option.GetValue().SafeToString();
                 };
             refreshAction();
             refreshActions.Add(refreshAction);
 
-            paramInput.TextChanged += new EventHandler(paramInput_TextChanged);
-            paramInput.Leave += new EventHandler(paramInput_Leave);
-            paramsPanel.Controls.Add(paramInput, 1, row);
+            textBoxOption.TextChanged +=new EventHandler(textBoxOption_TextChanged);
+            textBoxOption.Leave += new EventHandler(textBoxOption_Leave);
+            paramsPanel.Controls.Add(textBoxOption, 1, row);
 
             layout.Controls.Add(paramsPanel, 0, 1);
 
             return control;
+        }
+
+        void textBoxOption_TextChanged(object sender, EventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            var option = (Option)textBox.Tag;
+            try
+            {
+                option.Handle(new string[] { textBox.Text }.ToList(), true);
+                ClearError(textBox);
+            }
+            catch (Exception ex)
+            {
+                SetError(textBox, ex.Message);
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -591,26 +619,9 @@ namespace Sidi.CommandLine
         static Color errorColor = Color.Pink;
 
         [SuppressMessage("Microsoft.Design", "CA1031")]
-        void paramInput_Leave(object sender, EventArgs e)
+        void textBoxOption_Leave(object sender, EventArgs e)
         {
             Refresh();
         }
-        
-        [SuppressMessage("Microsoft.Design", "CA1031")]
-        void paramInput_TextChanged(object sender, EventArgs e)
-        {
-            var textBox = (TextBox) sender;
-            var option = (Option)textBox.Tag;
-            try
-            {
-                option.Handle(new string[] { textBox.Text }.ToList(), true);
-                ClearError(textBox);
-            }
-            catch (Exception ex)
-            {
-                SetError(textBox, ex.Message);
-            }
-        }
     }
-
 }

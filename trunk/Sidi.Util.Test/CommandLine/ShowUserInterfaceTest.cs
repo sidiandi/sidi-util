@@ -39,8 +39,8 @@ namespace Sidi.CommandLine.Test
         [Test, Explicit("UI")]
         public void ActionControl()
         {
-            var ui = new ShowUserInterface(null);
             var p = ParserTest.ParserWithAllTestApps();
+            var ui = new ShowUserInterface(p);
             var c = ui.ToDialog(p.GetAction("Greet"));
             c.ShowAndExecute();
         }
