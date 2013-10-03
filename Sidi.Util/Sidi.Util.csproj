@@ -98,6 +98,7 @@
     <Compile Include="CommandLine\Option.cs" />
     <Compile Include="CommandLine\StandardValueParser.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
+    <Compile Include="CommandLine\ValueContainer.cs" />
     <Compile Include="CommandLine\ValueParser.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
@@ -234,6 +235,7 @@
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
     <Compile Include="Test\TestBase.cs" />
+    <Compile Include="Util\TestFixture.cs" />
     <Compile Include="Util\TileGeometry.cs" />
     <Compile Include="Util\TimeInterval.cs" />
     <Compile Include="Util\TimeIntervalParser.cs" />

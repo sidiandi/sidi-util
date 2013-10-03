@@ -7,6 +7,7 @@ using Sidi.Extensions;
 using Sidi.Test;
 using System.Net;
 using Sidi.Util;
+using Sidi.IO;
 
 namespace Sidi.CommandLine
 {
@@ -22,20 +23,59 @@ namespace Sidi.CommandLine
             Assert.IsTrue(ValueParser.IsSuitable(mi));
         }
 
-        [Test]
+        [Test, RequiresSTA]
         public void ParseExamples()
         {
             foreach (var vp in new Parser().AvailableValueParsers)
             {
                 log.Info(vp.UsageText);
-                log.Info(vp.MethodInfo);
+                /*
                 foreach (var example in vp.Examples)
                 {
                     log.InfoFormat("Parsing {0}", example.Value.Quote());
                     var r = vp.Handle(new List<string>() { example.Value }, true);
                     log.InfoFormat("Parsing {0} returns {1}", example.Value.Quote(), r);
                 }
+                 */
             }
+        }
+
+        void TestTimeInterval(string text)
+        {
+            var p = new Parser();
+            var args = Tokenizer.ToList(text);
+            var ti = p.ParseValue<TimeInterval>(args);
+            log.InfoFormat("{0} parses to {1}", text, ti);
+        }
+
+        [Test]
+        public void TestDateParsing()
+        {
+            var p = new Parser();
+            p.ParseValue<DateTime>("tomorrow");
+        }
+
+        [Test]
+        public void TimeIntervalParsing()
+        {
+            TestTimeInterval("[18.04.2013 03:35:04, 18.04.2013 15:35:04[");
+            TestTimeInterval("year 2013-01-01");
+            TestTimeInterval("year today");
+            TestTimeInterval("FinancialYear today");
+            TestTimeInterval("last 90 days");
+            TestTimeInterval("next 12 hours");
+            TestTimeInterval("(begin 2013-03-01 end 2013-04-10)");
+            TestTimeInterval("[yesterday, Tomorrow[");
+            TestTimeInterval("(begin yesterday end tomorrow)");
+            TestTimeInterval("(last 30 days end tomorrow)");
+        }
+
+        [Test]
+        public void PathList()
+        {
+            var p = new Parser();
+            log.Info(p.ParseValue<PathList>(@"C:\temp\hello.txt"));
+            log.Info(p.ParseValue<PathList>(@":current"));
         }
 
         [Test]
@@ -71,7 +111,7 @@ namespace Sidi.CommandLine
         {
             var a = new SampleApp();
             var ipString = "1.2.3.4";
-            Parser.Run(a, new[] { "Time", "begin", "2013-05-01", "end", "2013-05-02", ";", "Address", ipString });
+            Parser.Run(a, new[] { "Time", "(", "begin", "2013-05-01", "end", "2013-05-02", ")", "Address", ipString });
             Assert.AreEqual(new TimeInterval(new DateTime(2013, 5, 1), new DateTime(2013, 5, 2)), a.Time);
         }
     }

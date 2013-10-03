@@ -461,6 +461,7 @@ namespace Sidi.Persistence
                                     {
                                         lock (addresses)
                                         {
+                                            log.InfoFormat("thread {0}: insert", Thread.CurrentThread.ManagedThreadId);
                                             addresses.Add(new Address()
                                             {
                                                 Name = "test",

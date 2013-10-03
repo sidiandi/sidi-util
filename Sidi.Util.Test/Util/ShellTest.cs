@@ -25,5 +25,13 @@ namespace Sidi.Util
             var s = new Shell();
             Console.WriteLine(s.SelectedFiles.Join());
         }
+
+        [Test, Explicit("interacts with Desktop")]
+        public void GetOpen()
+        {
+            var s = new Shell();
+            Console.WriteLine(s.GetOpenDirectory());
+        }
+
     }
 }

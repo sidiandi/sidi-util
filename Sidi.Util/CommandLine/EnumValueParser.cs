@@ -10,31 +10,31 @@ namespace Sidi.CommandLine
     {
         public EnumValueParser(Type type)
         {
-            this.type = type;
+            this.ValueType = type;
         }
 
-        Type type;
+        public Type ValueType { get; private set; }
 
         public string Usage
         {
-            get { return String.Format("{0} value", type.Name); }
+            get { return String.Format("{0} value", ValueType.Name); }
         }
 
         public string UsageText
         {
-            get { return String.Format("{0} enum. One of: {1}", type.Name, Enum.GetValues(type).Cast<object>().Join(", ")); }
+            get { return String.Format("{0} enum. One of: {1}", ValueType.Name, Enum.GetValues(ValueType).Cast<object>().Join(", ")); }
         }
 
         public string Name
         {
-            get { return type.Name; }
+            get { return ValueType.Name; }
         }
 
         public string Syntax
         {
             get
             {
-                return Enum.GetValues(type).Cast<object>().Join("|");
+                return Enum.GetValues(ValueType).Cast<object>().Join("|");
             }
         }
 
@@ -50,7 +50,7 @@ namespace Sidi.CommandLine
 
         public object Handle(IList<string> args, bool execute)
         {
-            return Enum.Parse(type, args.PopHead(), true);
+            return Enum.Parse(ValueType, args.PopHead(), true);
         }
     }
 }

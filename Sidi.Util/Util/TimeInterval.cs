@@ -29,7 +29,7 @@ namespace Sidi.Util
 
         public static TimeInterval Parse(string timeIntervalText)
         {
-            return Sidi.CommandLine.BasicValueParsers.ParseTimeInterval(new List<string>(){timeIntervalText});
+            return new Sidi.CommandLine.Parser().ParseValue<TimeInterval>(timeIntervalText);
         }
 
         public static TimeInterval MaxValue

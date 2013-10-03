@@ -14,6 +14,14 @@ namespace Sidi.CommandLine
             this.parser = parser;
         }
 
+        public Type ValueType
+        {
+            get
+            {
+                return Array.CreateInstance(type, 0).GetType();
+            }
+        }
+
         Type type;
         Parser parser;
 

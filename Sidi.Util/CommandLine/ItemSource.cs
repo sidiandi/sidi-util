@@ -70,12 +70,17 @@ namespace Sidi.CommandLine
         /// <summary>
         /// All value parsers
         /// </summary>
-        public IList<ValueParser> GetValueParsers(Parser parser)
+        public IList<IValueParser> GetValueParsers(Parser parser)
         {
-            return Instance.GetType().GetMethods()
+            return Instance.GetType().GetNestedTypes()
+                .Where(t => typeof(IValueContainer).IsAssignableFrom(t))
+                .Select(x => (IValueParser) new ComplexValueParser(x))
+                .Concat(
+
+            Instance.GetType().GetMethods()
                 .Where(i => ValueParser.IsSuitable(i))
-                .Select(i => new ValueParser(parser, this, i))
-                .ToList();
+                .Select(i => (IValueParser) new ValueParser(parser, this, i))
+                ).ToList();
         }
     }
 }

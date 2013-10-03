@@ -7,6 +7,7 @@ using Sidi.IO;
 using Sidi.Util;
 using Sidi.Extensions;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace Sidi.CommandLine
 {
@@ -45,10 +46,99 @@ namespace Sidi.CommandLine
             return stringRepresentation;
         }
 
-        class DateTimeParser
+        [Usage("Parse file system paths, e.g. C:\\temp\\hello.txt")]
+        public class LPathParser : ValueContainer<LPath>, CommandLineHandler
         {
-            public DateTime Value;
+            [Usage("Prompt for file")]
+            public void Ask()
+            {
+                var dlg = new OpenFileDialog();
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    Value = dlg.FileName;
+                }
+                else
+                {
+                    throw new Exception("Canceled by user");
+                }
+            }
 
+            public LPath Value { get; set; }
+
+            [Usage("Use directory currently open in Windows Explorer")]
+            public void Current()
+            {
+                Value = new Shell().GetOpenDirectory();
+            }
+
+            [Usage("Use file that is currently selected in Windows Explorer")]
+            public void Selected()
+            {
+                Value = new Shell().SelectedFiles.First();
+            }
+
+            [Usage("Use clipboard content")]
+            public void Paste()
+            {
+            }
+
+            public void BeforeParse(IList<string> args)
+            {
+            }
+
+            public void UnknownArgument(IList<string> args)
+            {
+                Value = LPath.Parse(args.PopHead());
+            }
+        }
+
+        [Usage("Parse file system path lists, e.g. C:\\temp\\hello.txt;C:\\temp\\world.txt")]
+        public class PathListParser : ValueContainer<PathList>, CommandLineHandler2
+        {
+            [Usage("Prompt for files")]
+            public void Ask()
+            {
+                var dlg = new OpenFileDialog();
+                dlg.Multiselect = true;
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    Value = new PathList(dlg.FileNames.Select(x => new LPath(x)));
+                }
+                else
+                {
+                    throw new Exception("Canceled by user");
+                }
+            }
+
+            [Usage("Use file that is currently selected in Windows Explorer")]
+            public void Selected()
+            {
+                Value = new PathList(new Shell().SelectedFiles);
+            }
+
+            [Usage("Use clipboard content")]
+            public void Paste()
+            {
+                Value = PathList.ReadClipboard();
+            }
+
+            public void BeforeParse(IList<string> args, Parser p)
+            {
+            }
+
+            public void UnknownArgument(IList<string> args, Parser p)
+            {
+                if (Value == null)
+                {
+                    Value = new PathList();
+                }
+                Value.Add(p.ParseValue<LPath>(args));
+            }
+        }
+
+        [Usage("Parse date and time values")]
+        public class DateTimeParser : ValueContainer<DateTime>, CommandLineHandler
+        {
             [Usage("Now")]
             public void Now()
             {
@@ -72,29 +162,17 @@ namespace Sidi.CommandLine
             {
                 Value = DateTime.Today.AddDays(-1);
             }
-        }
-        
-        [Usage("Absolute time")]
-        [Example("2013-04-10")]
-        [Example("now")]
-        [Example("today")]
-        [Example("yesterday")]
-        [Example("tomorrow")]
-        public static DateTime ParseDateTime(IList<string> args)
-        {
-            DateTime v;
-            if (DateTime.TryParse(args[0], out v))
+
+            public void BeforeParse(IList<string> args)
             {
-                args.PopHead();
-                return v;
             }
 
-            var tsp = new DateTimeParser();
-            var p = Parser.SingleSource(tsp);
-            p.ParseSingleCommand(args);
-            return tsp.Value;
+            public void UnknownArgument(IList<string> args)
+            {
+                Value = DateTime.Parse(args.PopHead());
+            }
         }
-
+        
         class TimeSpanParser
         {
             public TimeSpan Value;
@@ -167,13 +245,13 @@ namespace Sidi.CommandLine
             }
         }
 
-        class TimeIntervalParser
+        [Usage("Parse time intervals, e.g. [18.04.2013 03:35:04, 18.04.2013 15:35:04[")]
+        public class TimeIntervalParser : ValueContainer<TimeInterval>, CommandLineHandler2
         {
             public TimeIntervalParser()
             {
+                Value = TimeInterval.MaxValue;
             }
-
-            public TimeInterval Value = TimeInterval.MaxValue;
 
             [Usage("Time interval that ends now and starts in the past")]
             public void Last(TimeSpan duration)
@@ -210,8 +288,39 @@ namespace Sidi.CommandLine
             {
                 Value = TimeInterval.Year(time, 9);
             }
+
+            public void BeforeParse(IList<string> args, Parser parser)
+            {
+                if (args.First().StartsWith("["))
+                {
+                    string text = String.Empty;
+                    for (; ; )
+                    {
+                        var n = args.PopHead();
+                        if (n.EndsWith("["))
+                        {
+                            text += " " + n.Substring(0, n.Length - 1);
+                            break;
+                        }
+                        else
+                        {
+                            text += " " + n;
+                        }
+                    }
+                    var p = Regex.Split(text, @"\s*[\[\],]\s*");
+
+                    Value = new TimeInterval(
+                        parser.ParseValue<DateTime>(p[1]),
+                        parser.ParseValue<DateTime>(p[2]));
+                }
+            }
+
+            public void UnknownArgument(IList<string> args, Parser parser)
+            {
+            }
         }
         
+        /*
         [Usage("Time interval with begin and end time")]
         [Example("year 2013-01-01")]
         [Example("year today")]
@@ -270,19 +379,6 @@ namespace Sidi.CommandLine
             }
             return valueParser.Value;
         }
-
-        [Usage("File system path.")]
-        [Example(@"C:\temp")]
-        public static LPath ParseLPath(string stringRepresentation)
-        {
-            return LPath.Parse(stringRepresentation);
-        }
-
-        [Usage("List of file system paths, separated by \";\"")]
-        [Example(@"C:\temp;C:\work")]
-        public static PathList ParsePathList(string stringRepresentation)
-        {
-            return PathList.Parse(stringRepresentation);
-        }
+        */
     }
 }
