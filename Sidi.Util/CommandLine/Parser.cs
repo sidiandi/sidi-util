@@ -633,21 +633,23 @@ namespace Sidi.CommandLine
         }
 
         /// <summary>
-        /// Detects and removes an option prefix from name
+        /// Detects and removes an option prefix from text
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        bool DetectPrefix(string name, string[] prefixes, out string trimmedName)
+        /// <param name="text">Text with prefix</param>
+        /// <param name="prefixes">array of prefixes to be searched for</param>
+        /// <param name="trimmedText">returns the text without the prefix</param>
+        /// <returns>True, if prefix was found</returns>
+        bool DetectPrefix(string text, string[] prefixes, out string trimmedText)
         {
             foreach (var p in prefixes)
             {
-                if (name.StartsWith(p))
+                if (text.StartsWith(p))
                 {
-                    trimmedName = name.Substring(p.Length);
+                    trimmedText = text.Substring(p.Length);
                     return true;
                 }
             }
-            trimmedName = name;
+            trimmedText = text;
             return false;
         }
 
