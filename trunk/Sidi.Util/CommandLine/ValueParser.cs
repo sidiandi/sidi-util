@@ -172,7 +172,7 @@ namespace Sidi.CommandLine
 
         public ItemSource Source
         {
-            get { throw new NotImplementedException(); }
+            get { return null; }
         }
 
         public IEnumerable<string> Categories
