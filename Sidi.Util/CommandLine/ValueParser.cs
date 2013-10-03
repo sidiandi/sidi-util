@@ -162,12 +162,12 @@ namespace Sidi.CommandLine
 
         public string Name
         {
-            get { throw new NotImplementedException(); }
+            get { return parser.Name; }
         }
 
         public string Syntax
         {
-            get { throw new NotImplementedException(); }
+            get { return "( option value ...)"; }
         }
 
         public ItemSource Source
@@ -177,7 +177,7 @@ namespace Sidi.CommandLine
 
         public IEnumerable<string> Categories
         {
-            get { throw new NotImplementedException(); }
+            get { return new string[]{}; }
         }
 
         public object Handle(IList<string> args, bool execute)
