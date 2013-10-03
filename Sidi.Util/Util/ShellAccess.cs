@@ -70,7 +70,13 @@ namespace Sidi.Util
         public LPath GetOpenDirectory()
         {
             var w = GetForegroundWindow();
-            return new LPath(new Uri(w.LocationURL).LocalPath);
+            var url = w.LocationURL;
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                throw new InvalidOperationException("No directory open in Windows shell");
+            }
+
+            return new LPath(new Uri(url).LocalPath);
         }
     }
 }

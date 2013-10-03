@@ -75,7 +75,13 @@ namespace Sidi.CommandLine
         {
             var p = new Parser();
             log.Info(p.ParseValue<PathList>(@"C:\temp\hello.txt"));
-            log.Info(p.ParseValue<PathList>(@":current"));
+            try
+            {
+                log.Info(p.ParseValue<PathList>(@":current"));
+            }
+            catch (CommandLineException)
+            {
+            }
         }
 
         [Test]
