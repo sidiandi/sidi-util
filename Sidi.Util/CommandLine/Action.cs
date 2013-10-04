@@ -121,66 +121,33 @@ namespace Sidi.CommandLine
             w.WriteLine();
         }
 
-        IEnumerable<object> GetValues(IList<string> args, IEnumerable<ParameterInfo> parameters)
-        {
-            foreach (var p in parameters)
-            {
-                object r = null; 
-                {
-                    if (p.IsOptional && args.Count == 0)
-                    {
-                        r = p.DefaultValue;
-                    }
-                    else
-                    {
-                        if (args.Count == 0)
-                        {
-                            r = null;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                r = parser.ParseValue(args, p.ParameterType);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new InvalidParameterException(p, ex);
-                            }
-                        }
-                    }
-                }
-                yield return r;
-            }
-        }
-
         public object Handle(IList<string> args, bool execute)
         {
-            var parameters = MethodInfo.GetParameters();
-            object[] parameterValues;
-
-            try
-            {
-                parameterValues = GetValues(args, parameters).ToArray();
-            }
-            catch (InvalidParameterException ipe)
-            {
-                log.Error("Invalid parameter", ipe);
-                var parameter = ipe.Parameter;
-                if (args.Any())
-                {
-                    throw new CommandLineException("Parameter {0} could not be read from argument list {1}\r\n{2}".F(
-                        FormatParameter(parameter),
-                        args.Select(i => i.Quote()).Join(" "),
-                        this.UsageText
-                        ));
-                }
-                else
-                {
-                    throw new CommandLineException("Parameter {0} is missing.\r\n{1}".F(
-                        FormatParameter(parameter), this.UsageText));
-                }
-            }
+            var parameterValues = MethodInfo.GetParameters()
+                .Select(x =>
+                    {
+                        log.DebugFormat("Read parameter {0} from {1}", x, args.Join(" "));
+                        object value = null;
+                        var emptyArgs = !args.Any();
+                        try
+                        {
+                            value = parser.ParseValue(args, x.ParameterType);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (emptyArgs)
+                            {
+                                throw new CommandLineException("Error in command\r\n{0}\r\nParameter {1} is missing.".F(this.UsageText, x, args.Join(" ")), ex);
+                            }
+                            else
+                            {
+                                throw new CommandLineException("Error in command\r\n{0}\r\nCannot read parameter {1} from arguments {2}".F(this.UsageText, x, args.Join(" ")), ex);
+                            }
+                        }
+                        log.DebugFormat("Parameter {0} = {1}", x, value);
+                        return value;
+                    })
+                .ToArray();
 
             using (new LogScope(log.Info, "Action {0}({1})", Name, parameterValues.Join(", ")))
             {
