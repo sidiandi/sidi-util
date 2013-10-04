@@ -28,7 +28,7 @@ namespace Sidi.CommandLine
         {
             foreach (MethodInfo i in Instance.GetType().GetMethods())
             {
-                if (ValueParser.IsSuitable(i))
+                if (StaticMethodValueParser.IsSuitable(i))
                 {
                     // yield return new ValueParser(this, application, i);
                 }
@@ -72,14 +72,14 @@ namespace Sidi.CommandLine
         /// </summary>
         public IList<IValueParser> GetValueParsers(Parser parser)
         {
-            return Instance.GetType().GetNestedTypes()
-                .Where(t => typeof(IValueContainer).IsAssignableFrom(t))
-                .Select(x => (IValueParser) new ComplexValueParser(x))
+            return Instance.GetType().GetCustomAttributes(typeof(ValueParserAttribute), true)
+                .OfType<ValueParserAttribute>()
+                .Select(x => (IValueParser) new ComplexValueParser(x.ValueParserType))
                 .Concat(
 
             Instance.GetType().GetMethods()
-                .Where(i => ValueParser.IsSuitable(i))
-                .Select(i => (IValueParser) new ValueParser(parser, this, i))
+                .Where(i => StaticMethodValueParser.IsSuitable(i))
+                .Select(i => (IValueParser) new StaticMethodValueParser(parser, this, i))
                 ).ToList();
         }
     }

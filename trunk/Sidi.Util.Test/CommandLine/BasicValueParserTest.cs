@@ -20,7 +20,7 @@ namespace Sidi.CommandLine
         public void ValueParserSuitable()
         {
             var mi = typeof(BasicValueParsers).GetMethod("ParseBool");
-            Assert.IsTrue(ValueParser.IsSuitable(mi));
+            Assert.IsTrue(StaticMethodValueParser.IsSuitable(mi));
         }
 
         [Test, RequiresSTA]
@@ -29,14 +29,15 @@ namespace Sidi.CommandLine
             foreach (var vp in new Parser().AvailableValueParsers)
             {
                 log.Info(vp.UsageText);
-                /*
+
                 foreach (var example in vp.Examples)
                 {
                     log.InfoFormat("Parsing {0}", example.Value.Quote());
-                    var r = vp.Handle(new List<string>() { example.Value }, true);
+                    var args = Tokenizer.ToList(example.Value);
+                    var r = vp.Handle(args, true);
+                    Assert.IsTrue(args.Count == 0);
                     log.InfoFormat("Parsing {0} returns {1}", example.Value.Quote(), r);
                 }
-                 */
             }
         }
 
@@ -78,6 +79,8 @@ namespace Sidi.CommandLine
             try
             {
                 log.Info(p.ParseValue<PathList>(@":current"));
+                log.Info(p.ParseValue<PathList>(":selected"));
+                log.Info(p.ParseValue<PathList>(@":paste"));
             }
             catch (CommandLineException)
             {
@@ -101,6 +104,9 @@ namespace Sidi.CommandLine
 
             [Usage("Time interval value")]
             public TimeInterval Time;
+
+            [Usage("Path list")]
+            public PathList Paths;
         }
             
         [Test]
@@ -119,6 +125,13 @@ namespace Sidi.CommandLine
             var ipString = "1.2.3.4";
             Parser.Run(a, new[] { "Time", "(", "begin", "2013-05-01", "end", "2013-05-02", ")", "Address", ipString });
             Assert.AreEqual(new TimeInterval(new DateTime(2013, 5, 1), new DateTime(2013, 5, 2)), a.Time);
+        }
+
+        [Test]
+        public void Paths()
+        {
+            var a = new SampleApp();
+            Parser.Run(a, new []{"Paths", ":current"});
         }
     }
 }

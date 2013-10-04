@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Sidi.CommandLine
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple=true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple=true)]
     public class ExampleAttribute : System.Attribute
     {
         public string Value { private set; get; }

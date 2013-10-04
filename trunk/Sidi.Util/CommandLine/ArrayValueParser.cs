@@ -91,5 +91,11 @@ namespace Sidi.CommandLine
             }
             return array;
         }
+
+        public IEnumerable<ExampleAttribute> Examples
+        {
+            // todo
+            get { return Enumerable.Empty<ExampleAttribute>(); }
+        }
     }
 }

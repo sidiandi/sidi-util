@@ -768,7 +768,7 @@ found:
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
-        bool HandleParserItem(IList<string> args)
+        public bool HandleParserItem(IList<string> args)
         {
             var parserItem = LookupParserItem(args[0]);
             if (parserItem == null)
@@ -1020,7 +1020,7 @@ found:
             GroupByCategory(IEnumerable<IParserItem> items)
         {
             return items
-                .Where(x => !(x is ValueParser))
+                .Where(x => !(x is StaticMethodValueParser))
                 .SelectMany(i => i.Categories.Select(x => new { Category = x, Item = i }))
                 .GroupBy(x => x.Category)
                 .OrderBy(x => x.Key)

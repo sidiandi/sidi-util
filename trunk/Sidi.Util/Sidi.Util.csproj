@@ -84,6 +84,8 @@
     <Compile Include="CommandLine\ActionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="CommandLine\ComplexValueParser.cs" />
+    <Compile Include="CommandLine\DateTimeParser.cs" />
     <Compile Include="CommandLine\ItemSource.cs" />
     <Compile Include="CommandLine\ArrayValueParser.cs" />
     <Compile Include="CommandLine\Attributes.cs" />
@@ -91,15 +93,21 @@
     <Compile Include="CommandLine\EnumValueParser.cs" />
     <Compile Include="CommandLine\ExampleAttribute.cs" />
     <Compile Include="CommandLine\LogOptions.cs" />
+    <Compile Include="CommandLine\LPathParser.cs" />
     <Compile Include="CommandLine\Manual.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
+    <Compile Include="CommandLine\PathListParser.cs" />
     <Compile Include="CommandLine\ShellSupport.cs" />
     <Compile Include="CommandLine\IParserItem.cs" />
     <Compile Include="CommandLine\Option.cs" />
     <Compile Include="CommandLine\StandardValueParser.cs" />
+    <Compile Include="CommandLine\StaticMethodValueParser.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
-    <Compile Include="CommandLine\ValueContainer.cs" />
+    <Compile Include="CommandLine\TimeIntervalParser.cs" />
+    <Compile Include="CommandLine\TimeSpanParser.cs" />
+    <Compile Include="CommandLine\IValueParser.cs" />
     <Compile Include="CommandLine\ValueParser.cs" />
+    <Compile Include="CommandLine\ValueParserAttribute.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
