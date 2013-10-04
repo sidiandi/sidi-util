@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <StartProgram>C:\work\sidi-util\lib\NUnit\bin\net-2.0\nunit-x86.exe</StartProgram>
+    <StartArguments>Sidi.Util.Test.dll</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\work\sidi-util\lib\NUnit\bin\net-2.0\nunit-console-x86.exe</StartProgram>
+    <StartArguments>/labels C:\build\sidi-util_Release\Sidi.Util.Test.dll</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartArguments>$(TargetDir)Sidi.Util.Test.dll</StartArguments>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\work\sidi-util\packages\NUnit.Runners.2.6.2\tools\nunit.exe</StartProgram>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PublishUrlHistory />
+    <InstallUrlHistory />
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\work\sidi-util\packages\NUnit.Runners.2.6.2\tools\nunit.exe</StartProgram>
+    <StartArguments>Sidi.Util.Test.dll</StartArguments>
+  </PropertyGroup>
+</Project>
