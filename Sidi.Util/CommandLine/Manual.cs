@@ -111,7 +111,7 @@ namespace Sidi.CommandLine
                             CommandList(subCommand.Parser)
                         }),
                     h2("Value Syntax"),
-                    dl(parser.UsedValueParsers.Select(item => ToDt(item)))
+                    dl(parser.AvailableValueParsers.Select(item => ToDt(item)))
                 )
             );
         }

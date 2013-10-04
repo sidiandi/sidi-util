@@ -52,5 +52,11 @@ namespace Sidi.CommandLine
         {
             return Enum.Parse(ValueType, args.PopHead(), true);
         }
+
+        public IEnumerable<ExampleAttribute> Examples
+        {
+            // todo
+            get { return Enumerable.Empty<ExampleAttribute>(); }
+        }
     }
 }

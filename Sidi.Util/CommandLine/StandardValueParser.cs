@@ -87,5 +87,11 @@ namespace Sidi.CommandLine
 
             throw new InvalidCastException(ValueType.ToString() + " is not supported");
         }
+
+
+        public IEnumerable<ExampleAttribute> Examples
+        {
+            get { return Enumerable.Empty<ExampleAttribute>(); }
+        }
     }
 }

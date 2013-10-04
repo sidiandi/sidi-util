@@ -6,7 +6,7 @@ using Sidi.CommandLine;
 
 namespace Sidi.Util
 {
-    [Usage("Parse TimeInterval string representations")]
+    [Usage("Time interval")]
     public class TimeIntervalParser
     {
         public static TimeInterval Parse(string value)
