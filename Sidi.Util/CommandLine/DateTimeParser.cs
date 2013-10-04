@@ -13,6 +13,7 @@ namespace Sidi.CommandLine
     [Example("yesterday")]
     [Example("2013-10-01")]
     [Example("2013-10-01T11:59")]
+    [Example("\"18.04.2013 03:35:04\"")]
     public class DateTimeParser : ValueContainer<DateTime>, CommandLineHandler
     {
         [Usage("Now")]

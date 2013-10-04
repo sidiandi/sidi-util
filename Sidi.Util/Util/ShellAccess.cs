@@ -22,6 +22,7 @@ using System.Text;
 using Sidi.IO;
 using System.Collections;
 using SHDocVw;
+using Sidi.Extensions;
 
 namespace Sidi.Util
 {
@@ -42,14 +43,16 @@ namespace Sidi.Util
 
         public SHDocVw.InternetExplorer GetForegroundWindow()
         {
-            var shellWindows = ((IEnumerable)shell.Windows()).Cast<InternetExplorer>().ToDictionary(
-                x => (IntPtr)x.HWND, x => x);
+            var shellWindows = ((IEnumerable)shell.Windows()).OfType<InternetExplorer>()
+                .Select(x => { try { return new { Handle = x.HWND, Instance = x }; } catch { return null; } } )
+                .Where(x => x != null)
+                .ToDictionary(x => x.Handle, x => x.Instance);
 
             return GetZOrder(IntPtr.Zero)
                 .Select(hwnd =>
                     {
                         InternetExplorer x = null;
-                        shellWindows.TryGetValue(hwnd, out x);
+                        shellWindows.TryGetValue((int)hwnd, out x);
                         return x;
                     })
                 .Where(x => x != null)

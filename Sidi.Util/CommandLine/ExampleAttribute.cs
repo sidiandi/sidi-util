@@ -10,6 +10,7 @@ namespace Sidi.CommandLine
     public class ExampleAttribute : System.Attribute
     {
         public string Value { private set; get; }
+        public bool NoTest { get; set; }
 
         public ExampleAttribute(string stringRepresentation)
         {

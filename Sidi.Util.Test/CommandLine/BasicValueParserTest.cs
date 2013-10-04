@@ -30,7 +30,7 @@ namespace Sidi.CommandLine
             {
                 log.Info(vp.UsageText);
 
-                foreach (var example in vp.Examples)
+                foreach (var example in vp.Examples.Where(x => !x.NoTest))
                 {
                     log.InfoFormat("Parsing {0}", example.Value.Quote());
                     var args = Tokenizer.ToList(example.Value);

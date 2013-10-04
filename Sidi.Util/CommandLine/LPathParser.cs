@@ -11,9 +11,9 @@ namespace Sidi.CommandLine
 {
     [Usage("File system path")]
     [Example(@"C:\temp\hello.txt")]
-    [Example(@":current")]
-    [Example(@":selected")]
-    [Example(@":paste")]
+    [Example(@":current", NoTest = true)]
+    [Example(@":selected", NoTest = true)]
+    [Example(@":paste", NoTest = true)]
     public class LPathParser : ValueContainer<LPath>, CommandLineHandler2
     {
         [Usage("Prompt for file")]

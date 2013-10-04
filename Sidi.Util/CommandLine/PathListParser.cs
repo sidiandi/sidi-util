@@ -12,9 +12,9 @@ namespace Sidi.CommandLine
     [Example(@"C:\temp\somefile.txt")]
     [Example(@"C:\temp\somefile.txt;C:\temp\someotherfile.txt")]
     [Example(@"(C:\temp\somefile.txt C:\temp\someotherfile.txt)")]
-    [Example(@":current")]
-    [Example(@":selected")]
-    [Example(@":paste")]
+    [Example(@":current", NoTest=true)]
+    [Example(@":selected", NoTest=true)]
+    [Example(@":paste", NoTest = true)]
     public class PathListParser : ValueContainer<PathList>, CommandLineHandler2
     {
         [Usage("Prompt for files")]
