@@ -86,7 +86,8 @@ namespace Sidi.CommandLine
     [Serializable]
     public class InvalidParameterException : Exception
     {
-        public InvalidParameterException(ParameterInfo parameter)
+        public InvalidParameterException(ParameterInfo parameter, Exception inner)
+        : base(parameter.ToString(), inner)
         {
             this.Parameter = parameter;
         }
@@ -241,6 +242,7 @@ namespace Sidi.CommandLine
             }
             catch (CommandLineException exception)
             {
+                log.Error(exception);
                 Console.WriteLine(exception.Message);
                 Console.WriteLine("Type \"{0}\" to get usage information.", parser.ApplicationName);
                 return 1;
@@ -734,6 +736,7 @@ found:
 
         public object ParseValue(IList<string> args, Type type)
         {
+            var originalArgs = new List<string>(args);
             try
             {
                 var vp = GetValueParser(type);
@@ -747,7 +750,7 @@ found:
             }
             catch (Exception ex)
             {
-                throw new CommandLineException(String.Format("Cannot interpret argument(s) \"{0}\" as value of type {1}", args.Join(" "), type), ex);
+                throw new CommandLineException(String.Format("Cannot interpret argument(s) \"{0}\" as value of type {1}", originalArgs.Join(" "), type), ex);
             }
         }
         

@@ -126,7 +126,6 @@ namespace Sidi.CommandLine
             foreach (var p in parameters)
             {
                 object r = null; 
-                try
                 {
                     if (p.IsOptional && args.Count == 0)
                     {
@@ -136,10 +135,6 @@ namespace Sidi.CommandLine
                     {
                         r = parser.ParseValue(args, p.ParameterType);
                     }
-                }
-                catch
-                {
-                    throw new InvalidParameterException(p);
                 }
                 yield return r;
             }
@@ -156,6 +151,7 @@ namespace Sidi.CommandLine
             }
             catch (InvalidParameterException ipe)
             {
+                log.Error("Invalid parameter", ipe);
                 var parameter = ipe.Parameter;
                 if (args.Any())
                 {
