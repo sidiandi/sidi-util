@@ -128,7 +128,16 @@ namespace Sidi.CommandLine
                     {
                         log.DebugFormat("Read parameter {0} from {1}", x, args.Join(" "));
                         object value = null;
+
                         var emptyArgs = !args.Any();
+
+                        if (emptyArgs && x.DefaultValue != null)
+                        {
+                            value = x.DefaultValue;
+                            log.DebugFormat("Parameter {0} = {1} (default value)", x, value);
+                            return value;
+                        }
+
                         try
                         {
                             value = parser.ParseValue(args, x.ParameterType);
