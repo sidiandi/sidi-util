@@ -133,7 +133,21 @@ namespace Sidi.CommandLine
                     }
                     else
                     {
-                        r = parser.ParseValue(args, p.ParameterType);
+                        if (args.Count == 0)
+                        {
+                            r = null;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                r = parser.ParseValue(args, p.ParameterType);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new InvalidParameterException(p, ex);
+                            }
+                        }
                     }
                 }
                 yield return r;

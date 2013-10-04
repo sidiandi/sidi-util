@@ -407,9 +407,11 @@ namespace Sidi.CommandLine.Test
             try
             {
                 p.Parse(new string[] { "Add", "1", "car"});
+                Assert.Fail();
             }
             catch (CommandLineException e)
             {
+                log.Info(e.Message);
                 Assert.IsTrue(e.Message.Contains(p.GetAction("Add").Usage));
             }
         }
