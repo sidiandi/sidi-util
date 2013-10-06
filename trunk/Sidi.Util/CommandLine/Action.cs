@@ -133,7 +133,7 @@ namespace Sidi.CommandLine
 
                         if (emptyArgs && x.IsOptional)
                         {
-                            value = null;
+                            value = Missing.Value;
                             log.DebugFormat("Parameter {0} = {1} (default value)", x, value);
                             return value;
                         }
