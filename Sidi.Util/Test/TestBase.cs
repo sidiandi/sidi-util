@@ -47,6 +47,7 @@ namespace Sidi.Test
 
             var hierarchy = (Hierarchy)LogManager.GetRepository();
             hierarchy.Root.AddAppender(traceAppender);
+            hierarchy.Root.Level = log4net.Core.Level.All;
             hierarchy.Configured = true;
         }
 

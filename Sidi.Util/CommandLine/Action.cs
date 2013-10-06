@@ -131,9 +131,9 @@ namespace Sidi.CommandLine
 
                         var emptyArgs = !args.Any();
 
-                        if (emptyArgs && x.DefaultValue != null)
+                        if (emptyArgs && x.IsOptional)
                         {
-                            value = x.DefaultValue;
+                            value = null;
                             log.DebugFormat("Parameter {0} = {1} (default value)", x, value);
                             return value;
                         }
