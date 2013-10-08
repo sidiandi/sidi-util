@@ -52,7 +52,6 @@ namespace Sidi.Persistence
             private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
             SQLiteConnection connection;
-            int clientThreadId;
 
             int references = 0;
 
@@ -65,17 +64,6 @@ namespace Sidi.Persistence
             {
                 get
                 {
-                    if (clientThreadId == 0)
-                    {
-                        clientThreadId = Thread.CurrentThread.ManagedThreadId;
-                    }
-                    else
-                    {
-                        if (clientThreadId != Thread.CurrentThread.ManagedThreadId)
-                        {
-                            throw new Exception(String.Format("Multi-Threaded use of {0}", connection.ConnectionString));
-                        }
-                    }
                     return connection;
                 }
             }
