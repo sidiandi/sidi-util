@@ -58,7 +58,7 @@ namespace Sidi.Caching
             c.Clear();
             Assert.AreEqual(1, c.GetCached(key1, () => 1));
             Assert.AreEqual(2, c.GetCached(key2, () => 2));
-            var cacheDir = typeof(Cache).UserSetting("cache");
+            var cacheDir = Paths.GetLocalApplicationDataDirectory(typeof(Cache));
         }
         
         [Test]

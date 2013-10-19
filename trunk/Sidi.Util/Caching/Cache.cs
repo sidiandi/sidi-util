@@ -202,7 +202,9 @@ namespace Sidi.Caching
                 type = id.GetType();
             }
 
-            return new Cache(type.UserSetting("cache").CatDir(Digest(id)));
+            return new Cache(
+                Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                .CatDir(Paths.Get(type), "cache", Digest(id)));
         }
 
         public TimeSpan MaxAge { set; get; }

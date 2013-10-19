@@ -130,6 +130,7 @@
     <Compile Include="CommandLine\SubCommand.cs" />
     <Compile Include="Extensions\DumpExtensionsTest.cs" />
     <Compile Include="Extensions\IEnumerableExtensionsTest.cs" />
+    <Compile Include="Extensions\TypeExtensionsTest.cs" />
     <Compile Include="Forms\GenericListViewTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />
     <Compile Include="Forms\PromptTest.cs" />
@@ -152,6 +153,7 @@
     <Compile Include="IO\OperationTest.cs" />
     <Compile Include="IO\LPathTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
+    <Compile Include="IO\PathsTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
     <Compile Include="IO\FileUtilTest.cs" />

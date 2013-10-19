@@ -115,6 +115,13 @@ namespace Sidi.CommandLine.Test
             [cm.Category("Advanced")]
             public Fruit Fruit { set; get; }
 
+            [Usage("Throws an exception")]
+            public int ThrowException()
+            {
+                string a = null;
+                return a.Length;
+            }
+
             public string Result;
         }
 

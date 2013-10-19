@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+﻿// Copyright (c) 2013, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
 // 
 // This file is part of sidi-util.
 // 
@@ -19,26 +19,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
+using Sidi.Test;
+using Sidi.Extensions;
 
-namespace Sidi.IO
+namespace Sidi.Extensions
 {
-    public class FileType
+    [TestFixture]
+    public class TypeExtensionsTest : TestBase
     {
-        /// <summary>
-        /// Specify all extensions you want to match
-        /// </summary>
-        /// <param name="extensions">list of extensions without "."</param>
-        public FileType(params string[] extensions)
-        {
-            e = new HashSet<string>(extensions.Select(x => LPath.ExtensionSeparator + x.ToLower()));
-        }
-
-        HashSet<string> e;
-
-        public bool Is(LPath fileName)
-        {
-            return e.Contains(fileName.Extension.ToLower());
-        }
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     }
-
 }

@@ -31,24 +31,71 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static LPath LocalPath(this Assembly assembly)
+        public static LPath GetLocalPath(this Assembly assembly)
         {
             return new LPath(new Uri(assembly.CodeBase).LocalPath);
         }
 
-        public static LPath UserSetting(this Type type, string name)
+        /// <summary>
+        /// Returns the local application directory sub directory for a Type:
+        /// [LocalApplicationData]\[company name]\[assembly name]\[version]\[full type name]
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static LPath GetLocalApplicationDataDirectory(Type type)
         {
-            var root = new LPath(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData));
-            var assemblyName = type.Assembly.GetName().Name;
-            var path = root.CatDir(assemblyName, name);
-            return path;
+            return GetFolderPath(type, System.Environment.SpecialFolder.LocalApplicationData);
+        }
+
+        /// <summary>
+        /// Returns the sub directory of a special folder for a Type:
+        /// [special folder]\[company name]\[assembly name]\[version]\[full type name]
+        /// </summary>
+        /// <param name="type">Type for the sub directory</param>
+        /// <param name="folder">root folder</param>
+        /// <returns></returns>
+        public static LPath GetFolderPath(this Type type, System.Environment.SpecialFolder folder)
+        {
+            var assembly = type.Assembly;
+            var dir = Paths.GetFolderPath(folder).CatDir(Get(type));
+            dir.EnsureDirectoryExists();
+            return dir;
+        }
+
+        /// <summary>
+        /// Returns a relative path for an assembly. Can be used to determine the sub-directory
+        /// for the AppData directories.
+        /// [company name]\[assembly name]\[version].
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static LPath Get(this Assembly a)
+        {
+            var v = a.GetName().Version;
+            return LPath.Join(
+                LPath.GetValidFilename(a.GetCustomAttribute<AssemblyCompanyAttribute>().Company),
+                LPath.GetValidFilename(a.GetName().Name),
+                new []{ v.Major, v.Minor }.Join(LPath.ExtensionSeparator)
+                );
+        }
+
+        /// <summary>
+        /// Returns a relative path for type. Can be used to determine the sub-directory
+        /// for the AppData directories.
+        /// [company name]\[assembly name]\[version]\[type name].
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns></returns>
+        public static LPath Get(this Type type)
+        {
+            return LPath.Join(Get(type.Assembly), type.FullName);
         }
 
         public static LPath BinDir
         {
             get
             {
-                return LocalPath(Assembly.GetExecutingAssembly()).Parent;
+                return GetLocalPath(Assembly.GetExecutingAssembly()).Parent;
             }
         }
 

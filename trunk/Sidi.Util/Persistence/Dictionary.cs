@@ -21,6 +21,7 @@ using System.Text;
 using System.Data.Common;
 using System.Linq;
 using System.Data.SQLite;
+using Sidi.IO;
 
 namespace Sidi.Persistence
 {
@@ -57,7 +58,7 @@ namespace Sidi.Persistence
             }
         }
 
-        public Dictionary(string a_path, string a_table)
+        public Dictionary(LPath a_path, string a_table)
         {
             collection = new Collection<Record>(a_path, a_table);
         }

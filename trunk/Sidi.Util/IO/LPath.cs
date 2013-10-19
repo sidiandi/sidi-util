@@ -43,7 +43,7 @@ namespace Sidi.IO
         const string pathPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
         const string shortUncPrefix = @"\\";
-        const string extensionSeparator = ".";
+        public const string ExtensionSeparator = ".";
 
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
@@ -522,9 +522,9 @@ namespace Sidi.IO
             }
             else
             {
-                if (!newExtension.StartsWith(extensionSeparator, StringComparison))
+                if (!newExtension.StartsWith(ExtensionSeparator, StringComparison))
                 {
-                    newExtension = extensionSeparator + newExtension;
+                    newExtension = ExtensionSeparator + newExtension;
                 }
                 return Parent.CatDir(FileNameWithoutExtension + newExtension);
             }
@@ -870,7 +870,7 @@ namespace Sidi.IO
         {
             get
             {
-                return FileName.Split(new string[] { extensionSeparator }, StringSplitOptions.None);
+                return FileName.Split(new string[] { ExtensionSeparator }, StringSplitOptions.None);
             }
         }
         
@@ -882,7 +882,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static LPath JoinFileName(params string[] parts)
         {
-            return new LPath(parts.Where(x => x != null).Join(extensionSeparator));
+            return new LPath(parts.Where(x => x != null).Join(ExtensionSeparator));
         }
 
         /// <summary>

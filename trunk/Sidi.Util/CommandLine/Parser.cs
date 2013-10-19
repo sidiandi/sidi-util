@@ -466,19 +466,6 @@ namespace Sidi.CommandLine
             return parts.Join(@"\");
         }
 
-        T GetAssemblyAttribute<T>(Type t)
-        {
-            var a = t.Assembly;
-            try
-            {
-                return ((T)a.GetCustomAttributes(typeof(T), false).First());
-            }
-            catch (Exception)
-            {
-                throw new Exception(String.Format("{0} is not defined for assembly {1}", typeof(T).ToString(), a));
-            }
-        }
-
         /// <summary>
         /// Registry key for LoadPreferences and StorePreferences. 
         /// Default is HKEY_CURRENT_USER\Software\[your company]\[your product]
@@ -491,8 +478,8 @@ namespace Sidi.CommandLine
                 {
                     var k = CatReg(Registry.CurrentUser.ToString(), "Software");
                     var applicationType = MainSource.Instance.GetType();
-                    var company = GetAssemblyAttribute<AssemblyCompanyAttribute>(applicationType).Company;
-                    var product = GetAssemblyAttribute<AssemblyProductAttribute>(applicationType).Product;
+                    var company = applicationType.GetAssemblyAttribute<AssemblyCompanyAttribute>().Company;
+                    var product = applicationType.GetAssemblyAttribute<AssemblyProductAttribute>().Product;
                     k = CatReg(k, company, product, Profile);
                     m_PreferencesKey = k;
                 }
