@@ -58,7 +58,6 @@ namespace Sidi.IO
         {
             var assembly = type.Assembly;
             var dir = Paths.GetFolderPath(folder).CatDir(Get(type));
-            dir.EnsureDirectoryExists();
             return dir;
         }
 

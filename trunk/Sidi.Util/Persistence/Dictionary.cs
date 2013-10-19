@@ -58,6 +58,11 @@ namespace Sidi.Persistence
             }
         }
 
+        public static Dictionary<TKey, TValue> UserSetting(Type type, string dictionaryName)
+        {
+            return new Dictionary<TKey, TValue>(Paths.GetLocalApplicationDataDirectory(type) + ".sqlite", dictionaryName);
+        }
+
         public Dictionary(LPath a_path, string a_table)
         {
             collection = new Collection<Record>(a_path, a_table);

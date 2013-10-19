@@ -32,10 +32,11 @@ using Sidi.Test;
 
 namespace Sidi.Persistence
 {
-
     [TestFixture]
     public class DictionaryTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         Sidi.Persistence.Dictionary<string, string> dictionary;
 
         [SetUp()]
@@ -104,6 +105,24 @@ namespace Sidi.Persistence
                 t.Commit();
             }
             Console.WriteLine(w.Elapsed);
+        }
+
+        [Test]
+        public void UserSetting()
+        {
+            var value = "world";
+            var key = "hello";
+            var dictionaryName = "test";
+
+            using (var d = Dictionary<string, string>.UserSetting(GetType(), dictionaryName))
+            {
+                d[key] = value;
+            }
+
+            using (var d = Dictionary<string, string>.UserSetting(GetType(), dictionaryName))
+            {
+                Assert.AreEqual(value, d[key]);
+            }
         }
     }
 }
