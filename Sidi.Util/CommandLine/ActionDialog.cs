@@ -26,6 +26,8 @@ namespace Sidi.CommandLine
 {
     public class ActionDialog : Form
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public void Execute()
         {
             ActionTag.Execute();
@@ -52,6 +54,8 @@ namespace Sidi.CommandLine
 
     public class ActionTag
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public ActionTag(Action action)
         {
             Action = action;
@@ -71,7 +75,7 @@ namespace Sidi.CommandLine
             }                   
             catch (Exception ex)
             {
-                
+                log.Error(String.Format("{0} failed", this.Action), ex);
                 var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 ShowUserInterface.SetError(Button, msg);
             }

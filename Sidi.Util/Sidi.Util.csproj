@@ -108,10 +108,12 @@
     <Compile Include="CommandLine\ValueParser.cs" />
     <Compile Include="CommandLine\ValueParserAttribute.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
+    <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Forms\ChooseDialog.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -28,6 +28,7 @@ using Sidi.Util;
 using System.Linq.Expressions;
 using System.Threading;
 using Sidi.Extensions;
+using Sidi.IO;
 
 namespace Sidi.Persistence
 {
@@ -883,11 +884,8 @@ namespace Sidi.Persistence
 
         public static Collection<T> UserSetting()
         {
-            string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-            string an = typeof(T).Assembly.GetName().Name;
-            path = Path.Combine(path, an);
-            path = Path.Combine(path, an + ".sqlite");
-            return new Collection<T>(path);
+            return new Collection<T>(
+                Paths.GetLocalApplicationDataDirectory(typeof(T)).CatName(".sqlite"));
         }
 
         /// <summary>

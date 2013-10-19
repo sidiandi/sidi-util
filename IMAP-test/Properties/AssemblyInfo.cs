@@ -25,9 +25,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("IMAP-test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("sidi")]
 [assembly: AssemblyProduct("IMAP-test")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCopyright("Copyright © Andreas Grimme")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
