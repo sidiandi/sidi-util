@@ -49,7 +49,7 @@ namespace Sidi.Persistence
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        string path;
+        LPath path;
         string table;
         SQLiteCommand insert;
         SQLiteCommand select;
@@ -104,12 +104,12 @@ namespace Sidi.Persistence
             return a.Length > 0;
         }
 
-        public Collection(string a_path)
+        public Collection(LPath a_path)
         : this(a_path, typeof(T).Name)
         {
         }
 
-        public Collection(string a_path, string a_table)
+        public Collection(LPath a_path, string a_table)
         {
             Init(a_path, a_table);
         }
@@ -160,7 +160,7 @@ namespace Sidi.Persistence
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        void Init(string a_path, string a_table)
+        void Init(LPath a_path, string a_table)
         {
             path = a_path;
             SQLiteConnectionStringBuilder b = new SQLiteConnectionStringBuilder();
@@ -168,10 +168,10 @@ namespace Sidi.Persistence
             b.DateTimeFormat = SQLiteDateFormats.ISO8601;
             b.UseUTF16Encoding = true;
             b.DefaultTimeout = Int32.MaxValue;
-            bool create = !File.Exists(path);
+            bool create = !path.IsFile;
             if (create)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                path.EnsureParentDirectoryExists();
             }
 
             var c = new SQLiteConnection(b.ToString());
@@ -884,8 +884,7 @@ namespace Sidi.Persistence
 
         public static Collection<T> UserSetting()
         {
-            return new Collection<T>(
-                Paths.GetLocalApplicationDataDirectory(typeof(T)).CatName(".sqlite"));
+            return new Collection<T>(Paths.GetLocalApplicationDataDirectory(typeof(T)).CatName(".sqlite"));
         }
 
         /// <summary>
