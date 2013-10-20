@@ -131,12 +131,54 @@ namespace Sidi.IO
 
         public static bool IsValidFilename(string x)
         {
-            return x.Length <= LPath.MaxFilenameLength && !invalidFilenameRegex.IsMatch(x);
+            return CheckFilename(x) == null;
+        }
+
+        static Exception CheckFilename(string x)
+        {
+            if (x.Length > LPath.MaxFilenameLength)
+            {
+                return new System.IO.PathTooLongException("file name is {0} characters too long. Actual characters: {1}, allowed characters: {2}, file name: {3}".F(
+                    x.Length - MaxFilenameLength,
+                    x.Length,
+                    MaxFilenameLength,
+                    x));
+            }
+
+            var m = invalidFilenameRegex.Match(x);
+            if (m.Success)
+            {
+                return new System.IO.IOException("file name contains invalid character at {0}. File name: {1}".F(
+                    m.Index,
+                    x));
+            }
+            return null;
+        }
+
+        static Exception CheckFilenameWithWildcards(string x)
+        {
+            if (x.Length > LPath.MaxFilenameLength)
+            {
+                return new System.IO.PathTooLongException("file name is {0} characters too long. Actual characters: {1}, allowed characters: {2}, file name: {3}".F(
+                    x.Length - MaxFilenameLength,
+                    x.Length,
+                    MaxFilenameLength,
+                    x));
+            }
+
+            var m = invalidFilenameRegexWithoutWildcards.Match(x);
+            if (m.Success)
+            {
+                return new System.IO.IOException("file name contains invalid character at {0}. File name: {1}".F(
+                    m.Index,
+                    x));
+            }
+            return null;
         }
 
         public static bool IsValidFilenameWithWildcards(string x)
         {
-            return x.Length <= LPath.MaxFilenameLength && !invalidFilenameRegexWithoutWildcards.IsMatch(x);
+            return CheckFilenameWithWildcards(x) == null;
         }
 
         public LPath()
@@ -146,7 +188,11 @@ namespace Sidi.IO
 
         public LPath(string path)
         {
-            Check(path);
+            var exception = CheckPath(path);
+            if (exception != null)
+            {
+                throw exception;
+            }
 
             // remove trailing slash
             if (path.EndsWith(@"\"))
@@ -471,42 +517,40 @@ namespace Sidi.IO
 
         public static bool IsValid(string path)
         {
-            try
-            {
-                new LPath(path);
-                return true;
-            }
-            catch (System.IO.PathTooLongException)
-            {
-                return false;
-            }
+            return CheckPath(path) == null;
         }
 
-        static void Check(string path)
+        static Exception CheckPath(string path)
         {
             if (path.Length > MaxPathLength)
             {
-                throw new System.IO.PathTooLongException();
+                return new System.IO.PathTooLongException("Path is {0} characters too long. Actual length: {1}, allowed: {2}".F(
+                    path.Length - MaxPathLength,
+                    path.Length,
+                    MaxPathLength));
             }
 
             var parts = path.Split(DirectorySeparatorChar);
 
             for (int i = 0; i < Math.Min(1, parts.Length); ++i)
             {
-                var x = parts[i];
-                if (!IsValidFilename(x))
+                var exception = (i == parts.Length - 1) ? 
+                    CheckFilenameWithWildcards(parts[i]) : 
+                    CheckFilename(parts[i]);
+
+                if (exception != null)
                 {
-                    if (i == 0 && IsValidDriveRoot(x))
+                    if (i == 0 && IsValidDriveRoot(parts[i]))
                     {
                         continue;
                     }
-                    if (i == parts.Length - 1 && IsValidFilenameWithWildcards(x))
+                    else
                     {
-                        continue;
+                        return exception;
                     }
-                    throw new System.IO.PathTooLongException(x);
                 }
             }
+            return null;
         }
 
         /// <summary>
