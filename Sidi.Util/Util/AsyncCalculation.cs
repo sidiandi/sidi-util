@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sidi.Util
 {
@@ -29,8 +30,9 @@ namespace Sidi.Util
 
         Func<Input, Output> work;
         Input query = default(Input);
+        bool newQuery = false;
         Output result = default(Output);
-        Thread worker = null;
+        Task worker = null;
 
         public AsyncCalculation(Func<Input, Output> work)
         {
@@ -44,6 +46,7 @@ namespace Sidi.Util
                 lock (this)
                 {
                     query = value;
+                    newQuery = true;
                     Start();
                 }
             }
@@ -61,41 +64,43 @@ namespace Sidi.Util
 
         void Start()
         {
-            if (worker != null)
+            if (worker == null || worker.IsCompleted)
             {
-                worker.Abort();
-                worker = null;
-            }
-
-            worker = new Thread(() =>
-            {
-                Input i = default(Input);
-                try
+                worker = Task.Factory.StartNew(() =>
                 {
                     lock (this)
                     {
-                        i = Query;
-                    }
-                    Output o = work(i);
-                    lock (this)
-                    {
-                        worker = null;
-                        result = o;
-
-                        if (Complete != null)
+                        while (newQuery)
                         {
-                            Complete(this, EventArgs.Empty);
+                            var q = Query;
+                            newQuery = false;
+
+                            Monitor.Exit(this);
+                            Output r = default(Output);
+                            try
+                            {
+                                r = work(q);
+                            }
+                            catch
+                            {
+                            }
+                            finally
+                            {
+                                Monitor.Enter(this);
+                            }
+
+                            if (!newQuery)
+                            {
+                                this.result = r;
+                                if (Complete != null)
+                                {
+                                    Complete(this, EventArgs.Empty);
+                                }
+                            }
                         }
                     }
-                }
-                catch (ThreadAbortException)
-                {
-                    log.InfoFormat("Worker with input {0} aborted.", i);
-                    Thread.ResetAbort();
-                }
-            });
-
-            worker.Start();
+                });
+            }
         }
 
         public Output Result
@@ -122,15 +127,14 @@ namespace Sidi.Util
 
         public void Wait()
         {
-            Thread w;
+            Task w = null;
             lock (this)
             {
                 w = worker;
             }
-
             if (w != null)
             {
-                w.Join();
+                w.Wait();
             }
         }
     }
