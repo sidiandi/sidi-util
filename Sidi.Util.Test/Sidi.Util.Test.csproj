@@ -133,6 +133,7 @@
     <Compile Include="Extensions\TypeExtensionsTest.cs" />
     <Compile Include="Forms\GenericListViewTest.cs" />
     <Compile Include="Forms\ItemViewTest.cs" />
+    <Compile Include="Forms\JobListTest.cs" />
     <Compile Include="Forms\PromptTest.cs" />
     <Compile Include="GraMath.cs" />
     <Compile Include="IMAP\ArgParserTest.cs" />
