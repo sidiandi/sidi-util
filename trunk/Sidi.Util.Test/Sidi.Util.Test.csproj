@@ -128,6 +128,7 @@
     <Compile Include="CommandLine\BasicValueParserTest.cs" />
     <Compile Include="CommandLine\ShowUserInterfaceTest.cs" />
     <Compile Include="CommandLine\SubCommand.cs" />
+    <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppenderTest.cs" />
     <Compile Include="Extensions\DumpExtensionsTest.cs" />
     <Compile Include="Extensions\IEnumerableExtensionsTest.cs" />
     <Compile Include="Extensions\TypeExtensionsTest.cs" />
