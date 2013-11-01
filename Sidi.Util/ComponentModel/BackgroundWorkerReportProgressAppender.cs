@@ -31,7 +31,6 @@ namespace Sidi.ComponentModel
         }
 
         string propertyName;
-        string Identity = null;
 
         class Filter : FilterSkeleton
         {
