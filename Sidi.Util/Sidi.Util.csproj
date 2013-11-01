@@ -108,6 +108,7 @@
     <Compile Include="CommandLine\ValueParser.cs" />
     <Compile Include="CommandLine\ValueParserAttribute.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
+    <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppender.cs" />
     <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
@@ -129,7 +130,9 @@
     <Compile Include="Forms\GenericListView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms\JobList.cs">
+    <Compile Include="Forms\Job.cs" />
+    <Compile Include="Forms\JobList.cs" />
+    <Compile Include="Forms\JobListView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Forms\NativeMethods.cs" />

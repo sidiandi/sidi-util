@@ -112,7 +112,8 @@ namespace Sidi.Util
         public void ProcessChart()
         {
             var data = Process.GetProcesses();
-            data.ListFormat()
+            data
+                .ListFormat()
                 .AddColumn("Name", f => f.ToString())
                 .Property("Id")
                 .Chart().RunFullScreen();

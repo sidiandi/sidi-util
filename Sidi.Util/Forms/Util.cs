@@ -33,11 +33,16 @@ namespace Sidi.Forms
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         static public Form AsForm(this Control c, string caption)
         {
-            Form f = new Form();
+            Form f = new Form()
+            {
+                Size = c.Size,
+                Text = caption,
+            };
+
             c.Dock = DockStyle.Fill;
             c.Visible = true;
             f.Controls.Add(c);
-            f.Text = caption;
+
             f.Show();
             return f;
         }
