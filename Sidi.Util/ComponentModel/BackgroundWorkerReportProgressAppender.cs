@@ -13,7 +13,7 @@ namespace Sidi.ComponentModel
     /// Fires a BackgroundWorker.ReportProgress event for every log4net log event made 
     /// in the constructor thread until disposed.
     /// </summary>
-    public class BackgroundWorkerReportProgressAppender : AppenderSkeleton, IDisposable
+    public sealed class BackgroundWorkerReportProgressAppender : AppenderSkeleton, IDisposable
     {
         public BackgroundWorkerReportProgressAppender(BackgroundWorker bgw)
         {
@@ -68,7 +68,7 @@ namespace Sidi.ComponentModel
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {
