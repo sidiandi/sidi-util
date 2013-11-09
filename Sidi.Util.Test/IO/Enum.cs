@@ -76,6 +76,20 @@ namespace Sidi.IO
             }
 
             [Test]
+            public void GetChildren()
+            {
+                var e = new Find()
+                {
+                    Output = Find.OnlyFiles,
+                    Root = TestTree,
+                    GetChildren = i => i.GetChildren().OrderByDescending(x => x.LastWriteTimeUtc)
+                };
+                var files = e.Depth().ToList();
+                Assert.IsTrue(files.Any());
+                Assert.IsTrue(files.All(x => !x.IsDirectory));
+            }
+
+            [Test]
             public void NotExists()
             {
                 var files = Find.AllFiles(new LPath(@"C:\does_not_exist_4352345234234")).ToList();
