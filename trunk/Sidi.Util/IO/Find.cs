@@ -34,6 +34,7 @@ namespace Sidi.IO
             Visit = x => { };
             Follow = x => true;
             Output = x => true;
+            GetChildren = x => x.GetChildren();
         }
 
         public static IEnumerable<LFileSystemInfo> AllFiles(LPath root)
@@ -82,6 +83,12 @@ namespace Sidi.IO
         public Action<LFileSystemInfo> Visit { set; get; }
 
         /// <summary>
+        /// Set this function to determine how the child elements of a file system element are determined
+        /// and in which order they are presented to the searcher. Default calls LFileSystemInfo.GetChildren
+        /// </summary>
+        public Func<LFileSystemInfo, IEnumerable<LFileSystemInfo> > GetChildren { set; get; }
+
+        /// <summary>
         /// Counts the visited files
         /// </summary>
         public int Count { private set; get; }
@@ -125,7 +132,7 @@ namespace Sidi.IO
 
                 if (MustFollow(i))
                 {
-                    stack.InsertRange(0, i.GetChildren());
+                    stack.InsertRange(0, GetChildren(i));
                 }
             }
         }
