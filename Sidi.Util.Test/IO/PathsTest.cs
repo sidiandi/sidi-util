@@ -18,5 +18,27 @@ namespace Sidi.IO
             var p = Paths.Get(GetType());
             log.Info(p);
         }
+
+        [Test]
+        public void GetDrives()
+        {
+            foreach (var drive in Paths.GetDrives())
+            {
+                if (new System.IO.DriveInfo(drive).DriveType != System.IO.DriveType.CDRom)
+                {
+                    Assert.IsTrue(drive.IsDirectory);
+                }
+            }
+        }
+
+        [Test]
+        public void FreeDrives()
+        {
+            foreach (var d in Paths.GetFreeDrives())
+            {
+                Assert.IsFalse(d.Exists);
+                Assert.IsFalse(d.IsDirectory);
+            }
+        }
     }
 }

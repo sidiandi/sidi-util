@@ -343,5 +343,26 @@ namespace Sidi.IO
             var t = TestFile("test");
             log.Info(t.VolumePath);
         }
+
+        [Test]
+        public void DriveRootsExist()
+        {
+            Assert.IsFalse(new LPath(@"a:\").Exists);
+            var drives = DriveInfo.GetDrives();
+            var allDrives = Enumerable.Range('a', 'z' - 'a').Select(x => new String((char)x, 1))
+                .Select(x => new
+                    {
+                        Letter = x,
+                        Exists = drives.Any(d => d.RootDirectory.FullName.StartsWith(x, StringComparison.InvariantCultureIgnoreCase)),
+                    });
+
+            foreach (var i in allDrives)
+            {
+                if (new DriveInfo(i.Letter).DriveType != DriveType.CDRom)
+                {
+                    Assert.AreEqual(i.Exists, new LPath(i.Letter + @":\").IsDirectory, i.Letter);
+                }
+            }
+        }
     }
 }

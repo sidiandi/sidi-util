@@ -110,5 +110,17 @@ namespace Sidi.IO
         {
             return new LPath(System.Environment.GetFolderPath(sf));
         }
+
+        public static IEnumerable<LPath> GetDrives()
+        {
+            return System.IO.DriveInfo.GetDrives()
+                .Select(x => new LPath(x.RootDirectory.FullName));
+        }
+
+        public static IEnumerable<LPath> GetFreeDrives()
+        {
+            var allDrives = Enumerable.Range('A', 'Z' - 'A').Select(x => new LPath((char)x + @":\"));
+            return allDrives.Except(GetDrives());
+        }
     }
 }

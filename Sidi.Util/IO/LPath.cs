@@ -367,14 +367,22 @@ namespace Sidi.IO
         {
             if (IsRoot)
             {
-                fd = new FindData()
+                if (System.IO.Directory.Exists(NoPrefix))
                 {
-                    Attributes = System.IO.FileAttributes.Directory,
-                    nFileSizeHigh = 0,
-                    nFileSizeLow = 0,
-                    Name = this.NoPrefix,
-                };
-                return true;
+                    fd = new FindData()
+                    {
+                        Attributes = System.IO.FileAttributes.Directory,
+                        nFileSizeHigh = 0,
+                        nFileSizeLow = 0,
+                        Name = this.NoPrefix,
+                    };
+                    return true;
+                }
+                else
+                {
+                    fd = default(FindData);
+                    return false;
+                }
             }
 
             if (IsUnc && Parts.Length == 4)
