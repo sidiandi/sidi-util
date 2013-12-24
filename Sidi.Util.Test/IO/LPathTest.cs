@@ -326,6 +326,7 @@ namespace Sidi.IO
             Assert.AreEqual(p, LPath.Parse(@"C:\temp\somefile"));
             Assert.AreEqual(p, LPath.Parse(@"C:/temp/somefile"));
             Assert.AreEqual(new LPath(@"a\b\c"), LPath.Parse("a/b/c"));
+            Assert.AreEqual(new LPath(@"\\somehost.com\path1\path2"), LPath.Parse(@"file://somehost.com/path1/path2"));
         }
 
         [Test, RequiresSTA]
