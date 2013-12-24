@@ -278,12 +278,17 @@ namespace Sidi.IO
 
         /// <summary>
         /// Parses an LPath instance from a string. Allows / and \ as directory separators.
+        /// Accepts file:// URLs
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         public static LPath Parse(string text)
         {
-            if (text.StartsWith(":paste", StringComparison.InvariantCultureIgnoreCase) ||
+            if (text.StartsWith("file://"))
+            {
+                return new LPath(new Uri(text).LocalPath);
+            }
+            else if (text.StartsWith(":paste", StringComparison.InvariantCultureIgnoreCase) ||
                 text.Equals(":sel", StringComparison.OrdinalIgnoreCase))
             {
                 return PathList.Parse(text).First();

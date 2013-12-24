@@ -26,6 +26,32 @@ using Sidi.Extensions;
 
 namespace Sidi.Util
 {
+    public static class InternetExplorerExtension
+    {
+        public static IEnumerable<LPath> GetSelectedFiles(this SHDocVw.InternetExplorer w)
+        {
+            if (w == null)
+            {
+                return Enumerable.Empty<LPath>();
+            }
+
+            var view = ((Shell32.IShellFolderViewDual2)w.Document);
+
+            var items = view.SelectedItems()
+                .OfType<Shell32.FolderItem>()
+                .Select(i => new LPath(i.Path))
+                .ToList();
+
+            if (items.Any())
+            {
+                return items;
+            }
+
+            Console.WriteLine(w.LocationURL);
+            return new LPath[] { LPath.Parse(w.LocationURL) };
+        }
+    }
+
     public class Shell
     {
         Shell32.Shell shell = new Shell32.Shell();
@@ -41,6 +67,10 @@ namespace Sidi.Util
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Topmost Windows Explorer or Internet Explorer window or null if no such window is open</returns>
         public SHDocVw.InternetExplorer GetForegroundWindow()
         {
             var shellWindows = ((IEnumerable)shell.Windows()).OfType<InternetExplorer>()
@@ -59,14 +89,14 @@ namespace Sidi.Util
                 .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get selected files from topmost explorer window orr empty list if no such window exists
+        /// </summary>
         public IEnumerable<LPath> SelectedFiles
         {
             get
             {
-                var w = GetForegroundWindow();
-                var items = ((Shell32.IShellFolderViewDual2)w.Document).SelectedItems();
-                return items.Cast<Shell32.FolderItem>()
-                    .Select(i => new LPath(i.Path));
+                return GetForegroundWindow().GetSelectedFiles();
             }
         }
 
