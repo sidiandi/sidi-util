@@ -55,7 +55,7 @@ namespace Sidi.Build.Test
             instance = new Srctool();
         }
 
-        Sidi.IO.LPath pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
+        readonly Sidi.IO.LPath pdbFile = L.Paths.BinDir.CatDir("Sidi.Util.pdb");
 
         /// <summary>
         /// Dump source information of a PDB file

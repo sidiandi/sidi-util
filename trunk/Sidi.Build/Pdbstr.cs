@@ -32,7 +32,7 @@ namespace Sidi.Build
     /// </summary>
     public class Pdbstr
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         string Program
         {
@@ -73,7 +73,7 @@ namespace Sidi.Build
                 w.Write(content);
             }
 
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = Program;
             p.StartInfo.Arguments = String.Format("-w {0} -s:{1} {2}", ("-p:" + pdbFile).Quote(),
                 streamName,
@@ -96,7 +96,7 @@ namespace Sidi.Build
         /// <returns>Content of the stream</returns>
         public string Read(string pdbFile, string streamName)
         {
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = Program;
             p.StartInfo.Arguments = String.Format("-r {0} -s:{1}", ("-p:" + pdbFile).Quote(),
                 streamName);

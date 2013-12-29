@@ -33,12 +33,14 @@ namespace Sidi.Build
 
         public bool Execute()
         {
-            Assembly a = Assembly.ReflectionOnlyLoadFrom(AssemblyFile);
-            VersionInfo v = new VersionInfo();
-            v.AssemblyName = a.GetName();
-            v.DownloadUrl = DownloadUrl;
-            v.Message = Message;
-            UpdateInfo i = new UpdateInfo();
+            var a = Assembly.ReflectionOnlyLoadFrom(AssemblyFile);
+            var v = new VersionInfo()
+            {
+                AssemblyName = a.GetName(),
+                DownloadUrl = DownloadUrl,
+                Message = Message
+            };
+            var i = new UpdateInfo();
             i.VersionInfo.Add(v);
             i.Write(OutputFile);
             return true;

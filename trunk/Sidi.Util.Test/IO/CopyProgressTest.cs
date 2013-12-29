@@ -35,9 +35,8 @@ namespace Sidi.IO
         [Test]
         public void CopyProgressObject()
         {
-            CopyProgress cp;
             var start = DateTime.Now;
-            cp = new CopyProgress(null, null);
+            var cp = new CopyProgress(null, null);
             log.Info(cp.Message);
             Thread.Sleep(10);
             cp.Update(0, 100000);

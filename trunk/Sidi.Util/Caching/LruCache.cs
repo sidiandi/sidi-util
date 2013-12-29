@@ -50,14 +50,14 @@ namespace Sidi.Caching
             }
 
             public Value value;
-            public LinkedListNode<Key> usageEntry;
+            public readonly LinkedListNode<Key> usageEntry;
             public DateTime usageTime;
         }
 
         LinkedList<Key> usage = new LinkedList<Key>();
-        Dictionary<Key, DictionaryItem> dictionary = new Dictionary<Key,DictionaryItem>();
+        readonly Dictionary<Key, DictionaryItem> dictionary = new Dictionary<Key,DictionaryItem>();
         int maxCount;
-        Func<Key, Value> provideValue;
+        readonly Func<Key, Value> provideValue;
 
         public void Reset(Key key)
         {
@@ -150,7 +150,7 @@ namespace Sidi.Caching
         {
             lock (this)
             {
-                if (!(dictionary.Count == usage.Count))
+                if (dictionary.Count != usage.Count)
                 {
                     throw new Exception();
                 }
