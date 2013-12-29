@@ -15,10 +15,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Build.Framework;
 using System.Reflection;
 using Sidi.Util;
@@ -34,7 +30,7 @@ namespace Sidi.Build
         public bool Execute()
         {
             var a = Assembly.ReflectionOnlyLoadFrom(AssemblyFile);
-            var v = new VersionInfo()
+            var v = new VersionInfo
             {
                 AssemblyName = a.GetName(),
                 DownloadUrl = DownloadUrl,

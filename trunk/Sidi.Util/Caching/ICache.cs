@@ -22,11 +22,11 @@ using System.Text;
 
 namespace Sidi.Caching
 {
-    public interface ICache<Key, Value>
+    public interface ICache<in TKey, out TValue>
     {
-        bool Contains(Key key);
+        bool Contains(TKey key);
         void Clear();
-        void Reset(Key key);
-        Value this[Key key] { get; }
+        void Reset(TKey key);
+        TValue this[TKey key] { get; }
     }
 }

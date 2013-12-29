@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Sidi.Collections
 {
-    public interface IState<T>
+    public interface IState<in T>
     {
         void Save(T x);
         void Restore(T x);
@@ -30,14 +30,14 @@ namespace Sidi.Collections
     
     public class History<T, State> where State : IState<T>, new()
     {
-        T m_object;
+        readonly T m_object;
         
         public History(T x)
         {
             m_object = x;
         }
 
-        List<State> m_list = new List<State>();
+        readonly List<State> m_list = new List<State>();
         int m_index = 0;
         bool m_restoring = false;
 
@@ -105,7 +105,7 @@ namespace Sidi.Collections
     [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     public class LimitedQueue<T> : List<T>
     {
-        private int m_maxCount = 100;
+        private readonly int m_maxCount = 100;
 
         public LimitedQueue(int maxCount)
         {

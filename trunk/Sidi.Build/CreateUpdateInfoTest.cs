@@ -16,42 +16,39 @@
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using Sidi.IO;
 using System.Reflection;
 using Sidi.Util;
 using Sidi.Test;
+using Sidi.IO;
 
 namespace Sidi.Build.Test
 {
     [TestFixture]
     public class CreateUpdateInfoTest : TestBase
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        CreateUpdateInfo instance = null;
+        CreateUpdateInfo _instance = null;
 
         [SetUp]
         public void SetUp()
         {
-            instance = new CreateUpdateInfo();
+            _instance = new CreateUpdateInfo();
         }
 
         [Test]
         public void Writer()
         {
-            var outFile = this.TestFile(new Sidi.IO.LPath("generated.xml"));
+            var outFile = TestFile(new LPath("generated.xml"));
             {
-                CreateUpdateInfo cui = new CreateUpdateInfo();
+                var cui = new CreateUpdateInfo();
                 cui.OutputFile = outFile;
                 cui.AssemblyFile = Assembly.GetExecutingAssembly().Location;
                 cui.Execute();
             }
 
-            UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri(outFile));
+            var c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri(outFile));
             c.Check();
             Assert.IsTrue(!c.IsUpdateRequired);
         }

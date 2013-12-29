@@ -38,7 +38,7 @@ namespace Sidi.Caching
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public LruCacheBackground(int maxCount, int threadCount, Action<ProvideValueArgs> provideValue)
-        : this(maxCount, threadCount)
+            : this(maxCount, threadCount)
         {
             this.provideValue = provideValue;
         }
@@ -84,7 +84,7 @@ namespace Sidi.Caching
             }
         }
 
-        LruCache<Key, CacheEntry> cache;
+        readonly LruCache<Key, CacheEntry> cache;
 
         public class ProvideValueArgs
         {
@@ -118,7 +118,7 @@ namespace Sidi.Caching
             public CacheState State { get; private set; }
         }
         Action<ProvideValueArgs> provideValue;
-        List<Thread> workers;
+        readonly List<Thread> workers;
 
         public Action<ProvideValueArgs> ProvideValue
         {
@@ -151,7 +151,7 @@ namespace Sidi.Caching
                 Key = key;
             }
 
-            public Key Key { get; private set; } 
+            public Key Key { get; private set; }
         }
 
         /// <summary>
@@ -187,53 +187,53 @@ namespace Sidi.Caching
 
             public Value m_value;
             public CacheState m_state;
-            public Exception exception;
+            private Exception exception;
 
             #region IDisposable Members
 
-        private bool disposed = false;
-            
-        //Implement IDisposable.
-        public void Dispose()
-        {
-          Dispose(true);
-          GC.SuppressFinalize(this);
-        }
+            private bool disposed = false;
 
-        protected virtual void Dispose(bool disposing)
-        {
-          if (!disposed)
-          {
-            if (disposing)
+            //Implement IDisposable.
+            public void Dispose()
             {
-                IDisposable disposeValue = m_value as IDisposable;
-                if (disposeValue != null)
-                {
-                    disposeValue.Dispose();
-                }
-                m_value = default(Value);
+                Dispose(true);
+                GC.SuppressFinalize(this);
             }
-            // Free your own state (unmanaged objects).
-            // Set large fields to null.
-            disposed = true;
-          }
-        }
 
-        // Use C# destructor syntax for finalization code.
-        ~CacheEntry()
-        {
-          // Simply call Dispose(false).
-          Dispose(false);
-        }    
-    
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposed)
+                {
+                    if (disposing)
+                    {
+                        IDisposable disposeValue = m_value as IDisposable;
+                        if (disposeValue != null)
+                        {
+                            disposeValue.Dispose();
+                        }
+                        m_value = default(Value);
+                    }
+                    // Free your own state (unmanaged objects).
+                    // Set large fields to null.
+                    disposed = true;
+                }
+            }
+
+            // Use C# destructor syntax for finalization code.
+            ~CacheEntry()
+            {
+                // Simply call Dispose(false).
+                Dispose(false);
+            }
+
 
             #endregion
         }
 
         class ProvideValueRequest
         {
-            Key key;
-            DateTime requestTime;
+            readonly Key key;
+            readonly DateTime requestTime;
 
             public ProvideValueRequest(Key key)
             {
@@ -276,25 +276,21 @@ namespace Sidi.Caching
                             Monitor.Exit(this);
                             try
                             {
-                                try
+                                var args = new ProvideValueArgs(k.Key);
+                                provideValue(args);
+                                if (args.State == CacheState.Complete)
                                 {
-                                    var args = new ProvideValueArgs(k.Key);
-                                    provideValue(args);
-                                    if (args.State == CacheState.Complete)
-                                    {
-                                        ce = new CacheEntry(args.Value);
-                                    }
-                                    else
-                                    {
-                                        ce.m_state = CacheState.Missing;
-                                    }
+                                    ce = new CacheEntry(args.Value);
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    log.Warn(String.Format("Error while loading value for key={0}", k.Key), ex);
-                                    ce = new CacheEntry(ex);
+                                    ce.m_state = CacheState.Missing;
                                 }
-
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Warn(String.Format("Error while loading value for key={0}", k.Key), ex);
+                                ce = new CacheEntry(ex);
                             }
                             finally
                             {
@@ -416,39 +412,39 @@ namespace Sidi.Caching
             workers.ForEach(x => x.Join());
         }
 
-        
+
 
         private bool disposed = false;
-            
+
         //Implement IDisposable.
         public void Dispose()
         {
-          Dispose(true);
-          GC.SuppressFinalize(this);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-          if (!disposed)
-          {
-            if (disposing)
+            if (!disposed)
             {
-                          StopWorkers();
-            cache.Dispose();
+                if (disposing)
+                {
+                    StopWorkers();
+                    cache.Dispose();
+                }
+                // Free your own state (unmanaged objects).
+                // Set large fields to null.
+                disposed = true;
             }
-            // Free your own state (unmanaged objects).
-            // Set large fields to null.
-            disposed = true;
-          }
         }
 
         // Use C# destructor syntax for finalization code.
         ~LruCacheBackground()
         {
-          // Simply call Dispose(false).
-          Dispose(false);
-        }    
-    
+            // Simply call Dispose(false).
+            Dispose(false);
+        }
+
 
         public void Clear()
         {

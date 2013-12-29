@@ -16,10 +16,6 @@
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Sidi.IO;
 using System.IO;
 using L = Sidi.IO;
 
@@ -39,7 +35,7 @@ namespace Sidi.Build
         {
             get
             {
-                string[] searchPath = new string[]
+                string[] searchPath =
                 {
                     L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Windows Kits\8.0\Debuggers\x86"),
                     L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Debugging Tools for Windows (x86)"),

@@ -54,9 +54,9 @@ namespace Sidi.Caching
             public DateTime usageTime;
         }
 
-        LinkedList<Key> usage = new LinkedList<Key>();
+        readonly LinkedList<Key> usage = new LinkedList<Key>();
         readonly Dictionary<Key, DictionaryItem> dictionary = new Dictionary<Key,DictionaryItem>();
-        int maxCount;
+        readonly int maxCount;
         readonly Func<Key, Value> provideValue;
 
         public void Reset(Key key)

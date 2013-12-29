@@ -16,16 +16,12 @@
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
 
 namespace IMAP_test
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             log4net.Config.BasicConfigurator.Configure();
             var server = new Sidi.IMAP.Server();
