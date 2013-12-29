@@ -70,7 +70,7 @@ namespace Sidi.Collections
             m_intervals.Clear();
         }
 
-        Comparer m_comparer = new Comparer();
+        readonly Comparer m_comparer = new Comparer();
 
         int Find(int x)
         {
@@ -123,13 +123,12 @@ namespace Sidi.Collections
             List<Interval> a = m_intervals;
             List<Interval> b = x.m_intervals;
             int ia = 0;
-            int ib = 0;
 
             List<Interval> result = new List<Interval>();
 
             for (ia = 0; ia < a.Count; ++ia)
             {
-                ib = x.Find(a[ia].Begin) - 1;
+                var ib = x.Find(a[ia].Begin) - 1;
                 if (ib < 0)
                 {
                     ib = 0;

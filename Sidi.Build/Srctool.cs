@@ -42,7 +42,7 @@ namespace Sidi.Build
         {
         }
 
-        Sidi.IO.LPath Program
+        static Sidi.IO.LPath Program
         {
             get
             {

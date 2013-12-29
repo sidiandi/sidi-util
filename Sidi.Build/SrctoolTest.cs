@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -92,7 +93,7 @@ namespace Sidi.Build.Test
             w.WriteLine("VERSION=2");
             w.WriteLine("INDEXVERSION=2");
             w.WriteLine("VERCTRL=http");
-            w.WriteLine("DATETIME={0}", DateTime.Now.ToString());
+            w.WriteLine("DATETIME={0}", DateTime.Now.ToString(CultureInfo.InvariantCulture));
             w.WriteLine("SRCSRV: variables ------------------------------------------");
             w.WriteLine("SRCSRVVERCTRL=http");
             w.WriteLine("HTTP_ALIAS=http://sidi-util.googlecode.com/svn/trunk");
