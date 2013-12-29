@@ -16,13 +16,13 @@
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using NUnit.Framework;
 using System.Reflection;
-using Sidi.Util;
-using Sidi.Test;
+using NUnit.Framework;
 using Sidi.IO;
+using Sidi.Test;
+using Sidi.Util;
 
-namespace Sidi.Build.Test
+namespace Sidi.Build
 {
     [TestFixture]
     public class CreateUpdateInfoTest : TestBase
@@ -55,3 +55,5 @@ namespace Sidi.Build.Test
 
     }
 }
+
+
