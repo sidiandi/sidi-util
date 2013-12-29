@@ -41,7 +41,7 @@ namespace Sidi.Caching
             this.RememberExceptions = false;
         }
 
-        LPath storeDirectory;
+        readonly LPath storeDirectory;
 
         public T GetCached<T>(object key, Func<T> provider)
         {
@@ -163,7 +163,7 @@ namespace Sidi.Caching
             return storeDirectory.CatDir(Digest(key));
         }
 
-        static SHA1 sha = new SHA1CryptoServiceProvider();
+        readonly static SHA1 sha = new SHA1CryptoServiceProvider();
 
         public static string Digest(object x)
         {

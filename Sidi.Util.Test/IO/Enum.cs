@@ -38,7 +38,7 @@ namespace Sidi.IO
             {
                 var e = new Find()
                 {
-                    Root = TestTree,
+                    Root = _testTree,
                 };
 
                 foreach (var i in e.Depth())
@@ -52,7 +52,7 @@ namespace Sidi.IO
             {
                 var e = new Find()
                 {
-                    Root = TestTree
+                    Root = _testTree
                 };
 
                 var d = e.Depth();
@@ -60,7 +60,7 @@ namespace Sidi.IO
                 Assert.IsFalse(d.Except(b).Any());
             }
 
-            LPath TestTree = Paths.BinDir.CatDir(".");
+            readonly LPath _testTree = Paths.BinDir.CatDir(".");
 
             [Test]
             public void Output()
@@ -68,7 +68,7 @@ namespace Sidi.IO
                 var e = new Find()
                 {
                     Output = Find.OnlyFiles,
-                    Root = TestTree
+                    Root = _testTree
                 };
                 var files = e.Depth().ToList();
                 Assert.IsTrue(files.Any());
@@ -81,7 +81,7 @@ namespace Sidi.IO
                 var e = new Find()
                 {
                     Output = Find.OnlyFiles,
-                    Root = TestTree,
+                    Root = _testTree,
                     GetChildren = i => i.GetChildren().OrderByDescending(x => x.LastWriteTimeUtc)
                 };
                 var files = e.Depth().ToList();
@@ -118,7 +118,7 @@ namespace Sidi.IO
                 {
                     Output = x => Find.OnlyFiles(x) && fileType.Is(x.Name),
                     Follow = x => Find.NoDotNoHidden(x) && x.Name != "test",
-                    Root = TestTree
+                    Root = _testTree
                 };
                 
                 var files = e.Depth().ToList();
@@ -132,7 +132,7 @@ namespace Sidi.IO
                 var e = new Find()
                 {
                     Output = Find.OnlyFiles,
-                    Root = TestTree,
+                    Root = _testTree,
                 };
 
                 var maybeIdentical = e.Depth()
