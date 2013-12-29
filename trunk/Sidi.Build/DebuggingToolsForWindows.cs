@@ -15,9 +15,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
+using Sidi.IO;
 using System;
 using System.IO;
-using L = Sidi.IO;
+using System.Linq;
 
 namespace Sidi.Build
 {
@@ -31,27 +32,26 @@ namespace Sidi.Build
             }
         }
         
-        public static L.LPath Directory
+        public static LPath Directory
         {
             get
             {
-                string[] searchPath =
+                LPath[] searchPath =
                 {
-                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Windows Kits\8.0\Debuggers\x86"),
-                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Debugging Tools for Windows (x86)"),
-                    L.LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows")
+                    LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Windows Kits\8.0\Debuggers\x86"),
+                    LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Debugging Tools for Windows (x86)"),
+                    LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows")
                 };
 
-                foreach (string d in searchPath)
+                try
                 {
-                    if (System.IO.Directory.Exists(d))
-                    {
-                        return d;
-                    }
+                    return searchPath.First(d => d.IsDirectory);
                 }
-
-                throw new DirectoryNotFoundException(String.Format("The Debugging Tools for Windows must be installed at {0}. See {1}",
-                    searchPath[0], DownloadUrl));
+                catch (InvalidOperationException exception)
+                {
+                    throw new DirectoryNotFoundException(String.Format("The Debugging Tools for Windows must be installed at {0}. See {1}",
+                        searchPath[0], DownloadUrl), exception);
+                }
             }
         }
     }

@@ -45,12 +45,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
 using System;
-using System.Diagnostics;
 using System.Text;
 using System.IO;
-using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
-using Microsoft.Win32;
 using System.Reflection;
 using System.Net;
 using System.Collections.Generic;
@@ -71,7 +68,7 @@ namespace Sidi.Build.GoogleCode
             new Parser(this).LoadPreferences();
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly byte[] NewLineAsciiBytes = Encoding.ASCII.GetBytes("\r\n");
         private static readonly string Boundary = Guid.NewGuid().ToString();
@@ -140,28 +137,28 @@ namespace Sidi.Build.GoogleCode
 
         void DoUpload()
 		{
-			HttpWebRequest request = (HttpWebRequest) WebRequest.Create(String.Format("https://{0}.googlecode.com/files", ProjectName));
+			var request = (HttpWebRequest) WebRequest.Create(String.Format("https://{0}.googlecode.com/files", ProjectName));
 			request.Method = "POST";
 			request.ContentType = String.Concat("multipart/form-data; boundary=" + Boundary);
-            request.UserAgent = String.Concat(this.GetType().FullName + " " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            request.UserAgent = String.Concat(GetType().FullName + " " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 			request.Headers.Add("Authorization", String.Concat("Basic ", CreateAuthorizationToken(UserName, Password)));
 
-			log.Info(request.UserAgent);
-            log.InfoFormat("Upload URL: {0}", request.Address.ToString());
-            log.InfoFormat("Username: {0}", UserName);
-            log.InfoFormat("Local file: {0}", LocalFile);
-            log.InfoFormat("Remote file: {0}", RemoteFile);
-            log.InfoFormat("Summary: {0}", Summary);
+			Log.Info(request.UserAgent);
+            Log.InfoFormat("Upload URL: {0}", request.Address);
+            Log.InfoFormat("Username: {0}", UserName);
+            Log.InfoFormat("Local file: {0}", LocalFile);
+            Log.InfoFormat("Remote file: {0}", RemoteFile);
+            Log.InfoFormat("Summary: {0}", Summary);
 
-			using (Stream stream = request.GetRequestStream())
+			using (var stream = request.GetRequestStream())
 			{
-			    log.Info("Sending summary...");
+			    Log.Info("Sending summary...");
 				WriteLine(stream, String.Concat("--", Boundary));
 				WriteLine(stream, @"content-disposition: form-data; name=""summary""");
 				WriteLine(stream, "");
 				WriteLine(stream, Summary);
 
-                log.Info("Sending file...");
+                Log.Info("Sending file...");
 				WriteLine(stream, String.Concat("--", Boundary));
 				WriteLine(stream, String.Format(@"content-disposition: form-data; name=""filename""; filename=""{0}""", RemoteFile));
 				WriteLine(stream, "Content-Type: application/octet-stream");
@@ -185,7 +182,7 @@ namespace Sidi.Build.GoogleCode
             if (password == null)
                 throw new ArgumentNullException("password");
 
-            byte[] authBytes = Encoding.ASCII.GetBytes(String.Concat(username, ":", password));
+            var authBytes = Encoding.ASCII.GetBytes(String.Concat(username, ":", password));
             return Convert.ToBase64String(authBytes);
         }
 
@@ -197,7 +194,7 @@ namespace Sidi.Build.GoogleCode
             if (valueToWrite == null)
                 throw new ArgumentNullException("valueToWrite");
 
-            List<byte> bytesToWrite = new List<byte>(Encoding.ASCII.GetBytes(valueToWrite));
+            var bytesToWrite = new List<byte>(Encoding.ASCII.GetBytes(valueToWrite));
             bytesToWrite.AddRange(NewLineAsciiBytes);
             outputStream.Write(bytesToWrite.ToArray(), 0, bytesToWrite.Count);
         }
@@ -213,7 +210,7 @@ namespace Sidi.Build.GoogleCode
             if (fileToWrite == null)
                 throw new ArgumentNullException("fileToWrite");
 
-            using (FileStream fileStream = new FileStream(fileToWrite, FileMode.Open))
+            using (var fileStream = new FileStream(fileToWrite, FileMode.Open))
             {
                 byte[] buffer = new byte[1024];
                 int count;

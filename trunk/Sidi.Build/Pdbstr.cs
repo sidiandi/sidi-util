@@ -16,29 +16,28 @@
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Sidi.IO;
 using System.Diagnostics;
-using Sidi.Util;
-using Sidi.Extensions;
 using System.IO;
+using System.Reflection;
+using log4net;
+using Sidi.Extensions;
+using Sidi.IO;
+using Sidi.Util;
 
 namespace Sidi.Build
 {
     /// <summary>
-    /// Reads and writes streams in PDB files. Wrapper for the pdbstr.exe tool.
+    ///     Reads and writes streams in PDB files. Wrapper for the pdbstr.exe tool.
     /// </summary>
     public class Pdbstr
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        static string Program
+        private static string Program
         {
             get
             {
-                var f = new Sidi.IO.LPath(DebuggingToolsForWindows.Directory).CatDir("srcsrv", "pdbstr.exe");
+                LPath f = new LPath(DebuggingToolsForWindows.Directory).CatDir("srcsrv", "pdbstr.exe");
 
                 if (!f.Exists)
                 {
@@ -46,27 +45,20 @@ namespace Sidi.Build
                         "pdbstr.exe must be installed at {0}. See {1}",
                         f,
                         DebuggingToolsForWindows.DownloadUrl));
-                   }
-                return f;
                 }
+                return f;
+            }
         }
 
         /// <summary>
-        /// Default constructor
-        /// </summary>
-        public Pdbstr()
-        {
-        }
-
-        /// <summary>
-        /// Write a stream to a PDB file
+        ///     Write a stream to a PDB file
         /// </summary>
         /// <param name="pdbFile">PDB file name</param>
         /// <param name="streamName">Name of the stream</param>
         /// <param name="content">Content of the stream</param>
         public void Write(string pdbFile, string streamName, string content)
         {
-            var temp = Sidi.IO.LPath.GetTempFileName();
+            LPath temp = LPath.GetTempFileName();
 
             using (var w = new StreamWriter(temp))
             {
@@ -80,7 +72,7 @@ namespace Sidi.Build
                 ("-i:" + temp).Quote()
                 );
 
-            var r = p.Read().ReadToEnd();
+            string r = p.Read().ReadToEnd();
 
             if (!String.IsNullOrEmpty(r))
             {
@@ -89,7 +81,7 @@ namespace Sidi.Build
         }
 
         /// <summary>
-        /// Reads a stream from a PDB file
+        ///     Reads a stream from a PDB file
         /// </summary>
         /// <param name="pdbFile">PDB file name</param>
         /// <param name="streamName">Stream name</param>
