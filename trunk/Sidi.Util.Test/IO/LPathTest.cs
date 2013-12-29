@@ -329,7 +329,7 @@ namespace Sidi.IO
             Assert.AreEqual(new LPath(@"\\somehost.com\path1\path2"), LPath.Parse(@"file://somehost.com/path1/path2"));
         }
 
-        [Test, RequiresSTA]
+        [Test, RequiresSTA, Explicit]
         public void ParseClipboard()
         {
             var paths = new PathList(new []{ new LPath(@"C:\temp\somefile") });
