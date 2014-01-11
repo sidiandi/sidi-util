@@ -31,7 +31,8 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	<PropertyGroup>
     <RootDir>$(MSBuildProjectDirectory)</RootDir>
     <SvnBin>$(RootDir)\tools\SlikSvn\bin</SvnBin>
-    <NUnitBin>$(RootDir)\packages\NUnit.Runners.2.6.2\tools</NUnitBin>
+    <NugetPackagesDirectory>$(SolutionDir)</NugetPackagesDirectory>
+    <NUnitBin>$(NugetPackagesDirectory)NUnit.Runners.2.6.3\tools</NUnitBin>
     <NUnitConsole>$(NUnitBin)\nunit-console.exe</NUnitConsole>
     <OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
     <OutputDir>$(OutputRoot)\Release-AnyCPU</OutputDir>
