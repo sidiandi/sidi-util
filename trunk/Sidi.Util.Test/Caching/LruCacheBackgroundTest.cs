@@ -41,7 +41,7 @@ namespace Sidi.Caching
                 };
 
             int updateCount = 0;
-            using (var c = new LruCacheBackground<int, int>(maxCount, x => x * 2, 5))
+            using (var c = new LruCacheBackground<int, int>(maxCount, provider, maxCount))
             {
                 c.EntryUpdated += (o, e) =>
                 {
