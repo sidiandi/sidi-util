@@ -28,7 +28,7 @@ using Sidi.Test;
 
 namespace Sidi.Build.Test
 {
-    [TestFixture]
+    [TestFixture, Explicit("Requires Debugging Tools for Windows")]
     public class PdbstrTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

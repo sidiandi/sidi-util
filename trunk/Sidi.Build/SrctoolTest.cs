@@ -32,7 +32,7 @@ namespace Sidi.Build.Test
     /// <summary>
     /// Test for SrcTool
     /// </summary>
-    [TestFixture]
+    [TestFixture, Explicit("Requires Debugging Tools for Windows")]
     public class SrctoolTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
