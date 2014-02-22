@@ -96,14 +96,13 @@ namespace Sidi.IO
         [Test]
         public void Serialize()
         {
-            var info = TestFile("dir.txt").Info;
+            var p = TestFile("dir.txt");
+            var info = p.Info;
             var infoSerialized = TestSerialization(info);
-            var t0 = info.LastWriteTime;
-            var t1 = infoSerialized.LastWriteTime;
-            Assert.AreEqual(t0, t1);
-            log.Debug(t0);
+            LFile.WriteAllText(p, "changed");
+            var newInfo = p.Info;
+            Assert.AreNotEqual(infoSerialized.LastWriteTimeUtc, newInfo.LastWriteTimeUtc);
+            Assert.AreNotEqual(infoSerialized, newInfo);
         }
-
-
     }
 }

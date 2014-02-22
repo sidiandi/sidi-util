@@ -25,7 +25,7 @@ using System.ComponentModel;
 namespace Sidi.IO
 {
     [Serializable]
-    public class LFileSystemInfo : IEquatable<LFileSystemInfo>
+    public class LFileSystemInfo : IEquatable<LFileSystemInfo>, IComparable
     {
         public LFileSystemInfo(LPath path)
         {
@@ -287,7 +287,8 @@ namespace Sidi.IO
 
         public bool Equals(LFileSystemInfo other)
         {
-            return FullName.Equals(other.FullName);
+            return path.Equals(other.path) && 
+                FindData.Equals(other.FindData);
         }
 
         NativeMethods.BY_HANDLE_FILE_INFORMATION GetByHandleFileInformation()
@@ -359,6 +360,19 @@ namespace Sidi.IO
                 return GetFileSiblingHardLinks(FullName.ToString())
                     .Select(x => new LPath(x))
                     .ToList();
+            }
+        }
+
+        public int CompareTo(object obj)
+        {
+            try
+            {
+                var o = (LFileSystemInfo)obj;
+                return path.CompareTo(o.path);
+            }
+            catch (InvalidCastException ex)
+            {
+                throw new ArgumentException("obj is not of type LFileSystemInfo", ex);
             }
         }
     }

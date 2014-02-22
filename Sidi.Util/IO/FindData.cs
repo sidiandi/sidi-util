@@ -80,6 +80,27 @@ namespace Sidi.IO
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
         internal string cAlternate;
 
+        public bool Equals(FindData other)
+        {
+            return
+                Attributes == other.Attributes &&
+                Equals(ftCreationTime, other.ftCreationTime) && 
+                Equals(ftLastAccessTime, other.ftLastAccessTime) && 
+                Equals(ftLastWriteTime, other.ftLastWriteTime) &&
+                nFileSizeHigh == other.nFileSizeHigh &&
+                nFileSizeLow == other.nFileSizeLow &&
+                dwReserved0 == other.dwReserved0 &&
+                dwReserved1 == other.dwReserved1 &&
+                Name == other.Name &&
+                cAlternate == other.cAlternate;
+        }
+
+        static bool Equals(FILETIME a, FILETIME b)
+        {
+            return a.dwHighDateTime == b.dwHighDateTime &&
+                a.dwLowDateTime == b.dwLowDateTime;
+        }
+
         public bool IsDirectory
         {
             get

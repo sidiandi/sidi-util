@@ -266,7 +266,7 @@ namespace Sidi.Caching
             {
                 while (provideValueRequestQueue != null)
                 {
-                    while (provideValueRequestQueue.Count > 0)
+                    while (provideValueRequestQueue != null && provideValueRequestQueue.Count > 0)
                     {
                         var k = provideValueRequestQueue.Pop();
                         var ce = cache[k.Key];
@@ -411,8 +411,6 @@ namespace Sidi.Caching
             }
             workers.ForEach(x => x.Join());
         }
-
-
 
         private bool disposed = false;
 
