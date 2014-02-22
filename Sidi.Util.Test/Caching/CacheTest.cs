@@ -49,6 +49,41 @@ namespace Sidi.Caching
             }
         }
 
+        class Demo
+        {
+            public string Lookup(string id)
+            {
+                return Cache.Get(id, LookupUncached);
+            }
+
+            public string LookupUncached(string id)
+            {
+                return String.Format("Looked up: {0}", id);
+            }
+
+            public int Add(int x, int y)
+            {
+                return Cache.Get(x, y, AddUncached);
+            }
+
+            public int AddUncached(int x, int y)
+            {
+                return x + y;
+            }
+        }
+
+        [Test]
+        public void TestSimpleCache()
+        {
+            var demo = new Demo();
+            var result = demo.Lookup("John");
+            Assert.AreEqual("Looked up: John", result);
+
+            Assert.AreEqual(2, demo.Add(1, 1));
+            Assert.AreEqual(3, demo.Add(1, 2));
+            Assert.AreEqual(3, demo.Add(2, 1));
+        }
+
         [Test]
         public void HashCodeCollision()
         {
