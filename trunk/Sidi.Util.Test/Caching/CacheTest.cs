@@ -56,8 +56,8 @@ namespace Sidi.Caching
             var key1 = new Key(){ Value = 1};
             var key2 = new Key(){ Value = 2};
             c.Clear();
-            Assert.AreEqual(1, c.GetCached(key1, () => 1));
-            Assert.AreEqual(2, c.GetCached(key2, () => 2));
+            Assert.AreEqual(1, c.GetCached(key1, _ => 1));
+            Assert.AreEqual(2, c.GetCached(key2, _ => 2));
             var cacheDir = Paths.GetLocalApplicationDataDirectory(typeof(Cache));
         }
         
@@ -66,9 +66,9 @@ namespace Sidi.Caching
         {
             var c = Cache.Local(MethodBase.GetCurrentMethod());
             c.Clear();
-            Assert.AreEqual(1, c.GetCached(1, () => 1));
+            Assert.AreEqual(1, c.GetCached(1, _ => 1));
             c.Clear(1);
-            Assert.AreEqual(2, c.GetCached(1, () => 2));
+            Assert.AreEqual(2, c.GetCached(1, _ => 2));
         }
         
         [Test]
@@ -79,7 +79,7 @@ namespace Sidi.Caching
             
             for (int i = 0; i < 10; ++i)
             {
-                var result = c.GetCached(i, () => i * i);
+                var result = c.GetCached(i, _ => _ * _);
                 Assert.AreEqual(i * i, result);
             }
 
@@ -106,7 +106,7 @@ namespace Sidi.Caching
             var d = 0;
             try
             {
-                var r = c.GetCached(d, () => 1 / d);
+                var r = c.GetCached(d, x => 1 / x);
                 Assert.IsTrue(false);
             }
             catch (Exception e)
@@ -119,7 +119,7 @@ namespace Sidi.Caching
                 // this should not raise an exception
                 // but since RememberExceptions = true, 
                 // the cached DivideByZeroException will be returned.
-                var r = c.GetCached(d, () => 1 / 1); 
+                var r = c.GetCached(d, _ => 1 / 1); 
                 Assert.IsTrue(false);
             }
             catch (Exception e)
@@ -138,7 +138,7 @@ namespace Sidi.Caching
             var d = 0;
             try
             {
-                var r = c.GetCached(d, () => 1 / d);
+                var r = c.GetCached(d, _ => 1 / _);
                 Assert.IsTrue(false);
             }
             catch (Exception e)
@@ -150,7 +150,7 @@ namespace Sidi.Caching
             // and since RememberExceptions = true, 
             // the cached DivideByZeroException will not be returned.
             {
-                var r = c.GetCached(d, () => 1 / 1);
+                var r = c.GetCached(d, _ => 1 / 1);
             }
         }
 
@@ -175,6 +175,25 @@ namespace Sidi.Caching
                     LFile.WriteAllText(f, "hello");
                     return f;
                 }));
+        }
+
+        [Test]
+        public void ReadFile()
+        {
+            var content = "hello";
+            var file = TestFile("file-with-content");
+            LFile.WriteAllText(file, content);
+            var cache = Cache.Local(MethodBase.GetCurrentMethod());
+            var readContent = cache.ReadFile(file, path => LFile.ReadAllText(path));
+            Assert.AreEqual(content, readContent);
+            content = "new content";
+            LFile.WriteAllText(file, content);
+            readContent = cache.ReadFile(file, path => LFile.ReadAllText(path));
+            Assert.AreEqual(content, readContent);
+
+            Assert.IsTrue(cache.IsCached(file.Info));
+            cache.Clear();
+            Assert.IsFalse(cache.IsCached(file.Info));
         }
     }
 }

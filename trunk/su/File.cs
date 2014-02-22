@@ -242,7 +242,7 @@ namespace Sidi.Tool
         {
             var cache = Sidi.Caching.Cache.Local(MethodBase.GetCurrentMethod());
             cache.MaxAge = TimeSpan.FromDays(1);
-            var items = cache.GetCached(files, () => Find.AllFiles(files).ToList());
+            var items = cache.GetCached(files, _ => Find.AllFiles(_).ToList());
 
             var c = items.CreateTreeMap();
             c.GetLineage = i => i.FullName.Parts;

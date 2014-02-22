@@ -29,6 +29,10 @@ using System.Security.Cryptography;
 
 namespace Sidi.Caching
 {
+    /// <summary>
+    /// Pre-computes values and stores them as flat files. The computation results will be persistent between runs 
+    /// of the program.
+    /// </summary>
     public class Cache
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -43,35 +47,36 @@ namespace Sidi.Caching
 
         readonly LPath storeDirectory;
 
-        public T GetCached<T>(object key, Func<T> provider)
+        public static object DeSerializeFromFile(LPath path)
         {
-            return GetCached(key, provider,
-                path =>
-                {
-                    if (path.Exists && path.Info.Length == 0)
-                    {
-                        return null;
-                    }
+            if (path.Exists && path.Info.Length == 0)
+            {
+                return null;
+            }
 
-                    var b = new BinaryFormatter();
-                    using (var stream = LFile.OpenRead(path))
-                    {
-                        var cacheContent = b.Deserialize(stream);
-                        return cacheContent;
-                    }
-                },
-                (path, t) =>
+            var b = new BinaryFormatter();
+            using (var stream = LFile.OpenRead(path))
+            {
+                var cacheContent = b.Deserialize(stream);
+                return cacheContent;
+            }
+        }
+
+        public static void SerializeToFile(LPath path, object t)
+        {
+            path.EnsureParentDirectoryExists();
+            using (var stream = LFile.OpenWrite(path))
+            {
+                if (object.Equals(t, default(object)))
                 {
-                    path.EnsureParentDirectoryExists();
-                    using (var stream = LFile.OpenWrite(path))
-                    {
-                        if (t != null)
-                        {
-                            var b = new BinaryFormatter();
-                            b.Serialize(stream, t);
-                        }
-                    }
-                });
+                    path.EnsureFileNotExists();
+                }
+                else
+                {
+                    var b = new BinaryFormatter();
+                    b.Serialize(stream, t);
+                }
+            }
         }
 
         /// <summary>
@@ -92,13 +97,22 @@ namespace Sidi.Caching
 
         public static Func<LPath, object, bool> Valid = (p, k) => true;
 
-        public T GetCached<T>(object key, Func<T> provider, Func<LPath, object> reader, Action<LPath, object> writer)
+        public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> calculation)
+        {
+            return GetCached(key, calculation, DeSerializeFromFile, SerializeToFile);
+        }
+
+        public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> provider, Func<LPath, object> reader, Action<LPath, object> writer)
         {
             var p = CachePath(key);
             if (p.IsFile && IsValid(p, key))
             {
-                log.InfoFormat("Cache hit: {0} = {1}", key, p);
-                object cachedValue = null;
+                if (log.IsDebugEnabled)
+                {
+                    log.DebugFormat("Cache hit: {0} was cached in {1} at {2}", key, p, p.Info.LastWriteTimeUtc);
+                }
+
+                object cachedValue = default(TResult);
                 try
                 {
                     cachedValue = reader(p);
@@ -110,16 +124,16 @@ namespace Sidi.Caching
 
                 if (cachedValue is Exception && RememberExceptions)
                 {
-                    throw (Exception)cachedValue;
+                    throw (Exception) cachedValue;
                 }
 
-                return (T)cachedValue;
+                return (TResult)cachedValue;
             }
 
             {
                 try
                 {
-                    var result = provider();
+                    var result = provider(key);
                     p.EnsureParentDirectoryExists();
                     writer(p, result);
                     return result;
@@ -137,11 +151,26 @@ namespace Sidi.Caching
 
         public LPath GetCachedFile(object key, Func<LPath> provider)
         {
-            return GetCached(key, provider,
+            return GetCached(key, _ => provider(),
                 (cachePath) => cachePath,
                 (cachePath, path) => LFile.CopyOrHardLink((LPath)path, cachePath));
         }
 
+        /// <summary>
+        /// Caches a file read. Useful when the parsing of file contents is expensive.
+        /// </summary>
+        /// <typeparam name="T">File content type</typeparam>
+        /// <param name="path">File path</param>
+        /// <param name="fileReader">Function to read a file and return its contents as type T</param>
+        /// <returns></returns>
+        public T ReadFile<T>(LPath path, Func<LPath, T> fileReader)
+        {
+            return GetCached(path.Info, _ => fileReader(_.FullName));
+        }
+
+        /// <summary>
+        /// Clears all cached values 
+        /// </summary>
         public void Clear()
         {
             storeDirectory.EnsureNotExists();
@@ -183,9 +212,11 @@ namespace Sidi.Caching
 
         /// <summary>
         /// Returns a default instance, which stores values in local AppData
+        /// Typical use:
+        /// var cache = Cache.Local(MethodBase.GetCurrentMethod());
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Identifier of the cache</param>
+        /// <returns>A cache object specific to id</returns>
         public static Cache Local(object id)
         {
             Type type = null;
@@ -209,6 +240,5 @@ namespace Sidi.Caching
 
         public TimeSpan MaxAge { set; get; }
         public bool RememberExceptions { set; get; }
-
     }
 }
