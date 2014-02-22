@@ -56,5 +56,27 @@ namespace Sidi.Util
             o = "Hello";
             Assert.AreEqual("Hello", o.SafeToString());
         }
+
+        [Test]
+        public void SafeToStringEnum()
+        {
+            var e = Enumerable.Range(1, 100);
+            Assert.IsTrue(e.SafeToString().StartsWith("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18"));
+        }
+
+        [Test]
+        public void SafeToStringNestedEnum()
+        {
+            var e = Enumerable.Range(1, 3).Select(_ => Enumerable.Range(1, 3));
+            Assert.AreEqual("[[1, 2, 3], [1, 2, 3], [1, 2, 3]]", e.SafeToString());
+        }
+
+        [Test]
+        public void SafeToStringNestedEnumTruncated()
+        {
+            var e = Enumerable.Range(1, 100).Select(_ => Enumerable.Range(1, 100));
+            var s = e.SafeToString();
+            Assert.AreEqual("[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, ...], ...]", s);
+        }
     }
 }

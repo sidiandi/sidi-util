@@ -26,6 +26,7 @@ using Sidi.IO;
 using Sidi.Extensions;
 using Microsoft.CSharp;
 using System.CodeDom;
+using System.Collections;
 
 namespace Sidi.Extensions
 {
@@ -277,6 +278,60 @@ namespace Sidi.Extensions
             }
         }
 
+        static readonly string listSeparator = ", ";
+        static readonly string listBegin = "[";
+        static readonly string listEnd = "]";
+        static readonly string ellipsis = "...";
+
+        static void SafeWrite(this StringBuilder w, object x, int maxLen = 256)
+        {
+            if (w.Length > maxLen) { return; }
+
+            if (x == null)
+            {
+            }
+            else if (x is string)
+            {
+                w.Append(x);
+            }
+            else if (x is IEnumerable)
+            {
+                w.Append(listBegin);
+                var i = ((IEnumerable)x).GetEnumerator();
+                for (;i.MoveNext();)
+                {
+                    if (w.Length > maxLen)
+                    {
+                        w.Append(ellipsis);
+                        break;
+                    }
+                    w.SafeWrite(i.Current, maxLen);
+                    break;
+                }
+                for (;i.MoveNext();)
+                {
+                    w.Append(listSeparator);
+                    if (w.Length > maxLen)
+                    {
+                        w.Append(ellipsis);
+                        break;
+                    }
+                    w.SafeWrite(i.Current, maxLen);
+                }
+                w.Append(listEnd);
+            }
+            else
+            {
+                try
+                {
+                    w.Append(x);
+                }
+                catch
+                {
+                }
+            }
+        }
+
         /// <summary>
         /// Converts to a string, even if ToString() raises an exception or x is null.
         /// </summary>
@@ -284,22 +339,9 @@ namespace Sidi.Extensions
         /// <returns></returns>
         public static string SafeToString(this object x)
         {
-            try
-            {
-                if (x == null)
-                {
-                    return String.Empty;
-                }
-                else
-                {
-                    return x.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Warn(ex);
-                return String.Empty;
-            }
+            var s = new StringBuilder();
+            s.SafeWrite(x);
+            return s.ToString();
         }
 
         public static string SafeSubstring(this string x, int startIndex, int length)
