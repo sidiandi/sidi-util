@@ -47,6 +47,11 @@ namespace Sidi.Caching
 
         readonly LPath storeDirectory;
 
+        /// <summary>
+        /// Use binary serialization to read an object from a file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static object DeSerializeFromFile(LPath path)
         {
             if (path.Exists && path.Info.Length == 0)
@@ -62,6 +67,11 @@ namespace Sidi.Caching
             }
         }
 
+        /// <summary>
+        /// Use binary serialization to write an object to a file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="t"></param>
         public static void SerializeToFile(LPath path, object t)
         {
             path.EnsureParentDirectoryExists();
@@ -96,6 +106,34 @@ namespace Sidi.Caching
         }
 
         public static Func<LPath, object, bool> Valid = (p, k) => true;
+
+        /// <summary>
+        /// Uses a local cache with an ID derived from calculation
+        /// </summary>
+        /// <typeparam name="TInput"></typeparam>
+        /// <typeparam name="TOutput"></typeparam>
+        /// <param name="input"></param>
+        /// <param name="calculation"></param>
+        /// <returns></returns>
+        public static TOutput Get<TInput, TOutput>(TInput input, Func<TInput, TOutput> calculation)
+        {
+            return Cache.Local(calculation.Method).GetCached(input, calculation);
+        }
+
+        /// <summary>
+        /// Uses a local cache with an ID derived from calculation
+        /// </summary>
+        /// <typeparam name="TInput1"></typeparam>
+        /// <typeparam name="TInput2"></typeparam>
+        /// <typeparam name="TOutput"></typeparam>
+        /// <param name="input1"></param>
+        /// <param name="input2"></param>
+        /// <param name="calculation"></param>
+        /// <returns></returns>
+        public static TOutput Get<TInput1, TInput2, TOutput>(TInput1 input1, TInput2 input2, Func<TInput1, TInput2, TOutput> calculation)
+        {
+            return Cache.Local(calculation.Method).GetCached(new object[]{input1, input2}, _ => calculation(input1, input2));
+        }
 
         public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> calculation)
         {
