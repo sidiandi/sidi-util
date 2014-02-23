@@ -558,6 +558,11 @@ namespace Sidi.CommandLine.Test
 
             p.StorePreferences();
 
+            var a1 = new PreferencesTestApplication();
+            var pa1 = new Parser(a1);
+            pa1.LoadPreferences();
+            Assert.AreEqual(a.Password, a1.Password);
+
             var b = new PreferencesTestApplication2();
             var pb = new Parser(b);
             pb.LoadPreferences();

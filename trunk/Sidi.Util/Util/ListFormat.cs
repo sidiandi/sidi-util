@@ -22,11 +22,15 @@ using System.Text;
 using System.IO;
 using Sidi.Extensions;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace Sidi.Util
 {
     public class ListFormat<T>
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public ListFormat(IEnumerable<T> data)
         {
             this.Data = data;
@@ -87,11 +91,27 @@ namespace Sidi.Util
             return this;
         }
 
-        public ListFormat<T> Add(params Func<T, object>[] stringifiers)
+        string GuessColumnName(Func<T, object> f)
         {
-            foreach (var f in stringifiers)
+            var il = f.Method.GetMethodBody().GetILAsByteArray();
+            if (il.Length >= 6 && 0x6f == il[1])
             {
-                AddColumn(String.Empty, f);
+                var mdt = BitConverter.ToInt32(il, 2);
+                var m = f.Method.Module.ResolveMethod(mdt);
+                var name = m.Name;
+                name = Regex.Replace(name, @"^get_", String.Empty);
+                return name;
+            }
+
+            return f.Method.Name;
+        }
+
+        public ListFormat<T> Add(params Func<T, object>[] f)
+        {
+            foreach (var c in f)
+            {
+                var m = c.Method;
+                Columns.Add(new Column(GuessColumnName(c), c));
             }
             return this;
         }

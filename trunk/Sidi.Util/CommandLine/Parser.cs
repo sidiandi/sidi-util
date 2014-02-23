@@ -34,6 +34,7 @@ using log4net.Repository.Hierarchy;
 using log4net;
 using log4net.Appender;
 using log4net.Layout;
+using System.Security.Cryptography;
 
 namespace Sidi.CommandLine
 {
@@ -367,14 +368,26 @@ namespace Sidi.CommandLine
                     var key = GetPreferencesKey(o);
                     var valueName = o.Name;
                     log.DebugFormat("Load persistent option {0} from {1}\\{2}", o, key, valueName);
-                    var value = Registry.GetValue(key, valueName, null);
-                    if (value != null)
+                    string valueString = null;
+                    if (o.IsPassword)
                     {
-                        var valueString = value.ToString();
-                        if (o.IsPassword)
+                        var value = Registry.GetValue(key, valueName, null);
+                        if (value is byte[])
                         {
-                            valueString = valueString.Decrypt(preferencesPassword);
+                            valueString = ASCIIEncoding.ASCII.GetString(ProtectedData.Unprotect((byte[])value, null, DataProtectionScope.CurrentUser));
                         }
+                    }
+                    else
+                    {
+                        var value = Registry.GetValue(key, valueName, null);
+                        if (value != null)
+                        {
+                            valueString = value.ToString();
+                        }
+                    }
+
+                    if (valueString != null)
+                    {
                         o.Handle(new string[] { valueString }.ToList(), true);
                     }
 
@@ -390,12 +403,6 @@ namespace Sidi.CommandLine
             }
         }
 
-        /// <summary>
-        /// It is not safe to use an internal password
-        /// to store secrets in the registry, but better than nothing, however.
-        /// </summary>
-        static string preferencesPassword = "^69@KE3i3%VKAxAd";
-
         public void StorePreferences()
         {
             foreach (var o in Options.Where(x => x.IsPersistent))
@@ -404,17 +411,21 @@ namespace Sidi.CommandLine
                 if (value != null)
                 {
                     var valueString = value.ToString();
+                    var key = GetPreferencesKey(o);
+                    var valueName = o.Name;
                     if (o.IsPassword)
                     {
-                        valueString = valueString.Encrypt(preferencesPassword);
-                    }
-
-                    if (valueString != null)
-                    {
-                        var key = GetPreferencesKey(o);
-                        var valueName = o.Name;
+                        var encrypted = ProtectedData.Protect(ASCIIEncoding.ASCII.GetBytes(valueString), null, DataProtectionScope.CurrentUser);
                         log.DebugFormat("Store persistent option {0} = {1} in {2}\\{3}", o.Name, o.DisplayValue, key, valueName);
-                        Registry.SetValue(key, valueName, valueString);
+                        Registry.SetValue(key, valueName, encrypted);
+                    }
+                    else
+                    {
+                        if (valueString != null)
+                        {
+                            log.DebugFormat("Store persistent option {0} = {1} in {2}\\{3}", o.Name, o.DisplayValue, key, valueName);
+                            Registry.SetValue(key, valueName, valueString);
+                        }
                     }
                 }
             }
