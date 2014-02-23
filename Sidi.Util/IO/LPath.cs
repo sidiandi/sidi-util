@@ -1036,8 +1036,6 @@ namespace Sidi.IO
         /// <summary>
         /// The file:// URI represenation of the path
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns>Path as file:// URI</returns>
         public Uri Uri
         {
             get
