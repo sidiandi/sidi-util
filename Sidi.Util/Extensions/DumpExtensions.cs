@@ -80,6 +80,13 @@ namespace Sidi.Extensions
             return new ListFormat<T>(e);
         }
 
+        public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e, params Func<T,object>[] columns)
+        {
+            var lf = new ListFormat<T>(e);
+            lf.Add(columns);
+            return lf;
+        }
+
         public static ListFormat<IGrouping<TKey, TSource>> ListCount<TSource, TKey>(this IEnumerable<IGrouping<TKey, TSource>> groups)
         {
             return groups.ListFormat()

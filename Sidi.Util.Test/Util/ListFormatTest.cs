@@ -70,6 +70,20 @@ namespace Sidi.Util
             }
         }
 
+        public class Example
+        {
+            public string Name { set; get; }
+        }
+
+        [Test]
+        public void GuessColumnNames()
+        {
+            var lf = data.ListFormat(_ => _.FullName, _=> _.Extension, _ => _.ToString());
+            Assert.AreEqual("FullName", lf.Columns[0].Name);
+            Assert.AreEqual("Extension", lf.Columns[1].Name);
+            Assert.AreEqual("ToString", lf.Columns[2].Name);
+        }
+
         [Test]
         public void Width()
         {
