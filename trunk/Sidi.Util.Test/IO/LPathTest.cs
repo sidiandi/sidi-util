@@ -365,5 +365,21 @@ namespace Sidi.IO
                 }
             }
         }
+
+        [Test]
+        public void ToUri()
+        {
+            Assert.AreEqual(
+                new Uri("file://C:/temp/doc"),
+                new LPath(@"C:\temp\doc").Uri);
+
+            Assert.AreEqual(
+                new Uri("file://C:/"),
+                new LPath(@"C:\").Uri);
+
+            Assert.AreEqual(
+                new Uri("file://server/share/doc.txt"),
+                new LPath(@"\\server\share\doc.txt").Uri);
+        }
     }
 }

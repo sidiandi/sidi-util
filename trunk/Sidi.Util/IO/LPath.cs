@@ -1032,5 +1032,32 @@ namespace Sidi.IO
         {
             return LFile.OpenRead(this);
         }
+
+        /// <summary>
+        /// The file:// URI represenation of the path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>Path as file:// URI</returns>
+        public Uri Uri
+        {
+            get
+            {
+                try
+                {
+                    if (IsRoot)
+                    {
+                        return new Uri(ToString() + LPath.DirectorySeparator, UriKind.Absolute);
+                    }
+                    else
+                    {
+                        return new Uri(ToString(), UriKind.Absolute);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentOutOfRangeException(ToString(), ex);
+                }
+            }
+        }
     }
 }
