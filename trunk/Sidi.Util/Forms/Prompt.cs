@@ -32,16 +32,16 @@ namespace Sidi.Forms
     public interface IColumnInfo
     {
         string Name { get; }
-        string Value(object item);
+        string Value(object item, int index);
     }
 
     [Serializable]
     public class ColumnInfo<T> : IColumnInfo
     {
         string name;
-        Func<T, string> stringifier;
+        Func<T, int, string> stringifier;
 
-        public ColumnInfo(string name, Func<T, string> stringifier)
+        public ColumnInfo(string name, Func<T, int, string> stringifier)
         {
             this.name = name;
             this.stringifier = stringifier;
@@ -51,7 +51,7 @@ namespace Sidi.Forms
         {
             return typeof(T).GetProperties().Select(p =>
             {
-                return new ColumnInfo<T>(p.Name, x => Sidi.Forms.Support.SafeToString(p.GetValue(x, new object[] { })));
+                return new ColumnInfo<T>(p.Name, (index, x) => Sidi.Forms.Support.SafeToString(p.GetValue(x, new object[] { })));
             }).Cast<IColumnInfo>();
         }
 
@@ -60,11 +60,11 @@ namespace Sidi.Forms
             get { return name; }
         }
 
-        public string Value(object item)
+        public string Value(object item, int index)
         {
             try
             {
-                return stringifier((T)item);
+                return stringifier((T)item, index);
             }
             catch (Exception)
             {
@@ -79,7 +79,7 @@ namespace Sidi.Forms
         {
             return typeof(T).GetProperties().Select(p =>
             {
-                return new ColumnInfo<T>(p.Name, x => Sidi.Forms.Support.SafeToString(p.GetValue(x, new object[] { })));
+                return new ColumnInfo<T>(p.Name, (index, x) => Sidi.Forms.Support.SafeToString(p.GetValue(x, new object[] { })));
             }).Cast<IColumnInfo>();
         }
 
@@ -92,7 +92,7 @@ namespace Sidi.Forms
                 {
                     throw new Exception("{0} does not have a {1} property".F(typeof(T), pn));
                 }
-                return new ColumnInfo<T>(p.Name, x => Sidi.Forms.Support.SafeToString(p.GetValue(x, new object[] { })));
+                return new ColumnInfo<T>(p.Name, (index, x) => Sidi.Forms.Support.SafeToString(p.GetValue(x, new object[] { })));
             }).Cast<IColumnInfo>();
         }
     }

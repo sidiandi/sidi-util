@@ -58,7 +58,7 @@ namespace Sidi.Forms
         {
             this.Items = listFormat.Data.ToList();
             this.ColumnDefinition = listFormat.Columns
-                .Select(x => (IColumnInfo) new ColumnInfo<T>(x.Name, i => x.GetText(i)))
+                .Select(x => (IColumnInfo) new ColumnInfo<T>(x.Name, x.GetText))
                 .ToList();
             UpdateDisplay();
         }
@@ -75,7 +75,7 @@ namespace Sidi.Forms
             this.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(GenericListView_ItemSelectionChanged);
             this.View = System.Windows.Forms.View.Details;
             items = new System.Collections.ArrayList();
-            columnDefinition = new IColumnInfo[] { new ColumnInfo<object>("ToString", x => x.ToString()) }.ToList();
+            columnDefinition = new IColumnInfo[] { new ColumnInfo<object>("ToString", (index, x) => x.ToString()) }.ToList();
             UpdateDisplay();
         }
 
@@ -161,7 +161,7 @@ namespace Sidi.Forms
         void GenericListView_RetrieveVirtualItem(object sender, System.Windows.Forms.RetrieveVirtualItemEventArgs e)
         {
             var item  = Items[e.ItemIndex];
-            var texts = ColumnDefinition.Select(c => c.Value(item));
+            var texts = ColumnDefinition.Select(c => c.Value(item, e.ItemIndex));
             e.Item = new System.Windows.Forms.ListViewItem(texts.First());
             e.Item.Tag = item;
             e.Item.SubItems.AddRange(texts.Skip(1).ToArray());
