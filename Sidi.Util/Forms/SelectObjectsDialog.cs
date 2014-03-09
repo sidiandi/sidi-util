@@ -31,7 +31,7 @@ namespace Sidi.Forms
         public SelectObjectsDialog()
         {
             InitializeComponent();
-            Columns = new IColumnInfo[] { new ColumnInfo<object>("Object", x => Sidi.Forms.Support.SafeToString(x)) };
+            Columns = new IColumnInfo[] { new ColumnInfo<object>("Object", (index, x) => Sidi.Forms.Support.SafeToString(x)) };
         }
 
         public void SelectAll(bool selected)
@@ -58,18 +58,19 @@ namespace Sidi.Forms
                 {
                     listViewObjects.Columns[listViewObjects.Columns.Count - 1].Width = -2;
                 }
-                foreach (object i in value)
+
+                listViewObjects.Items.AddRange(
+                value.Select((i, index) =>
                 {
-                    ListViewItem item = new ListViewItem();
-                    item.Text = Columns.First().Value(i);
-                    item.Tag = i;
-                    item.Selected = true;
-                    foreach (var c in Columns.Skip(1))
+                    ListViewItem item = new ListViewItem
                     {
-                        item.SubItems.Add(c.Value(i));
-                    }
-                    listViewObjects.Items.Add(item);
-                }
+                        Text = Columns.First().Value(i, index),
+                        Tag = i,
+                        Selected = true,
+                    };
+                    item.SubItems.AddRange(Columns.Skip(1).Select(c => c.Value(i, index)).ToArray());
+                    return item;
+                }).ToArray());
             }
 
             get

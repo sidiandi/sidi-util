@@ -47,11 +47,11 @@ namespace Sidi.Util
                 AutoWidth = true;
             }
 
-            public string GetText(T x)
+            public string GetText(T x, int index)
             {
                 try
                 {
-                    return f(x).SafeToString();
+                    return f(index, x).SafeToString();
                 }
                 catch
                 {
@@ -59,11 +59,11 @@ namespace Sidi.Util
                 }
             }
 
-            public object GetObject(T x)
+            public object GetObject(T x, int index)
             {
                 try
                 {
-                    return f(x);
+                    return f(index, x);
                 }
                 catch
                 {
@@ -72,11 +72,18 @@ namespace Sidi.Util
             }
 
             public string Name { get; private set; }
-            Func<T, object> f;
+            Func<int, T, object> f;
 
-            public Column(string name, Func<T, object> f) : this()
+            public Column(string name, Func<int, T, object> f) : this()
             {
                 this.f = f;
+                Name = name;
+            }
+
+            public Column(string name, Func<T, object> f)
+                : this()
+            {
+                this.f = (i, x) => f(x);
                 Name = name;
             }
 
@@ -86,6 +93,12 @@ namespace Sidi.Util
         }
 
         public ListFormat<T> AddColumn(string caption, Func<T, object> f)
+        {
+            Columns.Add(new Column(caption, (i,x) => f(x)));
+            return this;
+        }
+
+        public ListFormat<T> AddColumn(string caption, Func<int, T, object> f)
         {
             Columns.Add(new Column(caption, f));
             return this;
@@ -154,7 +167,7 @@ namespace Sidi.Util
                 {
                     throw new ArgumentOutOfRangeException("properties", name);
                 }
-                AddColumn(member.Name, item => member.GetValue(item, new object[]{}).ToString());
+                AddColumn(member.Name, item => member.GetValue(item, new object[] { }));
             }
             return this;
         }
@@ -169,7 +182,7 @@ namespace Sidi.Util
             foreach (var m in fields.Select(f => typeof(T).GetField(f)))
             {
                 var member = m;
-                AddColumn(m.Name, item => member.GetValue(item).ToString());
+                AddColumn(m.Name, item => member.GetValue(item));
             }
             return this;
         }
@@ -191,7 +204,8 @@ namespace Sidi.Util
         {
             if (!Columns.Any())
             {
-                AddColumn(typeof(T).Name, x => x.ToString());
+                AddColumn("#", (i, x) => i);
+                AddColumn(typeof(T).Name, x => x);
             }
             return this;
         }
@@ -201,7 +215,7 @@ namespace Sidi.Util
             DefaultColumns();
 
             var rows = Data
-                .Select(i => Columns.Select(x => x.GetText(i)).ToArray())
+                .Select((item, index) => Columns.Select(x => x.GetText(item, index)).ToArray())
                 .ToList();
 
             // determine column widths
@@ -233,8 +247,14 @@ namespace Sidi.Util
             // print
             var columnFormat = Columns.Select(x => String.Format("{{0,-{0}}}{1}", x.Width, ColumnSeparator)).ToArray();
 
+            // separator
+            RenderMultiLine(o, Columns.Select(x => new String('-', x.Width)).ToArray(), columnFormat);
+
             // header
             RenderMultiLine(o, Columns.Select(x => x.Name).ToArray(), columnFormat);
+
+            // separator
+            RenderMultiLine(o, Columns.Select(x => new String('-', x.Width)).ToArray(), columnFormat);
 
             // rows
             foreach (var rowData in rows)
@@ -247,6 +267,7 @@ namespace Sidi.Util
         {
             using (var w = new StringWriter())
             {
+                w.WriteLine();
                 RenderText(w);
                 return w.ToString();
             }
@@ -259,7 +280,7 @@ namespace Sidi.Util
             var columnWidth = Columns.Max(x => x.Name.Length);
 
             var rows = Data
-                .Select(i => Columns.Select(x => x.GetText(i)).ToArray());
+                .Select((item, index) => Columns.Select(x => x.GetText(item, index)).ToArray());
 
             var rowFormat = String.Format("{{0,-{0}}}: {{1}}", columnWidth);
             foreach (var i in rows)
@@ -300,7 +321,7 @@ namespace Sidi.Util
             c.Legends.Add(new Legend());
 
             var x = this.Columns[0];
-            var xValues = Data.Select(i => x.GetObject(i)).ToList();
+            var xValues = Data.Select(x.GetObject).ToList();
 
             foreach (var y in this.Columns.Skip(1))
             {
@@ -309,7 +330,7 @@ namespace Sidi.Util
                     ChartType = SeriesChartType.Line,
                 };
                 series.Points.DataBindXY(xValues,
-                    this.Data.Select(v => y.GetObject(v)).ToList());
+                    this.Data.Select(y.GetObject).ToList());
                 c.Series.Add(series);
             }
             
@@ -336,9 +357,9 @@ namespace Sidi.Util
                     
                 };
                 series.Points.DataBindXY(
-                    this.Data.Select(v => xValues.GetObject(v)).ToList(),
-                    this.Data.Select(v => yValue.GetObject(v)).ToList(),
-                    this.Data.Select(v => bubbleSize.GetObject(v)).ToList()
+                    this.Data.Select(xValues.GetObject).ToList(),
+                    this.Data.Select(yValue.GetObject).ToList(),
+                    this.Data.Select(bubbleSize.GetObject).ToList()
                     );
                 c.Series.Add(series);
             }

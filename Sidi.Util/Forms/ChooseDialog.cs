@@ -32,7 +32,7 @@ namespace Sidi.Forms
         public ChooseDialog()
         {
             InitializeComponent();
-            Columns = new IColumnInfo[] { new ColumnInfo<object>("Object", x => Sidi.Forms.Support.SafeToString(x)) };
+            Columns = new IColumnInfo[] { new ColumnInfo<object>("Object", (index, x) => Sidi.Forms.Support.SafeToString(x)) };
         }
 
         public object SelectedObject

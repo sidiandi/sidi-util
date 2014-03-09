@@ -85,6 +85,29 @@ namespace Sidi.Util
         }
 
         [Test]
+        public void ToString()
+        {
+            var s = data.ListFormat().ToString();
+            Assert.IsTrue(s.StartsWith("\r\n"));
+            Assert.IsTrue(s.EndsWith("\r\n"));
+            log.Info(s);
+        }
+
+        [Test]
+        public void DefaultColumns()
+        {
+            var data = Process.GetProcesses();
+            log.Info(data.ListFormat());
+        }
+
+        [Test]
+        public void DefaultColumns2()
+        {
+            var data = Enumerable.Range(0, 10).Select(_ => new { D = Enumerable.Range(0, 10) });
+            log.Info(data.ListFormat().AllPublic());
+        }
+
+        [Test]
         public void Width()
         {
             var lf = data.ListFormat()
