@@ -85,7 +85,7 @@ namespace Sidi.Util
         }
 
         [Test]
-        public void ToString()
+        public void ToStringTest()
         {
             var s = data.ListFormat().ToString();
             Assert.IsTrue(s.StartsWith("\r\n"));

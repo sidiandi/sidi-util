@@ -30,19 +30,14 @@ namespace Sidi.Extensions
                 sheet.Cells[row, column++] = c.Name;
             }
 
+            int index = 0;
             foreach (var i in listFormat.Data)
             {
                 ++row;
                 column = 1;
                 foreach (var c in listFormat.Columns)
                 {
-                    try
-                    {
-                        sheet.Cells[row, column++] = c.GetText(i);
-                    }
-                    catch
-                    {
-                    }
+                    sheet.Cells[row, column++] = c.GetText(i, index++);
                 }
             }
         }
