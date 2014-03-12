@@ -4,6 +4,10 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <CodeAnalysisRuleSet>..\sidi-util.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
   <Import Project="..\Common.props" />
   <ItemGroup>
     <Reference Include="EntityFramework">
@@ -66,6 +70,7 @@
     <Compile Include="CommandLine\LPathParser.cs" />
     <Compile Include="CommandLine\Manual.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
+    <Compile Include="CommandLine\Parameter.cs" />
     <Compile Include="CommandLine\PathListParser.cs" />
     <Compile Include="CommandLine\ShellSupport.cs" />
     <Compile Include="CommandLine\IParserItem.cs" />

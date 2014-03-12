@@ -24,7 +24,7 @@ namespace IMAP_test
         static void Main()
         {
             log4net.Config.BasicConfigurator.Configure();
-            var server = new Sidi.IMAP.Server();
+            var server = new Sidi.Imap.Server();
             /*
             server.Start(new System.Net.Sockets.TcpListener(
                     Dns.GetHostEntry(System.Environment.MachineName).AddressList.First(),

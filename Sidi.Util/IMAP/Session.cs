@@ -27,7 +27,7 @@ using Sidi.Util;
 using Sidi.Extensions;
 using System.Globalization;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [CLSCompliant(false)]
     public class Session : IDisposable

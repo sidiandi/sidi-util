@@ -22,6 +22,8 @@ using System.Text;
 using NUnit.Framework;
 using Sidi.Test;
 using Sidi.Extensions;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace Sidi.Extensions
 {
@@ -29,5 +31,14 @@ namespace Sidi.Extensions
     public class TypeExtensionsTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        [Test]
+        public void AnonymousType()
+        {
+            var d = new { A = 1, B = 2, C = 3 };
+            Assert.IsTrue(d.GetType().IsAnonymousType());
+            Assert.IsFalse(this.GetType().IsAnonymousType());
+            Assert.IsFalse(typeof(string).IsAnonymousType());
+        }
     }
 }

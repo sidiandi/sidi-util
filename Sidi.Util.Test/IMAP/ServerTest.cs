@@ -22,7 +22,7 @@ using System.Text;
 using NUnit.Framework;
 using System.Threading;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [TestFixture]
     public class ServerTest
@@ -30,7 +30,7 @@ namespace Sidi.IMAP
         [Test, Explicit("server")]
         public void Serve()
         {
-            var server = new Sidi.IMAP.Server();
+            var server = new Sidi.Imap.Server();
             server.StartLoopback();
             Thread.Sleep(TimeSpan.FromDays(1));
         }

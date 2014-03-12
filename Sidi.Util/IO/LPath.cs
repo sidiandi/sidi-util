@@ -1053,7 +1053,7 @@ namespace Sidi.IO
                 }
                 catch (Exception ex)
                 {
-                    throw new ArgumentOutOfRangeException(ToString(), ex);
+                    throw new InvalidOperationException(ToString(), ex);
                 }
             }
         }

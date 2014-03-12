@@ -25,7 +25,7 @@ using System.Reflection;
 using Sidi.Util;
 using Sidi.Extensions;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     public class Rfc822DateTime
     {

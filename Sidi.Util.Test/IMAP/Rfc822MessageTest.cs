@@ -23,7 +23,7 @@ using System.IO;
 using NUnit.Framework;
 using Sidi.Test;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [TestFixture]
     public class Rfc822MessageTest : TestBase

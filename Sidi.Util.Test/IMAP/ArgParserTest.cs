@@ -25,7 +25,7 @@ using NUnit.Framework;
 using Sidi.Util;
 using Sidi.Extensions;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [TestFixture]
     public class ArgParserTest
