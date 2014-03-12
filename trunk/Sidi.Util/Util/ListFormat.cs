@@ -192,6 +192,11 @@ namespace Sidi.Util
             return Field(typeof(T).GetFields().Select(x => x.Name).ToArray());
         }
 
+        public ListFormat<T> Index()
+        {
+            return AddColumn("#", (i, x) => i);
+        }
+
         public IList<Column> Columns = new List<Column>();
         public string ColumnSeparator = "|";
 
@@ -204,8 +209,17 @@ namespace Sidi.Util
         {
             if (!Columns.Any())
             {
-                AddColumn("#", (i, x) => i);
-                AddColumn(typeof(T).Name, x => x);
+                Index();
+
+                var type = typeof(T);
+                if (type.IsAnonymousType())
+                {
+                    AllPublic();
+                }
+                else
+                {
+                    AddColumn(typeof(T).Name, x => x);
+                }
             }
             return this;
         }

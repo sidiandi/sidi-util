@@ -23,7 +23,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [CLSCompliant(false)]
     public class ArgParser

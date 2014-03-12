@@ -26,7 +26,7 @@ namespace Sidi.CommandLine
 {
     public class ActionDialog : Form
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public void Execute()
         {
@@ -49,7 +49,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public ActionTag ActionTag;
+        public ActionTag ActionTag { get; set; }
     }
 
     public class ActionTag

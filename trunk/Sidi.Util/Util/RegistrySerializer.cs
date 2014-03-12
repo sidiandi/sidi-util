@@ -59,11 +59,11 @@ namespace Sidi.Util
             }
         }
 
-        public static void Write(string key, object x)
+        public static void Write(string key, object objectToSerialize)
         {
-            foreach (var f in Fields(x))
+            foreach (var f in Fields(objectToSerialize))
             {
-                object value = f.GetValue(x);
+                object value = f.GetValue(objectToSerialize);
                 if (value != null)
                 {
                     if (value is bool)

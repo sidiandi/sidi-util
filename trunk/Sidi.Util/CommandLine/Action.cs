@@ -57,13 +57,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public class Parameter
-        {
-            public IValueParser ValueParser;
-            public System.Reflection.ParameterInfo ParameterInfo;
-        }
-
-        public Parameter[] Parameters
+        public IList<Parameter> Parameters
         {
             get
             {
@@ -71,7 +65,7 @@ namespace Sidi.CommandLine
                 {
                     ValueParser = parser.GetValueParser(x.ParameterType),
                     ParameterInfo = x,
-                }).ToArray();
+                }).ToList();
             }
         }
 

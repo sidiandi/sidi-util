@@ -108,6 +108,16 @@ namespace Sidi.Util
         }
 
         [Test]
+        public void DefaultColumns3()
+        {
+            var data = Enumerable.Range(0, 10).Select(_ => new { A = Path.GetRandomFileName(), B = Path.GetRandomFileName(), C = Path.GetRandomFileName() });
+            var lf = data.ListFormat();
+            log.Info(lf);
+            Assert.AreEqual("#", lf.Columns[0].Name);
+            Assert.AreEqual("A", lf.Columns[1].Name);
+        }
+
+        [Test]
         public void Width()
         {
             var lf = data.ListFormat()

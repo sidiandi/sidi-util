@@ -23,7 +23,7 @@ using System.Text.RegularExpressions;
 using Sidi.Util;
 using Sidi.Extensions;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [CLSCompliant(false)]
     public interface IRepository

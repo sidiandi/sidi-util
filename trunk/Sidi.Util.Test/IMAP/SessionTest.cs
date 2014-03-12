@@ -26,7 +26,7 @@ using System.IO;
 using Sidi.Extensions;
 using Sidi.Test;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [TestFixture]
     public class SessionTest : TestBase

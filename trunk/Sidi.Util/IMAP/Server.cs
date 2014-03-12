@@ -23,7 +23,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Net;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     public class Server
     {

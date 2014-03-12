@@ -23,7 +23,7 @@ using Sidi.IO;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace Sidi.IMAP
+namespace Sidi.Imap
 {
     [CLSCompliant(false)]
     public class EmlMailbox : IMailbox
