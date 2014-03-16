@@ -371,10 +371,10 @@ namespace Sidi.CommandLine
                     string valueString = null;
                     if (o.IsPassword)
                     {
-                        var value = Registry.GetValue(key, valueName, null);
-                        if (value is byte[])
+                        var encryptedValue = Registry.GetValue(key, valueName, null) as byte[];
+                        if (encryptedValue != null)
                         {
-                            valueString = ASCIIEncoding.ASCII.GetString(ProtectedData.Unprotect((byte[])value, null, DataProtectionScope.CurrentUser));
+                            valueString = ASCIIEncoding.ASCII.GetString(ProtectedData.Unprotect(encryptedValue, null, DataProtectionScope.CurrentUser));
                         }
                     }
                     else
@@ -433,6 +433,22 @@ namespace Sidi.CommandLine
             foreach (var s in SubCommands)
             {
                 s.StorePreferences();
+            }
+        }
+
+        public void ClearPreferences()
+        {
+            foreach (var o in Options.Where(x => x.IsPersistent))
+            {
+                var key = GetPreferencesKey(o);
+                var valueName = o.Name;
+                log.DebugFormat("Clear preference {0}\\{1}", key, valueName);
+                RegistryExtension.EnsureValueNotExists(key, valueName);
+            }
+
+            foreach (var s in SubCommands)
+            {
+                s.ClearPreferences();
             }
         }
 
