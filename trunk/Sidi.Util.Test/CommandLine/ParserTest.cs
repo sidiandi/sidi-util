@@ -584,6 +584,22 @@ namespace Sidi.CommandLine.Test
         }
 
         [Test]
+        public void LoadEmptyPreferences()
+        {
+            var a = new PreferencesTestApplication
+            {
+                Password = "secret",
+                Name = "name"
+            };
+
+            var p = new Parser(a);
+            p.StorePreferences();
+            p.ClearPreferences();
+            p.LoadPreferences();
+        }
+
+
+        [Test]
         public void Preferences2()
         {
             Parser.Run(new PreferencesTestApplication(), new string[] { });

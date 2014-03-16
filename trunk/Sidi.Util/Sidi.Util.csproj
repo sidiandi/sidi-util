@@ -90,6 +90,7 @@
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Extensions\RegistryExtension.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Forms\ChooseDialog.cs">
       <SubType>Form</SubType>

@@ -107,6 +107,14 @@ namespace Sidi.CommandLine
             }
         }
 
+        public void ClearPreferences()
+        {
+            if (IsMemberInitialized)
+            {
+                Parser.ClearPreferences();
+            }
+        }
+
         public void LoadPreferences()
         {
             if (IsMemberInitialized)
