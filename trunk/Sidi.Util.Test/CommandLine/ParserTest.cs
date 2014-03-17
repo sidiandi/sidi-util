@@ -353,6 +353,9 @@ namespace Sidi.CommandLine.Test
 
             [SubCommand]
             public TestApp Test { set; get; }
+
+            [SubCommand]
+            public TestApp Test2 { set; get; }
         }
 
         [Test]
@@ -501,10 +504,10 @@ namespace Sidi.CommandLine.Test
         [Usage("options")]
         public class SomeOptions
         {
-            [Usage("user"), Persistent(ApplicationSpecific = true)]
+            [Usage("user"), Persistent]
             public string LocalOption;
 
-            [Usage("global"), Persistent]
+            [Usage("global"), Persistent(Global=true)]
             public string GlobalOption;
         }
 
@@ -524,24 +527,24 @@ namespace Sidi.CommandLine.Test
             [Persistent]
             public string AnotherOption { set; get; }
 
-            [SubCommand]
+            [SubCommand, Persistent]
             public PreferencesTestApplication Test;
 
-            [SubCommand]
+            [SubCommand, Persistent]
             public SomeOptions Options = new SomeOptions();
         }
 
         [Usage("Tests preferences")]
         public class PreferencesTestApplication2
         {
-            [SubCommand]
+            [SubCommand, Persistent]
             public SomeOptions Options = new SomeOptions();
         }
 
         [Usage("Tests preferences")]
         public class PreferencesTestApplication3
         {
-            [SubCommand, Persistent(ApplicationSpecific=true)]
+            [SubCommand, Persistent]
             public SomeOptions Options = new SomeOptions();
         }
 
@@ -752,14 +755,14 @@ namespace Sidi.CommandLine.Test
         [Usage("Tests persistence of options in subcommands")]
         class MyApp
         {
-            [SubCommand]
+            [SubCommand, Persistent]
             public MySubCommand Sub = null;
         }
 
         [Usage("Tests persistence of options in subcommands")]
         class MyOtherApp
         {
-            [SubCommand]
+            [SubCommand, Persistent]
             public MySubCommand Sub = null;
         }
 
@@ -788,12 +791,6 @@ namespace Sidi.CommandLine.Test
             p.LoadPreferences();
             p.Parse(new string[] { "Sub" });
             Assert.AreEqual(name, a.Sub.Name);
-
-            var b = new MyOtherApp();
-            var pb = new Parser(b);
-            pb.LoadPreferences();
-            pb.Parse(new string[] { "Sub" });
-            Assert.AreEqual(name, b.Sub.Name);
         }
 
         class FieldTest

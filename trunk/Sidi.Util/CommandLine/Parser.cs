@@ -461,41 +461,32 @@ namespace Sidi.CommandLine
 
         public string GetPreferencesKey(Option o)
         {
-            IEnumerable<string> parts = new[] { PreferencesKey };
-            bool applicationSpecific;
-            if (ApplicationSpecificPreferences != null)
+            var persistent = o.GetPersistentAttribute();
+            if (persistent != null && persistent.Global)
             {
-                applicationSpecific = ApplicationSpecificPreferences.Value;
-                goto done;
+                return RegistryExtension.Cat(
+                    o.MemberInfo.DeclaringType.Assembly.GetRegistryKeyUserSoftware(),
+                    Profile);
             }
-
-            if (o.Source.ProgramSpecificPreferences != null)
+            else
             {
-                applicationSpecific = o.Source.ProgramSpecificPreferences.Value;
-                goto done;
+                return PreferencesKey;
             }
-
-            applicationSpecific = o.GetPersistentAttribute().ApplicationSpecific;
-            
-            done:
-
-            if (applicationSpecific)
-            {
-                parts = parts.Concat(GetNameParts(StartupSource.Instance.GetType()));
-            }
-            parts = parts.Concat(GetNameParts(o.Source.Instance.GetType()));
-
-            return CatReg(parts.ToArray());
         }
 
-        string CatReg(params string[] parts)
+        string GetDefaultPreferencesKey()
         {
-            return parts.Join(@"\");
+            var applicationType = MainSource.Instance.GetType();
+            return RegistryExtension.Cat(
+                applicationType.Assembly.GetRegistryKeyUserSoftware(),
+                Profile,
+                applicationType.Name
+                );
         }
 
         /// <summary>
         /// Registry key for LoadPreferences and StorePreferences. 
-        /// Default is HKEY_CURRENT_USER\Software\[your company]\[your product]
+        /// Default is HKEY_CURRENT_USER\Software\[your company]\[your product]\[profile]
         /// </summary>
         public string PreferencesKey
         {
@@ -503,12 +494,7 @@ namespace Sidi.CommandLine
             {
                 if (m_PreferencesKey == null)
                 {
-                    var k = CatReg(Registry.CurrentUser.ToString(), "Software");
-                    var applicationType = MainSource.Instance.GetType();
-                    var company = applicationType.GetAssemblyAttribute<AssemblyCompanyAttribute>().Company;
-                    var product = applicationType.GetAssemblyAttribute<AssemblyProductAttribute>().Product;
-                    k = CatReg(k, company, product, Profile);
-                    m_PreferencesKey = k;
+                    m_PreferencesKey = GetDefaultPreferencesKey();
                 }
                 return m_PreferencesKey;
             }
