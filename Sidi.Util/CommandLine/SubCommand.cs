@@ -69,11 +69,23 @@ namespace Sidi.CommandLine
                     // create parser
                     _parser = new Parser()
                     {
-                        Parent = this.parentParser
+                        Parent = this.parentParser,
+                        Profile = parentParser.Profile,
                     };
                     _parser.ItemSources.Add(new ItemSource(instance));
                     _parser.AddDefaultUserInterfaceForSubCommands();
-
+                    var persistent = this.memberInfo.GetCustomAttribute<PersistentAttribute>();
+                    if (persistent != null && persistent.Global)
+                    {
+                        _parser.PreferencesKey = RegistryExtension.Cat(
+                            this.memberInfo.GetMemberType().Assembly.GetRegistryKeyUserSoftware(),
+                            _parser.Profile,
+                            this.Name);
+                    }
+                    else
+                    {
+                        _parser.PreferencesKey = parentParser.PreferencesKey + "\\" + this.Name;
+                    }                    
                     if (instanceCreated && needLoadPreferences)
                     {
                         LoadPreferences();
@@ -99,8 +111,18 @@ namespace Sidi.CommandLine
             }
         }
 
+        public bool IsPersistent
+        {
+            get
+            {
+                return memberInfo.GetCustomAttribute<PersistentAttribute>() != null;
+            }
+        }
+
         public void StorePreferences()
         {
+            if (!IsPersistent) { return; }
+
             if (IsMemberInitialized)
             {
                 Parser.StorePreferences();
@@ -109,6 +131,8 @@ namespace Sidi.CommandLine
 
         public void ClearPreferences()
         {
+            if (!IsPersistent) { return; }
+
             if (IsMemberInitialized)
             {
                 Parser.ClearPreferences();
@@ -117,6 +141,8 @@ namespace Sidi.CommandLine
 
         public void LoadPreferences()
         {
+            if (!IsPersistent) { return; }
+
             if (IsMemberInitialized)
             {
                 Parser.LoadPreferences();

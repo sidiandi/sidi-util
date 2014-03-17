@@ -443,9 +443,15 @@ namespace Sidi.CommandLine
             t.treeView.ExpandAll();
             return t;
         }
-        
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         void AddToControlTree(ControlTree t, Parser parser, Control parentPage)
+        {
+            AddToControlTree(t, parser.MainSource.Instance.GetType().Name, parser, parentPage);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        void AddToControlTree(ControlTree t, string title, Parser parser, Control parentPage)
         {
             var items = parser.Items
                 .Where(item => !(ExcludedFromUi(item) || item is SubCommand));
@@ -454,7 +460,7 @@ namespace Sidi.CommandLine
             // main page
             var mainPage = new Control()
             {
-                Text = parser.MainSource.Instance.GetType().Name
+                Text = title
             };
             AddToPage(mainPage, items.Where(x => x.Categories.Contains(String.Empty)));
             t.AddPage(mainPage, parentPage);
@@ -471,7 +477,7 @@ namespace Sidi.CommandLine
 
             foreach (var subCommand in parser.SubCommands.Where(x => !ExcludedFromUi(x)))
             {
-                AddToControlTree(t, subCommand.Parser, mainPage);
+                AddToControlTree(t, subCommand.Name, subCommand.Parser, mainPage);
             }
         }
 
