@@ -870,35 +870,34 @@ namespace Sidi.IO
 
         /// <summary>
         /// Ensures that this path does not exist. Warning: will delete the whole directory tree if
-        /// path points to a directory.
+        /// path points to a directory. Will not follow Junction Points, i.e. will only delete the 
+        /// junction point, but not the directory it points to.
         /// </summary>
         public void EnsureNotExists()
         {
-            var ln = this;
             FindData fd;
-            if (ln.GetFindData(out fd))
+            if (GetFindData(out fd))
             {
                 if (fd.IsDirectory)
                 {
-                    foreach (var c in LDirectory.FindFile(ln.CatDir(LPath.AllFilesWildcard)).ToList())
+                    if (JunctionPoint.Exists(this))
                     {
-                        var cn = ln.CatDir(c.Name);
-                        if (c.IsDirectory)
-                        {
-                            cn.EnsureNotExists();
-                        }
-                        else
-                        {
-                            LFile.Delete(cn);
-                        }
+                        JunctionPoint.Delete(this);
                     }
-                    LDirectory.Delete(ln);
+                    else
+                    {
+                        foreach (var c in this.Children)
+                        {
+                            c.EnsureNotExists();
+                        }
+                        LDirectory.Delete(this);
+                    }
                 }
                 else
                 {
-                    LFile.Delete(ln);
+                    LFile.Delete(this);
                 }
-                log.InfoFormat("Delete {0}", ln);
+                log.InfoFormat("Delete {0}", this);
             }
         }
 

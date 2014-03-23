@@ -129,6 +129,7 @@
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperation.cs" />
+    <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
