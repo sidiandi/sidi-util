@@ -26,7 +26,7 @@ namespace Sidi.IO
             {
                 if (new System.IO.DriveInfo(drive).DriveType != System.IO.DriveType.CDRom)
                 {
-                    Assert.IsTrue(drive.IsDirectory);
+                    Assert.IsTrue(drive.IsDirectory, drive.ToString());
                 }
             }
         }
