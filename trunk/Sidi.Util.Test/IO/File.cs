@@ -134,6 +134,21 @@ namespace Sidi.IO
         }
 
         [Test]
+        public void Junction()
+        {
+            CreateSampleFile(lp);
+            var d = lp.Parent;
+            var j = d.CatName("-link");
+            Assert.IsFalse(j.Exists);
+            JunctionPoint.Create(j, d);
+            Assert.IsTrue(JunctionPoint.Exists(j));
+            Assert.AreEqual(d, JunctionPoint.GetTarget(j));
+            Assert.IsTrue(j.CatDir(lp.FileName).IsFile);
+            j.EnsureNotExists();
+            Assert.IsTrue(lp.IsFile);
+        }
+
+        [Test]
         public void Move()
         {
             CreateSampleFile(lp);

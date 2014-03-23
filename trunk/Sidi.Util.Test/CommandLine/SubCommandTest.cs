@@ -52,8 +52,21 @@ namespace Sidi.CommandLine.Test
             [SubCommand]
             public Math Math;
 
-            [SubCommand]
+            [SubCommand, Persistent]
             public Settings Settings;
+
+            [SubCommand]
+            public Settings NonPersistentSettings;
+
+            [SubCommand, Persistent(Global = true)]
+            public Settings GlobalSettings;
+        }
+
+        [Usage("Test app")]
+        public class AnotherAppThatUsesGlobalSettings
+        {
+            [SubCommand, Persistent(Global = true)]
+            public Settings GlobalSettings;
         }
 
         [Usage("Mathematical operations")]
@@ -116,8 +129,28 @@ namespace Sidi.CommandLine.Test
         [Test]
         public void Persistence()
         {
-            Parser.Run(new App(), new[] { "Settings", "Name", "Andreas" });
-            Parser.Run(new App(), new[] { "Settings" });
+            var a0 = new App();
+            Parser.Run(a0, new[] { "Settings", "Name", "Andreas", ";", 
+                "NonPersistentSettings", "Name", "B", ";",
+                "GlobalSettings", "Name", "GlobalName" });
+            Assert.AreEqual("Andreas", a0.Settings.Name);
+            Assert.AreEqual("B", a0.NonPersistentSettings.Name);
+
+            var a1 = new App();
+
+            var parser = new Parser(a1);
+            var settingsSubCommand = parser.SubCommands.ToList()[1];
+            Assert.AreEqual("Settings", settingsSubCommand.Name);
+            Assert.IsTrue(settingsSubCommand.IsPersistent);
+
+            parser.LoadPreferences();
+            parser.Parse(new string[] { "Settings", "Name", "Andreas", ";", "NonPersistentSettings", "help" });
+            Assert.AreEqual("Andreas", a1.Settings.Name);
+            Assert.IsNull(a1.NonPersistentSettings.Name);
+
+            var another = new AnotherAppThatUsesGlobalSettings();
+            Parser.Run(another, new string[] { "GlobalSettings" });
+            Assert.AreEqual("GlobalName", another.GlobalSettings.Name);
         }
     }
 }
