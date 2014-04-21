@@ -79,9 +79,9 @@ namespace Sidi.CommandLine
 
         public object Handle(IList<string> args, bool execute)
         {
-            var p = Activator.CreateInstance(parser);
-            Parser.SingleSource(p).ParseBraces(args);
-            return ((IValueContainer)p).Value;
+            var valueParser = (IValueContainer) Activator.CreateInstance(parser);
+            Parser.SingleSource(valueParser).ParseBraces(args);
+            return valueParser.Value;
         }
 
         public IEnumerable<ExampleAttribute> Examples
