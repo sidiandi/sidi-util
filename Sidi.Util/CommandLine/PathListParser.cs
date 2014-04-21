@@ -5,6 +5,7 @@ using System.Text;
 using Sidi.IO;
 using Sidi.Util;
 using System.Windows.Forms;
+using Sidi.Extensions;
 
 namespace Sidi.CommandLine
 {
@@ -54,8 +55,8 @@ namespace Sidi.CommandLine
             if (Value == null)
             {
                 Value = new PathList();
+                Value.AddRange(args.PopHead().Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x.Unquote())));
             }
-            Value.Add(p.ParseValue<LPath>(args));
         }
     }
 }
