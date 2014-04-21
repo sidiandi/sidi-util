@@ -79,6 +79,7 @@
     <Compile Include="IO\OperationTest.cs" />
     <Compile Include="IO\LPathTest.cs" />
     <Compile Include="IO\PathExTest.cs" />
+    <Compile Include="IO\PathListTest.cs" />
     <Compile Include="IO\PathsTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
