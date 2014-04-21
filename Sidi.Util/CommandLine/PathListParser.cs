@@ -55,8 +55,8 @@ namespace Sidi.CommandLine
             if (Value == null)
             {
                 Value = new PathList();
-                Value.AddRange(args.PopHead().Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x.Unquote())));
             }
+            Value.AddRange(args.PopHead().Split(new[] { ";" }, StringSplitOptions.None).Select(x => new Sidi.IO.LPath(x.Unquote())));
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Sidi.CommandLine
 
                 foreach (var example in vp.Examples.Where(x => !x.NoTest))
                 {
-                    log.InfoFormat("Parsing {0}", example.Value.Quote());
+                    log.InfoFormat("Parsing a {1} from {0}", example.Value.Quote(), vp.ValueType);
                     var args = Tokenizer.ToList(example.Value);
                     var r = vp.Handle(args, true);
                     Assert.IsTrue(args.Count == 0);
