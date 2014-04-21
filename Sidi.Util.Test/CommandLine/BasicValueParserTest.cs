@@ -75,7 +75,19 @@ namespace Sidi.CommandLine
         public void PathList()
         {
             var p = new Parser();
-            log.Info(p.ParseValue<PathList>(@"C:\temp\hello.txt"));
+            {
+                var pl = (PathList)p.ParseValue<PathList>(@"C:\temp\hello.txt");
+                Assert.AreEqual(1, pl.Count);
+                Assert.AreEqual(new LPath(@"C:\temp\hello.txt"), pl[0]);
+            }
+
+            {
+                var pl = (PathList)p.ParseValue<PathList>(@"C:\temp\hello.txt;C:\temp\hello2.txt");
+                Assert.AreEqual(2, pl.Count);
+                Assert.AreEqual(new LPath(@"C:\temp\hello.txt"), pl[0]);
+                Assert.AreEqual(new LPath(@"C:\temp\hello2.txt"), pl[1]);
+            }
+
             try
             {
                 log.Info(p.ParseValue<PathList>(@":current"));
