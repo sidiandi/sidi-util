@@ -48,6 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\SqliteCache.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Caching\LruCache.cs" />
     <Compile Include="Caching\LruCacheBackground.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="IMAP\Server.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperation.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
+    <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
