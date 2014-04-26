@@ -753,6 +753,10 @@ namespace Sidi.Persistence
                 {
                     i.SetValue(item, reader.GetInt64(index));
                 }
+                else if (mt == typeof(byte[]))
+                {
+                    i.SetValue(item, (byte[])reader[index]);
+                }
                 else if (mt == typeof(Guid))
                 {
                     i.SetValue(item, reader.GetGuid(index));

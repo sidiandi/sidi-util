@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCalculationTest.cs" />
+    <Compile Include="Caching\SqliteCacheTest.cs" />
     <Compile Include="Caching\LruCacheBackgroundTest.cs" />
     <Compile Include="Caching\LruCacheTest.cs" />
     <Compile Include="Caching\CacheTest.cs" />
