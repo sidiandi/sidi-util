@@ -20,6 +20,12 @@
       <HintPath>..\..\nuget-packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\lib\Visual Studio Tools for Office\PIA\Office15\Microsoft.Office.Interop.Excel.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\nuget-packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -87,6 +93,8 @@
     <Compile Include="IO\FileUtilTest.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServerTest.cs" />
+    <Compile Include="Office\ExcelProviderTest.cs" />
+    <Compile Include="Office\ListFormatOfficeExtensionTest.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -127,6 +135,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sidi.Office\Sidi.Office.csproj">
+      <Project>{3a78ddf6-fbee-4c4a-aed3-f834cd7ca0c0}</Project>
+      <Name>Sidi.Office</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sidi.Util\Sidi.Util.csproj">
       <Project>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</Project>
       <Name>Sidi.Util</Name>

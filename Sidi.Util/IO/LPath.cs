@@ -102,7 +102,6 @@ namespace Sidi.IO
                 try
                 {
                     LDirectory.Delete(path);
-                    log.InfoFormat("Delete {0}", path);
                 }
                 catch (System.IO.IOException)
                 {
@@ -897,7 +896,6 @@ namespace Sidi.IO
                 {
                     LFile.Delete(this);
                 }
-                log.InfoFormat("Delete {0}", this);
             }
         }
 

@@ -328,7 +328,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        public void ParseSingleCommand(IList<string> args)
+        public object ParseSingleCommand(IList<string> args)
         {
             foreach (var i in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler>())
             {
@@ -342,17 +342,18 @@ namespace Sidi.CommandLine
 
             if (args.Count == 0)
             {
-                return;
+                return null;
             }
 
-            if (HandleParserItem(args))
+            object result = null;
+            if (HandleParserItem(args, out result))
             {
-                return;
+                return result;
             }
 
-            if (HandleUnknown(args))
+            if (HandleUnknown(args, out result))
             {
-                return;
+                return result;
             }
 
             throw new CommandLineException("Argument " + args[0] + " is unknown.");
@@ -533,8 +534,10 @@ namespace Sidi.CommandLine
         string m_profile;
         const string defaultProfile = "default";
 
-        bool HandleUnknown(IList<string> args)
+        bool HandleUnknown(IList<string> args, out object result)
         {
+            result = null;
+
             foreach (var h in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler>())
             {
                 int c = args.Count;
@@ -771,16 +774,17 @@ found:
             throw new InvalidCastException(type.ToString() + " is not supported");
         }
 
-        public bool HandleParserItem(IList<string> args)
+        public bool HandleParserItem(IList<string> args, out object result)
         {
             var parserItem = LookupParserItem(args[0]);
             if (parserItem == null)
             {
+                result = null;
                 return false;
             }
 
             args.PopHead();
-            var result = parserItem.Handle(args, execute);
+            result = parserItem.Handle(args, execute);
             ProcessResult(result);
             return true;
         }
