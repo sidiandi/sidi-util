@@ -64,7 +64,8 @@ namespace Sidi.CommandLine
                 var rev = args.Take(argCount).Reverse().ToList();
                 try
                 {
-                    if (parser.HandleParserItem(rev))
+                    object result;
+                    if (parser.HandleParserItem(rev, out result))
                     {
                         for (int i = 0; i < argCount; ++i)
                         {
