@@ -30,12 +30,11 @@ namespace Sidi.Util
     {
         public void Binary()
         {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-
-            var b = new BinaryPrefix();
-            Assert.AreEqual("1.00 Ki", String.Format(b, "{0:B}", 1024));
-            Assert.AreEqual("1.46 Ki", String.Format(b, "{0:B}", 1500));
-            Assert.AreEqual("1.00 Mi", String.Format(b, "{0:B}", 1 << 20));
+            var b = BinaryPrefix.Instance;
+            Assert.AreEqual("1.00 Ki", String.Format(b, "{0}", 1024));
+            Assert.AreEqual("1023", String.Format(b, "{0}", 1023));
+            Assert.AreEqual("1.46 Ki", String.Format(b, "{0}", 1500));
+            Assert.AreEqual("1.00 Mi", String.Format(b, "{0}", 1 << 20));
         }
     }
 }

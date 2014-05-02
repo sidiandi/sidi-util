@@ -25,52 +25,49 @@ namespace Sidi.Util
 {
     public class BinaryPrefix : IFormatProvider, ICustomFormatter
     {
-        static string[] prefixes = new string[] { String.Empty, "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi" };
-
-        string Prefix;
-        double Value;
-
-        public override string ToString()
-        {
-            return String.Format("{0:F} {1}", Value, Prefix);
-        }
-
         public object GetFormat(Type formatType)
         {
             if (typeof(ICustomFormatter).Equals(formatType)) return this;
-            return Thread.CurrentThread.CurrentCulture.GetFormat(formatType);
+            return null;
         }
 
         public string Format(string format, object arg, IFormatProvider formatProvider)
         {
-            if ("B".Equals(format))
+            return arg.ToDouble().BinaryPrefix();
+        }
+
+        public static IFormatProvider Instance
+        {
+            get
             {
-                double x = 1;
-                if (arg is System.Int32)
+                if (s_instance == null)
                 {
-                    x = (double)(int)arg;
+                    s_instance = new BinaryPrefix();
                 }
-                else if (arg is long)
-                {
-                    x = (double)(long)arg;
-                }
-                var b = (double)(1 << 10);
-                if (x < b)
-                {
-                    return arg.ToString();
-                }
-                else
-                {
-                    var e = Math.Log(x) / Math.Log(b);
-                    int index = (int)(e);
-                    Prefix = prefixes[index];
-                    Value = x / Math.Pow(b, index);
-                    return String.Format("{0:F} {1}", Value, Prefix);
-                }
+                return s_instance;
+            }
+        }
+        static BinaryPrefix s_instance = null;
+    }
+
+    public static class BinaryPrefixExtension
+    {
+        static string[] prefixes = new string[] { String.Empty, "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi" };
+
+        public static string BinaryPrefix(this double x)
+        {
+            var b = (double)(1 << 10);
+            if (x < b)
+            {
+                return x.ToString("F0");
             }
             else
             {
-                return arg.ToString();
+                var e = Math.Log(x) / Math.Log(b);
+                int index = (int)(e);
+                var Prefix = prefixes[index];
+                var Value = x / Math.Pow(b, index);
+                return String.Format("{0:F} {1}", Value, Prefix);
             }
         }
     }
