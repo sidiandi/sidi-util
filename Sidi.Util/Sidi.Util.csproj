@@ -219,6 +219,7 @@
     <Compile Include="Util\MetricPrefix.cs" />
     <Compile Include="Util\ProcessEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\Progress.cs" />
     <Compile Include="Util\RandomEx.cs" />
     <Compile Include="Pop3\Session.cs" />
     <Compile Include="Util\RegexIgnoreCase.cs" />

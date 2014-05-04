@@ -35,6 +35,10 @@ namespace Sidi.Util
             Assert.AreEqual("1023", String.Format(b, "{0}", 1023));
             Assert.AreEqual("1.46 Ki", String.Format(b, "{0}", 1500));
             Assert.AreEqual("1.00 Mi", String.Format(b, "{0}", 1 << 20));
+            Assert.AreEqual("1.00 Mi", String.Format(b, "{0}", (long)(1 << 20)));
+            Assert.AreEqual("1.00 Mi", String.Format(b, "{0}", (ulong)(1 << 20)));
+            Assert.AreEqual("1.00 Ki", String.Format(b, "{0}", (Int16)(1 << 10)));
+            Assert.AreEqual("1.00 Ki", String.Format(b, "{0}", (UInt16)(1 << 10)));
         }
     }
 }
