@@ -114,7 +114,7 @@ namespace Sidi.IO
             var lpCopy = bigSampleFile.CatName(".copy");
             LFile.Copy(bigSampleFile, lpCopy, true, (p) =>
             {
-                log.Info(p.Message);
+                log.Info(p);
             });
             Assert.IsTrue(LFile.Exists(lpCopy));
             lpCopy.EnsureNotExists();

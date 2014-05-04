@@ -334,13 +334,8 @@ namespace Sidi.IO
         //     sourceFileName or destFileName is in an invalid format.
         public static void Copy(LPath sourceFileName, LPath destFileName, bool overwrite)
         {
-            Copy(sourceFileName, destFileName, overwrite, (p) =>
-                {
-                    log.Info(p.Message);
-                });
+            Copy(sourceFileName, destFileName, overwrite, (p) => { log.InfoFormat("{0}: {1} -> {2}", p, sourceFileName, destFileName);  });
         }
-
-        static TimeSpan progressInterval = TimeSpan.FromSeconds(1);
 
         public static void Copy(
             LPath sourceFileName,
@@ -350,8 +345,6 @@ namespace Sidi.IO
         {
             Int32 pbCancel = 0;
             var progress = new CopyProgress(sourceFileName, destFileName);
-
-            var nextProgress = DateTime.Now + progressInterval;
 
             NativeMethods.CopyFileEx(
                 sourceFileName.Param,
@@ -367,12 +360,10 @@ namespace Sidi.IO
             IntPtr hDestinationFile,
             IntPtr lpData) =>
                     {
-                        var n = DateTime.Now;
-                        if (n > nextProgress)
+                        progress.Progress.Total = TotalFileSize;
+                        if (progress.Progress.Update(TotalBytesTransferred))
                         {
-                            progress.Update(TotalBytesTransferred, TotalFileSize);
                             progressCallback(progress);
-                            nextProgress = n + progressInterval;
                         }
                         return NativeMethods.CopyProgressResult.PROGRESS_CONTINUE;
                     }),
