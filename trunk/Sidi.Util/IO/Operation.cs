@@ -208,15 +208,28 @@ namespace Sidi.IO
         /// <param name="tree"></param>
         public void DeleteEmptyDirectories(LPath tree)
         {
-            if (tree.IsDirectory)
+            LPath path = tree;
+
+            if (path.IsDirectory)
             {
-                foreach (var d in tree.GetDirectories())
+                var thumbs = path.CatDir("Thumbs.db");
+                thumbs.EnsureFileNotExists();
+
+                foreach (var d in path.GetDirectories())
                 {
                     DeleteEmptyDirectories(d);
                 }
-                LDirectory.Delete(tree);
+
+                try
+                {
+                    LDirectory.Delete(path);
+                }
+                catch (System.IO.IOException)
+                {
+                }
             }
         }
+
 
         /// <summary>
         /// Deletes file or directory tree and all files and subdirectories below.

@@ -82,32 +82,6 @@ namespace Sidi.IO
             return this.ToString().Quote();
         }
 
-        public void RemoveEmptyDirectories()
-        {
-            LPath path = this;
-
-            if (path.Exists)
-            {
-                var thumbs = path.CatDir("Thumbs.db");
-                if (thumbs.Exists)
-                {
-                    LFile.Delete(thumbs);
-                }
-                foreach (var d in path.GetDirectories())
-                {
-                    d.RemoveEmptyDirectories();
-                }
-
-                try
-                {
-                    LDirectory.Delete(path);
-                }
-                catch (System.IO.IOException)
-                {
-                }
-            }
-        }
-
         public static string GetValidFilename(string x)
         {
             x = invalidFilenameRegex.Replace(x, "_");
