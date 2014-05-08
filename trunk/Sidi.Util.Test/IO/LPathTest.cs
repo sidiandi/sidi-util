@@ -90,12 +90,27 @@ namespace Sidi.IO
             var p = ln.Parts;
             Assert.AreEqual(pCount, p.Count());
             Assert.AreEqual(part, p[0]);
+
+            Assert.AreEqual(0, LPath.Empty.Parts.Length);
+        }
+
+        [Test]
+        public void Parent()
+        {
+            Assert.AreEqual(LPath.Empty, new LPath(@"a").Parent);
+            Assert.AreEqual(new LPath(@"a"), new LPath(@"a\b").Parent);
+        }
+
+        [Test]
+        public void ParentOfEmpty()
+        {
+            Assert.IsTrue(LPath.Empty.Parent == null);
         }
 
         [Test]
         public void SpecialPaths()
         {
-            for (Sidi.IO.LPath p = System.Environment.SystemDirectory; p != null; p = p.Parent)
+            foreach (var p in new LPath(System.Environment.SystemDirectory).Lineage)
             {
                 Console.WriteLine(p);
                 Assert.IsTrue(LDirectory.Exists(p));
@@ -119,7 +134,7 @@ namespace Sidi.IO
             tempDir = longNameUnc.NoPrefix;
             Assert.IsTrue(System.IO.Directory.Exists(tempDir));
 
-            for (var i = longNameUnc; i != null; i = i.Parent)
+            for (var i = longNameUnc; !i.IsEmpty; i = i.Parent)
             {
                 Console.WriteLine(i);
                 Console.WriteLine(i.Parts.Join("|"));
@@ -168,16 +183,21 @@ namespace Sidi.IO
             Assert.IsTrue(LPath.IsValid(@"C:\temp"));
         }
 
-        [Test]
-        public void XmlSerialize()
+        void TestXmlSerialize(LPath n)
         {
-            var n = Sidi.IO.LPath.GetTempPath();
             var s = new XmlSerializer(typeof(LPath));
             var t = new System.IO.StringWriter();
             s.Serialize(t, n);
             log.Info(t.ToString());
             var n1 = s.Deserialize(new System.IO.StringReader(t.ToString()));
             Assert.AreEqual(n, n1);
+        }
+
+        [Test]
+        public void XmlSerialize()
+        {
+            TestXmlSerialize(LPath.Empty);
+            TestXmlSerialize(Sidi.IO.LPath.GetTempPath());
         }
 
         [Test]
@@ -210,7 +230,7 @@ namespace Sidi.IO
         public void CatDir()
         {
             int someNum = 123;
-            var p = LPath.Join(@"C:\temp", someNum);
+            var p = LPath.Join(@"C:\temp", someNum.ToString());
             Assert.AreEqual(new LPath(@"C:\temp\123"), p);
             Assert.AreEqual(new LPath(@"C:\temp\123\dir"), LPath.Join(p, "dir"));
         }
@@ -380,6 +400,23 @@ namespace Sidi.IO
             Assert.AreEqual(
                 new Uri("file://server/share/doc.txt"),
                 new LPath(@"\\server\share\doc.txt").Uri);
+        }
+
+        [Test]
+        public void Equals()
+        {
+            var x = Paths.Temp;
+            Assert.IsTrue(x.Equals(x));
+            var y = Paths.Temp;
+            Assert.AreEqual(x.Equals(y), y.Equals(x));
+            y = Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            Assert.AreEqual(x.Equals(y), y.Equals(x));
+            Assert.IsFalse(x.Equals(null));
+
+            Assert.IsTrue(LPath.Empty.Equals(LPath.Empty));
+            Assert.IsFalse(LPath.Empty.Equals(x));
+
+            Assert.AreEqual(new LPath("a"), new LPath(@"A"));
         }
     }
 }
