@@ -30,15 +30,14 @@ namespace Sidi.IO
     [Serializable]
     public class LPath : IXmlSerializable, IComparable
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static LPath()
         {
             StringComparison = StringComparison.OrdinalIgnoreCase;
         }
         
-        string path;
-        static LPath empty = new LPath();
-
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        string m_internalPathRepresentation;
 
         const string pathPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
@@ -65,7 +64,7 @@ namespace Sidi.IO
 
         public static implicit operator string(LPath path)
         {
-            return path.path;
+            return path.NoPrefix;
         }
 
         public static LPath GetTempFileName()
@@ -182,7 +181,7 @@ namespace Sidi.IO
 
         public LPath()
         {
-            path = String.Empty;
+            m_internalPathRepresentation = null;
         }
 
         public LPath(string path)
@@ -201,19 +200,19 @@ namespace Sidi.IO
 
             if (String.IsNullOrEmpty(path))
             {
-                this.path = String.Empty;
+                this.m_internalPathRepresentation = null;
             }
             else if (path.StartsWith(pathPrefix))
             {
-                this.path = path.Substring(pathPrefix.Length);
+                this.m_internalPathRepresentation = path.Substring(pathPrefix.Length);
             }
             else if (path.StartsWith(longUncPrefix))
             {
-                this.path = shortUncPrefix + path.Substring(longUncPrefix.Length);
+                this.m_internalPathRepresentation = shortUncPrefix + path.Substring(longUncPrefix.Length);
             }
             else
             {
-                this.path = path;
+                this.m_internalPathRepresentation = path;
             }
         }
 
@@ -222,25 +221,14 @@ namespace Sidi.IO
         {
         }
 
-        public static LPath Join(params object[] parts)
+        public static LPath Join(params string[] parts)
         {
-            return new LPath(
-                parts
-                .SafeSelect(p =>
-                {
-                    if (p is LPath)
-                    {
-                        return ((LPath)p).NoPrefix;
-                    }
-                    else if (p is string)
-                    {
-                        return (string)p;
-                    }
-                    else
-                    {
-                        return LPath.GetValidFilename(p.ToString());
-                    }
-                }));
+            return new LPath(parts);
+        }
+
+        public static LPath Join(IEnumerable<string> parts)
+        {
+            return new LPath(parts);
         }
 
         public LPath Canonic
@@ -287,8 +275,7 @@ namespace Sidi.IO
             {
                 return new LPath(new Uri(text).LocalPath);
             }
-            else if (text.StartsWith(":paste", StringComparison.InvariantCultureIgnoreCase) ||
-                text.Equals(":sel", StringComparison.OrdinalIgnoreCase))
+            else if (text.StartsWith(":paste", StringComparison.OrdinalIgnoreCase) || text.Equals(":sel", StringComparison.OrdinalIgnoreCase))
             {
                 return PathList.Parse(text).First();
             }
@@ -341,7 +328,7 @@ namespace Sidi.IO
                 }
                 else
                 {
-                    return this.path.Length >= 2 && this.path[1].Equals(':');
+                    return this.NoPrefix.Length >= 2 && this.NoPrefix[1].Equals(':');
                 }
             }
         }
@@ -443,7 +430,14 @@ namespace Sidi.IO
         {
             get
             {
-                return this.path.Split(DirectorySeparatorChar).ToArray();
+                if (this.m_internalPathRepresentation == null)
+                {
+                    return new string[] { };
+                }
+                else
+                {
+                    return this.m_internalPathRepresentation.Split(DirectorySeparatorChar).ToArray();
+                }
             }
         }
 
@@ -493,7 +487,7 @@ namespace Sidi.IO
         
         public LPath CatDir(IEnumerable<string> parts)
         {
-            return new LPath((new string[] { this.path }.Concat(parts)).Join(DirectorySeparator));
+            return new LPath(Parts.Concat(parts));
         }
 
         public LPath CatDir(params object[] parts)
@@ -520,7 +514,7 @@ namespace Sidi.IO
 
         public LPath CatName(string namePostfix)
         {
-            return new LPath(this.path + namePostfix);
+            return new LPath(this.NoPrefix + namePostfix);
         }
 
         public const int MaxFilenameLength = 255;
@@ -631,21 +625,33 @@ namespace Sidi.IO
         {
             get
             {
-                var p = GetFullPath().Parts;
+                if (IsEmpty)
+                {
+                    return null;
+                }
+
+                var p = Parts;
 
                 if (IsUnc)
                 {
                     if (p.Length <= 4)
                     {
-                        return null;
+                        return LPath.Empty;
                     }
                 }
 
-                if (p.Length <= 1)
+                return new LPath(p.TakeAllBut(1));
+            }
+        }
+
+        public IEnumerable<LPath> Lineage
+        {
+            get
+            {
+                for (var i = this; !i.IsEmpty; i = i.Parent)
                 {
-                    return null;
+                    yield return i;
                 }
-                return new LPath(p.Take(p.Length - 1));
             }
         }
 
@@ -715,7 +721,11 @@ namespace Sidi.IO
         {
             get
             {
-                return path;
+                if (m_internalPathRepresentation == null)
+                {
+                    return String.Empty;
+                }
+                return m_internalPathRepresentation;
             }
         }
 
@@ -728,17 +738,17 @@ namespace Sidi.IO
         {
             get
             {
-                if (String.IsNullOrEmpty(path))
+                if (m_internalPathRepresentation == null)
                 {
                     return String.Empty;
                 }
-                else if (path.StartsWith(shortUncPrefix))
+                else if (m_internalPathRepresentation.StartsWith(shortUncPrefix))
                 {
-                    return longUncPrefix + path.Substring(shortUncPrefix.Length);
+                    return longUncPrefix + m_internalPathRepresentation.Substring(shortUncPrefix.Length);
                 }
                 else
                 {
-                    return pathPrefix + path;
+                    return pathPrefix + m_internalPathRepresentation;
                 }
             }
         }
@@ -779,7 +789,7 @@ namespace Sidi.IO
         {
             get
             {
-                return path.StartsWith(shortUncPrefix);
+                return NoPrefix.StartsWith(shortUncPrefix);
             }
         }
 
@@ -788,7 +798,7 @@ namespace Sidi.IO
             return Param.ToLower().GetHashCode();
         }
 
-        static public StringComparison StringComparison { get; set; }
+        static public StringComparison StringComparison { get; private set; }
 
         public static LPath Empty
         {
@@ -797,12 +807,29 @@ namespace Sidi.IO
                 return empty;
             }
         }
+        static LPath empty = new LPath();
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return this.Equals(Empty);
+            }
+        }
         
         public override bool Equals(object obj)
         {
-            if (obj is LPath)
+            var r = obj as LPath;
+            if (r != null)
             {
-                return Param.Equals(((LPath)obj).Param, StringComparison);
+                if (m_internalPathRepresentation == null)
+                {
+                    return r.m_internalPathRepresentation == null;
+                }
+                else
+                {
+                    return m_internalPathRepresentation.Equals(r.m_internalPathRepresentation, StringComparison);
+                }
             }
             else
             {
@@ -812,27 +839,30 @@ namespace Sidi.IO
 
         public bool Contains(string value)
         {
-            return this.path.IndexOf(value, StringComparison) >= 0;
+            return this.ToString().IndexOf(value, StringComparison) >= 0;
         }
 
         public bool EndsWith(string value)
         {
-            return path.EndsWith(value, StringComparison);
+            return NoPrefix.EndsWith(value, StringComparison);
         }
 
         public bool StartsWith(string value)
         {
-            return path.StartsWith(value, StringComparison);
+            return NoPrefix.StartsWith(value, StringComparison);
         }
+
+        static StringComparer partComparer = StringComparer.InvariantCultureIgnoreCase;
 
         public LPath RelativeTo(LPath root)
         {
-            if (!path.StartsWith(root.path, StringComparison))
+            var p = Parts;
+            var rp = root.Parts;
+
+            if (!rp.SequenceEqual(p.Take(rp.Length), partComparer))
             {
                 throw new ArgumentOutOfRangeException("root");
             }
-
-            var rp = root.Parts;
 
             return new LPath(Parts.Skip(rp.Length));
         }
@@ -975,14 +1005,25 @@ namespace Sidi.IO
 
         public void ReadXml(System.Xml.XmlReader reader)
         {
-            reader.ReadStartElement();
-            path = reader.ReadString();
-            reader.ReadEndElement();
+            if (reader.IsEmptyElement)
+            {
+                reader.ReadStartElement();
+                m_internalPathRepresentation = null;
+            }
+            else
+            {
+                reader.ReadStartElement();
+                m_internalPathRepresentation = reader.ReadString();
+                reader.ReadEndElement();
+            }
         }
 
         public void WriteXml(System.Xml.XmlWriter writer)
         {
-            writer.WriteString(path);
+            if (m_internalPathRepresentation != null)
+            {
+                writer.WriteString(m_internalPathRepresentation);
+            }
         }
 
         public int CompareTo(object obj)

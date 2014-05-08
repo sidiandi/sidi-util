@@ -149,5 +149,18 @@ namespace Sidi.Extensions
                 }
             }
         }
+
+        /// <summary>
+        /// Returns all elements of the enumerable except the last excludedCount items
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="excludedCount"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> TakeAllBut<T>(this IEnumerable<T> data, int excludedCount)
+        {
+            var count = data.Count();
+            return data.Take(Math.Max(0, count - excludedCount));
+        }
     }
 }
