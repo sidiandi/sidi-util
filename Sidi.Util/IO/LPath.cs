@@ -24,6 +24,7 @@ using Sidi.Extensions;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Reflection;
+using System.IO;
 
 namespace Sidi.IO
 {
@@ -878,28 +879,24 @@ namespace Sidi.IO
         /// </summary>
         public void EnsureNotExists()
         {
-            FindData fd;
-            if (GetFindData(out fd))
+            if (IsDirectory)
             {
-                if (fd.IsDirectory)
+                try
                 {
-                    if (JunctionPoint.Exists(this))
-                    {
-                        JunctionPoint.Delete(this);
-                    }
-                    else
-                    {
-                        foreach (var c in this.Children)
-                        {
-                            c.EnsureNotExists();
-                        }
-                        LDirectory.Delete(this);
-                    }
+                    LDirectory.Delete(this);
                 }
-                else
+                catch (IOException)
                 {
-                    LFile.Delete(this);
+                    foreach (var c in this.Children)
+                    {
+                        c.EnsureNotExists();
+                    }
+                    LDirectory.Delete(this);
                 }
+            }
+            else if (IsFile)
+            {
+                LFile.Delete(this);
             }
         }
 
@@ -1068,6 +1065,11 @@ namespace Sidi.IO
                     throw new InvalidOperationException(ToString(), ex);
                 }
             }
+        }
+
+        public static LPath GetRandomFileName()
+        {
+            return new LPath(System.IO.Path.GetRandomFileName());
         }
     }
 }

@@ -25,6 +25,7 @@ using Sidi.Extensions;
 using Sidi.Forms;
 using System.Diagnostics;
 using Sidi.Test;
+using Sidi.IO;
 
 namespace Sidi.Util
 {
@@ -115,6 +116,17 @@ namespace Sidi.Util
             log.Info(lf);
             Assert.AreEqual("#", lf.Columns[0].Name);
             Assert.AreEqual("A", lf.Columns[1].Name);
+        }
+
+        [Test]
+        public void DefaultColumnsDictionary()
+        {
+            var d = Enumerable.Range(1, 100).ToDictionary(_ => LPath.GetRandomFileName(), _ => LPath.GetRandomFileName());
+            var lf = d.ListFormat();
+            log.Info(lf);
+            Assert.AreEqual("#", lf.Columns[0].Name);
+            Assert.AreEqual("Key", lf.Columns[1].Name);
+            Assert.AreEqual("Value", lf.Columns[2].Name);
         }
 
         [Test]
