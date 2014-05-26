@@ -149,6 +149,20 @@ namespace Sidi.IO
         }
 
         [Test]
+        public void JunctionExists()
+        {
+            lp.EnsureNotExists();
+            lp.EnsureDirectoryExists();
+            Assert.IsFalse(JunctionPoint.Exists(lp));
+            lp.EnsureNotExists();
+            Assert.IsFalse(JunctionPoint.Exists(lp));
+            var target = lp.Sibling("target");
+            target.EnsureDirectoryExists();
+            JunctionPoint.Create(lp, target);
+            Assert.IsTrue(JunctionPoint.Exists(lp));
+        }
+
+        [Test]
         public void Move()
         {
             CreateSampleFile(lp);
@@ -267,6 +281,22 @@ namespace Sidi.IO
                     Assert.IsFalse(w32.Message.Contains("The operation completed successfully"));
                 }
             }
+        }
+
+        [Test]
+        public void EnsureNotExistsDoesNotFollowJunctionPoints()
+        {
+            var root = TestFile("EnsureNotExistsDoesNotFollowJunctionPoints");
+            root.EnsureNotExists();
+            var a = root.CatDir("a");
+            a.EnsureDirectoryExists();
+            var b = root.CatDir("b");
+            var c = b.CatDir("c");
+            LFile.WriteAllText(c, "hello");
+            JunctionPoint.Create(a.CatDir("b"), b);
+            a.EnsureNotExists();
+            Assert.IsTrue(b.IsDirectory);
+            Assert.IsTrue(c.IsFile);
         }
     }
 }

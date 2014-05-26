@@ -24,6 +24,7 @@ using Sidi.Extensions;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Collections;
 
 namespace Sidi.Util
 {
@@ -212,7 +213,11 @@ namespace Sidi.Util
                 Index();
 
                 var type = typeof(T);
-                if (type.IsAnonymousType())
+                if (type.IsGenericType && type.Name.Contains("KeyValuePair"))
+                {
+                    AllPublic();
+                }
+                else if (type.IsAnonymousType())
                 {
                     AllPublic();
                 }
