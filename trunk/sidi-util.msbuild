@@ -22,6 +22,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
         <Major>2</Major>
         <Minor>6</Minor>
         <Build>0</Build>
+		<InitialRevision>1114</InitialRevision>
 		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\packages</MSBuildExtensionsPath>
 		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
 	</PropertyGroup>
@@ -62,7 +63,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
       <Output TaskParameter="Revision" PropertyName="Revision" />
     </SvnVersion>
     <CreateProperty
-        Value="$(Major).$(Minor).$(Build).$(Revision)">
+        Value="$(Major).$(Minor).$(Build).$([MSBuild]::Subtract($(Revision), $(InitialRevision)))">
       <Output
           TaskParameter="Value"
           PropertyName="Version" />
