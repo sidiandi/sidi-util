@@ -881,7 +881,7 @@ namespace Sidi.Persistence
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -920,17 +920,17 @@ namespace Sidi.Persistence
 
             public int IndexOf(TItem item)
             {
-                throw new Exception("The method or operation is not implemented.");
+                throw new NotImplementedException();
             }
 
             public void Insert(int index, TItem item)
             {
-                throw new Exception("The method or operation is not implemented.");
+                throw new NotImplementedException();
             }
 
             public void RemoveAt(int index)
             {
-                throw new Exception("The method or operation is not implemented.");
+                throw new NotImplementedException();
             }
 
             public TItem this[int index]
@@ -941,7 +941,7 @@ namespace Sidi.Persistence
                 }
                 set
                 {
-                    throw new Exception("The method or operation is not implemented.");
+                    throw new NotImplementedException();
                 }
             }
 
@@ -951,7 +951,7 @@ namespace Sidi.Persistence
 
             public void Add(TItem item)
             {
-                throw new Exception("The method or operation is not implemented.");
+                throw new NotImplementedException();
             }
 
             public void Clear()
@@ -961,7 +961,7 @@ namespace Sidi.Persistence
 
             public bool Contains(TItem item)
             {
-                throw new Exception("The method or operation is not implemented.");
+                throw new NotImplementedException();
             }
 
             public void CopyTo(TItem[] array, int arrayIndex)
@@ -984,7 +984,7 @@ namespace Sidi.Persistence
 
             public bool Remove(TItem item)
             {
-                throw new Exception("The method or operation is not implemented.");
+                throw new NotImplementedException();
             }
 
             #endregion
