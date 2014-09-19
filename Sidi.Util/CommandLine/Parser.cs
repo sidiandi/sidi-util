@@ -820,18 +820,11 @@ found:
         /// </summary>
         IEnumerable<IParserItem> FindItems()
         {
-            var items = SubParsers
+            return SubParsers
                 .Concat(
                     ItemSources.Concat(builtInSources)
                     .SelectMany(x => x.FindItems(this)))
                     .ToList();
-
-            if (!items.Any())
-            {
-                throw new Exception();
-            }
-
-            return items;
         }
 
         List<IValueParser> availableValueParsers;
