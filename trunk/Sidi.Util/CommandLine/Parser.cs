@@ -542,14 +542,20 @@ namespace Sidi.CommandLine
             {
                 int c = args.Count;
                 h.UnknownArgument(args);
-                return args.Count != c;
+                if (args.Count < c)
+                {
+                    return true;
+                }
             }
 
             foreach (var h in ItemSources.Select(x => x.Instance).OfType<CommandLineHandler2>())
             {
                 int c = args.Count;
                 h.UnknownArgument(args, this);
-                return args.Count != c;
+                if (args.Count < c)
+                {
+                    return true;
+                }
             }
 
             return false;

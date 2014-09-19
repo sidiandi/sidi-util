@@ -17,9 +17,9 @@ namespace Sidi.Extensions
             {
                 return ((T)a.GetCustomAttributes(typeof(T), false).First());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(String.Format("{0} is not defined for assembly {1}", typeof(T).ToString(), a));
+                throw new ArgumentOutOfRangeException(String.Format("{0} is not defined for assembly {1}", typeof(T).ToString(), a), ex);
             }
         }
 

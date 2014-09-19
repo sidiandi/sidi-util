@@ -8,6 +8,8 @@ using Sidi.Test;
 using System.Net;
 using Sidi.Util;
 using Sidi.IO;
+using System.Threading;
+using System.Globalization;
 
 namespace Sidi.CommandLine
 {
@@ -54,12 +56,32 @@ namespace Sidi.CommandLine
         {
             var p = new Parser();
             p.ParseValue<DateTime>("tomorrow");
+
+            var c = Thread.CurrentThread.CurrentCulture;
+            try
+            {
+                Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+                Assert.AreEqual(new DateTime(2013, 4, 18, 3, 35, 4), p.ParseValue<DateTime>("18.04.2013 03:35:04"));
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = c;
+            }
         }
 
         [Test]
         public void TimeIntervalParsing()
         {
-            TestTimeInterval("[18.04.2013 03:35:04, 18.04.2013 15:35:04[");
+            var c = Thread.CurrentThread.CurrentCulture;
+            try
+            {
+                Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+                TestTimeInterval("[18.04.2013 03:35:04, 18.04.2013 15:35:04[");
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = c;
+            }
             TestTimeInterval("year 2013-01-01");
             TestTimeInterval("year today");
             TestTimeInterval("FinancialYear today");
@@ -69,6 +91,12 @@ namespace Sidi.CommandLine
             TestTimeInterval("[yesterday, Tomorrow[");
             TestTimeInterval("(begin yesterday end tomorrow)");
             TestTimeInterval("(last 30 days end tomorrow)");
+        }
+
+        [Test]
+        public void DateTimeParsing()
+        {
+            var rep = "18.04.2013 03:35:04";
         }
 
         [Test]
