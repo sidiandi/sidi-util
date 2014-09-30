@@ -135,46 +135,67 @@ namespace Sidi.Util
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static double ToDouble(this object x)
+        public static bool TryConvertToDouble(this object x, out double d)
         {
             if (x == null)
             {
-                return Double.NaN;
+                d = Double.NaN;
+                return false;
             }
 
             if (x is double)
             {
-                return (double)x;
+                d = (double)x;
+                return true;
             }
             else if (x is Int16)
             {
-                return (double)(Int16)x;
+                d = (double)(Int16)x;
+                return true;
             }
             else if (x is UInt16)
             {
-                return (double)(UInt16)x;
+                d = (double)(UInt16)x;
+                return true;
             }
             else if (x is Int32)
             {
-                return (double)(Int32)x;
+                d = (double)(Int32)x;
+                return true;
             }
             else if (x is UInt32)
             {
-                return (double)(UInt32)x;
+                d = (double)(UInt32)x;
+                return true;
             }
             else if (x is Int64)
             {
-                return (double)(Int64)x;
+                d = (double)(Int64)x;
+                return true;
             }
             else if (x is UInt64)
             {
-                return (double)(UInt64)x;
+                d = (double)(UInt64)x;
+                return true;
             }
-            else if (x is string)
+            else
             {
-                return Double.Parse((string)x);
+                d = double.NaN;
+                return false;
             }
-            return (double)x;
+        }
+
+        public static double ToDouble(this object x)
+        {
+            double d;
+            if (TryConvertToDouble(x, out d))
+            {
+                return d;
+            }
+            else
+            {
+                throw new ArgumentException("Cannot convert to double");
+            }
         }
     }
 }

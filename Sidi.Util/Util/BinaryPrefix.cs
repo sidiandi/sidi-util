@@ -33,7 +33,15 @@ namespace Sidi.Util
 
         public string Format(string format, object arg, IFormatProvider formatProvider)
         {
-            return arg.ToDouble().BinaryPrefix();
+            double d;
+            if (arg.TryConvertToDouble(out d))
+            {
+                return d.BinaryPrefix();
+            }
+            else
+            {
+                return arg.ToString();
+            }
         }
 
         public static IFormatProvider Instance

@@ -28,6 +28,7 @@ namespace Sidi.Util
     [TestFixture]
     public class BinaryPrefixTest
     {
+        [Test]
         public void Binary()
         {
             var b = BinaryPrefix.Instance;
@@ -39,6 +40,7 @@ namespace Sidi.Util
             Assert.AreEqual("1.00 Mi", String.Format(b, "{0}", (ulong)(1 << 20)));
             Assert.AreEqual("1.00 Ki", String.Format(b, "{0}", (Int16)(1 << 10)));
             Assert.AreEqual("1.00 Ki", String.Format(b, "{0}", (UInt16)(1 << 10)));
+            Assert.AreEqual("Andreas", String.Format(b, "{0}", "Andreas"));
         }
     }
 }
