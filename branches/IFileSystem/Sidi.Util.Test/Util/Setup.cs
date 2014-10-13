@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sidi.Util
 {
-    class TestFixtureAttribute : Attribute
+    class SetupAttribute : Attribute
     {
     }
 }

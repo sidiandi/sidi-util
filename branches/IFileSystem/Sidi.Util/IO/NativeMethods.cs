@@ -46,6 +46,8 @@ namespace Sidi.IO
 
     internal static class NativeMethods
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [DllImport("msvcrt.dll")]
         internal static extern int memcmp(byte[] b1, byte[] b2, long count);
 
@@ -60,11 +62,17 @@ namespace Sidi.IO
             CheckApiCall(result, path.ToString());
         }
 
+        public const int ERROR_REQUEST_ABORTED = 1235;
+        
         public static void CheckApiCall(this bool result, string message)
         {
             if (!result)
             {
                 var win32Exception = new Win32Exception();
+                if (win32Exception.NativeErrorCode == ERROR_REQUEST_ABORTED)
+                {
+                    throw new OperationCanceledException(message, win32Exception);
+                }
                 throw new System.IO.IOException(message, win32Exception);
             }
         }
@@ -282,10 +290,12 @@ namespace Sidi.IO
         [Flags]
         public enum CopyFileFlags : uint
         {
-            COPY_FILE_FAIL_IF_EXISTS = 0x00000001,
-            COPY_FILE_RESTARTABLE = 0x00000002,
-            COPY_FILE_OPEN_SOURCE_FOR_WRITE = 0x00000004,
-            COPY_FILE_ALLOW_DECRYPTED_DESTINATION = 0x00000008
+            COPY_FILE_ALLOW_DECRYPTED_DESTINATION = 0x00000008, // An attempt to copy an encrypted file will succeed even if the destination copy cannot be encrypted.
+            COPY_FILE_COPY_SYMLINK = 0x00000800, // If the source file is a symbolic link, the destination file is also a symbolic link pointing to the same file that the source symbolic link is pointing to.
+            COPY_FILE_FAIL_IF_EXISTS = 0x00000001, // The copy operation fails immediately if the target file already exists.
+            COPY_FILE_NO_BUFFERING = 0x00001000, // The copy operation is performed using unbuffered I/O, bypassing system I/O cache resources. Recommended for very large file transfers.
+            COPY_FILE_OPEN_SOURCE_FOR_WRITE = 0x00000004, // The file is copied and the original file is opened for write access.
+            COPY_FILE_RESTARTABLE = 0x00000002, // Progress of the copy is tracked in the target file in case the copy fails. The failed copy can be restarted at a later time by specifying the same values for lpExistingFileName and lpNewFileName as those used in the call that failed. This can significantly slow down the copy operation as the new file may be flushed multiple times during the copy operation.
         }
 
         [DllImport("user32.dll")]

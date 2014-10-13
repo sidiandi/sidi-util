@@ -19,11 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Reflection;
 using System.ComponentModel;
 using System.IO;
 using Sidi.Util;
 using Sidi.Extensions;
+using System.Reflection;
 
 namespace Sidi.CommandLine
 {
@@ -31,7 +31,7 @@ namespace Sidi.CommandLine
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Option(Parser parser, ItemSource source, MemberInfo memberInfo)
+        public Option(Parser parser, ItemSource source, System.Reflection.MemberInfo memberInfo)
         {
             Source = source;
             MemberInfo = memberInfo;
@@ -177,7 +177,7 @@ namespace Sidi.CommandLine
 
         public PersistentAttribute GetPersistentAttribute()
         {
-            return MemberInfo.GetCustomAttribute<PersistentAttribute>();
+            return MemberInfo.GetCustomAttribute<Sidi.CommandLine.PersistentAttribute>();
         }
 
         public bool IsPassword

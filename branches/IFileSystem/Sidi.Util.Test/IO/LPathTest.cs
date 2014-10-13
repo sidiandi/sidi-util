@@ -266,7 +266,7 @@ namespace Sidi.IO
         }
 
         [Test]
-        public void EnsureNotExists()
+        public void EnsureFileNotExists()
         {
             var tf = NewTestFile("file-to-delete");
             LFile.WriteAllText(tf, "hello");
@@ -278,6 +278,7 @@ namespace Sidi.IO
         public void EnsureNotExistsCannotDeleteDirectory()
         {
             var tf = NewTestFile("directory-to-delete");
+            tf.EnsureNotExists();
             tf.EnsureDirectoryExists();
             tf.EnsureFileNotExists();
         }

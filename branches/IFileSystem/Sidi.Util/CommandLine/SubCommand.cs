@@ -74,7 +74,7 @@ namespace Sidi.CommandLine
                     };
                     _parser.ItemSources.Add(new ItemSource(instance));
                     _parser.AddDefaultUserInterfaceForSubCommands();
-                    var persistent = this.memberInfo.GetCustomAttribute<PersistentAttribute>();
+                    var persistent = this.memberInfo.GetCustomAttribute<Sidi.CommandLine.PersistentAttribute>();
                     if (persistent != null && persistent.Global)
                     {
                         _parser.PreferencesKey = RegistryExtension.Cat(
@@ -115,7 +115,7 @@ namespace Sidi.CommandLine
         {
             get
             {
-                return memberInfo.GetCustomAttribute<PersistentAttribute>() != null;
+                return memberInfo.GetCustomAttribute<Sidi.CommandLine.PersistentAttribute>() != null;
             }
         }
 

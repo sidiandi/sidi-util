@@ -9,28 +9,6 @@ namespace Sidi.Extensions
     public static class MemberInfoExtensions
     {
         /// <summary>
-        /// Returns the first custom attribute of type attrivute on memberInfo
-        /// </summary>
-        /// <typeparam name="Attribute"></typeparam>
-        /// <param name="memberInfo"></param>
-        /// <returns>null, if no such attribute is on the memberInfo</returns>
-        public static Attribute GetCustomAttribute<Attribute>(this System.Reflection.MemberInfo memberInfo) where Attribute : class
-        {
-            return memberInfo.GetCustomAttributes(typeof(Attribute), true).FirstOrDefault() as Attribute;
-        }
-
-        /// <summary>
-        /// Returns custom attributes of type attribute on memberInfo
-        /// </summary>
-        /// <typeparam name="Attribute"></typeparam>
-        /// <param name="memberInfo"></param>
-        /// <returns>null, if no such attribute is on the memberInfo</returns>
-        public static IEnumerable<Attribute> GetCustomAttributes<Attribute>(this System.Reflection.MemberInfo memberInfo) where Attribute : class
-        {
-            return memberInfo.GetCustomAttributes(typeof(Attribute), true).OfType<Attribute>();
-        }
-
-        /// <summary>
         /// Set the value of a field or property
         /// </summary>
         /// <param name="member"></param>

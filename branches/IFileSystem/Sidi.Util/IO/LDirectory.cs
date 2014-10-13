@@ -34,12 +34,7 @@ namespace Sidi.IO
 
         public static void Delete(LPath directory)
         {
-            if (!NativeMethods.RemoveDirectory(directory.Param))
-            {
-                new LFileSystemInfo(directory).IsReadOnly = false;
-                NativeMethods.RemoveDirectory(directory.Param).CheckApiCall(directory);
-            }
-            log.InfoFormat("Delete {0}", directory);
+            FileSystem.Current.RemoveDirectory(directory);
         }
 
         public static bool Exists(LPath directory)
@@ -62,29 +57,7 @@ namespace Sidi.IO
 
         public static void Move(LPath from, LPath to)
         {
-            NativeMethods.MoveFileEx(from.Param, to.Param, 0).CheckApiCall(String.Format("{0} -> {1}", from, to));
-        }
-
-        /// <summary>
-        /// Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
-        /// </summary>
-        /// <param name="searchPath"></param>
-        /// <returns></returns>
-        internal static IEnumerable<FindData> FindFileRaw(LPath searchPath)
-        {
-            FindData fd;
-
-            using (var fh = NativeMethods.FindFirstFile(searchPath.Param, out fd))
-            {
-                if (!fh.IsInvalid)
-                {
-                    yield return fd;
-                    while (NativeMethods.FindNextFile(fh, out fd))
-                    {
-                        yield return fd;
-                    }
-                }
-            }
+            FileSystem.Current.Move(from, to);
         }
 
         /// <summary>
@@ -94,14 +67,14 @@ namespace Sidi.IO
         /// <returns></returns>
         public static IEnumerable<LFileSystemInfo> FindFile(LPath searchPath)
         {
-            return FindFileRaw(searchPath)
+            return FileSystem.Current.FindFileRaw(searchPath)
                 .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
                 .Select(x => new LFileSystemInfo(searchPath.Parent, x));
         }
 
         public static void Create(LPath path)
         {
-            CreateDirectoryInternal(path);
+            FileSystem.Current.EnsureDirectoryExists(path);
         }
 
         public static LPath Current
@@ -111,32 +84,5 @@ namespace Sidi.IO
                 return new LPath(System.Environment.CurrentDirectory);
             }
         }
-
-        const int ERROR_ALREADY_EXISTS = 183;
-        const int ERROR_PATH_NOT_FOUND = 3;
-
-        static void CreateDirectoryInternal(LPath path)
-        {
-            if (!NativeMethods.CreateDirectory(path.Param, IntPtr.Zero))
-            {
-                switch (Marshal.GetLastWin32Error())
-                {
-                    case ERROR_ALREADY_EXISTS:
-                        return;
-                    case ERROR_PATH_NOT_FOUND:
-                        {
-                            var p = path.Parent;
-                            CreateDirectoryInternal(p);
-                            log.InfoFormat("Create directory {0}", path);
-                            NativeMethods.CreateDirectory(path.Param, IntPtr.Zero).CheckApiCall(path);
-                        }
-                        break;
-                    default:
-                        false.CheckApiCall(path);
-                        break;
-                }
-            }
-        }
     }
-
 }
