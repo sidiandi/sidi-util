@@ -34,13 +34,13 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
+        [Test, ExpectedException(typeof(System.ArgumentOutOfRangeException))]
         public void Check()
         {
             var ln = new LPath(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
         }
 
-        [Test, ExpectedException(ExpectedException = typeof(System.IO.PathTooLongException))]
+        [Test, ExpectedException(ExpectedException = typeof(System.ArgumentOutOfRangeException))]
         public void Check2()
         {
             var ln = new LPath(new string('0', 256));
@@ -68,17 +68,9 @@ namespace Sidi.IO
         [Test]
         public void FullPath()
         {
-            var ln = new LPath(Enumerable.Range(0, 100).Select(x => "0000000000"));
+            var ln = LPath.Join(Enumerable.Range(0, 100).Select(x => "0000000000"));
             var cd = new LPath(System.Environment.CurrentDirectory);
             Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
-
-            ln = new LPath(@"\" + ln.NoPrefix);
-            Assert.AreEqual(
-                cd.GetPathRoot().CatName(ln.ToString()), 
-                ln.GetFullPath());
-
-            ln = new LPath(".");
-            Assert.AreEqual(LDirectory.Current, ln.GetFullPath());
         }
 
         [Test]

@@ -45,7 +45,7 @@ namespace Sidi.IO
             var p = new LPath(TestFile(".")).Parts;
             var p1 = new []{ @"\", Environment.MachineName, p[0].Replace(":", "$")}.Concat(p.Skip(1));
             log.Info(p1.Join());
-            var nwPath = new LPath(p1);
+            var nwPath = LPath.Join(p1);
             log.Info(nwPath);
 
             var i = nwPath.Info;

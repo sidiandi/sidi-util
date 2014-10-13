@@ -158,7 +158,7 @@ namespace Sidi.IO
 
         public void CopyRecursive(LPath source, LPath dest, int numberOfCopiedDirectoryLevels)
         {
-            string[] parts = source.Parts;
+            var parts = source.Parts;
             if (parts.Length < numberOfCopiedDirectoryLevels)
             {
                 throw new ArgumentOutOfRangeException("numberOfCopiedDirectoryLevels", numberOfCopiedDirectoryLevels, "must be equal or less the number of directories in source");
