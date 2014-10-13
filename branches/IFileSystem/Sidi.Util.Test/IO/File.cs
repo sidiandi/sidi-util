@@ -167,7 +167,7 @@ namespace Sidi.IO
         public void Move()
         {
             CreateSampleFile(lp);
-            var m = new LPath(lp.Parts.Take(20));
+            var m = LPath.Join(lp.Parts.Take(20));
             var dest = root.CatDir("moved");
             LDirectory.Move(m, dest);
             Assert.IsTrue(LDirectory.Exists(dest));
@@ -227,7 +227,7 @@ namespace Sidi.IO
         public void Reopen()
         {
             var random = new Random();
-            var relPath = new LPath(Enumerable.Range(0, 100)
+            var relPath = LPath.Join(Enumerable.Range(0, 100)
                 .Select(x => random.String(10)));
             var rootDir = TestFile("opentest");
             rootDir.EnsureNotExists();

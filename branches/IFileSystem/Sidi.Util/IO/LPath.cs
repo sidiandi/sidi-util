@@ -45,13 +45,22 @@ namespace Sidi.IO
         {
             StringComparison = StringComparison.OrdinalIgnoreCase;
         }
-        
+
         string m_internalPathRepresentation;
 
-        const string pathPrefix = @"\\?\";
+        const string longPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
         const string shortUncPrefix = @"\\";
+        const string deviceNamespacePrefix = @"\\.\";
+
         public const string ExtensionSeparator = ".";
+
+        static readonly string[] prefixes = new[]
+        {
+            longUncPrefix,
+            longPrefix,
+            deviceNamespacePrefix
+        };
 
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
@@ -138,9 +147,14 @@ namespace Sidi.IO
 
         static Exception CheckFilenameWithWildcards(string x)
         {
+            if (String.IsNullOrEmpty(x))
+            {
+                return new ArgumentException("file name cannot be empty.");
+            }
+
             if (x.Length > LPath.MaxFilenameLength)
             {
-                return new System.IO.PathTooLongException("file name is {0} characters too long. Actual characters: {1}, allowed characters: {2}, file name: {3}".F(
+                return new ArgumentException("file name is {0} characters too long. Actual characters: {1}, allowed characters: {2}, file name: {3}".F(
                     x.Length - MaxFilenameLength,
                     x.Length,
                     MaxFilenameLength,
@@ -150,7 +164,7 @@ namespace Sidi.IO
             var m = invalidFilenameRegexWithoutWildcards.Match(x);
             if (m.Success)
             {
-                return new System.IO.IOException("file name contains invalid character at {0}. File name: {1}".F(
+                return new ArgumentException("file name contains invalid character at {0}. File name: {1}".F(
                     m.Index,
                     x));
             }
@@ -162,17 +176,36 @@ namespace Sidi.IO
             return CheckFilenameWithWildcards(x) == null;
         }
 
+        LPath(string prefix, IEnumerable<string> parts)
+        : this(prefix + String.Join(DirectorySeparator, parts))
+        {
+            
+        }
+
         public LPath()
         {
             m_internalPathRepresentation = null;
         }
 
+        static bool RemovePrefix(string text, string prefix, out string result)
+        {
+            if (text.StartsWith(prefix))
+            {
+                result = text.Substring(prefix.Length);
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
+        }
+
         public LPath(string path)
         {
-            var exception = CheckPath(path);
-            if (exception != null)
+            if (String.IsNullOrEmpty(path))
             {
-                throw exception;
+                throw new ArgumentOutOfRangeException("path");
             }
 
             // remove trailing slash
@@ -181,49 +214,86 @@ namespace Sidi.IO
                 path = path.Substring(0, path.Length - 1);
             }
 
-            if (String.IsNullOrEmpty(path))
+                if (prefixes.Any(_=>path.StartsWith(_)))
+                {
+                    m_internalPathRepresentation = path;
+                }
+                else
+                {
+                    // handle normal path
+
+                    // UNC
+                    if (RemovePrefix(path, shortUncPrefix, out m_internalPathRepresentation))
+                    {
+                        m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
+                    }
+                    else if (path.Length >= 2 && char.IsLetter(path[0]) && path[1] == ':')
+                    {
+                        m_internalPathRepresentation = longPrefix + path;
+                    }
+                    else
+                    {
+                        m_internalPathRepresentation = path;
+                    }
+                }
+
+            if (m_internalPathRepresentation.Length > MaxPathLength)
             {
-                this.m_internalPathRepresentation = null;
+                throw new ArgumentOutOfRangeException(String.Format("string is {0} characters long. Maximal path length: {1}", m_internalPathRepresentation.Length, MaxPathLength));
             }
-            else if (path.StartsWith(pathPrefix))
+            
+            var invalidFileName = NameParts.FirstOrDefault(_ => !IsValidFilenameWithWildcards(_));
+            if (invalidFileName != null)
             {
-                this.m_internalPathRepresentation = path.Substring(pathPrefix.Length);
-            }
-            else if (path.StartsWith(longUncPrefix))
-            {
-                this.m_internalPathRepresentation = shortUncPrefix + path.Substring(longUncPrefix.Length);
-            }
-            else
-            {
-                this.m_internalPathRepresentation = path;
+                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid file name", invalidFileName));
             }
         }
 
-        public LPath(IEnumerable<string> parts)
-        : this(parts.Join(DirectorySeparator))
+        IEnumerable<string> NameParts
         {
-            var invalidFileName = parts.Skip(1).FirstOrDefault(p => !IsValidFilenameWithWildcards(p));
-            if (invalidFileName != null)
+            get
             {
-                throw new ArgumentOutOfRangeException("parts", String.Format("{0} is not a valid file name.", invalidFileName));
+                if (IsAbsolute)
+                {
+                    if (IsUnc)
+                    {
+                        return Parts.Skip(3);
+                    }
+                    else
+                    {
+                        return Parts.Skip(1);
+                    }
+                }
+                else
+                {
+                    return Parts;
+                }
             }
         }
 
         public static LPath Join(params string[] parts)
         {
-            return new LPath(parts);
+            return new LPath(parts.Join(DirectorySeparator));
         }
 
         public static LPath Join(IEnumerable<string> parts)
         {
-            return new LPath(parts);
+            var s = parts.Join(DirectorySeparator);
+            if (String.IsNullOrEmpty(s))
+            {
+                return LPath.Empty;
+            }
+            else
+            {
+                return new LPath(s);
+            }
         }
 
         public LPath Canonic
         {
             get
             {
-                return new LPath(Parts.Where(x => !x.Equals(".")));
+                return Join(Parts.Where(x => !x.Equals(".")));
             }
         }
 
@@ -286,19 +356,19 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// Throws an excpetion when !IsAbsolute
+        /// Throws an exception when !IsAbsolute
         /// </summary>
         /// <returns>Root of the file system, e.g. C: or \\server\share</returns>
         public LPath GetPathRoot()
         {
-            if (IsUnc)
-            {
-                return new LPath(Parts.Take(4));
-            }
-
             if (IsAbsolute)
             {
-                return new LPath(Parts.Take(1));
+                if (IsUnc)
+                {
+                    return new LPath(Prefix, Parts.Skip(2).Take(2));
+                }
+
+                return new LPath(Prefix, Parts.Take(1));
             }
             else
             {
@@ -306,18 +376,26 @@ namespace Sidi.IO
             }
         }
 
+        string Prefix
+        {
+            get
+            {
+                foreach (var p in prefixes)
+                {
+                    if (m_internalPathRepresentation.StartsWith(p))
+                    {
+                        return p;
+                    }
+                }
+                return String.Empty;
+            }
+        }
+
         public bool IsAbsolute
         {
             get
             {
-                if (IsUnc)
-                {
-                    return true;
-                }
-                else
-                {
-                    return this.NoPrefix.Length >= 2 && this.NoPrefix[1].Equals(':');
-                }
+                return prefixes.Any(_ => m_internalPathRepresentation.StartsWith(_));
             }
         }
 
@@ -398,7 +476,7 @@ namespace Sidi.IO
                 }
             }
         }
-
+        
         internal FindData FindData
         {
             get
@@ -418,13 +496,13 @@ namespace Sidi.IO
         {
             get
             {
-                if (this.m_internalPathRepresentation == null)
+                if (this.IsEmpty)
                 {
                     return new string[] { };
                 }
                 else
                 {
-                    return this.m_internalPathRepresentation.Split(DirectorySeparatorChar).ToArray();
+                    return NoPrefix.Split(new[]{DirectorySeparator}, StringSplitOptions.None);
                 }
             }
         }
@@ -475,19 +553,24 @@ namespace Sidi.IO
         
         public LPath CatDir(IEnumerable<string> parts)
         {
-            return new LPath(Parts.Concat(parts));
+            return Join(Parts.Concat(parts));
         }
 
         public LPath CatDir(params object[] parts)
         {
-            return new LPath(
+            return Join(
                 this.Parts.Concat(
                 parts
                 .SafeSelect(p =>
                 {
                     if (p is LPath)
                     {
-                        return ((LPath)p).NoPrefix;
+                        var path = (LPath)p;
+                        if (path.IsAbsolute)
+                        {
+                            throw new ArgumentOutOfRangeException("absolute paths cannot be appended");
+                        }
+                        return path.m_internalPathRepresentation;
                     }
                     else if (p is string)
                     {
@@ -502,7 +585,7 @@ namespace Sidi.IO
 
         public LPath CatName(string namePostfix)
         {
-            return new LPath(this.NoPrefix + namePostfix);
+            return new LPath(this.Param + namePostfix);
         }
 
         public const int MaxFilenameLength = 255;
@@ -606,7 +689,7 @@ namespace Sidi.IO
                 result.Add(p[i]);
             }
 
-            return new LPath(result);
+            return Join(result);
         }
         
         public LPath Parent
@@ -628,7 +711,7 @@ namespace Sidi.IO
                     }
                 }
 
-                return new LPath(p.TakeAllBut(1));
+                return Join(p.TakeAllBut(1));
             }
         }
 
@@ -709,11 +792,20 @@ namespace Sidi.IO
         {
             get
             {
-                if (m_internalPathRepresentation == null)
+                string result;
+                if (RemovePrefix(m_internalPathRepresentation, longUncPrefix, out result))
                 {
-                    return String.Empty;
+                    return shortUncPrefix + result;
                 }
-                return m_internalPathRepresentation;
+                else if (RemovePrefix(m_internalPathRepresentation, longPrefix, out result))
+                {
+                    return result;
+                }
+                else
+                {
+                    result = m_internalPathRepresentation;
+                    return result;
+                }
             }
         }
 
@@ -730,13 +822,9 @@ namespace Sidi.IO
                 {
                     return String.Empty;
                 }
-                else if (m_internalPathRepresentation.StartsWith(shortUncPrefix))
+                else 
                 {
-                    return longUncPrefix + m_internalPathRepresentation.Substring(shortUncPrefix.Length);
-                }
-                else
-                {
-                    return pathPrefix + m_internalPathRepresentation;
+                    return m_internalPathRepresentation;
                 }
             }
         }
@@ -852,7 +940,7 @@ namespace Sidi.IO
                 throw new ArgumentOutOfRangeException("root");
             }
 
-            return new LPath(Parts.Skip(rp.Length));
+            return Join(Parts.Skip(rp.Length));
         }
 
         public bool IsDirectory
