@@ -23,6 +23,7 @@ using System.ComponentModel;
 using Sidi.Util;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+using System.Threading;
 
 namespace Sidi.IO
 {
@@ -32,12 +33,7 @@ namespace Sidi.IO
 
         public static void Delete(LPath path)
         {
-            if (!NativeMethods.DeleteFile(path.Param))
-            {
-                new LFileSystemInfo(path).IsReadOnly = false;
-                NativeMethods.DeleteFile(path.Param).CheckApiCall(path);
-            }
-            log.InfoFormat("Delete {0}", path);
+            FileSystem.Current.DeleteFile(path);
         }
 
         public static void WriteAllText(LPath path, string contents)
@@ -87,107 +83,17 @@ namespace Sidi.IO
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode)
         {
-            var desiredAccess = System.IO.FileAccess.ReadWrite;
-            var shareMode = System.IO.FileShare.None;
-            var lpSecurityAttributes = IntPtr.Zero;
-            var creationDisposition = System.IO.FileMode.Open;
-            var flagsAndAttributes = System.IO.FileAttributes.Normal;
-            var hTemplateFile = IntPtr.Zero;
-            var access = System.IO.FileAccess.Read;
-
-            switch (fileMode)
-            {
-                case System.IO.FileMode.Create:
-                    desiredAccess = System.IO.FileAccess.Write;
-                    creationDisposition = System.IO.FileMode.Create;
-                    access = System.IO.FileAccess.ReadWrite;
-                    break;
-                case System.IO.FileMode.Open:
-                    desiredAccess = System.IO.FileAccess.Read;
-                    creationDisposition = System.IO.FileMode.Open;
-                    access = System.IO.FileAccess.Read;
-                    break;
-                default:
-                    throw new NotImplementedException(fileMode.ToString());
-            }
-
-            SafeFileHandle h;
-            try
-            {
-                h = NativeMethods.CreateFile(
-                    path.Param,
-                    desiredAccess,
-                    shareMode,
-                    lpSecurityAttributes,
-                    creationDisposition,
-                    flagsAndAttributes,
-                    hTemplateFile);
-
-                if (h.IsInvalid)
-                {
-                    throw new Win32Exception();
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
-            }
-
-            return new System.IO.FileStream(h, access);
+            return FileSystem.Current.Open(path, fileMode);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.FileStream Open(
-            LPath path, 
+            LPath fileName, 
             System.IO.FileMode fileMode, 
             System.IO.FileAccess fileAccess,
             System.IO.FileShare shareMode)
         {
-            var lpSecurityAttributes = IntPtr.Zero;
-            var creationDisposition = System.IO.FileMode.Open;
-            var flagsAndAttributes = System.IO.FileAttributes.Normal;
-            var hTemplateFile = IntPtr.Zero;
-            var access = System.IO.FileAccess.Read;
-
-            switch (fileMode)
-            {
-                case System.IO.FileMode.Create:
-                    fileAccess = System.IO.FileAccess.Write;
-                    creationDisposition = System.IO.FileMode.Create;
-                    access = System.IO.FileAccess.ReadWrite;
-                    break;
-                case System.IO.FileMode.Open:
-                    fileAccess = System.IO.FileAccess.Read;
-                    creationDisposition = System.IO.FileMode.Open;
-                    access = System.IO.FileAccess.Read;
-                    break;
-                default:
-                    throw new NotImplementedException(fileMode.ToString());
-            }
-
-            SafeFileHandle h;
-            try
-            {
-                h = NativeMethods.CreateFile(
-                    path.Param,
-                    fileAccess,
-                    shareMode,
-                    lpSecurityAttributes,
-                    creationDisposition,
-                    flagsAndAttributes,
-                    hTemplateFile);
-
-                if (h.IsInvalid)
-                {
-                    throw new Win32Exception();
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
-            }
-
-            return new System.IO.FileStream(h, access);
+            return FileSystem.Current.Open(fileName, fileMode, fileAccess, shareMode);
         }
 
         /// <summary>
@@ -343,34 +249,20 @@ namespace Sidi.IO
             bool overwrite,
             Action<CopyProgress> progressCallback)
         {
-            Int32 pbCancel = 0;
             var progress = new CopyProgress(sourceFileName, destFileName);
 
-            NativeMethods.CopyFileEx(
-                sourceFileName.Param,
-                destFileName.Param,
-                new NativeMethods.CopyProgressRoutine(
-                    (long TotalFileSize,
-            long TotalBytesTransferred,
-            long StreamSize,
-            long StreamBytesTransferred,
-            uint dwStreamNumber,
-            NativeMethods.CopyProgressCallbackReason dwCallbackReason,
-            IntPtr hSourceFile,
-            IntPtr hDestinationFile,
-            IntPtr lpData) =>
+            var p = new Progress<CopyFileProgress>();
+            p.ProgressChanged += (s,e) =>
+                {
+                    progress.Progress.Total = e.TotalFileSize;
+                    if (progress.Progress.Update(e.TotalBytesTransferred))
                     {
-                        progress.Progress.Total = TotalFileSize;
-                        if (progress.Progress.Update(TotalBytesTransferred))
-                        {
-                            progressCallback(progress);
-                        }
-                        return NativeMethods.CopyProgressResult.PROGRESS_CONTINUE;
-                    }),
-            IntPtr.Zero,
-           ref pbCancel,
-           overwrite ? 0 : NativeMethods.CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS)
-            .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
+                        progressCallback(progress);
+                    }
+                };
+
+            CancellationToken ct;
+            FileSystem.Current.CopyFile(sourceFileName, destFileName, null, ct, new CopyFileOptions { FailIfExists = !overwrite });
         }
 
         //

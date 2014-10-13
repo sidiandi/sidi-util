@@ -146,6 +146,7 @@ namespace Sidi.IO
             Assert.IsTrue(j.CatDir(lp.FileName).IsFile);
             j.EnsureNotExists();
             Assert.IsTrue(lp.IsFile);
+            lp.EnsureFileNotExists();
         }
 
         [Test]
@@ -172,17 +173,6 @@ namespace Sidi.IO
             Assert.IsTrue(LDirectory.Exists(dest));
             Assert.IsFalse(LFile.Exists(lp));
             Assert.IsTrue(LDirectory.Exists(root));
-        }
-
-        [Test]
-        public void DeleteReadOnlyFiles()
-        {
-            CreateSampleFile(lp);
-            var info = new LFileSystemInfo(lp);
-            Assert.IsFalse(info.IsReadOnly);
-            info.IsReadOnly = true;
-            Assert.IsTrue(info.IsReadOnly);
-            LFile.Delete(lp);
         }
 
         [Test]

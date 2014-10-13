@@ -82,11 +82,11 @@
     <Compile Include="IO\EnumConfig.cs" />
     <Compile Include="IO\FileListTest.cs" />
     <Compile Include="IO\FileSystemInfo.cs" />
+    <Compile Include="IO\FileSystemTest.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperationTest.cs" />
     <Compile Include="IO\NamespaceCompatibilityTest.cs" />
     <Compile Include="IO\OperationTest.cs" />
     <Compile Include="IO\LPathTest.cs" />
-    <Compile Include="IO\PathExTest.cs" />
     <Compile Include="IO\PathListTest.cs" />
     <Compile Include="IO\PathsTest.cs" />
     <Compile Include="LruBackgroundCache.cs" />
@@ -109,12 +109,14 @@
     <Compile Include="Util\LogScopeTest.cs" />
     <Compile Include="Util\MetricPrefixTest.cs" />
     <Compile Include="Util\ProgressTest.cs" />
+    <Compile Include="Util\Setup.cs" />
     <Compile Include="Util\ShellTest.cs" />
     <Compile Include="Util\SizeCount.cs" />
     <Compile Include="Util\StringExTest.cs" />
     <Compile Include="TokenizerUt.cs" />
     <Compile Include="UpdateCheckTest.cs" />
     <Compile Include="Util\TimeIntervalTest.cs" />
+    <Compile Include="Util\UseInvariantCultureForTest.cs" />
     <Compile Include="Visualization\SimpleTreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTestData.cs" />

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using System.Globalization;
+using System.Threading;
 
 namespace Sidi.Util
 {
-    [TestFixture, SetCulture("en-US")]
+    [TestFixture]
     public class ProgressTest : Sidi.Test.TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -38,7 +40,7 @@ namespace Sidi.Util
 
             var s = p.ToString();
             log.Info(s);
-            Assert.AreEqual("0.0% (1.00/1E+99, rate=31.7n/s, rem=10675199.02:48:05.4775807, eta=12/31/9999 11:59:59 PM)", s);
+            Assert.AreEqual("0.0% (1.00/1E+99, rate=31.7n/s, rem=10675199.02:48:05.4775807, eta=12/31/9999 23:59:59)", s);
         }
 
         [Test]

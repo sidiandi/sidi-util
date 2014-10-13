@@ -191,12 +191,7 @@ namespace Sidi.IO
                 string fileName,
                 string existingFileName)
         {
-            bool result = NativeMethods.CreateHardLink(fileName, existingFileName, IntPtr.Zero);
-            if (!result)
-            {
-                throw new System.IO.IOException(String.Format("Cannot create hard link: {0} -> {1}", fileName, existingFileName));
-            }
+            FileSystem.Current.CreateHardLink(fileName, existingFileName);
         }
-
     }
 }

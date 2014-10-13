@@ -33,6 +33,14 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        FileSystem FS
+        {
+            get
+            {
+                return FileSystem.Current;
+            }
+        }
+        
         static LPath()
         {
             StringComparison = StringComparison.OrdinalIgnoreCase;
@@ -371,7 +379,7 @@ namespace Sidi.IO
                 }
             }
 
-            using (var f = LDirectory.FindFileRaw(this).GetEnumerator())
+            using (var f = FS.FindFileRaw(this).GetEnumerator())
             {
                 if (f.MoveNext())
                 {
@@ -494,7 +502,7 @@ namespace Sidi.IO
 
         public const int MaxFilenameLength = 255;
 
-        const int MaxPathLength = 32000;
+        internal const int MaxPathLength = 32000;
 
         public static bool IsValid(string path)
         {
@@ -864,7 +872,23 @@ namespace Sidi.IO
         {
             if (IsFile)
             {
-                LFile.Delete(this);
+                try
+                {
+                    FS.DeleteFile(this);
+                }
+                catch (IOException)
+                {
+                    var info = Info;
+                    if (Info.IsReadOnly)
+                    {
+                        Info.IsReadOnly = false;
+                        EnsureFileNotExists();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
             if (Exists)
             {
@@ -883,20 +907,20 @@ namespace Sidi.IO
             {
                 try
                 {
-                    LDirectory.Delete(this);
+                    FS.RemoveDirectory(this);
                 }
-                catch (IOException)
+                catch
                 {
                     foreach (var c in this.Children)
                     {
                         c.EnsureNotExists();
                     }
-                    LDirectory.Delete(this);
+                    FS.RemoveDirectory(this);
                 }
             }
             else if (IsFile)
             {
-                LFile.Delete(this);
+                EnsureFileNotExists();
             }
         }
 
@@ -1011,10 +1035,7 @@ namespace Sidi.IO
         {
             get
             {
-                var sb = new StringBuilder(MaxPathLength);
-                NativeMethods.GetVolumePathName(this.Param, sb, (uint) sb.Capacity)
-                    .CheckApiCall(this);
-                return sb.ToString();
+                return FS.GetVolumePath(this);
             }
         }
 

@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <CodeAnalysisRuleSet>..\sidi-util.ruleset</CodeAnalysisRuleSet>
@@ -127,6 +129,7 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperation.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="IO\LPathWriteTime.cs" />
@@ -230,7 +233,6 @@
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
     <Compile Include="Test\TestBase.cs" />
-    <Compile Include="Util\TestFixture.cs" />
     <Compile Include="Util\TileGeometry.cs" />
     <Compile Include="Util\TimeInterval.cs" />
     <Compile Include="Util\TimeIntervalParser.cs" />
