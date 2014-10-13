@@ -235,6 +235,24 @@ namespace Sidi.IO
             Assert.AreEqual(new LPath(@"C:\temp\123\dir"), LPath.Join(p, "dir"));
         }
 
+        static string GetFileNameWhichIsTooLong()
+        {
+            return new string('a', 512);
+        }
+
+        [Test, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void CatDirLong()
+        {
+            var p = TestFile("root");
+            p.CatDir(GetFileNameWhichIsTooLong());
+        }
+
+        [Test]
+        public void CatDirWildCards()
+        {
+            var p = TestFile("root").CatDir("*.*");
+        }
+
         [Test]
         public void GetRelativePath()
         {

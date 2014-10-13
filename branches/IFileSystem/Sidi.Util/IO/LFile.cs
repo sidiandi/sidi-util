@@ -307,14 +307,12 @@ namespace Sidi.IO
         //     sourceFileName or destFileName is in an invalid format.
         public static void Move(LPath sourceFileName, LPath destFileName)
         {
-            NativeMethods.MoveFileEx(sourceFileName.Param, destFileName.Param, 0)
-                .CheckApiCall(String.Format("{0} -> {1}", sourceFileName, destFileName));
+            FileSystem.Current.Move(sourceFileName, destFileName);
         }
 
         public static void CreateHardLink(LPath fileName, LPath existingFileName)
         {
-            NativeMethods.CreateHardLink(fileName.Param, existingFileName.Param, IntPtr.Zero)
-                .CheckApiCall(String.Format("{0} -> {1}", fileName, existingFileName));
+            FileSystem.Current.CreateHardLink(fileName, existingFileName);
         }
 
         public static void CopyOrHardLink(LPath source, LPath destination)

@@ -202,6 +202,11 @@ namespace Sidi.IO
         public LPath(IEnumerable<string> parts)
         : this(parts.Join(DirectorySeparator))
         {
+            var invalidFileName = parts.Skip(1).FirstOrDefault(p => !IsValidFilenameWithWildcards(p));
+            if (invalidFileName != null)
+            {
+                throw new ArgumentOutOfRangeException("parts", String.Format("{0} is not a valid file name.", invalidFileName));
+            }
         }
 
         public static LPath Join(params string[] parts)
@@ -476,7 +481,7 @@ namespace Sidi.IO
         public LPath CatDir(params object[] parts)
         {
             return new LPath(
-                new string[] { this.NoPrefix }.Concat(
+                this.Parts.Concat(
                 parts
                 .SafeSelect(p =>
                 {
