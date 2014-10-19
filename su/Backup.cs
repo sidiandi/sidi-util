@@ -91,14 +91,11 @@ namespace Sidi.Tool
 
             ConfigFile.EnsureParentDirectoryExists();
 
-            using (var c = LFile.Open(ConfigFile, System.IO.FileMode.Create))
+            using (var w = ConfigFile.WriteText())
             {
-                using (var w = new System.IO.StreamWriter(c))
-                {
-                    w.WriteLine(@"Include {0}
+                w.WriteLine(@"Include {0}
 ", System.Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).Quote());
 
-                }
             }
         }
 
@@ -279,7 +276,7 @@ namespace Sidi.Tool
 
                 b.Store = root;
 
-                using (var w = LFile.TextWriter(b.ConfigFile))
+                using (var w = b.ConfigFile.WriteText())
                 {
                     w.WriteLine("Include {0}", Sidi.IO.Paths.BinDir);
                     w.WriteLine("Exclude test");

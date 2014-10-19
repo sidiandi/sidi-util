@@ -240,14 +240,14 @@ namespace Sidi.Caching
         {
             var content = "hello";
             var file = TestFile("file-with-content");
-            LFile.WriteAllText(file, content);
+            file.WriteAllText(content);
             var cache = SqliteCache.Local(MethodBase.GetCurrentMethod());
             {
-                var readContent = cache.GetCached(new LPathWriteTime(file), _ => LFile.ReadAllText(_.Path));
+                var readContent = cache.GetCached(new LPathWriteTime(file), _ => _.Path.ReadAllText());
                 Assert.AreEqual(content, readContent);
                 content = "new content";
-                LFile.WriteAllText(file, content);
-                readContent = cache.GetCached(new LPathWriteTime(file), _ => LFile.ReadAllText(_.Path));
+                file.WriteAllText(content);
+                readContent = cache.GetCached(new LPathWriteTime(file), _ => _.Path.ReadAllText());
                 Assert.AreEqual(content, readContent);
 
                 Assert.IsTrue(cache.IsCached(new LPathWriteTime(file)));

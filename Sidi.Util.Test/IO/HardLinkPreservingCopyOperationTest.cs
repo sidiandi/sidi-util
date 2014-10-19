@@ -44,7 +44,7 @@ namespace Sidi.IO
             sourceDir.EnsureNotExists();
             sourceDir.EnsureDirectoryExists();
             var f = sourceDir.CatDir("orig");
-            LFile.WriteAllText(f, "hello");
+            f.WriteAllText("hello");
             for (int i = 0; i < count; ++i)
             {
                 LFile.CreateHardLink(f.CatName(i.ToString()), f);

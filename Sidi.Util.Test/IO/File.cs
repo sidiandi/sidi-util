@@ -76,13 +76,10 @@ namespace Sidi.IO
 
         public void CreateSampleFile(LPath lp)
         {
-            using (var f = LFile.Open(lp, System.IO.FileMode.Create))
-            {
-                using (var o = new System.IO.StreamWriter(f))
+                using (var o = lp.WriteText())
                 {
                     o.WriteLine("Hello");
                 }
-            }
         }
 
         [Test]
@@ -101,7 +98,7 @@ namespace Sidi.IO
         {
             var bigSampleFile = root.CatDir("big");
 
-            using (var f = LFile.Open(bigSampleFile, System.IO.FileMode.Create))
+            using (var f = bigSampleFile.OpenWrite())
             {
                 var b = new byte[1024 * 1024];
                 for (int i = 0; i < 100; ++i)
@@ -182,7 +179,7 @@ namespace Sidi.IO
             Assert.IsFalse(info.IsReadOnly);
             info.IsReadOnly = true;
             Assert.IsTrue(info.IsReadOnly);
-            LFile.Delete(lp);
+            lp.DeleteFile();
         }
 
         [Test]
@@ -194,7 +191,7 @@ namespace Sidi.IO
             LFile.Copy(f1, f2);
             Assert.IsTrue(LFile.EqualByContent(f1, f2));
 
-            using (var s = LFile.Open(f2, System.IO.FileMode.Create))
+            using (var s = f2.OpenWrite())
             {
                 s.WriteByte(0);
             }
@@ -208,8 +205,8 @@ namespace Sidi.IO
             var d = this.TestFile("Long").CatDir("blablabla");
             d.EnsureNotExists();
             var p = d.CatDir(".moviesidi");
-            LFile.WriteAllText(p, "hello");
-            Assert.AreEqual("hello", LFile.ReadAllText(p));
+            p.WriteAllText("hello");
+            Assert.AreEqual("hello", p.ReadAllText());
             d.EnsureNotExists();
         }
 
@@ -218,19 +215,19 @@ namespace Sidi.IO
         {
             var text = "world";
             var d = this.TestFile("Long").CatDir("234234", "23443", "blablabla");
-            using (var s = LFile.StreamWriter(d))
+            using (var s = d.WriteText())
             {
                 s.WriteLine("hello");
             }
-            using (var s = LFile.StreamWriter(d))
+            using (var s = d.WriteText())
             {
                 s.Write(text);
             }
-            using (var s = LFile.StreamReader(d))
+            using (var s = d.ReadText())
             {
                 Assert.AreEqual(text, s.ReadToEnd());
             }
-            Assert.AreEqual(text, LFile.ReadAllText(d));
+            Assert.AreEqual(text, d.ReadAllText());
         }
 
         [Test]
@@ -267,7 +264,7 @@ namespace Sidi.IO
         public void CannotDelete()
         {
             var p = TestFile("delete_me");
-            using (var w = LFile.StreamWriter(p))
+            using (var w = p.WriteText())
             {
                 try
                 {
@@ -292,7 +289,7 @@ namespace Sidi.IO
             a.EnsureDirectoryExists();
             var b = root.CatDir("b");
             var c = b.CatDir("c");
-            LFile.WriteAllText(c, "hello");
+            c.WriteAllText("hello");
             JunctionPoint.Create(a.CatDir("b"), b);
             a.EnsureNotExists();
             Assert.IsTrue(b.IsDirectory);

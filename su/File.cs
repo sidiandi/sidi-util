@@ -170,10 +170,7 @@ namespace Sidi.Tool
             if (LDirectory.Exists(path))
             {
                 var thumbs = path.CatDir("Thumbs.db");
-                if (thumbs.Exists)
-                {
-                    LFile.Delete(thumbs);
-                }
+                thumbs.EnsureFileNotExists();
                 foreach (var d in path.GetDirectories())
                 {
                     RemoveEmptyDirectories(d);
@@ -204,7 +201,7 @@ namespace Sidi.Tool
                     }
                     else
                     {
-                        LFile.Delete(path);
+                        path.DeleteFile();
                     }
                 }
                 catch (Exception ex)

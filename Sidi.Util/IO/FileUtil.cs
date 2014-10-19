@@ -106,9 +106,9 @@ namespace Sidi.IO
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static bool FilesAreEqual(string a, string b)
+        public static bool FilesAreEqual(LPath a, LPath b)
         {
-            if (LFile.Exists(a))
+            if (a.IsFile)
             {
                 if (LFile.Exists(b))
                 {
@@ -123,8 +123,8 @@ namespace Sidi.IO
                     Stream fb = null;
                     try
                     {
-                        fa = LFile.OpenRead(a);
-                        fb = LFile.OpenRead(b);
+                        fa = a.OpenRead();
+                        fb = b.OpenRead();
                         int da;
                         int db;
                         do

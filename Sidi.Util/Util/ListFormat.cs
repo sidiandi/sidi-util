@@ -201,9 +201,9 @@ namespace Sidi.Util
         public IList<Column> Columns = new List<Column>();
         public string ColumnSeparator = "|";
 
-        public void RenderText()
+        public ListFormat<T> RenderText()
         {
-            RenderText(Console.Out);
+            return RenderText(Console.Out);
         }
 
         public ListFormat<T> DefaultColumns()
@@ -229,7 +229,7 @@ namespace Sidi.Util
             return this;
         }
 
-        public void RenderText(TextWriter o)
+        public ListFormat<T> RenderText(TextWriter o)
         {
             DefaultColumns();
 
@@ -280,6 +280,8 @@ namespace Sidi.Util
             {
                 RenderMultiLine(o, rowData, columnFormat);
             }
+
+            return this;
         }
 
         public override string ToString()
@@ -292,7 +294,7 @@ namespace Sidi.Util
             }
         }
 
-        public void RenderDetails(TextWriter o)
+        public ListFormat<T> RenderDetails(TextWriter o)
         {
             DefaultColumns();
 
@@ -310,6 +312,8 @@ namespace Sidi.Util
                 }
                 o.WriteLine();
             }
+
+            return this;
         }
 
         void RenderMultiLine(TextWriter o, string[] rowData, string[] columnFormat)

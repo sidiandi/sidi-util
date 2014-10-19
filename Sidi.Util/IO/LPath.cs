@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.IO;
+using Microsoft.Win32.SafeHandles;
 
 namespace Sidi.IO
 {
@@ -37,13 +38,25 @@ namespace Sidi.IO
         {
             StringComparison = StringComparison.OrdinalIgnoreCase;
         }
+
+        static FileSystem s_fileSystem = new FileSystem();
+        
+        static FileSystem FileSystem
+        {
+            get
+            {
+                return s_fileSystem;
+            }
+        }
         
         string m_internalPathRepresentation;
+
+        public const string DirectorySeparator = @"\";
+        public const string ExtensionSeparator = ".";
 
         const string pathPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
         const string shortUncPrefix = @"\\";
-        public const string ExtensionSeparator = ".";
 
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
@@ -70,12 +83,12 @@ namespace Sidi.IO
 
         public static LPath GetTempFileName()
         {
-            return new LPath(System.IO.Path.GetTempFileName());
+            return FileSystem.GetTempFileName();
         }
 
         public static LPath GetTempPath()
         {
-            return new LPath(System.IO.Path.GetTempPath());
+            return FileSystem.GetTempPath();
         }
 
         public string Quote()
@@ -222,20 +235,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public LPath UniqueFileName()
         {
-            if (!Exists)
-            {
-                return this;
-            }
-
-            for (int i = 1; i < 1000; ++i)
-            {
-                var u = Parent.CatDir(JoinFileName(new string[] { FileNameWithoutExtension, i.ToString(), ExtensionWithoutDot }));
-                if (!u.Exists)
-                {
-                    return u;
-                }
-            }
-            throw new System.IO.IOException(String.Format("{0} cannot be made unique.", this));
+            return FileSystem.GetNonExistingFileName(this);
         }
 
         /// <summary>
@@ -420,7 +420,7 @@ namespace Sidi.IO
         {
             get
             {
-                return new LFileSystemInfo(this.GetFullPath());
+                return FileSystem.GetInfo(this);
             }
         }
 
@@ -444,7 +444,7 @@ namespace Sidi.IO
             else
             {
                 // concat with current directory
-                full = LDirectory.Current.CatDir(this);
+                full = FileSystem.CurrentDirectory.CatDir(this);
             }
 
             full = full.Canonic;
@@ -494,7 +494,7 @@ namespace Sidi.IO
 
         public const int MaxFilenameLength = 255;
 
-        const int MaxPathLength = 32000;
+        public static readonly int MaxPathLength = 32000;
 
         public static bool IsValid(string path)
         {
@@ -677,7 +677,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static IList<LPath> Get(LPath searchPath)
         {
-            return LDirectory.FindFile(searchPath)
+            return FileSystem.FindFile(searchPath)
                 .Select(x => x.FullName)
                 .ToList();
         }
@@ -689,8 +689,6 @@ namespace Sidi.IO
                 return GetFullPath().Parts.Last();
             }
         }
-
-        public const string DirectorySeparator = @"\";
 
         public string NoPrefix
         {
@@ -836,7 +834,7 @@ namespace Sidi.IO
 
             if (!rp.SequenceEqual(p.Take(rp.Length), partComparer))
             {
-                throw new ArgumentOutOfRangeException("root");
+                throw new ArgumentOutOfRangeException(String.Format("{0} and {1} do not have a common root.", this, root));
             }
 
             return new LPath(Parts.Skip(rp.Length));
@@ -864,7 +862,7 @@ namespace Sidi.IO
         {
             if (IsFile)
             {
-                LFile.Delete(this);
+                FileSystem.DeleteFile(this);
             }
             if (Exists)
             {
@@ -883,7 +881,7 @@ namespace Sidi.IO
             {
                 try
                 {
-                    LDirectory.Delete(this);
+                    DeleteDirectory();
                 }
                 catch (IOException)
                 {
@@ -891,13 +889,23 @@ namespace Sidi.IO
                     {
                         c.EnsureNotExists();
                     }
-                    LDirectory.Delete(this);
+                    DeleteDirectory();
                 }
             }
             else if (IsFile)
             {
-                LFile.Delete(this);
+                DeleteFile();
             }
+        }
+
+        public void DeleteDirectory()
+        {
+            FileSystem.DeleteDirectory(this);
+        }
+
+        public void DeleteFile()
+        {
+            FileSystem.DeleteFile(this);
         }
 
         public void EnsureParentDirectoryExists()
@@ -907,9 +915,9 @@ namespace Sidi.IO
 
         public void EnsureDirectoryExists()
         {
-            if (!LDirectory.Exists(this))
+            if (!this.IsDirectory)
             {
-                LDirectory.Create(this);
+                FileSystem.CreateDirectory(this);
             }
         }
 
@@ -1011,18 +1019,23 @@ namespace Sidi.IO
         {
             get
             {
-                var sb = new StringBuilder(MaxPathLength);
-                NativeMethods.GetVolumePathName(this.Param, sb, (uint) sb.Capacity)
-                    .CheckApiCall(this);
-                return sb.ToString();
+                return Info.VolumePath;
             }
         }
 
+        /// <summary>
+        /// Returns a TextWriter to write to this file
+        /// </summary>
+        /// <returns></returns>
         public System.IO.StreamWriter WriteText()
         {
             return new System.IO.StreamWriter(OpenWrite());
         }
 
+        /// <summary>
+        /// Returns a TextReader to read from this file
+        /// </summary>
+        /// <returns></returns>
         public System.IO.StreamReader ReadText()
         {
             return new System.IO.StreamReader(OpenRead());
@@ -1034,12 +1047,28 @@ namespace Sidi.IO
         /// <returns></returns>
         public System.IO.Stream OpenWrite()
         {
-            return LFile.OpenWrite(this); 
+            return FileSystem.OpenWrite(this);
         }
 
         public System.IO.Stream OpenRead()
         {
-            return LFile.OpenRead(this);
+            return FileSystem.OpenRead(this);
+        }
+
+        public void WriteAllText(string contents)
+        {
+            using (var w = WriteText())
+            {
+                w.Write(contents);
+            }
+        }
+
+        public string ReadAllText()
+        {
+            using (var r = ReadText())
+            {
+                return r.ReadToEnd();
+            }
         }
 
         /// <summary>
@@ -1069,7 +1098,7 @@ namespace Sidi.IO
 
         public static LPath GetRandomFileName()
         {
-            return new LPath(System.IO.Path.GetRandomFileName());
+            return FileSystem.GetRandomFileName();
         }
     }
 }

@@ -94,12 +94,6 @@ namespace Sidi.CommandLine
         }
 
         [Test]
-        public void DateTimeParsing()
-        {
-            var rep = "18.04.2013 03:35:04";
-        }
-
-        [Test]
         public void PathList()
         {
             var p = new Parser();

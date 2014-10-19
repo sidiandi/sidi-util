@@ -238,7 +238,7 @@ namespace Sidi.IO
                 {
                     try
                     {
-                        Sidi.IO.LFile.Delete(i);
+                        i.EnsureFileNotExists();
                     }
                     catch (System.UnauthorizedAccessException)
                     {
@@ -249,7 +249,7 @@ namespace Sidi.IO
                         {
                             info.IsReadOnly = false;
                         }
-                        Sidi.IO.LFile.Delete(i);
+                        i.EnsureFileNotExists();
                     }
                 }
             }
