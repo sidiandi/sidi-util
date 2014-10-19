@@ -11,7 +11,7 @@
     <description>Collection of general purpose .NET utility classes</description>
     <releaseNotes>
     </releaseNotes>
-    <copyright>Copyright 2012-2013 Andreas Grimme</copyright>
+    <copyright>Copyright 2012-2014 Andreas Grimme</copyright>
     <tags>
     </tags>
     <dependencies>
@@ -26,12 +26,10 @@
     <file src="Sidi.Util.dll" target="lib\net40" />
     <file src="Sidi.Util.pdb" target="lib\net40" />
     <file src="Sidi.Util.xml" target="lib\net40" />
-    <file src="$RootDir$\Sidi.Util\**" target="src\Sidi.Util" />
     
     <file src="Sidi.Office.dll" target="lib\net40" />
     <file src="Sidi.Office.pdb" target="lib\net40" />
     <file src="Sidi.Office.xml" target="lib\net40" />
-    <file src="$RootDir$\Sidi.Office\**" target="src\Sidi.Office" />
 
     <file src="su.exe" target="tools" />
     
