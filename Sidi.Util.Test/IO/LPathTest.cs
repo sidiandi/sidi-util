@@ -26,6 +26,7 @@ using Sidi.Extensions;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Sidi.Test;
+using System.Diagnostics;
 
 namespace Sidi.IO
 {
@@ -82,21 +83,13 @@ namespace Sidi.IO
             var p = ln.Parts;
             Assert.AreEqual(pCount, p.Count());
             Assert.AreEqual(part, p[0]);
-
-            Assert.AreEqual(0, LPath.Empty.Parts.Length);
         }
 
         [Test]
         public void Parent()
         {
-            Assert.AreEqual(LPath.Empty, new LPath(@"a").Parent);
+            Assert.AreEqual(null, new LPath(@"a").Parent);
             Assert.AreEqual(new LPath(@"a"), new LPath(@"a\b").Parent);
-        }
-
-        [Test]
-        public void ParentOfEmpty()
-        {
-            Assert.IsTrue(LPath.Empty.Parent == null);
         }
 
         [Test]
@@ -126,7 +119,7 @@ namespace Sidi.IO
             tempDir = longNameUnc.NoPrefix;
             Assert.IsTrue(System.IO.Directory.Exists(tempDir));
 
-            for (var i = longNameUnc; !i.IsEmpty; i = i.Parent)
+            for (var i = longNameUnc; i != null; i = i.Parent)
             {
                 Console.WriteLine(i);
                 Console.WriteLine(i.Parts.Join("|"));
@@ -166,7 +159,7 @@ namespace Sidi.IO
             var n = new LPath(@"C:\temp\abc.txt");
             var root = new LPath(@"C:\Temp");
             Assert.AreEqual(new LPath("abc.txt"), n.RelativeTo(root));
-            Assert.AreEqual(new LPath(), n.RelativeTo(n));
+            Assert.AreEqual(new LPath(@"..\abc.txt"), n.RelativeTo(n));
         }
 
         [Test]
@@ -175,9 +168,9 @@ namespace Sidi.IO
             Assert.IsTrue(LPath.IsValid(@"C:\temp"));
         }
 
-        void TestXmlSerialize(LPath n)
+        static void TestXmlSerialize<T>(T n)
         {
-            var s = new XmlSerializer(typeof(LPath));
+            var s = new XmlSerializer(typeof(T));
             var t = new System.IO.StringWriter();
             s.Serialize(t, n);
             log.Info(t.ToString());
@@ -188,8 +181,13 @@ namespace Sidi.IO
         [Test]
         public void XmlSerialize()
         {
-            TestXmlSerialize(LPath.Empty);
             TestXmlSerialize(Sidi.IO.LPath.GetTempPath());
+        }
+
+        [Test, Explicit("todo")]
+        public void XmlSerializeNull()
+        {
+            TestXmlSerialize<LPath>(null);
         }
 
         [Test]
@@ -424,8 +422,7 @@ namespace Sidi.IO
             Assert.AreEqual(x.Equals(y), y.Equals(x));
             Assert.IsFalse(x.Equals(null));
 
-            Assert.IsTrue(LPath.Empty.Equals(LPath.Empty));
-            Assert.IsFalse(LPath.Empty.Equals(x));
+            Assert.IsFalse(object.Equals(null, x));
 
             Assert.AreEqual(new LPath("a"), new LPath(@"A"));
         }
