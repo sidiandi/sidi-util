@@ -13,7 +13,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartArguments>$(TargetDir)Sidi.Util.Test.dll</StartArguments>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\work\nuget-packages\NUnit.Runners.2.6.2\tools\nunit-x86.exe</StartProgram>
+    <StartProgram>C:\work\nuget-packages\NUnit.Runners.2.6.3\tools\nunit.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory />
