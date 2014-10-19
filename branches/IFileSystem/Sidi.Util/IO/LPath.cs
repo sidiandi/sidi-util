@@ -182,7 +182,7 @@ namespace Sidi.IO
             
         }
 
-        public LPath()
+        LPath()
         {
             m_internalPathRepresentation = null;
         }
@@ -281,7 +281,7 @@ namespace Sidi.IO
             var s = parts.Join(DirectorySeparator);
             if (String.IsNullOrEmpty(s))
             {
-                return LPath.Empty;
+                return null;
             }
             else
             {
@@ -496,14 +496,7 @@ namespace Sidi.IO
         {
             get
             {
-                if (this.IsEmpty)
-                {
-                    return new string[] { };
-                }
-                else
-                {
-                    return NoPrefix.Split(new[]{DirectorySeparator}, StringSplitOptions.None);
-                }
+                return NoPrefix.Split(new[]{DirectorySeparator}, StringSplitOptions.None);
             }
         }
 
@@ -639,7 +632,7 @@ namespace Sidi.IO
         {
             if (newExtension == null)
             {
-                return Parent.CatDir(FileNameWithoutExtension);
+                newExtension = String.Empty;
             }
             else
             {
@@ -647,8 +640,11 @@ namespace Sidi.IO
                 {
                     newExtension = ExtensionSeparator + newExtension;
                 }
-                return Parent.CatDir(FileNameWithoutExtension + newExtension);
             }
+
+            var p = Parts;
+            p[p.Length - 1] = FileNameWithoutExtension + newExtension;
+            return Join(p);
         }
 
         public LPath Sibling(string siblingName)
@@ -696,18 +692,20 @@ namespace Sidi.IO
         {
             get
             {
-                if (IsEmpty)
-                {
-                    return null;
-                }
-
                 var p = Parts;
 
                 if (IsUnc)
                 {
                     if (p.Length <= 4)
                     {
-                        return LPath.Empty;
+                        return null;
+                    }
+                }
+                else
+                {
+                    if (p.Length <= 1)
+                    {
+                        return null;
                     }
                 }
 
@@ -719,7 +717,7 @@ namespace Sidi.IO
         {
             get
             {
-                for (var i = this; !i.IsEmpty; i = i.Parent)
+                for (var i = this; i != null; i = i.Parent)
                 {
                     yield return i;
                 }
@@ -876,23 +874,8 @@ namespace Sidi.IO
 
         static public StringComparison StringComparison { get; private set; }
 
-        public static LPath Empty
-        {
-            get
-            {
-                return empty;
-            }
-        }
         static LPath empty = new LPath();
 
-        public bool IsEmpty
-        {
-            get
-            {
-                return this.Equals(Empty);
-            }
-        }
-        
         public override bool Equals(object obj)
         {
             var r = obj as LPath;
@@ -940,7 +923,16 @@ namespace Sidi.IO
                 throw new ArgumentOutOfRangeException("root");
             }
 
-            return Join(Parts.Skip(rp.Length));
+            var difference = Parts.Skip(rp.Length);
+
+            if (difference.Any())
+            {
+                return Join(difference);
+            }
+            else
+            {
+                return Join(new[] { "..", this.FileName });
+            }
         }
 
         public bool IsDirectory
