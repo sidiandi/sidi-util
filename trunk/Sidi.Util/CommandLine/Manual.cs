@@ -16,7 +16,7 @@ namespace Sidi.CommandLine
         {
             var file = Paths.Temp.CatDir(LPath.GetValidFilename(p.ApplicationName)).CatName(".html");
             var m = new Manual();
-            using (var w = LFile.StreamWriter(file))
+            using (var w = file.WriteText())
             {
                 m.Write(w, () => m.Page(p));
             }

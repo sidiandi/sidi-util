@@ -269,7 +269,7 @@ namespace Sidi.IO
         public void EnsureNotExists()
         {
             var tf = NewTestFile("file-to-delete");
-            LFile.WriteAllText(tf, "hello");
+            tf.WriteAllText("hello");
             tf.EnsureFileNotExists();
             Assert.IsFalse(tf.Exists);
         }
@@ -296,13 +296,13 @@ namespace Sidi.IO
 
             Assert.AreEqual(p, p.Parent.CatDir(LPath.JoinFileName(p.FileNameParts)));
             p.EnsureNotExists();
-            LFile.WriteAllText(p, "hello");
+            p.WriteAllText("hello");
             for (int i = 0; i < 10; ++i)
             {
                 var p1 = p.UniqueFileName();
                 log.Info(p1);
                 Assert.IsFalse(p1.Exists);
-                LFile.WriteAllText(p1, "hello");
+                p1.WriteAllText("hello");
                 Assert.IsTrue(p1.IsFile);
             }
         }

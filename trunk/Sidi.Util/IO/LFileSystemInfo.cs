@@ -375,5 +375,15 @@ namespace Sidi.IO
                 throw new ArgumentException("obj is not of type LFileSystemInfo", ex);
             }
         }
+
+        public LPath VolumePath
+        {
+            get
+            {
+                var sb = new StringBuilder(LPath.MaxPathLength);
+                NativeMethods.GetVolumePathName(this.FullName.Param, sb, (uint)sb.Capacity).CheckApiCall(this.FullName);
+                return new LPath(sb.ToString());
+            }
+        }
     }
 }

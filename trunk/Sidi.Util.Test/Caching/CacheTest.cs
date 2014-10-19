@@ -198,7 +198,7 @@ namespace Sidi.Caching
             var file = c.GetCachedFile(key, () =>
                 {
                     var f = TestFile("hello");
-                    LFile.WriteAllText(f, "hello");
+                    f.WriteAllText("hello");
                     return f;
                 });
 
@@ -207,7 +207,7 @@ namespace Sidi.Caching
             log.Info(c.GetCachedFile(key, () =>
                 {
                     var f = TestFile("hello");
-                    LFile.WriteAllText(f, "hello");
+                    f.WriteAllText("hello");
                     return f;
                 }));
         }
@@ -217,13 +217,13 @@ namespace Sidi.Caching
         {
             var content = "hello";
             var file = TestFile("file-with-content");
-            LFile.WriteAllText(file, content);
+            file.WriteAllText(content);
             var cache = Cache.Local(MethodBase.GetCurrentMethod());
-            var readContent = cache.ReadFile(file, path => LFile.ReadAllText(path));
+            var readContent = cache.ReadFile(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
             content = "new content";
-            LFile.WriteAllText(file, content);
-            readContent = cache.ReadFile(file, path => LFile.ReadAllText(path));
+            file.WriteAllText(content);
+            readContent = cache.ReadFile(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
 
             Assert.IsTrue(cache.IsCached(file.Info));

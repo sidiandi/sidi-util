@@ -132,7 +132,7 @@ namespace Sidi.IO
                 {
                     if (to.IsFile)
                     {
-                        LFile.Delete(to);
+                        to.DeleteFile();
                     }
                 }
                 LFile.CreateHardLink(to, from);
@@ -237,46 +237,7 @@ namespace Sidi.IO
         /// <param name="tree"></param>
         public void Delete(LPath tree)
         {
-            Count = 0;
-            DeleteInternal(tree);
-        }
-
-        /// <summary>
-        /// Deletes file or directory tree and all files and subdirectories below.
-        /// </summary>
-        /// <param name="tree"></param>
-        public void DeleteInternal(LPath tree)
-        {
-            if (tree.IsDirectory)
-            {
-                foreach (var c in tree.Children)
-                {
-                    DeleteInternal(c);
-                }
-            }
-            DeleteElement(tree);
-        }
-
-        void DeleteElement(LPath path)
-        {
-            if (path.IsDirectory)
-            {
-                log.InfoFormat("{0}delete directory {1}", this, path);
-                if (!Simulate)
-                {
-                    Count++;
-                    LDirectory.Delete(path);
-                }
-            }
-            else if (path.IsFile)
-            {
-                log.InfoFormat("{0}delete file {1}", this, path);
-                if (!Simulate)
-                {
-                    Count++;
-                    LFile.Delete(path);
-                }
-            }
+            tree.EnsureNotExists();
         }
 
         public override string ToString()

@@ -82,7 +82,7 @@ namespace Sidi.Imap
             {
                 if (_Message == null)
                 {
-                    using (var r = LFile.Open(fileInfo.FullName, System.IO.FileMode.Open))
+                    using (var r = fileInfo.FullName.OpenRead())
                     {
                         _Message = Rfc822Message.Parse(new System.IO.StreamReader(r));
                     }

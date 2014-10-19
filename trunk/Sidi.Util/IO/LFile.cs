@@ -30,45 +30,6 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void Delete(LPath path)
-        {
-            if (!NativeMethods.DeleteFile(path.Param))
-            {
-                new LFileSystemInfo(path).IsReadOnly = false;
-                NativeMethods.DeleteFile(path.Param).CheckApiCall(path);
-            }
-            log.InfoFormat("Delete {0}", path);
-        }
-
-        public static void WriteAllText(LPath path, string contents)
-        {
-            using (var w = StreamWriter(path))
-            {
-                w.Write(contents);
-            }
-        }
-
-        public static string ReadAllText(LPath path)
-        {
-            using (var r = StreamReader(path))
-            {
-                return r.ReadToEnd();
-            }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamReader StreamReader(LPath path)
-        {
-            var s = OpenRead(path);
-            return new System.IO.StreamReader(s);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamWriter StreamWriter(LPath path)
-        {
-            return new System.IO.StreamWriter(OpenWrite(path));
-        }
-
         public static bool Exists(LPath path)
         {
             using (var f = LDirectory.FindFile(path).GetEnumerator())
@@ -82,163 +43,6 @@ namespace Sidi.IO
                     return false;
                 }
             }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode)
-        {
-            var desiredAccess = System.IO.FileAccess.ReadWrite;
-            var shareMode = System.IO.FileShare.None;
-            var lpSecurityAttributes = IntPtr.Zero;
-            var creationDisposition = System.IO.FileMode.Open;
-            var flagsAndAttributes = System.IO.FileAttributes.Normal;
-            var hTemplateFile = IntPtr.Zero;
-            var access = System.IO.FileAccess.Read;
-
-            switch (fileMode)
-            {
-                case System.IO.FileMode.Create:
-                    desiredAccess = System.IO.FileAccess.Write;
-                    creationDisposition = System.IO.FileMode.Create;
-                    access = System.IO.FileAccess.ReadWrite;
-                    break;
-                case System.IO.FileMode.Open:
-                    desiredAccess = System.IO.FileAccess.Read;
-                    creationDisposition = System.IO.FileMode.Open;
-                    access = System.IO.FileAccess.Read;
-                    break;
-                default:
-                    throw new NotImplementedException(fileMode.ToString());
-            }
-
-            SafeFileHandle h;
-            try
-            {
-                h = NativeMethods.CreateFile(
-                    path.Param,
-                    desiredAccess,
-                    shareMode,
-                    lpSecurityAttributes,
-                    creationDisposition,
-                    flagsAndAttributes,
-                    hTemplateFile);
-
-                if (h.IsInvalid)
-                {
-                    throw new Win32Exception();
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
-            }
-
-            return new System.IO.FileStream(h, access);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.FileStream Open(
-            LPath path, 
-            System.IO.FileMode fileMode, 
-            System.IO.FileAccess fileAccess,
-            System.IO.FileShare shareMode)
-        {
-            var lpSecurityAttributes = IntPtr.Zero;
-            var creationDisposition = System.IO.FileMode.Open;
-            var flagsAndAttributes = System.IO.FileAttributes.Normal;
-            var hTemplateFile = IntPtr.Zero;
-            var access = System.IO.FileAccess.Read;
-
-            switch (fileMode)
-            {
-                case System.IO.FileMode.Create:
-                    fileAccess = System.IO.FileAccess.Write;
-                    creationDisposition = System.IO.FileMode.Create;
-                    access = System.IO.FileAccess.ReadWrite;
-                    break;
-                case System.IO.FileMode.Open:
-                    fileAccess = System.IO.FileAccess.Read;
-                    creationDisposition = System.IO.FileMode.Open;
-                    access = System.IO.FileAccess.Read;
-                    break;
-                default:
-                    throw new NotImplementedException(fileMode.ToString());
-            }
-
-            SafeFileHandle h;
-            try
-            {
-                h = NativeMethods.CreateFile(
-                    path.Param,
-                    fileAccess,
-                    shareMode,
-                    lpSecurityAttributes,
-                    creationDisposition,
-                    flagsAndAttributes,
-                    hTemplateFile);
-
-                if (h.IsInvalid)
-                {
-                    throw new Win32Exception();
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
-            }
-
-            return new System.IO.FileStream(h, access);
-        }
-
-        /// <summary>
-        /// Ensures that parent directory exists and opens file for writing
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static System.IO.FileStream OpenWrite(LPath path)
-        {
-            try
-            {
-                return Open(path,
-                    System.IO.FileMode.Create,
-                    System.IO.FileAccess.ReadWrite,
-                    System.IO.FileShare.Read);
-            }
-            catch (System.IO.IOException)
-            {
-                if (!path.Parent.IsDirectory)
-                {
-                    path.EnsureParentDirectoryExists();
-                    return Open(path,
-                        System.IO.FileMode.Create,
-                        System.IO.FileAccess.ReadWrite,
-                        System.IO.FileShare.Read);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        public static System.IO.FileStream OpenRead(LPath path)
-        {
-            return Open(path,
-                System.IO.FileMode.Open,
-                System.IO.FileAccess.Read,
-                System.IO.FileShare.ReadWrite);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamWriter TextWriter(LPath p)
-        {
-            return new System.IO.StreamWriter(Open(p, System.IO.FileMode.Create));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.StreamReader TextReader(LPath p)
-        {
-            return new System.IO.StreamReader(Open(p, System.IO.FileMode.Open));
         }
 
         //
@@ -502,9 +306,9 @@ namespace Sidi.IO
             byte[] b1 = new byte[bufSize];
             byte[] b2 = new byte[bufSize];
 
-            using (var s1 = Open(f1, System.IO.FileMode.Open))
+            using (var s1 = f1.OpenRead())
             {
-                using (var s2 = Open(f2, System.IO.FileMode.Open))
+                using (var s2 = f2.OpenRead())
                 {
                     int readCount = s1.Read(b1, 0, bufSize);
                     if (readCount != s2.Read(b2, 0, bufSize))
