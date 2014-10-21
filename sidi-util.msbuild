@@ -20,9 +20,9 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   <PropertyGroup>
         <ProjectName>sidi-util</ProjectName>
         <Major>2</Major>
-        <Minor>6</Minor>
+        <Minor>7</Minor>
         <Build>0</Build>
-		<InitialRevision>1114</InitialRevision>
+		<InitialRevision>1158</InitialRevision>
 		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\packages</MSBuildExtensionsPath>
 		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
 	</PropertyGroup>
