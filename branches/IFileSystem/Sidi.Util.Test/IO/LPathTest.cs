@@ -35,6 +35,16 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        [Test]
+        public void Ctor()
+        {
+            var p = new LPath(@"\some\root\relative\path");
+            Assert.AreEqual(@"\some\root\relative\path", p.ToString());
+
+            p = new LPath(@"\\server\share\a\b\c");
+            Assert.AreEqual(@"\\server\share\a\b\c", p.ToString());
+        }
+
         [Test, ExpectedException(typeof(System.ArgumentOutOfRangeException))]
         public void Check()
         {

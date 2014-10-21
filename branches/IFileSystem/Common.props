@@ -18,6 +18,7 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <RestorePackages>true</RestorePackages>
+	<PackagesDir>..\..\nuget-packages</PackagesDir>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
 	</PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
