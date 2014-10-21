@@ -16,6 +16,7 @@
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,7 @@ namespace Sidi.IO
         const string longUncPrefix = @"\\?\UNC\";
         const string shortUncPrefix = @"\\";
         const string deviceNamespacePrefix = @"\\.\";
+        const string shortRootRelativePrefix = @"\";
 
         public const string ExtensionSeparator = ".";
 
@@ -59,7 +61,9 @@ namespace Sidi.IO
         {
             longUncPrefix,
             longPrefix,
-            deviceNamespacePrefix
+            deviceNamespacePrefix,
+            shortUncPrefix,
+            shortRootRelativePrefix
         };
 
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
@@ -214,28 +218,28 @@ namespace Sidi.IO
                 path = path.Substring(0, path.Length - 1);
             }
 
-                if (prefixes.Any(_=>path.StartsWith(_)))
+            if (prefixes.Any(_=>path.StartsWith(_)))
+            {
+                m_internalPathRepresentation = path;
+            }
+            else
+            {
+                // handle normal path
+
+                // UNC
+                if (RemovePrefix(path, shortUncPrefix, out m_internalPathRepresentation))
                 {
-                    m_internalPathRepresentation = path;
+                    m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
+                }
+                else if (path.Length >= 2 && char.IsLetter(path[0]) && path[1] == ':')
+                {
+                    m_internalPathRepresentation = longPrefix + path;
                 }
                 else
                 {
-                    // handle normal path
-
-                    // UNC
-                    if (RemovePrefix(path, shortUncPrefix, out m_internalPathRepresentation))
-                    {
-                        m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
-                    }
-                    else if (path.Length >= 2 && char.IsLetter(path[0]) && path[1] == ':')
-                    {
-                        m_internalPathRepresentation = longPrefix + path;
-                    }
-                    else
-                    {
-                        m_internalPathRepresentation = path;
-                    }
+                    m_internalPathRepresentation = path;
                 }
+            }
 
             if (m_internalPathRepresentation.Length > MaxPathLength)
             {

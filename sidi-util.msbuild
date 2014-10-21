@@ -103,7 +103,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <RemoveDir Directories="$(TestDir)" />
   </Target>
 
-  <Target Name="Release" DependsOnTargets="CreateVersion;Build;UnitTest" />
+  <Target Name="Release" DependsOnTargets="GetVersion;Build;UnitTest" />
 
   <Target Name="NugetPack" DependsOnTargets="GetVersion" >
     <MakeDir Directories="$(PackageDir)"/>
