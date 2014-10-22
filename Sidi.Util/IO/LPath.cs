@@ -66,6 +66,14 @@ namespace Sidi.IO
             shortRootRelativePrefix
         };
 
+        static readonly string[] fullPathPrefixes = new[]
+        {
+            longUncPrefix,
+            longPrefix,
+            deviceNamespacePrefix,
+            shortUncPrefix,
+        };
+
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
             System.IO.Path.GetInvalidFileNameChars()
             .Where(x => x != '*' && x != '?')
@@ -395,11 +403,28 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// As IsFullPath, but returns true for paths without drive specifier, such as \a\b\c
+        /// Because you normally would like to check for a fully qualified path, i.e. which is not 
+        /// changed by current drive or directory anymore, you should use IsFullPath instead
+        /// </summary>
+        [Obsolete("use IsFullPath instead")]
         public bool IsAbsolute
         {
             get
             {
                 return prefixes.Any(_ => m_internalPathRepresentation.StartsWith(_));
+            }
+        }
+
+        /// <summary>
+        /// Returns true if GetFullPath will return the path itself
+        /// </summary>
+        public bool IsFullPath
+        {
+            get
+            {
+                return fullPathPrefixes.Any(_ => m_internalPathRepresentation.StartsWith(_));
             }
         }
 
