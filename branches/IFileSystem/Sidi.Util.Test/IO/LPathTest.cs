@@ -67,13 +67,8 @@ namespace Sidi.IO
         [Test]
         public void Serialize()
         {
-            var p = Paths.BinDir;
-            var b = new BinaryFormatter();
-            var m = new MemoryStream();
-            b.Serialize(m, p);
-            m.Seek(0, SeekOrigin.Begin);
-            var p1 = (LPath)b.Deserialize(m);
-            Assert.AreEqual(p, p1);
+            TestSerialize(Paths.BinDir);
+            TestSerialize<LPath>(null);
         }
 
         [Test]
@@ -178,20 +173,28 @@ namespace Sidi.IO
             Assert.IsTrue(LPath.IsValid(@"C:\temp"));
         }
 
-        static void TestXmlSerialize<T>(T n)
+        public class ObjectGraph
         {
-            var s = new XmlSerializer(typeof(T));
-            var t = new System.IO.StringWriter();
-            s.Serialize(t, n);
-            log.Info(t.ToString());
-            var n1 = s.Deserialize(new System.IO.StringReader(t.ToString()));
-            Assert.AreEqual(n, n1);
+            [XmlElement]
+            public LPath Path;
+
+            public override bool Equals(object obj)
+            {
+                return object.Equals(Path, ((ObjectGraph)obj).Path);
+            }
         }
 
         [Test]
         public void XmlSerialize()
         {
             TestXmlSerialize(Sidi.IO.LPath.GetTempPath());
+
+            // passes - string null values are handled properly
+            TestXmlSerialize<string>(null);
+            // would fail - IXmlSerializable cannot handle null values properly
+            // TestXmlSerialize<LPath>(null);
+
+            TestXmlSerialize(new ObjectGraph());
         }
 
         [Test, Explicit("todo")]
@@ -269,18 +272,44 @@ namespace Sidi.IO
             Assert.IsFalse(p.HasExtension);
         }
 
+        LPath[] examplePaths = new LPath[]
+        {
+            new LPath(@"a\b\c"),
+            new LPath(@"C:\temp\something.txt"),
+            new LPath(@"\\server\share\somedir\somefile"),
+            new LPath(@"\a\b\c")
+        };
+
+        [Test]
+        public void GetFullPath()
+        {
+            foreach (var p in examplePaths)
+            {
+                Assert.IsTrue(p.IsFullPath ^ !object.Equals(p, p.GetFullPath()), p);
+            }
+        }
+
         [Test]
         public void Absolute()
         {
-            var rel = LPath.Join("a", "b", "c");
-            Assert.IsFalse(rel.IsAbsolute);
+            var relative = new LPath(@"a\b\c");
+            Assert.IsFalse(relative.IsAbsolute);
+            Assert.AreNotEqual(relative, relative.GetFullPath());
+
             var abs = new LPath(@"C:\temp\something.txt");
             Assert.IsTrue(abs.IsAbsolute);
+            Assert.AreEqual(new LPath(@"C:"), abs.GetPathRoot());
+            Assert.AreEqual(abs, abs.GetFullPath());
 
             var unc = new LPath(@"\\server\share\somedir\somefile");
             Assert.IsTrue(unc.IsAbsolute);
             Assert.IsTrue(unc.IsUnc);
             Assert.AreEqual(new LPath(@"\\server\share"), unc.GetPathRoot());
+            Assert.AreEqual(unc, unc.GetFullPath());
+
+            var abs2 = new LPath(@"\a\b\c");
+            Assert.IsTrue(abs2.IsAbsolute);
+            Assert.AreEqual(abs2, abs2.GetFullPath());
         }
 
         [Test]
