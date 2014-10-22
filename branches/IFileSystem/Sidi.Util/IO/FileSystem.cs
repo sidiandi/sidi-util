@@ -28,7 +28,7 @@ namespace Sidi.IO
             long TotalBytesTransferred,
             long StreamSize,
             long StreamBytesTransferred,
-            uint StreamNumber)
+            int StreamNumber)
         {
             this.Begin = Begin;
             this.TotalFileSize = TotalFileSize;
@@ -43,7 +43,7 @@ namespace Sidi.IO
         public long TotalBytesTransferred { get; private set; }
         public long StreamSize { get; private set; }
         public long StreamBytesTransferred { get; private set; }
-        public uint StreamNumber { get; private set; }
+        public int StreamNumber { get; private set; }
 
         public override string ToString()
         {
@@ -320,7 +320,7 @@ namespace Sidi.IO
                         TotalBytesTransferred,
                         StreamSize,
                         StreamBytesTransferred,
-                        dwStreamNumber));
+                        (int) dwStreamNumber));
 
                     if (ct.IsCancellationRequested)
                     {
