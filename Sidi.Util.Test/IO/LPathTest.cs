@@ -182,6 +182,11 @@ namespace Sidi.IO
             {
                 return object.Equals(Path, ((ObjectGraph)obj).Path);
             }
+
+            public override int GetHashCode()
+            {
+                return Path.GetHashCode();
+            }
         }
 
         [Test]
@@ -289,6 +294,8 @@ namespace Sidi.IO
             }
         }
 
+#pragma warning disable 618
+
         [Test]
         public void Absolute()
         {
@@ -312,6 +319,8 @@ namespace Sidi.IO
             Assert.AreEqual(abs2, abs2.GetFullPath());
         }
 
+#pragma warning restore 618
+        
         [Test]
         public void EnsureFileNotExists()
         {

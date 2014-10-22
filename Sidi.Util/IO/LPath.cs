@@ -368,19 +368,21 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// Throws an exception when !IsAbsolute
+        /// Throws an exception when !IsFullPath
         /// </summary>
         /// <returns>Root of the file system, e.g. C: or \\server\share</returns>
         public LPath GetPathRoot()
         {
-            if (IsAbsolute)
+            if (IsFullPath)
             {
                 if (IsUnc)
                 {
                     return new LPath(Prefix, Parts.Skip(2).Take(2));
                 }
-
-                return new LPath(Prefix, Parts.Take(1));
+                else
+                {
+                    return new LPath(Prefix, Parts.Take(1));
+                }
             }
             else
             {
@@ -430,7 +432,7 @@ namespace Sidi.IO
 
         public static bool IsSameFileSystem(LPath p1, LPath p2)
         {
-            return p1.IsAbsolute && p2.IsAbsolute && p1.GetPathRoot().Equals(p2.GetPathRoot());
+            return p1.IsFullPath && p2.IsFullPath && object.Equals(p1.GetPathRoot(), p2.GetPathRoot());
         }
 
         public string DriveLetter

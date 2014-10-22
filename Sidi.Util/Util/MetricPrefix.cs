@@ -134,7 +134,8 @@ namespace Sidi.Util
         /// converts an object to a double. Supported types: double, int, uint, long, ulong
         /// </summary>
         /// <param name="x"></param>
-        /// <returns></returns>
+        /// <param name="d">Value of x as a double. NaN if function returns false</param>
+        /// <returns>True, if conversion was successful</returns>
         public static bool TryConvertToDouble(this object x, out double d)
         {
             if (x == null)
