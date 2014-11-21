@@ -114,7 +114,7 @@ namespace Sidi.IO
             Assert.IsTrue(tempDir.IsDirectory);
 
             log.Info(tempDir.DriveLetter);
-            var unc = @"\\" + System.Environment.MachineName + @"\" + tempDir.DriveLetter + "$";
+            var unc = LPath.Join(LPath.ShortUncPrefix, new []{System.Environment.MachineName, tempDir.DriveLetter + "$"});
             Assert.IsTrue(System.IO.Directory.Exists(unc));
 
             var longNameUnc = new Sidi.IO.LPath(unc);
@@ -134,7 +134,7 @@ namespace Sidi.IO
         }
 
         [Test]
-        public void MakeFileName()
+        public void GetValidFilename()
         {
             var validName = "I am a valid filename";
             var invalidName = System.IO.Path.GetInvalidFileNameChars().Join(" ");
@@ -149,6 +149,10 @@ namespace Sidi.IO
             Assert.AreEqual(validName, LPath.GetValidFilename(validName));
             Assert.AreEqual("someName_", LPath.GetValidFilename("someName "));
             Assert.AreEqual("someName___", LPath.GetValidFilename("someName..."));
+            var fn = LPath.GetValidFilename(new string(Enumerable.Range(0, 4096).Select(_ => (char)_).ToArray()));
+            log.Info(fn);
+            Assert.IsTrue(LPath.IsValidFilename(fn));
+
         }
 
         [Test]
