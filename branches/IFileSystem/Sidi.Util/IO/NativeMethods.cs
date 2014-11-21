@@ -25,25 +25,6 @@ using System.ComponentModel;
 
 namespace Sidi.IO
 {
-    internal class FindHandle : SafeHandleZeroOrMinusOneIsInvalid
-    {
-        public FindHandle()
-            : base(true)
-        {
-        }
-
-        public override bool IsInvalid
-        {
-            get { return this.handle == IntPtr.Zero || this.handle == (IntPtr)(-1); }
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            NativeMethods.FindClose(this.handle);
-            return true;
-        }
-    }
-
     internal static class NativeMethods
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

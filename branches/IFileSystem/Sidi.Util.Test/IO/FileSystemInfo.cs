@@ -38,7 +38,7 @@ namespace Sidi.IO
         {
             var drive = LDirectory.Current.GetPathRoot();
             Assert.IsTrue(drive.IsRoot);
-            var c = new LFileSystemInfo(drive);
+            var c = drive.Info;
             Assert.IsTrue(c.Exists);
             c.DumpProperties(Console.Out);
             log.Info(c.GetChildren().Join());

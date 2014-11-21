@@ -24,13 +24,12 @@ using System.Runtime.InteropServices;
 
 namespace Sidi.IO
 {
+    [Obsolete("Use LPath and FileSystem methods")]
     public class LDirectory
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         const string PathSep = @"\";
-        const string ThisDir = ".";
-        const string UpDir = "..";
 
         public static void Delete(LPath directory)
         {
@@ -39,20 +38,7 @@ namespace Sidi.IO
 
         public static bool Exists(LPath directory)
         {
-            FindData fd;
-            if (directory.GetFindData(out fd))
-            {
-                return fd.IsDirectory;
-            }
-            else
-            {
-                if (directory.IsUnc && directory.Parts.Length == 4)
-                {
-                    return System.IO.Directory.Exists(directory.NoPrefix);
-                }
-
-                return false;
-            }
+            return directory.Info.IsDirectory;
         }
 
         public static void Move(LPath from, LPath to)
@@ -65,11 +51,10 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="searchPath">File search path complete with wildcards, e.g. C:\temp\*.doc</param>
         /// <returns></returns>
+        [Obsolete("use FileSystem.FindFile")]
         public static IEnumerable<LFileSystemInfo> FindFile(LPath searchPath)
         {
-            return FileSystem.Current.FindFileRaw(searchPath)
-                .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
-                .Select(x => new LFileSystemInfo(searchPath.Parent, x));
+            return FileSystem.Current.FindFile(searchPath);
         }
 
         public static void Create(LPath path)

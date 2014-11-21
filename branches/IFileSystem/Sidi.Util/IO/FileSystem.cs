@@ -133,12 +133,32 @@ namespace Sidi.IO
             NativeMethods.MoveFileEx(existingFileName.Param, newFileName.Param, 0).CheckApiCall(String.Format("{0} -> {1}", existingFileName, newFileName));
         }
 
+        const string ThisDir = ".";
+        const string UpDir = "..";
+
+        public LFileSystemInfo GetInfo(LPath lPath)
+        {
+            return new LFileSystemInfo(this, lPath.GetFullPath());
+        }
+
+        /// <summary>
+        /// Enumerates found files. Make sure that the Enumerator is closed properly to free the Find handle.
+        /// </summary>
+        /// <param name="searchPath">File search path complete with wildcards, e.g. C:\temp\*.doc</param>
+        /// <returns></returns>
+        public IEnumerable<LFileSystemInfo> FindFile(LPath searchPath)
+        {
+            return FindFileRaw(searchPath)
+                .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
+                .Select(x => new LFileSystemInfo(searchPath.Parent, x));
+        }
+
         /// <summary>
         /// Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
         /// </summary>
         /// <param name="searchPath"></param>
         /// <returns></returns>
-        internal IEnumerable<FindData> FindFileRaw(LPath searchPath)
+        private IEnumerable<FindData> FindFileRaw(LPath searchPath)
         {
             FindData fd;
 
@@ -151,6 +171,63 @@ namespace Sidi.IO
                     {
                         yield return fd;
                     }
+                }
+            }
+        }
+
+        internal bool GetFindData(LPath path, out FindData fd)
+        {
+            if (path.IsRoot)
+            {
+                if (System.IO.Directory.Exists(path.NoPrefix))
+                {
+                    fd = new FindData()
+                    {
+                        Attributes = System.IO.FileAttributes.Directory,
+                        nFileSizeHigh = 0,
+                        nFileSizeLow = 0,
+                        Name = path.NoPrefix,
+                    };
+                    return true;
+                }
+                else
+                {
+                    fd = default(FindData);
+                    return false;
+                }
+            }
+
+            if (path.IsUnc && path.Parts.Length == 2)
+            {
+                if (System.IO.Directory.Exists(path.NoPrefix))
+                {
+                    fd = new FindData()
+                    {
+                        Attributes = System.IO.FileAttributes.Directory,
+                        nFileSizeHigh = 0,
+                        nFileSizeLow = 0,
+                        Name = path.NoPrefix,
+                    };
+                    return true;
+                }
+                else
+                {
+                    fd = default(FindData);
+                    return false;
+                }
+            }
+
+            using (var f = FindFileRaw(path).GetEnumerator())
+            {
+                if (f.MoveNext())
+                {
+                    fd = f.Current;
+                    return true;
+                }
+                else
+                {
+                    fd = default(FindData);
+                    return false;
                 }
             }
         }

@@ -27,12 +27,12 @@ namespace Sidi.IO
     [Serializable]
     public class LFileSystemInfo : IEquatable<LFileSystemInfo>, IComparable
     {
-        public LFileSystemInfo(LPath path)
+        internal LFileSystemInfo(FileSystem fileSystem, LPath path)
         {
             this.path = path.GetFullPath();
-            _findDataValid = this.path.GetFindData(out _findData);
+            _findDataValid = fileSystem.GetFindData(this.path, out _findData);
         }
-
+        
         public LPath FullName
         {
             get { return path; }
