@@ -361,7 +361,7 @@ namespace Sidi.IO
                 fast = value;
                 if (fast)
                 {
-                    NeedCopy = (from, to) => !LFile.EqualByTimeAndLength(from, to, MaxFileTimeDifference);
+                    NeedCopy = (from, to) => !LFile.EqualByTimeAndLength(MaxFileTimeDifference, from, to);
                 }
                 else
                 {

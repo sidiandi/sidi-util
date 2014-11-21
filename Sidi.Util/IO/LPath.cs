@@ -34,6 +34,103 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public LPath(string path)
+        {
+            if (String.IsNullOrEmpty(path))
+            {
+                throw new ArgumentOutOfRangeException("path");
+            }
+
+            // remove trailing slash
+            if (path.EndsWith(@"\"))
+            {
+                path = path.Substring(0, path.Length - 1);
+            }
+
+            if (prefixes.Any(_ => path.StartsWith(_)))
+            {
+                m_internalPathRepresentation = path;
+            }
+            else
+            {
+                // handle normal path
+
+                // UNC
+                if (RemovePrefix(path, shortUncPrefix, out m_internalPathRepresentation))
+                {
+                    m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
+                }
+                else if (path.Length >= 2 && char.IsLetter(path[0]) && path[1] == ':')
+                {
+                    m_internalPathRepresentation = longPrefix + path;
+                }
+                else
+                {
+                    m_internalPathRepresentation = path;
+                }
+            }
+
+            if (m_internalPathRepresentation.Length > MaxPathLength)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("string is {0} characters long. Maximal path length: {1}", m_internalPathRepresentation.Length, MaxPathLength));
+            }
+
+            var p = Parts;
+
+            var invalidFileName = p.Take(1).FirstOrDefault(_ => !IsValidFilenameWithWildcards(_) && !IsDriveSpecifier(_));
+            if (invalidFileName != null)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid file name or a drive specifier", invalidFileName.Quote()));
+            }
+
+            invalidFileName = p.Skip(1).FirstOrDefault(_ => !IsValidFilenameWithWildcards(_));
+            if (invalidFileName != null)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid file name", invalidFileName.Quote()));
+            }
+        }
+
+        LPath(string prefix, IEnumerable<string> parts)
+            : this(
+                ((prefix == null) ? String.Empty : prefix)
+                + String.Join(DirectorySeparator, parts))
+        {
+
+        }
+
+        LPath()
+        {
+            m_internalPathRepresentation = null;
+        }
+
+        public static LPath Join(string prefix, IEnumerable<string> parts)
+        {
+            return new LPath(prefix, parts);
+        }
+
+        string Prefix
+        {
+            get
+            {
+                foreach (var p in prefixes)
+                {
+                    if (m_internalPathRepresentation.StartsWith(p))
+                    {
+                        return p;
+                    }
+                }
+                return String.Empty;
+            }
+        }
+
+        public string[] Parts
+        {
+            get
+            {
+                return m_internalPathRepresentation.Substring(Prefix.Length).Split(new[] { DirectorySeparator }, StringSplitOptions.None);
+            }
+        }
+
         FileSystem FS
         {
             get
@@ -51,7 +148,7 @@ namespace Sidi.IO
 
         const string longPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
-        const string shortUncPrefix = @"\\";
+        public const string shortUncPrefix = @"\\";
         const string deviceNamespacePrefix = @"\\.\";
         const string shortRootRelativePrefix = @"\";
 
@@ -188,17 +285,6 @@ namespace Sidi.IO
             return CheckFilenameWithWildcards(x) == null;
         }
 
-        LPath(string prefix, IEnumerable<string> parts)
-        : this(prefix + String.Join(DirectorySeparator, parts))
-        {
-            
-        }
-
-        LPath()
-        {
-            m_internalPathRepresentation = null;
-        }
-
         static bool RemovePrefix(string text, string prefix, out string result)
         {
             if (text.StartsWith(prefix))
@@ -213,74 +299,9 @@ namespace Sidi.IO
             }
         }
 
-        public LPath(string path)
+        static bool IsDriveSpecifier(string d)
         {
-            if (String.IsNullOrEmpty(path))
-            {
-                throw new ArgumentOutOfRangeException("path");
-            }
-
-            // remove trailing slash
-            if (path.EndsWith(@"\"))
-            {
-                path = path.Substring(0, path.Length - 1);
-            }
-
-            if (prefixes.Any(_=>path.StartsWith(_)))
-            {
-                m_internalPathRepresentation = path;
-            }
-            else
-            {
-                // handle normal path
-
-                // UNC
-                if (RemovePrefix(path, shortUncPrefix, out m_internalPathRepresentation))
-                {
-                    m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
-                }
-                else if (path.Length >= 2 && char.IsLetter(path[0]) && path[1] == ':')
-                {
-                    m_internalPathRepresentation = longPrefix + path;
-                }
-                else
-                {
-                    m_internalPathRepresentation = path;
-                }
-            }
-
-            if (m_internalPathRepresentation.Length > MaxPathLength)
-            {
-                throw new ArgumentOutOfRangeException(String.Format("string is {0} characters long. Maximal path length: {1}", m_internalPathRepresentation.Length, MaxPathLength));
-            }
-            
-            var invalidFileName = NameParts.FirstOrDefault(_ => !IsValidFilenameWithWildcards(_));
-            if (invalidFileName != null)
-            {
-                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid file name", invalidFileName));
-            }
-        }
-
-        IEnumerable<string> NameParts
-        {
-            get
-            {
-                if (IsAbsolute)
-                {
-                    if (IsUnc)
-                    {
-                        return Parts.Skip(3);
-                    }
-                    else
-                    {
-                        return Parts.Skip(1);
-                    }
-                }
-                else
-                {
-                    return Parts;
-                }
-            }
+            return d.Length == 2 && char.IsLetter(d[0]) && d[1] == ':';
         }
 
         public static LPath Join(params string[] parts)
@@ -288,24 +309,11 @@ namespace Sidi.IO
             return new LPath(parts.Join(DirectorySeparator));
         }
 
-        public static LPath Join(IEnumerable<string> parts)
-        {
-            var s = parts.Join(DirectorySeparator);
-            if (String.IsNullOrEmpty(s))
-            {
-                return null;
-            }
-            else
-            {
-                return new LPath(s);
-            }
-        }
-
         public LPath Canonic
         {
             get
             {
-                return Join(Parts.Where(x => !x.Equals(".")));
+                return new LPath(Prefix, Parts.Where(x => !x.Equals(".")));
             }
         }
 
@@ -377,7 +385,7 @@ namespace Sidi.IO
             {
                 if (IsUnc)
                 {
-                    return new LPath(Prefix, Parts.Skip(2).Take(2));
+                    return new LPath(Prefix, Parts.Take(2));
                 }
                 else
                 {
@@ -387,21 +395,6 @@ namespace Sidi.IO
             else
             {
                 throw new InvalidOperationException("path is not absolute");
-            }
-        }
-
-        string Prefix
-        {
-            get
-            {
-                foreach (var p in prefixes)
-                {
-                    if (m_internalPathRepresentation.StartsWith(p))
-                    {
-                        return p;
-                    }
-                }
-                return String.Empty;
             }
         }
 
@@ -415,7 +408,7 @@ namespace Sidi.IO
         {
             get
             {
-                return prefixes.Any(_ => m_internalPathRepresentation.StartsWith(_));
+                return IsFullPath;
             }
         }
 
@@ -451,120 +444,34 @@ namespace Sidi.IO
             }
         }
 
-        internal bool GetFindData(out FindData fd)
-        {
-            if (IsRoot)
-            {
-                if (System.IO.Directory.Exists(NoPrefix))
-                {
-                    fd = new FindData()
-                    {
-                        Attributes = System.IO.FileAttributes.Directory,
-                        nFileSizeHigh = 0,
-                        nFileSizeLow = 0,
-                        Name = this.NoPrefix,
-                    };
-                    return true;
-                }
-                else
-                {
-                    fd = default(FindData);
-                    return false;
-                }
-            }
-
-            if (IsUnc && Parts.Length == 4)
-            {
-                if (System.IO.Directory.Exists(NoPrefix))
-                {
-                    fd = new FindData()
-                    {
-                        Attributes = System.IO.FileAttributes.Directory,
-                        nFileSizeHigh = 0,
-                        nFileSizeLow = 0,
-                        Name = this.NoPrefix,
-                    };
-                    return true;
-                }
-                else
-                {
-                    fd = default(FindData);
-                    return false;
-                }
-            }
-
-            using (var f = FS.FindFileRaw(this).GetEnumerator())
-            {
-                if (f.MoveNext())
-                {
-                    fd = f.Current;
-                    return true;
-                }
-                else
-                {
-                    fd = default(FindData);
-                    return false;
-                }
-            }
-        }
-        
-        internal FindData FindData
-        {
-            get
-            {
-                FindData fd;
-                if (!GetFindData(out fd))
-                {
-                    throw new System.IO.IOException(this.ToString());
-                }
-                return fd;
-            }
-        }
-
         public static readonly char DirectorySeparatorChar = System.IO.Path.DirectorySeparatorChar;
-
-        public string[] Parts
-        {
-            get
-            {
-                return NoPrefix.Split(new[]{DirectorySeparator}, StringSplitOptions.None);
-            }
-        }
 
         public LFileSystemInfo Info
         {
             get
             {
-                return new LFileSystemInfo(this.GetFullPath());
+                return FS.GetInfo(this);
             }
+        }
+
+        private LPath GetFullPathImpl()
+        {
+            if (IsAbsolute)
+            {
+                return this;
+            }
+
+            if (Prefix.Equals(shortRootRelativePrefix))
+            {
+                return LDirectory.Current.GetPathRoot().CatDir(Parts);
+            }
+
+            return LDirectory.Current.CatDir(this);
         }
 
         public LPath GetFullPath()
         {
-            var p = Parts;
-            LPath full = null;
-            if (IsUnc)
-            {
-                full = this;
-            }
-            else if (String.IsNullOrEmpty(p[0]))
-            {
-                // concat with drive
-                full = new LPath(LDirectory.Current.Parts[0]).CatDir(this.Parts.Skip(1));
-            }
-            else if (IsValidDriveRoot(p[0]))
-            {
-                full = this;
-            }
-            else
-            {
-                // concat with current directory
-                full = LDirectory.Current.CatDir(this);
-            }
-
-            full = full.Canonic;
-
-            return full;
+            return GetFullPathImpl().Canonic;
         }
 
         public bool HasExtension
@@ -577,12 +484,12 @@ namespace Sidi.IO
         
         public LPath CatDir(IEnumerable<string> parts)
         {
-            return Join(Parts.Concat(parts));
+            return new LPath(Prefix, Parts.Concat(parts));
         }
 
-        public LPath CatDir(params object[] parts)
+        public LPath CatDir(params string[] parts)
         {
-            return Join(
+            return new LPath(Prefix,
                 this.Parts.Concat(
                 parts
                 .SafeSelect(p =>
@@ -716,7 +623,7 @@ namespace Sidi.IO
                 result.Add(p[i]);
             }
 
-            return Join(result);
+            return new LPath(String.Empty, result);
         }
         
         public LPath Parent
@@ -727,7 +634,7 @@ namespace Sidi.IO
 
                 if (IsUnc)
                 {
-                    if (p.Length <= 4)
+                    if (p.Length <= 2)
                     {
                         return null;
                     }
@@ -740,7 +647,7 @@ namespace Sidi.IO
                     }
                 }
 
-                return Join(p.TakeAllBut(1));
+                return new LPath(Prefix, p.TakeAllBut(1));
             }
         }
 
@@ -755,34 +662,75 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// Same as GetChildren()
+        /// </summary>
         public IList<LPath> Children
         {
             get
             {
-                return GetChildren(LPath.AllFilesWildcard);
+                return GetChildren();
             }
         }
 
+        /// <summary>
+        /// Get all children of this path, directories as well as files.
+        /// Will return not an exception, but return an empty list.
+        /// </summary>
+        /// <returns>List of children paths. Empty list for file paths or paths which do not exist.</returns>
+        public IList<LPath> GetChildren()
+        {
+            return GetChildren(LPath.AllFilesWildcard);
+        }
+
+        /// <summary>
+        /// Get all children of this path, directories as well as files.
+        /// Will return not an exception, but return an empty list.
+        /// </summary>
+        /// <param name="pattern">wildcard pattern. See Windows API function FsRtlIsNameInExpression for details.</param>
+        /// <returns>List of children paths. Empty list for file paths or paths which do not exist.</returns>
         public IList<LPath> GetChildren(string pattern)
         {
             return ToPathList(Info.GetChildren(pattern));
         }
 
+        /// <summary>
+        /// Get all file children of this path.
+        /// Will return not an exception, but return an empty list.
+        /// </summary>
+        /// <param name="pattern">wildcard pattern. See Windows API function FsRtlIsNameInExpression for details.</param>
+        /// <returns>List of children paths. Empty list for file paths or paths which do not exist.</returns>
         public IList<LPath> GetFiles(string pattern)
         {
             return ToPathList(Info.GetFiles(pattern));
         }
 
+        /// <summary>
+        /// Get all file children of this path.
+        /// Will return not an exception, but return an empty list.
+        /// </summary>
+        /// <returns>List of children paths. Empty list for file paths or paths which do not exist.</returns>
         public IList<LPath> GetFiles()
         {
             return GetFiles(AllFilesWildcard);
         }
 
+        /// <summary>
+        /// Get all children of this path which are directories.
+        /// Will return not an exception, but return an empty list.
+        /// </summary>
+        /// <param name="pattern">wildcard pattern. See Windows API function FsRtlIsNameInExpression for details.</param>
+        /// <returns>List of children paths. Empty list for file paths or paths which do not exist.</returns>
         public IList<LPath> GetDirectories(string pattern)
         {
             return ToPathList(Info.GetDirectories(pattern));
         }
 
+        /// <summary>
+        /// Get all children of this path which are directories.
+        /// Will return not an exception, but return an empty list.
+        /// </summary>
+        /// <returns>List of children paths. Empty list for file paths or paths which do not exist.</returns>
         public IList<LPath> GetDirectories()
         {
             return GetDirectories(AllFilesWildcard);
@@ -958,7 +906,7 @@ namespace Sidi.IO
 
             if (difference.Any())
             {
-                return Join(difference);
+                return new LPath(String.Empty, difference);
             }
             else
             {

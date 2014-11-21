@@ -31,7 +31,7 @@ namespace Sidi.Visualization
 
         public static Tree Get(LPath dir)
         {
-            return GetRecursive(null, new LFileSystemInfo(dir));
+            return GetRecursive(null, dir.Info);
         }
 
         public static Tree GetBackground(LPath dir)

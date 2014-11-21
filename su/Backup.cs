@@ -170,7 +170,7 @@ namespace Sidi.Tool
                                 {
                                     log.DebugFormat("Link {0} -> {1}", destination, existing);
                                     LFile.CreateHardLink(destination, existing);
-                                    linked.Add(new LFileSystemInfo(existing).Length);
+                                    linked.Add(existing.Info.Length);
                                 }
                                 goto copied;
                             }

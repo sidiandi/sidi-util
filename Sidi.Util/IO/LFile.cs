@@ -24,9 +24,11 @@ using Sidi.Util;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Threading;
+using Sidi.Extensions;
 
 namespace Sidi.IO
 {
+    [Obsolete("Use LPath and FileSystem methods")]
     public class LFile
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -331,38 +333,34 @@ namespace Sidi.IO
             }
         }
 
-        public static bool EqualByTimeAndLength(LPath f1, LPath f2)
+        public static bool EqualByTimeAndLength(params LPath[] files)
         {
-            FindData d1;
-            FindData d2;
-            if (f1.GetFindData(out d1) && f2.GetFindData(out d2))
-            {
-                return d1.Length == d2.Length && d1.ftLastWriteTime.Equals(d2.ftLastWriteTime);
-            }
-            else
+            return EqualByTimeAndLength(TimeSpan.Zero, files);
+        }
+
+        public static bool EqualByTimeAndLength(TimeSpan maxTimeDifference, params LPath[] files)
+        {
+            var info = files.Select(_ => _.Info).ToArray();
+
+            if (!info.All(_=>_.IsFile))
             {
                 return false;
             }
-        }
 
-        public static bool EqualByTimeAndLength(LPath f1, LPath f2, TimeSpan maxTimeDifference)
-        {
-            FindData d1;
-            FindData d2;
-            if (f1.GetFindData(out d1) && f2.GetFindData(out d2))
+            var f = info.First();
+            if (!info.Skip(1).All(_ => _.Length == f.Length))
             {
-                if (d1.Length == d2.Length)
-                {
-                    var d = d1.ftLastWriteTime.DateTimeUtc - d2.ftLastWriteTime.DateTimeUtc;
-                    return Math.Abs(d.TotalSeconds) <= maxTimeDifference.TotalSeconds;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
+            }
+
+            var timeDifference = (info.Max(_=>_.LastWriteTimeUtc) - info.Min(_=>_.LastWriteTimeUtc));
+            if (timeDifference <= maxTimeDifference)
+            {
+                return true;
             }
             else
             {
+                log.Info(timeDifference);
                 return false;
             }
         }
@@ -376,14 +374,10 @@ namespace Sidi.IO
 
         public static bool EqualByContent(LPath f1, LPath f2)
         {
-            FindData d1;
-            FindData d2;
-            if (!(f1.GetFindData(out d1) && f2.GetFindData(out d2)))
-            {
-                return false;
-            }
+            var i1 = f1.Info;
+            var i2 = f2.Info;
 
-            if (d1.Length != d2.Length)
+            if (!i1.IsFile || !i2.IsFile)
             {
                 return false;
             }

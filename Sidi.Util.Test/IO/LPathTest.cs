@@ -74,7 +74,7 @@ namespace Sidi.IO
         [Test]
         public void FullPath()
         {
-            var ln = LPath.Join(Enumerable.Range(0, 100).Select(x => "0000000000"));
+            var ln = LPath.Join(String.Empty, Enumerable.Range(0, 100).Select(x => "0000000000"));
             var cd = new LPath(System.Environment.CurrentDirectory);
             Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
         }
@@ -185,7 +185,7 @@ namespace Sidi.IO
 
             public override int GetHashCode()
             {
-                return Path.GetHashCode();
+                return Path == null ? 0 : Path.GetHashCode();
             }
         }
 
@@ -315,8 +315,8 @@ namespace Sidi.IO
             Assert.AreEqual(unc, unc.GetFullPath());
 
             var abs2 = new LPath(@"\a\b\c");
-            Assert.IsTrue(abs2.IsAbsolute);
-            Assert.AreEqual(abs2, abs2.GetFullPath());
+            Assert.IsFalse(abs2.IsAbsolute);
+            Assert.AreNotEqual(abs2, abs2.GetFullPath());
         }
 
 #pragma warning restore 618
@@ -473,6 +473,42 @@ namespace Sidi.IO
             Assert.IsFalse(object.Equals(null, x));
 
             Assert.AreEqual(new LPath("a"), new LPath(@"A"));
+        }
+
+        [Test]
+        public void GetChildren()
+        {
+            var dir = Paths.GetFolderPath(Environment.SpecialFolder.System);
+
+            var c = dir.GetChildren();
+            Assert.IsTrue(c.All(_ => _.Exists));
+            Assert.IsTrue(c.All(_ => _.Parent.Equals(dir)));
+
+            c = dir.GetChildren("*.dll");
+            Assert.IsTrue(c.All(_ => _.Exists));
+
+            c = dir.GetFiles();
+            Assert.IsTrue(c.All(_ => _.IsFile));
+
+            // GetChildren should return an empty list for files
+            Assert.AreEqual(0, c.First().GetChildren().Count);
+
+            c = dir.GetFiles("*.dll");
+            Assert.IsTrue(c.All(_ => _.IsFile));
+
+            c = dir.GetDirectories();
+            Assert.IsTrue(c.All(_ => _.IsDirectory));
+
+            c = dir.GetDirectories("de*");
+            Assert.IsTrue(c.All(_ => _.IsDirectory));
+        }
+
+        [Test]
+        public void GetChildrenNoException()
+        {
+            var f = Paths.Temp.CatDir(LPath.GetRandomFileName());
+            Assert.IsFalse(f.Exists);
+            f.GetChildren();
         }
     }
 }
