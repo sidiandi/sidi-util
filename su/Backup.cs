@@ -142,7 +142,7 @@ namespace Sidi.Tool
                 {
                     var parts = source.Parts.Where(x => !String.IsNullOrEmpty(x)).ToArray();
                     parts[0] = parts[0].Replace(":", String.Empty);
-                    var bakPath = LPath.Join(parts);
+                    var bakPath = LPath.CreateRelative(parts);
                     var destination = incompleteBackupSet.CatDir(bakPath);
 
                     if (LDirectory.Exists(source))

@@ -17,7 +17,7 @@ namespace Sidi.IO
             rootDir = this.TestFile("OperationTest");
             sourceRoot = rootDir.CatDir("source");
             destRoot = rootDir.CatDir("dest");
-            relChild = LPath.Join(Enumerable.Range(0, 30).Select(x => String.Format("directory_{0}", x)).ToArray());
+            relChild = LPath.CreateRelative(Enumerable.Range(0, 30).Select(x => String.Format("directory_{0}", x)).ToArray());
             source = sourceRoot.CatDir(relChild);
             dest = destRoot.CatDir(relChild);
         }

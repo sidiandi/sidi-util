@@ -38,22 +38,21 @@ namespace Sidi.Extensions
         
         public static string ShortenMd5(this string text, int maxLength)
         {
-            int md5StringLength = 16 * 2 + 1;
-
-            if (!(maxLength > md5StringLength))
+            if (text.Length <= maxLength)
             {
-                throw new ArgumentOutOfRangeException(String.Format("maxLength must be > {0}", md5StringLength));
+                return text;
             }
 
-                if (text.Length <= maxLength)
-                {
-                    return text;
-                }
+            var digest = serviceProvider.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(text)).HexString();
 
-                string toEncode = text.Substring(maxLength - md5StringLength);
-                return
-                    text.Substring(0, maxLength) + "." +
-                    serviceProvider.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode)).HexString();
+            var truncatedTextLength = maxLength-digest.Length;
+
+            if (truncatedTextLength < 0)
+            {
+                throw new ArgumentException("maxLength");
+            }
+
+            return text.Substring(0, truncatedTextLength) + digest;
         }
 
         public static string Unquote(this string text)

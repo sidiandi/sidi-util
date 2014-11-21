@@ -29,6 +29,17 @@ using System.IO;
 
 namespace Sidi.IO
 {
+    /// <summary>
+    /// Absolute or relative file system path.
+    /// A file system path has following grammar
+    ///
+    /// Path = Prefix [*(Name PathSeparator) Name]
+    /// Prefix = RootRelative / Unc / Drive
+    /// RootRelative = PathSeparator
+    /// Unc = "\\?\UNC\" Host PathSeparator Share PathSeparator
+    /// Drive = [A-Z] ":\"
+    /// 
+    /// </summary>
     [Serializable]
     public class LPath : IXmlSerializable, IComparable
     {
@@ -56,7 +67,7 @@ namespace Sidi.IO
                 // handle normal path
 
                 // UNC
-                if (RemovePrefix(path, shortUncPrefix, out m_internalPathRepresentation))
+                if (RemovePrefix(path, ShortUncPrefix, out m_internalPathRepresentation))
                 {
                     m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
                 }
@@ -91,11 +102,23 @@ namespace Sidi.IO
         }
 
         LPath(string prefix, IEnumerable<string> parts)
-            : this(
-                ((prefix == null) ? String.Empty : prefix)
-                + String.Join(DirectorySeparator, parts))
+            : this(CheckPrefix(prefix) + String.Join(DirectorySeparator, parts))
         {
+        }
 
+        static string CheckPrefix(string p)
+        {
+            if (p == null)
+            {
+                p = String.Empty;
+            }
+
+            if (!prefixes.Contains(p))
+            {
+                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid path prefix.", p.Quote()));
+            }
+
+            return p;
         }
 
         LPath()
@@ -106,6 +129,16 @@ namespace Sidi.IO
         public static LPath Join(string prefix, IEnumerable<string> parts)
         {
             return new LPath(prefix, parts);
+        }
+
+        public static LPath Join(string prefix, params string[] parts)
+        {
+            return new LPath(prefix, parts);
+        }
+
+        public static LPath CreateRelative(params string[] parts)
+        {
+            return Join(RelativePrefix, parts);
         }
 
         string Prefix
@@ -146,9 +179,10 @@ namespace Sidi.IO
 
         string m_internalPathRepresentation;
 
+        private const string RelativePrefix = "";
         const string longPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
-        public const string shortUncPrefix = @"\\";
+        public const string ShortUncPrefix = @"\\";
         const string deviceNamespacePrefix = @"\\.\";
         const string shortRootRelativePrefix = @"\";
 
@@ -159,8 +193,9 @@ namespace Sidi.IO
             longUncPrefix,
             longPrefix,
             deviceNamespacePrefix,
-            shortUncPrefix,
-            shortRootRelativePrefix
+            ShortUncPrefix,
+            shortRootRelativePrefix,
+            RelativePrefix
         };
 
         static readonly string[] fullPathPrefixes = new[]
@@ -168,7 +203,7 @@ namespace Sidi.IO
             longUncPrefix,
             longPrefix,
             deviceNamespacePrefix,
-            shortUncPrefix,
+            ShortUncPrefix,
         };
 
         static Regex invalidFilenameRegexWithoutWildcards = new Regex(
@@ -209,11 +244,16 @@ namespace Sidi.IO
             return this.ToString().Quote();
         }
 
+        /// <summary>
+        /// Converts x into a valid filename by replacing illegal characters and shortening it while keeping uniqueness.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static string GetValidFilename(string x)
         {
             x = invalidFilenameRegex.Replace(x, "_");
             x = invalidFilenameEndRegex.Replace(x, m => Regex.Replace(m.Value, ".", "_"));
-            return Truncate(x, LPath.MaxFilenameLength);
+            return x.ShortenMd5(LPath.MaxFilenameLength);
         }
 
         static string Truncate(string x, int maxLength)
@@ -302,11 +342,6 @@ namespace Sidi.IO
         static bool IsDriveSpecifier(string d)
         {
             return d.Length == 2 && char.IsLetter(d[0]) && d[1] == ':';
-        }
-
-        public static LPath Join(params string[] parts)
-        {
-            return new LPath(parts.Join(DirectorySeparator));
         }
 
         public LPath Canonic
@@ -582,7 +617,7 @@ namespace Sidi.IO
 
             var p = Parts;
             p[p.Length - 1] = FileNameWithoutExtension + newExtension;
-            return Join(p);
+            return Join(Prefix, p);
         }
 
         public LPath Sibling(string siblingName)
@@ -772,7 +807,7 @@ namespace Sidi.IO
                 string result;
                 if (RemovePrefix(m_internalPathRepresentation, longUncPrefix, out result))
                 {
-                    return shortUncPrefix + result;
+                    return ShortUncPrefix + result;
                 }
                 else if (RemovePrefix(m_internalPathRepresentation, longPrefix, out result))
                 {
@@ -842,7 +877,7 @@ namespace Sidi.IO
         {
             get
             {
-                return NoPrefix.StartsWith(shortUncPrefix);
+                return NoPrefix.StartsWith(ShortUncPrefix);
             }
         }
 
@@ -910,7 +945,7 @@ namespace Sidi.IO
             }
             else
             {
-                return Join(new[] { "..", this.FileName });
+                return Join(RelativePrefix, new[] { "..", this.FileName });
             }
         }
 

@@ -71,7 +71,7 @@ namespace Sidi.IO
         public static LPath Get(this Assembly a)
         {
             var v = a.GetName().Version;
-            return LPath.Join(
+            return LPath.CreateRelative(
                 LPath.GetValidFilename(a.GetCustomAttribute<AssemblyCompanyAttribute>().Company),
                 LPath.GetValidFilename(a.GetName().Name),
                 new []{ v.Major, v.Minor }.Join(LPath.ExtensionSeparator)
