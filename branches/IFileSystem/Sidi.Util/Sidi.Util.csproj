@@ -120,6 +120,7 @@
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
+    <Compile Include="IO\PathParser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
     <Compile Include="IO\CopyProgress.cs" />
