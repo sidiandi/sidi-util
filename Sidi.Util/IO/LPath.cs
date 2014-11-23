@@ -34,7 +34,7 @@ namespace Sidi.IO
     /// A file system path has following grammar
     ///
     /// Path = Prefix [*(Name PathSeparator) Name]
-    /// Prefix = RootRelative / Unc / Drive
+    /// Prefix = Unc / Drive / RootRelative
     /// RootRelative = PathSeparator
     /// Unc = "\\?\UNC\" Host PathSeparator Share PathSeparator
     /// Drive = [A-Z] ":\"
@@ -45,59 +45,37 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        string m_internalPathRepresentation;
+        public readonly string prefix;
+        string[] parts;
+
+        public string Prefix
+        {
+            get
+            {
+                return prefix;
+            }
+        }
+
+        public LPath(string prefix, string[] parts)
+        {
+            this.prefix = prefix;
+            this.parts = parts;
+        }
+        
         public LPath(string path)
         {
-            if (String.IsNullOrEmpty(path))
+            var text = new Text(path);
+            var p = new PathParser();
+            prefix = p.Prefix(ref text);
+            if (prefix == null)
             {
                 throw new ArgumentOutOfRangeException("path");
             }
-
-            // remove trailing slash
-            if (path.EndsWith(@"\"))
+            parts = p.Names(ref text);
+            if (parts == null)
             {
-                path = path.Substring(0, path.Length - 1);
-            }
-
-            if (prefixes.Any(_ => path.StartsWith(_)))
-            {
-                m_internalPathRepresentation = path;
-            }
-            else
-            {
-                // handle normal path
-
-                // UNC
-                if (RemovePrefix(path, ShortUncPrefix, out m_internalPathRepresentation))
-                {
-                    m_internalPathRepresentation = longUncPrefix + m_internalPathRepresentation;
-                }
-                else if (path.Length >= 2 && char.IsLetter(path[0]) && path[1] == ':')
-                {
-                    m_internalPathRepresentation = longPrefix + path;
-                }
-                else
-                {
-                    m_internalPathRepresentation = path;
-                }
-            }
-
-            if (m_internalPathRepresentation.Length > MaxPathLength)
-            {
-                throw new ArgumentOutOfRangeException(String.Format("string is {0} characters long. Maximal path length: {1}", m_internalPathRepresentation.Length, MaxPathLength));
-            }
-
-            var p = Parts;
-
-            var invalidFileName = p.Take(1).FirstOrDefault(_ => !IsValidFilenameWithWildcards(_) && !IsDriveSpecifier(_));
-            if (invalidFileName != null)
-            {
-                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid file name or a drive specifier", invalidFileName.Quote()));
-            }
-
-            invalidFileName = p.Skip(1).FirstOrDefault(_ => !IsValidFilenameWithWildcards(_));
-            if (invalidFileName != null)
-            {
-                throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid file name", invalidFileName.Quote()));
+                throw new ArgumentOutOfRangeException("path");
             }
         }
 
@@ -141,26 +119,11 @@ namespace Sidi.IO
             return Join(RelativePrefix, parts);
         }
 
-        string Prefix
-        {
-            get
-            {
-                foreach (var p in prefixes)
-                {
-                    if (m_internalPathRepresentation.StartsWith(p))
-                    {
-                        return p;
-                    }
-                }
-                return String.Empty;
-            }
-        }
-
         public string[] Parts
         {
             get
             {
-                return m_internalPathRepresentation.Substring(Prefix.Length).Split(new[] { DirectorySeparator }, StringSplitOptions.None);
+                return parts;
             }
         }
 
@@ -176,8 +139,6 @@ namespace Sidi.IO
         {
             StringComparison = StringComparison.OrdinalIgnoreCase;
         }
-
-        string m_internalPathRepresentation;
 
         private const string RelativePrefix = "";
         const string longPrefix = @"\\?\";
@@ -823,7 +784,7 @@ namespace Sidi.IO
 
         public override string ToString()
         {
-            return NoPrefix;
+            return Prefix + Parts.Join(DirectorySeparator);
         }
 
         public string Param
