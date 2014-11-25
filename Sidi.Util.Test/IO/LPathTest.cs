@@ -288,37 +288,29 @@ namespace Sidi.IO
             new LPath(@"\a\b\c")
         };
 
-        [Test]
-        public void GetFullPath()
-        {
-            foreach (var p in examplePaths)
-            {
-                Assert.IsTrue(p.IsFullPath ^ !object.Equals(p, p.GetFullPath()), p);
-            }
-        }
-
 #pragma warning disable 618
 
         [Test]
         public void Absolute()
         {
             var relative = new LPath(@"a\b\c");
-            Assert.IsFalse(relative.IsAbsolute);
+            Assert.IsTrue(relative.IsRelative);
             Assert.AreNotEqual(relative, relative.GetFullPath());
 
             var abs = new LPath(@"C:\temp\something.txt");
-            Assert.IsTrue(abs.IsAbsolute);
+            Assert.IsFalse(abs.IsRelative);
             Assert.AreEqual(new LPath(@"C:\"), abs.GetPathRoot());
             Assert.AreEqual(abs, abs.GetFullPath());
 
             var unc = new LPath(@"\\server\share\somedir\somefile");
-            Assert.IsTrue(unc.IsAbsolute);
+            Assert.IsFalse(unc.IsRelative);
             Assert.IsTrue(unc.IsUnc);
             Assert.AreEqual(new LPath(@"\\server\share\"), unc.GetPathRoot());
             Assert.AreEqual(unc, unc.GetFullPath());
 
             var abs2 = new LPath(@"\a\b\c");
-            Assert.IsFalse(abs2.IsAbsolute);
+            Assert.IsFalse(abs2.IsRelative);
+            Assert.IsTrue(abs2.IsRootRelative);
             Assert.AreNotEqual(abs2, abs2.GetFullPath());
         }
 
