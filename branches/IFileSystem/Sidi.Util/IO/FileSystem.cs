@@ -148,9 +148,10 @@ namespace Sidi.IO
         /// <returns></returns>
         public IEnumerable<LFileSystemInfo> FindFile(LPath searchPath)
         {
+            var p = searchPath.Parent;
             return FindFileRaw(searchPath)
                 .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
-                .Select(x => new LFileSystemInfo(searchPath.Parent, x));
+                .Select(x => new LFileSystemInfo(p, x));
         }
 
         /// <summary>
@@ -179,14 +180,14 @@ namespace Sidi.IO
         {
             if (path.IsRoot)
             {
-                if (System.IO.Directory.Exists(path.NoPrefix))
+                if (System.IO.Directory.Exists(path))
                 {
                     fd = new FindData()
                     {
                         Attributes = System.IO.FileAttributes.Directory,
                         nFileSizeHigh = 0,
                         nFileSizeLow = 0,
-                        Name = path.NoPrefix,
+                        Name = path,
                     };
                     return true;
                 }
@@ -199,14 +200,14 @@ namespace Sidi.IO
 
             if (path.IsUnc && path.Parts.Length == 2)
             {
-                if (System.IO.Directory.Exists(path.NoPrefix))
+                if (System.IO.Directory.Exists(path))
                 {
                     fd = new FindData()
                     {
                         Attributes = System.IO.FileAttributes.Directory,
                         nFileSizeHigh = 0,
                         nFileSizeLow = 0,
-                        Name = path.NoPrefix,
+                        Name = path,
                     };
                     return true;
                 }
@@ -422,6 +423,11 @@ namespace Sidi.IO
                 (options.OpenSourceForWrite ? NativeMethods.CopyFileFlags.COPY_FILE_OPEN_SOURCE_FOR_WRITE : 0) |
                 (options.Restartable ? NativeMethods.CopyFileFlags.COPY_FILE_RESTARTABLE : 0))
                 .CheckApiCall(String.Format("copy from {0} to {1}", existingFileName, newFileName));
+        }
+
+        public LPath GetCurrentDirectory()
+        {
+            return new LPath(System.Environment.CurrentDirectory);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Sidi.IO
         public void Exists()
         {
             var p = new LPath(String.Format(@"\\{0}\C$", System.Environment.MachineName));
-            Assert.IsTrue(System.IO.Directory.Exists(p.NoPrefix)); 
+            Assert.IsTrue(System.IO.Directory.Exists(p)); 
             Assert.IsTrue(LDirectory.Exists(p));
         }
     }

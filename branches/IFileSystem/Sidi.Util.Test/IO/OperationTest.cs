@@ -33,6 +33,9 @@ namespace Sidi.IO
             log.Info(source);
             Assert.IsFalse(source.IsFile);
 
+            var param = source.Param;
+            log.Info(param);
+
             op.EnsureParentDirectoryExists(source);
             LFile.WriteAllText(source, "hello");
             Assert.IsTrue(source.IsFile);

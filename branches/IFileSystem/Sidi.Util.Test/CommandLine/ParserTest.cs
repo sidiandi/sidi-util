@@ -347,7 +347,7 @@ namespace Sidi.CommandLine.Test
 
                 foreach (var f in e.Depth())
                 {
-                    Console.WriteLine(f.FullName.NoPrefix);
+                    Console.WriteLine(f.FullName);
                 }
             }
 
