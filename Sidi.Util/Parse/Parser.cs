@@ -44,6 +44,10 @@ namespace Sidi.Parse
 
         public static Text Consume(Text text, int length)
         {
+            if (length > text.Length)
+            {
+                return null;
+            }
             var t = text.Part(0, length);
             text.Set(text.Part(length));
             return t;

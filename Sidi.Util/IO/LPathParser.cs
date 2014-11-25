@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sidi.Parse;
 using Rule = System.Func<Sidi.Parse.Text>;
+using Sidi.Extensions;
 
 namespace Sidi.IO
 {
@@ -118,7 +119,7 @@ namespace Sidi.IO
 
             for (; ; )
             {
-                var n = NtfsFilename(t);
+                var n = NtfsFilenameWithWildcards(t);
                 if (n == null)
                 {
                     break;
@@ -152,6 +153,22 @@ namespace Sidi.IO
             return r;
         }
 
+        public static Text NtfsFilenameWithWildcards(Text text)
+        {
+            Text r = Repetition(text, 1, Int32.MaxValue, NtfsAllowedCharacterWithWildcards);
+            if (r == null)
+            {
+                return null;
+            }
+
+            if (r.Length > LPath.MaxFilenameLength)
+            {
+                throw new System.ArgumentOutOfRangeException(String.Format("file name {0} is {1} characters long. {2} characters are allowed.", r, r.Length, LPath.MaxFilenameLength));
+            }
+
+            return r;
+        }
+
         public static Text NtfsAllowedCharacter(Text text)
         {
             if (text.Length < 1)
@@ -160,37 +177,31 @@ namespace Sidi.IO
             }
 
             var c = text[0];
-            /*
 
-Use any character in the current code page for a name, including Unicode characters and characters in the extended character set (128–255), except for the following:
-
-    The following reserved characters:
-        < (less than)
-        > (greater than)
-        : (colon)
-        " (double quote)
-        / (forward slash)
-        \ (backslash)
-        | (vertical bar or pipe)
-        ? (question mark)
-        * (asterisk)
-    Integer value zero, sometimes referred to as the ASCII NUL character.
-    Characters whose integer representations are in the range from 1 through 31, except for alternate data streams where these characters are allowed. For more information about file streams, see File Streams.
-    Any other character that the target file system does not allow.
-             */
-
-            switch (c)
+            if (illegalFilenameCharacters.Contains(c))
             {
-                case '\0':
-                case '<':
-                case '>':
-                case ':':
-                case '"':
-                case '/':
-                case '\\':
-                case '|':
-                case '?':
-                    return null;
+                return null;
+            }
+
+            return Consume(text, 1);
+        }
+
+        static HashSet<char> illegalFilenameCharacters = new HashSet<char>(System.IO.Path.GetInvalidFileNameChars());
+        static HashSet<char> illegalFilenameCharactersWithoutWildcards = new HashSet<char>(System.IO.Path.GetInvalidFileNameChars()
+            .Where(x => x != '*' && x != '?'));
+
+        public static Text NtfsAllowedCharacterWithWildcards(Text text)
+        {
+            if (text.Length < 1)
+            {
+                return null;
+            }
+
+            var c = text[0];
+
+            if (illegalFilenameCharactersWithoutWildcards.Contains(c))
+            {
+                return null;
             }
 
             return Consume(text, 1);
@@ -281,6 +292,27 @@ Use any character in the current code page for a name, including Unicode charact
             }
 
             return Consume(text, 1);
+        }
+
+        internal static string MakeValidFilename(Text text)
+        {
+            var r = Repetition(text, 1, Int32.MaxValue, _ =>
+            {
+                var c = NtfsAllowedCharacter(text);
+                if (c == null)
+                {
+                    c = Consume(text, 1);
+                    if (c == null)
+                    {
+                        return null;
+                    }
+                    c = new Text("_");
+                }
+                return c.ToString();
+            });
+
+            var valid = String.Join(String.Empty, r.Childs.Select(x => x.ToString()));
+            return valid.ShortenMd5(LPath.MaxFilenameLength);
         }
     }
 }

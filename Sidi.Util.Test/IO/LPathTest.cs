@@ -149,12 +149,9 @@ namespace Sidi.IO
             Assert.AreNotEqual(invalidName, f);
             Assert.AreEqual(System.IO.Path.GetInvalidFileNameChars().Select(c => "_").Join(" "), f);
             Assert.AreEqual(validName, LPath.GetValidFilename(validName));
-            Assert.AreEqual("someName_", LPath.GetValidFilename("someName "));
-            Assert.AreEqual("someName___", LPath.GetValidFilename("someName..."));
             var fn = LPath.GetValidFilename(new string(Enumerable.Range(0, 4096).Select(_ => (char)_).ToArray()));
             log.Info(fn);
             Assert.IsTrue(LPath.IsValidFilename(fn));
-
         }
 
         [Test]
