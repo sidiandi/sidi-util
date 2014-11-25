@@ -191,18 +191,6 @@ namespace Sidi.IO
             return PathParser.MakeValidFilename(new Text(x));
         }
 
-        static string Truncate(string x, int maxLength)
-        {
-            if (x.Length > maxLength)
-            {
-                return x.Substring(0, maxLength);
-            }
-            else
-            {
-                return x;
-            }
-        }
-
         public static bool IsValidFilename(string x)
         {
             return CheckFilename(x) == null;
@@ -336,7 +324,7 @@ namespace Sidi.IO
         /// <returns>Root of the file system, e.g. C: or \\server\share</returns>
         public LPath GetPathRoot()
         {
-            if (IsFullPath)
+            if (!IsRelative)
             {
                 return new LPath(Prefix, Enumerable.Empty<string>());
             }
@@ -354,34 +342,17 @@ namespace Sidi.IO
             }
         }
 
-        /// <summary>
-        /// As IsFullPath, but returns true for paths without drive specifier, such as \a\b\c
-        /// Because you normally would like to check for a fully qualified path, i.e. which is not 
-        /// changed by current drive or directory anymore, you should use IsFullPath instead
-        /// </summary>
-        [Obsolete("use IsFullPath instead")]
-        public bool IsAbsolute
+        public bool IsRootRelative
         {
             get
             {
-                return IsFullPath;
-            }
-        }
-
-        /// <summary>
-        /// Returns true if GetFullPath will return the path itself
-        /// </summary>
-        public bool IsFullPath
-        {
-            get
-            {
-                return !(prefix is RelativePrefix || prefix is RootRelativePrefix);
+                return prefix is RootRelativePrefix;
             }
         }
 
         public static bool IsSameFileSystem(LPath p1, LPath p2)
         {
-            return p1.IsFullPath && p2.IsFullPath && object.Equals(p1.GetPathRoot(), p2.GetPathRoot());
+            return !p1.IsRelative && !p2.IsRelative && object.Equals(p1.GetPathRoot(), p2.GetPathRoot());
         }
 
         public string DriveLetter
@@ -411,17 +382,18 @@ namespace Sidi.IO
 
         private LPath GetFullPathImpl()
         {
-            if (IsAbsolute)
+            if (prefix is RootRelativePrefix)
+            {
+                return FS.GetCurrentDirectory().GetPathRoot().CatDir(Parts);
+            }
+            else if (prefix is RelativePrefix)
+            {
+                return FS.GetCurrentDirectory().CatDir(this.Parts);
+            }
+            else
             {
                 return this;
             }
-
-            if (prefix is RootRelativePrefix)
-            {
-                return FS.GetCurrentDirectory().CatDir(Parts);
-            }
-
-            return LDirectory.Current.CatDir(this.Parts);
         }
 
         public LPath GetFullPath()
