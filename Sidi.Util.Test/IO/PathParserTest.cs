@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Text = Sidi.IO.Text;
 
 namespace Sidi.IO
 {
@@ -17,8 +16,7 @@ namespace Sidi.IO
         [Test]
         public void ParseExpressions()
         {
-            var p = new Parser();
-            var text = new Text(@"// hello, world
+            var text = new Sidi.Parse.Text(@"// hello, world
 
 /* dfj;asldkfj asd;lfkja sdf
 
@@ -32,17 +30,23 @@ asdlfjasldfa s;dlkj;lk
 adkfjahs dfkjha sdfka hsdfkj
 
 ");
-            log.Info(p.Whitespace(ref text));
+            log.Info(Sidi.Parse.Parser.Whitespace(text));
         }
         
         [Test]
         public void Parse()
         {
-            log.Info(new LPath(@"C:\temp\hello.txt"));
-            log.Info(new LPath(@"\\server\share\temp\hello.txt"));
-            log.Info(new LPath(@"\\?\UNC\server\share\temp\hello.txt"));
-            log.Info(new LPath(@"\temp\hello.txt"));
-            log.Info(new LPath(@"temp\hello.txt"));
+            foreach (var i in new[]{
+@"C:\temp\hello.txt",
+@"\\server\share\temp\hello.txt",
+@"\\?\UNC\server\share\temp\hello.txt",
+@"\temp\hello.txt",
+@"temp\hello.txt"})
+            {
+                var p = new LPath(i);
+                log.InfoFormat("{0} = {1}", i, p);
+                Assert.AreEqual(i, p.ToString());
+            }
         }
     }
 }

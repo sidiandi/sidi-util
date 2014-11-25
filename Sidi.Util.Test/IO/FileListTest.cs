@@ -42,9 +42,8 @@ namespace Sidi.IO
         [Test]
         public void Network()
         {
-            var p = new LPath(TestFile(".")).Parts;
-            var p1 = new []{ Environment.MachineName, p[0].Replace(":", "$")}.Concat(p.Skip(1));
-            var nwPath = LPath.Join(LPath.ShortUncPrefix, p1);
+            var p = TestFile(".");
+            var nwPath = LPath.GetUncRoot(Environment.MachineName, p.DriveLetter + "$");
             log.Info(nwPath);
 
             var i = nwPath.Info;

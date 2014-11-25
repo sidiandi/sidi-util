@@ -87,7 +87,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static LPath Get(this Type type)
         {
-            return LPath.Join(Get(type.Assembly), type.FullName);
+            return LPath.CreateRelative(Get(type.Assembly), type.FullName);
         }
 
         public static LPath BinDir

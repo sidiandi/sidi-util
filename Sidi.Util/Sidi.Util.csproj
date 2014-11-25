@@ -118,9 +118,11 @@
     <Compile Include="IO\FindHandle.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperation.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
+    <Compile Include="IO\LPathParser.cs" />
     <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
-    <Compile Include="IO\PathParser.cs" />
+    <Compile Include="IO\Prefix.cs" />
+    <Compile Include="Parse\Parser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
     <Compile Include="IO\CopyProgress.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServer.cs" />
+    <Compile Include="Parse\Text.cs" />
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
     <Compile Include="Util\Base32.cs" />
@@ -327,6 +330,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\build\net451\System.Data.SQLite.Core.targets')" />

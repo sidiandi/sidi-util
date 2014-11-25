@@ -22,6 +22,7 @@ using System.Text;
 using Sidi.IO;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using Sidi.Extensions;
 
 namespace Sidi.Imap
 {
@@ -142,14 +143,13 @@ namespace Sidi.Imap
         {
             get
             {
-                var rootLength = directory.NoPrefix.Length;
                 var e = new Sidi.IO.Find()
                 {
                     Root = directory,
                     Output = x => x.IsDirectory,
                 };
                 return e.Depth()
-                    .Select(x => x.FullName.NoPrefix.Substring(rootLength).Replace(@"\", Delimiter))
+                    .Select(x => x.FullName.RelativeTo(directory).Parts.Join(Delimiter))
                     .Where(x => !String.IsNullOrEmpty(x))
                     .ToList();
             }

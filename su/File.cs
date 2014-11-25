@@ -258,7 +258,7 @@ namespace Sidi.Tool
                         strip.Items.Add(
                             String.Format("Open {0}", tree.SafeToString()), null, (s1, e1) =>
                             {
-                                var p = LPath.Join("", tree.Lineage.Select(x => (string)x).ToArray());
+                                var p = LPath.CreateRelative(tree.Lineage.Select(x => (string)x).ToArray());
                                 Process.Start(p);
                             });
                     }

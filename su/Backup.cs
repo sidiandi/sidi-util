@@ -254,7 +254,7 @@ namespace Sidi.Tool
         {
             var incompleteBackups = 
                 store.Children
-                .Where(c => c.EndsWith(incompleteExtension))
+                .Where(c => c.ToString().EndsWith(incompleteExtension, StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
             foreach (var i in incompleteBackups)
             {

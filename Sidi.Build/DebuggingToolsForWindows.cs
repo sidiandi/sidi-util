@@ -38,9 +38,9 @@ namespace Sidi.Build
             {
                 LPath[] searchPath =
                 {
-                    LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Windows Kits\8.0\Debuggers\x86"),
-                    LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Debugging Tools for Windows (x86)"),
-                    LPath.Join(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Debugging Tools for Windows")
+                    Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles).CatDir(@"Windows Kits\8.0\Debuggers\x86"),
+                    Paths.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).CatDir("Debugging Tools for Windows (x86)"),
+                    Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles).CatDir("Debugging Tools for Windows")
                 };
 
                 try

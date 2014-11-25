@@ -82,6 +82,8 @@
     <Compile Include="Net\WebServerTest.cs" />
     <Compile Include="Office\ExcelProviderTest.cs" />
     <Compile Include="Office\ListFormatOfficeExtensionTest.cs" />
+    <Compile Include="Parse\Parser.cs" />
+    <Compile Include="Parse\Text.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

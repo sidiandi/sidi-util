@@ -74,7 +74,7 @@ namespace Sidi.IO
         [Test]
         public void FullPath()
         {
-            var ln = LPath.Join(String.Empty, Enumerable.Range(0, 100).Select(x => "0000000000"));
+            var ln = LPath.CreateRelative(Enumerable.Range(0, 100).Select(x => "0000000000").ToArray());
             var cd = new LPath(System.Environment.CurrentDirectory);
             Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
         }
@@ -93,7 +93,7 @@ namespace Sidi.IO
         [Test]
         public void Parent()
         {
-            Assert.AreEqual(null, new LPath(@"a").Parent);
+            Assert.AreEqual(new LPath(""), new LPath(@"a").Parent);
             Assert.AreEqual(new LPath(@"a"), new LPath(@"a\b").Parent);
         }
 
@@ -114,14 +114,16 @@ namespace Sidi.IO
             Assert.IsTrue(tempDir.IsDirectory);
 
             log.Info(tempDir.DriveLetter);
-            var unc = LPath.Join(LPath.ShortUncPrefix, new []{System.Environment.MachineName, tempDir.DriveLetter + "$"});
+            var unc = LPath.GetUncRoot(System.Environment.MachineName, tempDir.DriveLetter + "$");
+            log.Info(unc);
             Assert.IsTrue(System.IO.Directory.Exists(unc));
 
             var longNameUnc = new Sidi.IO.LPath(unc);
+            log.Info(longNameUnc);
             Assert.IsTrue(longNameUnc.IsDirectory);
             Assert.IsTrue(longNameUnc.IsUnc);
 
-            tempDir = longNameUnc.NoPrefix;
+            tempDir = longNameUnc;
             Assert.IsTrue(System.IO.Directory.Exists(tempDir));
 
             for (var i = longNameUnc; i != null; i = i.Parent)
@@ -159,7 +161,7 @@ namespace Sidi.IO
         public void PathRoot()
         {
             var n = Sidi.IO.LPath.GetTempPath();
-            Assert.AreEqual(System.IO.Path.GetPathRoot(n.NoPrefix), n.GetPathRoot().NoPrefix + @"\");
+            Assert.AreEqual(System.IO.Path.GetPathRoot(n), n.GetPathRoot().ToString());
         }
 
         [Test]
@@ -242,9 +244,9 @@ namespace Sidi.IO
         public void CatDir()
         {
             int someNum = 123;
-            var p = LPath.Join(@"C:\temp", someNum.ToString());
+            var p = new LPath(@"C:\temp").CatDir(someNum.ToString());
             Assert.AreEqual(new LPath(@"C:\temp\123"), p);
-            Assert.AreEqual(new LPath(@"C:\temp\123\dir"), LPath.Join(p, "dir"));
+            Assert.AreEqual(new LPath(@"C:\temp\123\dir"), p.CatDir("dir"));
         }
 
         static string GetFileNameWhichIsTooLong()
@@ -309,13 +311,13 @@ namespace Sidi.IO
 
             var abs = new LPath(@"C:\temp\something.txt");
             Assert.IsTrue(abs.IsAbsolute);
-            Assert.AreEqual(new LPath(@"C:"), abs.GetPathRoot());
+            Assert.AreEqual(new LPath(@"C:\"), abs.GetPathRoot());
             Assert.AreEqual(abs, abs.GetFullPath());
 
             var unc = new LPath(@"\\server\share\somedir\somefile");
             Assert.IsTrue(unc.IsAbsolute);
             Assert.IsTrue(unc.IsUnc);
-            Assert.AreEqual(new LPath(@"\\server\share"), unc.GetPathRoot());
+            Assert.AreEqual(new LPath(@"\\server\share\"), unc.GetPathRoot());
             Assert.AreEqual(unc, unc.GetFullPath());
 
             var abs2 = new LPath(@"\a\b\c");
@@ -455,12 +457,12 @@ namespace Sidi.IO
                 new LPath(@"C:\temp\doc").Uri);
 
             Assert.AreEqual(
-                new Uri("file://C:/"),
-                new LPath(@"C:\").Uri);
-
-            Assert.AreEqual(
                 new Uri("file://server/share/doc.txt"),
                 new LPath(@"\\server\share\doc.txt").Uri);
+
+            Assert.AreEqual(
+                new Uri("file://C:/"),
+                new LPath(@"C:\").Uri);
         }
 
         [Test]
