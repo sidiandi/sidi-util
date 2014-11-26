@@ -158,7 +158,7 @@ namespace Sidi.IO
         public void PathRoot()
         {
             var n = Sidi.IO.LPath.GetTempPath();
-            Assert.AreEqual(System.IO.Path.GetPathRoot(n), n.GetPathRoot().ToString());
+            Assert.AreEqual(System.IO.Path.GetPathRoot(n), n.Root.ToString());
         }
 
         [Test]
@@ -299,13 +299,13 @@ namespace Sidi.IO
 
             var abs = new LPath(@"C:\temp\something.txt");
             Assert.IsFalse(abs.IsRelative);
-            Assert.AreEqual(new LPath(@"C:\"), abs.GetPathRoot());
+            Assert.AreEqual(new LPath(@"C:\"), abs.Root);
             Assert.AreEqual(abs, abs.GetFullPath());
 
             var unc = new LPath(@"\\server\share\somedir\somefile");
             Assert.IsFalse(unc.IsRelative);
             Assert.IsTrue(unc.IsUnc);
-            Assert.AreEqual(new LPath(@"\\server\share\"), unc.GetPathRoot());
+            Assert.AreEqual(new LPath(@"\\server\share\"), unc.Root);
             Assert.AreEqual(unc, unc.GetFullPath());
 
             var abs2 = new LPath(@"\a\b\c");

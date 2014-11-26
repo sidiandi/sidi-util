@@ -21,36 +21,43 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Sidi.IO
 {
+    /// <summary>
+    /// Same methods and properties as System.IO.FileSystemInfo, but can handle long paths
+    /// </summary>
     [Serializable]
     public class LFileSystemInfo : IEquatable<LFileSystemInfo>, IComparable
     {
-        internal LFileSystemInfo(FileSystem fileSystem, LPath path)
-        {
-            this.path = path.GetFullPath();
-            _findDataValid = fileSystem.GetFindData(this.path, out _findData);
-        }
+        #region FileSystemInfo methods
         
-        public LPath FullName
-        {
-            get { return path; }
-        }
-        
-        LPath path;
-        FindData _findData;
-        bool _findDataValid = false;
-
-        internal LFileSystemInfo(LPath directory, FindData findData)
-        {
-            _findData = findData;
-            _findDataValid = true;
-            path = directory.CatDir(findData.Name).GetFullPath();
-        }
-
+        // Summary:
+        //     Gets or sets the attributes for the current file or directory.
+        //
+        // Returns:
+        //     System.IO.FileAttributes of the current System.IO.FileSystemInfo.
+        //
+        // Exceptions:
+        //   System.IO.FileNotFoundException:
+        //     The specified file does not exist.
+        //
+        //   System.IO.DirectoryNotFoundException:
+        //     The specified path is invalid; for example, it is on an unmapped drive.
+        //
+        //   System.Security.SecurityException:
+        //     The caller does not have the required permission.
+        //
+        //   System.ArgumentException:
+        //     The caller attempts to set an invalid file attribute. -or-The user attempts
+        //     to set an attribute value but does not have write permission.
+        //
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
         public System.IO.FileAttributes Attributes
-        { 
+        {
             get
             {
                 return FindData.Attributes;
@@ -58,9 +65,295 @@ namespace Sidi.IO
 
             set
             {
-                NativeMethods.SetFileAttributes(FullName.Param, value).CheckApiCall(FullName);
-                _findData.Attributes = value;
+                FS.SetFileAttribute(FullName, value);
+                Refresh();
             }
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the creation time of the current file or directory.
+        //
+        // Returns:
+        //     The creation date and time of the current System.IO.FileSystemInfo object.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
+        //
+        //   System.IO.DirectoryNotFoundException:
+        //     The specified path is invalid; for example, it is on an unmapped drive.
+        //
+        //   System.PlatformNotSupportedException:
+        //     The current operating system is not Windows NT or later.
+        //
+        //   System.ArgumentOutOfRangeException:
+        //     The caller attempts to set an invalid creation time.
+        public DateTime CreationTime
+        {
+            get
+            {
+                return FindData.ftCreationTime.DateTime;
+            }
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the creation time, in coordinated universal time (UTC), of the
+        //     current file or directory.
+        //
+        // Returns:
+        //     The creation date and time in UTC format of the current System.IO.FileSystemInfo
+        //     object.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
+        //
+        //   System.IO.DirectoryNotFoundException:
+        //     The specified path is invalid; for example, it is on an unmapped drive.
+        //
+        //   System.PlatformNotSupportedException:
+        //     The current operating system is not Windows NT or later.
+        //
+        //   System.ArgumentOutOfRangeException:
+        //     The caller attempts to set an invalid access time.
+        [ComVisible(false)]
+        public DateTime CreationTimeUtc
+        {
+            get
+            {
+                return FindData.ftCreationTime.DateTimeUtc;
+            }
+        }
+
+        //
+        // Summary:
+        //     Gets a value indicating whether the file or directory exists.
+        //
+        // Returns:
+        //     true if the file or directory exists; otherwise, false.
+        public bool Exists
+        {
+            get
+            {
+                return _findDataValid;
+            }
+        }
+
+        //
+        // Summary:
+        //     Gets the string representing the extension part of the file.
+        //
+        // Returns:
+        //     A string containing the System.IO.FileSystemInfo extension.
+        public string Extension
+        {
+            get
+            {
+                return System.IO.Path.GetExtension(Name);
+            }
+        }
+        
+        //
+        // Summary:
+        //     Gets the full path of the directory or file.
+        //
+        // Returns:
+        //     A string containing the full path.
+        //
+        // Exceptions:
+        //   System.IO.PathTooLongException:
+        //     The fully qualified path and file name is 260 or more characters.
+        //
+        //   System.Security.SecurityException:
+        //     The caller does not have the required permission.
+        public LPath FullName
+        {
+            get { return path; }
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the time the current file or directory was last accessed.
+        //
+        // Returns:
+        //     The time that the current file or directory was last accessed.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
+        //
+        //   System.PlatformNotSupportedException:
+        //     The current operating system is not Windows NT or later.
+        //
+        //   System.ArgumentOutOfRangeException:
+        //     The caller attempts to set an invalid access time
+        public DateTime LastAccessTime
+        {
+            get
+            {
+                return FindData.ftLastAccessTime.DateTime;
+            }
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the time, in coordinated universal time (UTC), that the current
+        //     file or directory was last accessed.
+        //
+        // Returns:
+        //     The UTC time that the current file or directory was last accessed.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
+        //
+        //   System.PlatformNotSupportedException:
+        //     The current operating system is not Windows NT or later.
+        //
+        //   System.ArgumentOutOfRangeException:
+        //     The caller attempts to set an invalid access time.
+        [ComVisible(false)]
+        public DateTime LastAccessTimeUtc
+        {
+            get
+            {
+                return FindData.ftLastAccessTime.DateTimeUtc;
+            }
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the time when the current file or directory was last written
+        //     to.
+        //
+        // Returns:
+        //     The time the current file was last written.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
+        //
+        //   System.PlatformNotSupportedException:
+        //     The current operating system is not Windows NT or later.
+        //
+        //   System.ArgumentOutOfRangeException:
+        //     The caller attempts to set an invalid write time.
+        public DateTime LastWriteTime
+        {
+            get
+            {
+                return FindData.ftLastWriteTime.DateTime;
+            }
+        }
+
+        //
+        // Summary:
+        //     Gets or sets the time, in coordinated universal time (UTC), when the current
+        //     file or directory was last written to.
+        //
+        // Returns:
+        //     The UTC time when the current file was last written to.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     System.IO.FileSystemInfo.Refresh() cannot initialize the data.
+        //
+        //   System.PlatformNotSupportedException:
+        //     The current operating system is not Windows NT or later.
+        //
+        //   System.ArgumentOutOfRangeException:
+        //     The caller attempts to set an invalid write time.
+        [ComVisible(false)]
+        public DateTime LastWriteTimeUtc
+        {
+            get
+            {
+                return FindData.ftLastWriteTime.DateTimeUtc;
+            }
+        }
+
+        //
+        // Summary:
+        //     For files, gets the name of the file. For directories, gets the name of the
+        //     last directory in the hierarchy if a hierarchy exists. Otherwise, the Name
+        //     property gets the name of the directory.
+        //
+        // Returns:
+        //     A string that is the name of the parent directory, the name of the last directory
+        //     in the hierarchy, or the name of a file, including the file name extension.
+        public string Name
+        {
+            get
+            {
+                return FindData.Name;
+            }
+        }
+
+        // Summary:
+        //     Deletes a file or directory.
+        //
+        // Exceptions:
+        //   System.IO.DirectoryNotFoundException:
+        //     The specified path is invalid; for example, it is on an unmapped drive.
+        //
+        //   System.IO.IOException:
+        //     There is an open handle on the file or directory, and the operating system
+        //     is Windows XP or earlier. This open handle can result from enumerating directories
+        //     and files. For more information, see How to: Enumerate Directories and Files.
+        public void Delete()
+        {
+            FullName.EnsureNotExists();
+        }
+
+        //
+        // Summary:
+        //     Refreshes the state of the object.
+        //
+        // Exceptions:
+        //   System.IO.IOException:
+        //     A device such as a disk drive is not ready.
+        [SecuritySafeCritical]
+        public void Refresh()
+        {
+            _findDataValid = FS.GetFindData(this.path, out _findData);
+        }
+
+        #endregion
+
+        [NonSerialized]
+        FileSystem _fileSystem;
+
+        FileSystem FS
+        {
+            get
+            {
+                if (_fileSystem == null)
+                {
+                    _fileSystem = FileSystem.Current;
+                }
+                return _fileSystem;
+            }
+        }
+        
+        LPath path;
+        FindData _findData;
+        bool _findDataValid = false;
+
+        internal LFileSystemInfo(FileSystem fileSystem, LPath path)
+        {
+            this._fileSystem = fileSystem;
+            this.path = path.GetFullPath();
+            Refresh();
+        }
+
+        internal LFileSystemInfo(FileSystem fileSystem, LPath directory, FindData findData)
+        {
+            this._fileSystem = fileSystem;
+            _findData = findData;
+            _findDataValid = true;
+            path = directory.CatDir(findData.Name).GetFullPath();
         }
 
         public bool IsReadOnly
@@ -115,19 +408,6 @@ namespace Sidi.IO
             }
         }
 
-        public bool Hidden
-        {
-            get
-            {
-                return IsAttribute(System.IO.FileAttributes.Hidden);
-            }
-
-            set
-            {
-                SetAttributes(System.IO.FileAttributes.Hidden, value);
-            }
-        }
-
         public long Length
         {
             get
@@ -170,77 +450,19 @@ namespace Sidi.IO
                 .ToList();
         }
 
-        public DateTime CreationTime
-        { 
-            get
-            {
-                return FindData.ftCreationTime.DateTime;
-            }
-        }
-
-        public DateTime CreationTimeUtc
-        {
-            get
-            {
-                return FindData.ftCreationTime.DateTimeUtc;
-            }
-        }
         
-        public bool Exists
-        {
-            get
-            {
-                return _findDataValid;
-            }
-        }
 
-        public string Extension
-        {
-            get
-            {
-                return System.IO.Path.GetExtension(Name);
-            }
-        }
+        
 
-        public DateTime LastAccessTime
-        {
-            get
-            {
-                return FindData.ftLastAccessTime.DateTime;
-            }
-        }
+        
 
-        public DateTime LastAccessTimeUtc
-        {
-            get
-            {
-                return FindData.ftLastAccessTime.DateTimeUtc;
-            }
-        }
+        
 
-        public DateTime LastWriteTime
-        { 
-            get
-            {
-                return FindData.ftLastWriteTime.DateTime;
-            }
-        }
+        
 
-        public DateTime LastWriteTimeUtc
-        {
-            get
-            {
-                return FindData.ftLastWriteTime.DateTimeUtc;
-            }
-        }
+        
 
-        public string Name
-        {
-            get
-            {
-                return FindData.Name;
-            }
-        }
+        
 
         public string FileNameWithoutExtension
         {
@@ -250,10 +472,7 @@ namespace Sidi.IO
             }
         }
 
-        public void Delete()
-        {
-            FullName.EnsureNotExists();
-        }
+        
 
         FindData FindData
         {
@@ -289,78 +508,6 @@ namespace Sidi.IO
         {
             return path.Equals(other.path) && 
                 FindData.Equals(other.FindData);
-        }
-
-        NativeMethods.BY_HANDLE_FILE_INFORMATION GetByHandleFileInformation()
-        {
-            using (var handle = NativeMethods.CreateFile(
-                this.FullName.Param, 
-                System.IO.FileAccess.Read, 
-                System.IO.FileShare.Read, IntPtr.Zero, 
-                System.IO.FileMode.Open, System.IO.FileAttributes.Normal, 
-                IntPtr.Zero))
-                {
-            if (handle.IsInvalid)
-            {
-                throw new Win32Exception(this.FullName);
-            }
-
-                var fileInfo = new NativeMethods.BY_HANDLE_FILE_INFORMATION();
-                NativeMethods.GetFileInformationByHandle(handle, out fileInfo)
-                    .CheckApiCall(this.FullName);
-                return fileInfo;
-            }
-        }
-
-        public int FileLinkCount
-        {
-            get
-            {
-                return (int) GetByHandleFileInformation().NumberOfLinks;
-            }
-        }
-
-        public long FileIndex
-        {
-            get
-            {
-                var fileInfo = GetByHandleFileInformation();
-                return (long)(((ulong)fileInfo.FileIndexHigh << 32) + (ulong)fileInfo.FileIndexLow);
-            }
-        }
-
-        static string[] GetFileSiblingHardLinks(string filepath)
-        {
-            List<string> result = new List<string>();
-            uint stringLength = 256;
-            StringBuilder sb = new StringBuilder(256);
-            NativeMethods.GetVolumePathName(filepath, sb, stringLength);
-            string volume = sb.ToString();
-            sb.Length = 0; stringLength = 256;
-            IntPtr findHandle = NativeMethods.FindFirstFileNameW(filepath, 0, ref stringLength, sb);
-            if (findHandle.ToInt32() != -1)
-            {
-                do
-                {
-                    StringBuilder pathSb = new StringBuilder(volume, 256);
-                    NativeMethods.PathAppend(pathSb, sb.ToString());
-                    result.Add(pathSb.ToString());
-                    sb.Length = 0; stringLength = 256;
-                } while (NativeMethods.FindNextFileNameW(findHandle, ref stringLength, sb));
-                NativeMethods.FindClose(findHandle);
-                return result.ToArray();
-            }
-            return null;
-        }
-
-        public IList<LPath> HardLinks
-        {
-            get
-            {
-                return GetFileSiblingHardLinks(FullName.ToString())
-                    .Select(x => new LPath(x))
-                    .ToList();
-            }
         }
 
         public int CompareTo(object obj)

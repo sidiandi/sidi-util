@@ -166,7 +166,7 @@ namespace Sidi.IO
         public void Move()
         {
             CreateSampleFile(lp);
-            var m = lp.GetPathRoot().CatDir(lp.Parts.Take(20));
+            var m = lp.Root.CatDir(lp.Parts.Take(20));
             var dest = root.CatDir("moved");
             LDirectory.Move(m, dest);
             Assert.IsTrue(LDirectory.Exists(dest));

@@ -49,7 +49,7 @@ namespace Sidi.Extensions
 
             if (truncatedTextLength < 0)
             {
-                throw new ArgumentException("maxLength");
+                throw new ArgumentException("maxLength", String.Format("must be >= {0}", digest.Length));
             }
 
             return text.Substring(0, truncatedTextLength) + digest;

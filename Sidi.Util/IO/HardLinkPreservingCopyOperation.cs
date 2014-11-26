@@ -60,7 +60,7 @@ namespace Sidi.IO
             }
             else
             {
-                var fi = source.Info.FileIndex;
+                var fi = HardLinkInfo.Get(source).FileIndex;
                 LPath existingDestinationFile;
                 if (sourceFileIdToDestinationPath.TryGetValue(fi, out existingDestinationFile))
                 {

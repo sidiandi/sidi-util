@@ -77,7 +77,7 @@ namespace Sidi.IO
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH)]
         internal string Name;
         // not using this
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_ALTERNATE)]
         internal string cAlternate;
 
         public bool Equals(FindData other)

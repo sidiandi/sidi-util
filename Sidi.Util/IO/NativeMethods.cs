@@ -37,6 +37,7 @@ namespace Sidi.IO
         internal static int FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
 
         public const int MAX_PATH = 260;
+        public const int MAX_ALTERNATE = 14;
 
         public static void CheckApiCall(this bool result, LPath path)
         {

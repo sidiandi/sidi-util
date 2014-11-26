@@ -116,7 +116,9 @@
     <Compile Include="IMAP\Server.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\FindHandle.cs" />
+    <Compile Include="IO\HardLinkInfo.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperation.cs" />
+    <Compile Include="IO\IHardLinkInfo.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="IO\LPathParser.cs" />
     <Compile Include="IO\LPathWriteTime.cs" />
@@ -195,6 +197,7 @@
     <Compile Include="Util\Interval.cs" />
     <Compile Include="Collections\IntSet.cs" />
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="IO\PathExtensions.cs" />
     <Compile Include="IO\SearchPath.cs" />
     <Compile Include="Util\ListEx.cs" />

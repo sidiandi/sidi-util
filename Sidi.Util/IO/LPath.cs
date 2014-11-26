@@ -233,20 +233,6 @@ namespace Sidi.IO
             return CheckFilenameWithWildcards(x) == null;
         }
 
-        static bool RemovePrefix(string text, string prefix, out string result)
-        {
-            if (text.StartsWith(prefix))
-            {
-                result = text.Substring(prefix.Length);
-                return true;
-            }
-            else
-            {
-                result = null;
-                return false;
-            }
-        }
-
         static bool IsDriveSpecifier(string d)
         {
             return d.Length == 2 && char.IsLetter(d[0]) && d[1] == ':';
@@ -319,18 +305,13 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// Throws an exception when !IsFullPath
+        /// Root of the path, e.g. C:\ or \\server\share\
         /// </summary>
-        /// <returns>Root of the file system, e.g. C: or \\server\share</returns>
-        public LPath GetPathRoot()
+        public LPath Root
         {
-            if (!IsRelative)
+            get
             {
                 return new LPath(Prefix, Enumerable.Empty<string>());
-            }
-            else
-            {
-                throw new InvalidOperationException("path is not absolute");
             }
         }
 
@@ -352,7 +333,7 @@ namespace Sidi.IO
 
         public static bool IsSameFileSystem(LPath p1, LPath p2)
         {
-            return !p1.IsRelative && !p2.IsRelative && object.Equals(p1.GetPathRoot(), p2.GetPathRoot());
+            return !p1.IsRelative && !p2.IsRelative && object.Equals(p1.Root, p2.Root);
         }
 
         public string DriveLetter
@@ -380,11 +361,19 @@ namespace Sidi.IO
             }
         }
 
+        public IHardLinkInfo HardLinkInfo
+        {
+            get
+            {
+                return FS.GetHardLinkInfo(this);
+            }
+        }
+
         private LPath GetFullPathImpl()
         {
             if (prefix is RootRelativePrefix)
             {
-                return FS.GetCurrentDirectory().GetPathRoot().CatDir(Parts);
+                return FS.GetCurrentDirectory().Root.CatDir(Parts);
             }
             else if (prefix is RelativePrefix)
             {
@@ -542,6 +531,9 @@ namespace Sidi.IO
             return new LPath(String.Empty, result);
         }
         
+        /// <summary>
+        /// Parent of this path, or null if path is a root path
+        /// </summary>
         public LPath Parent
         {
             get
@@ -557,6 +549,9 @@ namespace Sidi.IO
             }
         }
 
+        /// <summary>
+        /// List of all parents of this path down to the path root, starting with this path
+        /// </summary>
         public IEnumerable<LPath> Lineage
         {
             get

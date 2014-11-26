@@ -91,14 +91,14 @@ namespace Sidi.IO
 
             op.Link(source, dest);
 
-            log.Info(source.GetPathRoot());
+            log.Info(source.Root);
             Assert.IsTrue(LPath.IsSameFileSystem(sourceRoot, destRoot));
         }
 
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [Test]
         public void PathRoot()
         {
-            log.Info(relChild.GetPathRoot());
+            Assert.AreEqual(LPath.CreateRelative(), relChild.Root);
         }
 
         [Test, ExpectedException(typeof(System.IO.IOException))]
