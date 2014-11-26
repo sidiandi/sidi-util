@@ -24,13 +24,13 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Sidi.IO
+namespace Sidi.IO.Windows
 {
     /// <summary>
     /// Same methods and properties as System.IO.FileSystemInfo, but can handle long paths
     /// </summary>
     [Serializable]
-    public class LFileSystemInfo : IEquatable<LFileSystemInfo>, IComparable
+    public class FileSystemInfo : IEquatable<FileSystemInfo>, IComparable, Sidi.IO.IFileSystemInfo
     {
         #region FileSystemInfo methods
         
@@ -323,16 +323,12 @@ namespace Sidi.IO
         #endregion
 
         [NonSerialized]
-        FileSystem _fileSystem;
+        readonly FileSystem _fileSystem;
 
         FileSystem FS
         {
             get
             {
-                if (_fileSystem == null)
-                {
-                    _fileSystem = FileSystem.Current;
-                }
                 return _fileSystem;
             }
         }
@@ -341,14 +337,14 @@ namespace Sidi.IO
         FindData _findData;
         bool _findDataValid = false;
 
-        internal LFileSystemInfo(FileSystem fileSystem, LPath path)
+        internal FileSystemInfo(FileSystem fileSystem, LPath path)
         {
             this._fileSystem = fileSystem;
             this.path = path.GetFullPath();
             Refresh();
         }
 
-        internal LFileSystemInfo(FileSystem fileSystem, LPath directory, FindData findData)
+        internal FileSystemInfo(FileSystem fileSystem, LPath directory, FindData findData)
         {
             this._fileSystem = fileSystem;
             _findData = findData;
@@ -416,34 +412,28 @@ namespace Sidi.IO
             }
         }
 
-        public IList<LFileSystemInfo> GetChildren()
+        public IList<IFileSystemInfo> GetChildren(string searchPattern = null)
         {
-            return GetChildren(LPath.AllFilesWildcard);
+            return FS.FindFile(SearchPath(searchPattern)).ToList();
         }
 
-        public IList<LFileSystemInfo> GetChildren(string searchPattern)
+        LPath SearchPath(string searchPattern)
         {
-            return LDirectory.FindFile(this.FullName.CatDir(searchPattern)).ToList();
+            if (searchPattern == null)
+            {
+                searchPattern = LPath.AllFilesWildcard;
+            }
+            return FullName.CatDir(searchPattern);
         }
 
-        public IList<LFileSystemInfo> GetDirectories()
-        {
-            return GetDirectories(LPath.AllFilesWildcard);
-        }
-
-        public IList<LFileSystemInfo> GetDirectories(string searchPattern)
+        public IList<IFileSystemInfo> GetDirectories(string searchPattern)
         {
             return GetChildren(searchPattern)
                 .Where(x => x.IsDirectory)
                 .ToList();
         }
 
-        public IList<LFileSystemInfo> GetFiles()
-        {
-            return GetFiles(LPath.AllFilesWildcard);
-        }
-
-        public IList<LFileSystemInfo> GetFiles(string searchPattern)
+        public IList<IFileSystemInfo> GetFiles(string searchPattern = null)
         {
             return GetChildren(searchPattern)
                 .Where(x => x.IsFile)
@@ -494,9 +484,9 @@ namespace Sidi.IO
 
         public override bool Equals(object obj)
         {
-            if (obj is LFileSystemInfo)
+            if (obj is FileSystemInfo)
             {
-                return Equals((LFileSystemInfo)obj);
+                return Equals((FileSystemInfo)obj);
             }
             else
             {
@@ -504,7 +494,7 @@ namespace Sidi.IO
             }
         }
 
-        public bool Equals(LFileSystemInfo other)
+        public bool Equals(FileSystemInfo other)
         {
             return path.Equals(other.path) && 
                 FindData.Equals(other.FindData);
@@ -514,12 +504,12 @@ namespace Sidi.IO
         {
             try
             {
-                var o = (LFileSystemInfo)obj;
+                var o = (FileSystemInfo)obj;
                 return path.CompareTo(o.path);
             }
             catch (InvalidCastException ex)
             {
-                throw new ArgumentException("obj is not of type LFileSystemInfo", ex);
+                throw new ArgumentException("obj is not of type IFileSystemInfo", ex);
             }
         }
     }

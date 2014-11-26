@@ -411,13 +411,6 @@ namespace Sidi.IO
         }
 
         [Test]
-        public void VolumePath()
-        {
-            var t = TestFile("test");
-            log.Info(t.VolumePath);
-        }
-
-        [Test]
         public void DriveRootsExist()
         {
             Assert.IsFalse(new LPath(@"a:\").Exists);

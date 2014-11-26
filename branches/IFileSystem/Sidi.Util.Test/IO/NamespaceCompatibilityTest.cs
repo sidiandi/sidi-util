@@ -39,9 +39,7 @@ namespace Sidi.Test
         [Test]
         public void TestNames()
         {
-            FileUtil.GetFileSystemInfo(Paths.BinDir);
             Console.WriteLine(Paths.BinDir);
-
             Copy copy = null;
             CopyOp copyOp = null;
             CopyProgress copyProgress = null;

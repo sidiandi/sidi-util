@@ -52,7 +52,8 @@ namespace Sidi.Build.Test
         public void Write()
         {
             var pdbFileCopy = pdbFile.ChangeExtension(".modified.pdb");
-            Sidi.IO.LFile.Copy(pdbFile, pdbFileCopy, true);
+
+            FileSystem.Current.CopyFile(pdbFile, pdbFileCopy, options: new CopyFileOptions { FailIfExists = false });
 
             const string content = "Hello, Test";
             const string streamName = "srcsrv";

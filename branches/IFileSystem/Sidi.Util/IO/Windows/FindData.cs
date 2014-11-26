@@ -22,7 +22,7 @@ using System.Text;
 using ComTypes=System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 
-namespace Sidi.IO
+namespace Sidi.IO.Windows
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     [Serializable]

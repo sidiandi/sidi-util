@@ -49,7 +49,7 @@ namespace Sidi.Visualization
         static void GetChildrenRecursive(Tree t)
         {
             log.Info(t.Object);    
-            var i = (Sidi.IO.LFileSystemInfo) t.Object;
+            var i = (Sidi.IO.IFileSystemInfo) t.Object;
             if (i.IsDirectory)
             {
                 foreach (var x in i.GetChildren())
@@ -64,7 +64,7 @@ namespace Sidi.Visualization
             }
         }
 
-        static Tree GetRecursive(Tree parent, Sidi.IO.LFileSystemInfo i)
+        static Tree GetRecursive(Tree parent, Sidi.IO.IFileSystemInfo i)
         {
             var t = new Tree(parent) { Object = i };
             if (i.IsDirectory)

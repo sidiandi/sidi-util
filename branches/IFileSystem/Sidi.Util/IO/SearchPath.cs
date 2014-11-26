@@ -85,17 +85,9 @@ namespace Sidi.IO
 
         public bool TryFind(LPath file, out LPath path)
         {
-            foreach (var i in Paths)
-            {
-                string p = i.CatDir(file);
-                if (LFile.Exists(p))
-                {
-                    path = p;
-                    return true;
-                }
-            }
-            path = null;
-            return false;
+            path = Paths.Select(_ => _.CatDir(file))
+                .FirstOrDefault(x => x.IsFile);
+            return path != null;
         }
     }
 }

@@ -136,7 +136,7 @@ namespace Sidi.IO
             return new LPath(RelativePrefix, parts);
         }
 
-        FileSystem FS
+        IFileSystem FS
         {
             get
             {
@@ -353,7 +353,7 @@ namespace Sidi.IO
 
         public static readonly char DirectorySeparatorChar = System.IO.Path.DirectorySeparatorChar;
 
-        public LFileSystemInfo Info
+        public IFileSystemInfo Info
         {
             get
             {
@@ -638,24 +638,12 @@ namespace Sidi.IO
             return GetDirectories(AllFilesWildcard);
         }
 
-        static IList<LPath> ToListOfPath(IEnumerable<LFileSystemInfo> list)
+        static IList<LPath> ToListOfPath(IEnumerable<IFileSystemInfo> list)
         {
             return list.Select(x => x.FullName).ToList();
         }
 
         public static readonly string AllFilesWildcard = "*";
-
-        /// <summary>
-        /// Gets all files that match the wildcard searchPath
-        /// </summary>
-        /// <param name="searchPath">search path that can contain wild cards</param>
-        /// <returns></returns>
-        public static IList<LPath> Get(LPath searchPath)
-        {
-            return LDirectory.FindFile(searchPath)
-                .Select(x => x.FullName)
-                .ToList();
-        }
 
         public string FileName
         {
@@ -968,14 +956,6 @@ namespace Sidi.IO
                 throw new System.ArgumentException("Parameter must be of Type LPath", "obj");
             }
             return this.ToString().CompareTo(r.ToString());
-        }
-
-        public LPath VolumePath
-        {
-            get
-            {
-                return FS.GetVolumePath(this);
-            }
         }
 
         public System.IO.StreamWriter WriteText()

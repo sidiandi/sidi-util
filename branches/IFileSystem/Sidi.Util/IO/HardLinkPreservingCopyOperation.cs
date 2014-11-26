@@ -18,13 +18,13 @@ namespace Sidi.IO
         {
             if (volume == null)
             {
-                volume = path.VolumePath;
+                volume = path.Root;
             }
             else
             {
-                if (!volume.Equals(path.VolumePath))
+                if (!volume.Equals(path.Root))
                 {
-                    throw new Exception(String.Format("Volume of {2} must be {0} but is {1}", volume, path.VolumePath, path));
+                    throw new Exception(String.Format("Volume of {2} must be {0} but is {1}", volume, path.Root, path));
                 }
             }
         }
@@ -60,7 +60,7 @@ namespace Sidi.IO
             }
             else
             {
-                var fi = HardLinkInfo.Get(source).FileIndex;
+                var fi = source.HardLinkInfo.FileIndex;
                 LPath existingDestinationFile;
                 if (sourceFileIdToDestinationPath.TryGetValue(fi, out existingDestinationFile))
                 {
@@ -68,7 +68,7 @@ namespace Sidi.IO
                     log.InfoFormat("re-create link at {0} as {1} -> {2}",
                         source,
                         destination, existingDestinationFile);
-                    LFile.CreateHardLink(destination, existingDestinationFile);
+                    fileSystem.CreateHardLink(destination, existingDestinationFile);
                 }
                 else
                 {
@@ -81,5 +81,6 @@ namespace Sidi.IO
         Dictionary<long, LPath> sourceFileIdToDestinationPath = new Dictionary<long, LPath>();
         LPath sourceVolume;
         LPath destinationVolume;
+        IFileSystem fileSystem = FileSystem.Current;
     }
 }
