@@ -195,7 +195,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static bool NoDotNoHidden(LFileSystemInfo i)
         {
-            return !i.Hidden && !i.Name.StartsWith(".");
+            return !i.IsHidden && !i.Name.StartsWith(".");
         }
     }
 }

@@ -151,7 +151,7 @@ namespace Sidi.IO
             var p = searchPath.Parent;
             return FindFileRaw(searchPath)
                 .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
-                .Select(x => new LFileSystemInfo(p, x));
+                .Select(x => new LFileSystemInfo(this, p, x));
         }
 
         /// <summary>
@@ -428,6 +428,16 @@ namespace Sidi.IO
         public LPath GetCurrentDirectory()
         {
             return new LPath(System.Environment.CurrentDirectory);
+        }
+
+        public void SetFileAttribute(LPath path, System.IO.FileAttributes value)
+        {
+            NativeMethods.SetFileAttributes(path.Param, value).CheckApiCall(path);
+        }
+
+        public IHardLinkInfo GetHardLinkInfo(LPath path)
+        {
+            return HardLinkInfo.Get(path);
         }
     }
 }

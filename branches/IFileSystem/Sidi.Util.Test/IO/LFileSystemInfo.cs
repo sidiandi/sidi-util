@@ -36,7 +36,7 @@ namespace Sidi.IO
         [Test]
         public void DriveRoot()
         {
-            var drive = LDirectory.Current.GetPathRoot();
+            var drive = FileSystem.Current.GetCurrentDirectory().Root;
             Assert.IsTrue(drive.IsRoot);
             var c = drive.Info;
             Assert.IsTrue(c.Exists);
@@ -70,16 +70,16 @@ namespace Sidi.IO
             var testFile1 = testFile.CatName(".hl");
             testFile1.EnsureNotExists();
             LFile.CreateHardLink(testFile1, testFile);
-            Assert.AreEqual(2, testFile.Info.FileLinkCount);
+            Assert.AreEqual(2, testFile.HardLinkInfo.FileLinkCount);
 
-            var hl = (List<LPath>) testFile.Info.HardLinks;
+            var hl = (List<LPath>)testFile.HardLinkInfo.HardLinks;
 
             Assert.AreEqual(2, hl.Count);
             Assert.Contains(testFile, hl);
             Assert.Contains(testFile1, hl);
 
-            log.Info(testFile.Info.FileIndex);
-            Assert.AreEqual(testFile.Info.FileIndex, testFile1.Info.FileIndex);
+            log.Info(testFile.HardLinkInfo.FileIndex);
+            Assert.AreEqual(testFile.HardLinkInfo.FileIndex, testFile1.HardLinkInfo.FileIndex);
         }
 
         static T TestSerialization<T>(T x)
@@ -103,6 +103,31 @@ namespace Sidi.IO
             var newInfo = p.Info;
             Assert.AreNotEqual(infoSerialized.LastWriteTimeUtc, newInfo.LastWriteTimeUtc);
             Assert.AreNotEqual(infoSerialized, newInfo);
+        }
+
+        [Test]
+        public void SameAsSystemIoFileSystemInfo()
+        {
+            var testFile = TestFile("test.txt");
+            testFile.EnsureFileNotExists();
+            LFile.WriteAllText(testFile, "hello");
+
+            var system = new FileInfo(testFile);
+            var sidi = testFile.Info;
+
+            Assert.AreEqual(system.Attributes, sidi.Attributes);
+            Assert.AreEqual(system.CreationTime, sidi.CreationTime);
+            Assert.AreEqual(system.CreationTimeUtc, sidi.CreationTimeUtc);
+            Assert.AreEqual(system.Exists, sidi.Exists);
+            Assert.AreEqual(system.Extension, sidi.Extension);
+            Assert.AreEqual(system.FullName, sidi.FullName.ToString());
+            Assert.AreEqual(system.LastAccessTime, sidi.LastAccessTime);
+            Assert.AreEqual(system.LastAccessTimeUtc, sidi.LastAccessTimeUtc);
+            Assert.AreEqual(system.LastWriteTime, sidi.LastWriteTime);
+            Assert.AreEqual(system.LastWriteTimeUtc, sidi.LastWriteTimeUtc);
+            Assert.AreEqual(system.Name, sidi.Name);
+            sidi.Delete();
+            Assert.IsFalse(testFile.Exists);
         }
     }
 }

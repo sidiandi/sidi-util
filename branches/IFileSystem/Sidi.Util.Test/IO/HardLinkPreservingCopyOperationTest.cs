@@ -49,7 +49,7 @@ namespace Sidi.IO
             {
                 LFile.CreateHardLink(f.CatName(i.ToString()), f);
             }
-            Assert.AreEqual(count + 1, f.Info.FileLinkCount);
+            Assert.AreEqual(count + 1, f.HardLinkInfo.FileLinkCount);
 
             var destinationDir = new LPath(targetDrive.RootDirectory.FullName).CatDir(@"temp\copy-hardlink-test");
             destinationDir.EnsureNotExists();
@@ -59,7 +59,7 @@ namespace Sidi.IO
             co.Copy(sourceDir, destinationDir);
             var c = destinationDir.Children;
             Assert.AreEqual(count + 1, c.Count);
-            var g = c.GroupBy(x => x.Info.FileIndex);
+            var g = c.GroupBy(x => x.HardLinkInfo.FileIndex);
 
             Assert.AreEqual(1, g.Count());
 

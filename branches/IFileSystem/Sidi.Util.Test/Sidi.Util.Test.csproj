@@ -66,7 +66,7 @@
     <Compile Include="IO\File.cs" />
     <Compile Include="IO\EnumConfig.cs" />
     <Compile Include="IO\FileListTest.cs" />
-    <Compile Include="IO\FileSystemInfo.cs" />
+    <Compile Include="IO\LFileSystemInfo.cs" />
     <Compile Include="IO\FileSystemTest.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperationTest.cs" />
     <Compile Include="IO\NamespaceCompatibilityTest.cs" />
