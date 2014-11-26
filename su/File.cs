@@ -232,7 +232,7 @@ namespace Sidi.Tool
             public string Digest;
         }
 
-        IEnumerable<LFileSystemInfo> AllFilesRecursive(PathList fileList)
+        IEnumerable<IFileSystemInfo> AllFilesRecursive(PathList fileList)
         {
             return fileList.SelectMany(root => Find.AllFiles(root));
         }

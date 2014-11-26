@@ -17,7 +17,7 @@ namespace Sidi.Tool
             {
                 return;
             }
-            if (LFile.Exists(To))
+            if (To.IsFile)
             {
                 return;
             }

@@ -90,7 +90,7 @@ namespace Sidi.IO
             CreateSampleFile(lp);
             var lpCopy = lp.CatName(".copy");
             LFile.Copy(lp, lpCopy);
-            Assert.IsTrue(LFile.Exists(lpCopy));
+            Assert.IsTrue(lpCopy.IsFile);
             log.Info(lp.Parent.Children);
             log.Info(lp);
         }
@@ -115,7 +115,7 @@ namespace Sidi.IO
             {
                 log.Info(p);
             });
-            Assert.IsTrue(LFile.Exists(lpCopy));
+            Assert.IsTrue(lpCopy.IsFile);
             lpCopy.EnsureNotExists();
             bigSampleFile.EnsureNotExists();
         }
@@ -126,7 +126,7 @@ namespace Sidi.IO
             CreateSampleFile(lp);
             var lpCopy = lp.CatName(".link");
             LFile.CreateHardLink(lpCopy, lp);
-            Assert.IsTrue(LFile.Exists(lpCopy));
+            Assert.IsTrue(lpCopy.IsFile);
             log.Info(lp.Parent.Children);
             log.Info(lp);
             Assert.IsTrue(LFile.EqualByTimeAndLength(lp, lpCopy));
@@ -170,7 +170,7 @@ namespace Sidi.IO
             var dest = root.CatDir("moved");
             LDirectory.Move(m, dest);
             Assert.IsTrue(LDirectory.Exists(dest));
-            Assert.IsFalse(LFile.Exists(lp));
+            Assert.IsFalse(lp.IsFile);
             Assert.IsTrue(LDirectory.Exists(root));
         }
 

@@ -70,20 +70,5 @@ namespace Sidi.Util
                 Trace.Listeners.Remove(listener);
             }
         }
-
-        [Test()]
-        public void TestGetRelativePath()
-        {
-            Assert.AreEqual(FileUtil.GetRelativePath(@"a\b\c", @"a"), @"b\c");
-            Assert.AreEqual(FileUtil.GetRelativePath(@"a", @"a\b\c"), @"..\..");
-            Assert.AreEqual(FileUtil.GetRelativePath(@".\a", @"."), @"a");
-            Assert.AreEqual(FileUtil.GetRelativePath(@".", @".\a"), @"..");
-
-            Assert.AreEqual(@"a\b\c".GetRelativePath(@"a"), @"b\c");
-            Assert.AreEqual(@"a".GetRelativePath(@"a\b\c"), @"..\..");
-            Assert.AreEqual(@".\a".GetRelativePath(@"."), @"a");
-            Assert.AreEqual(@".".GetRelativePath(@".\a"), @"..");
-        }
     }
-
 }

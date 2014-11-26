@@ -28,7 +28,7 @@ using Sidi.Extensions;
 
 namespace Sidi.IO
 {
-    [Obsolete("Use LPath and FileSystem methods")]
+    [Obsolete("Use IFileSystem and LPath methods")]
     public class LFile
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -65,21 +65,6 @@ namespace Sidi.IO
         public static System.IO.StreamWriter StreamWriter(LPath path)
         {
             return new System.IO.StreamWriter(OpenWrite(path));
-        }
-
-        public static bool Exists(LPath path)
-        {
-            using (var f = LDirectory.FindFile(path).GetEnumerator())
-            {
-                if (f.MoveNext())
-                {
-                    return ((f.Current.Attributes & System.IO.FileAttributes.Directory) == 0);
-                }
-                else
-                {
-                    return false;
-                }
-            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -369,7 +354,7 @@ namespace Sidi.IO
         {
             // Validate buffers are the same length.
             // This also ensures that the count does not exceed the length of either buffer.  
-            return NativeMethods.memcmp(b1, b2, count) == 0;
+            return Sidi.IO.Windows.NativeMethods.memcmp(b1, b2, count) == 0;
         }
 
         public static bool EqualByContent(LPath f1, LPath f2)

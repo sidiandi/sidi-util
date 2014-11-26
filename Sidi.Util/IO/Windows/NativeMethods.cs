@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 
-namespace Sidi.IO
+namespace Sidi.IO.Windows
 {
     internal static class NativeMethods
     {

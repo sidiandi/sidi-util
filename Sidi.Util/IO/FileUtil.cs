@@ -31,86 +31,16 @@ namespace Sidi.IO
     public static class FileUtil
     {
         /// <summary>
-        /// Searches fileName in directory first, then in all parent directories
-        /// </summary>
-        /// <param name="directory"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public static string SearchUp(L.LPath directory, string fileName)
-        {
-            if (directory == null)
-            {
-                return null;
-            }
-
-            for (var p = directory; p != null; p = p.Parent)
-            {
-                var file = p.CatDir(fileName);
-                if (LFile.Exists(file))
-                {
-                    return file;
-                }
-            }
-            return null;
-        }
-
-        public static System.IO.FileSystemInfo GetFileSystemInfo(this string path)
-        {
-            FileInfo f = new FileInfo(path);
-            if ((f.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
-            {
-                return new DirectoryInfo(path);
-            }
-            else
-            {
-                return f;
-            }
-        }
-
-        public static string GetRelativePath(this string path, string basePath)
-        {
-            basePath = System.IO.Path.GetFullPath(basePath);
-            path = System.IO.Path.GetFullPath(path);
-
-            string[] fromDirs = basePath.Split(System.IO.Path.DirectorySeparatorChar);
-            string[] toDirs = path.Split(System.IO.Path.DirectorySeparatorChar);
-
-            int i = 0;
-            for (; i < fromDirs.Length && i < toDirs.Length; ++i)
-            {
-                if (fromDirs[i] != toDirs[i])
-                {
-                    break;
-                }
-            }
-            int identicalIndex = i;
-
-            List<string> rel = new List<string>();
-
-            for (i = Math.Max(identicalIndex, fromDirs.Length); i > identicalIndex; --i)
-            {
-                rel.Add("..");
-            }
-            for (; i < toDirs.Length; ++i)
-            {
-
-                rel.Add(toDirs[i]);
-            }
-
-            return rel.Join(new String(System.IO.Path.DirectorySeparatorChar, 1));
-        }
-
-        /// <summary>
         /// Compares two files bytewise
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static bool FilesAreEqual(string a, string b)
+        public static bool FilesAreEqual(LPath a, LPath b)
         {
-            if (LFile.Exists(a))
+            if (a.IsFile)
             {
-                if (LFile.Exists(b))
+                if (b.IsFile)
                 {
                     FileInfo ia = new FileInfo(a);
                     FileInfo ib = new FileInfo(b);
@@ -153,7 +83,7 @@ namespace Sidi.IO
             }
             else
             {
-                if (LFile.Exists(b))
+                if (b.IsFile)
                 {
                     return false;
                 }
@@ -164,11 +94,11 @@ namespace Sidi.IO
             }
         }
 
-        public static bool FilesAreEqualByTime(string a, string b)
+        public static bool FilesAreEqualByTime(LPath a, LPath b)
         {
-            if (LFile.Exists(a))
+            if (a.IsFile)
             {
-                if (LFile.Exists(b))
+                if (b.IsFile)
                 {
                     var fa = new FileInfo(a);
                     var fb = new FileInfo(b);
@@ -183,15 +113,8 @@ namespace Sidi.IO
             }
             else
             {
-                return !LFile.Exists(b);
+                return !b.IsFile;
             }
-        }
-
-        public static void CreateHardLink(
-                string fileName,
-                string existingFileName)
-        {
-            FileSystem.Current.CreateHardLink(fileName, existingFileName);
         }
     }
 }

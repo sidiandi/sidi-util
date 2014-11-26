@@ -37,7 +37,25 @@ namespace Sidi.IO
             GetChildren = x => x.GetChildren();
         }
 
-        public static IEnumerable<LFileSystemInfo> AllFiles(LPath root)
+        /// <summary>
+        /// Searches fileName in directory first, then in all parent directories
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="fileName"></param>
+        /// <returns>Path of found file, null if no file was found.</returns>
+        public static LPath SearchUpwards(LPath directory, string fileName)
+        {
+            if (directory == null)
+            {
+                return null;
+            }
+
+            return directory.Lineage
+                .Select(d => d.CatDir(fileName))
+                .FirstOrDefault(_ => _.Exists);
+        }
+
+        public static IEnumerable<IFileSystemInfo> AllFiles(LPath root)
         {
             var e = new Find()
             {
@@ -47,7 +65,7 @@ namespace Sidi.IO
             return e.Depth();
         }
 
-        public static IEnumerable<LFileSystemInfo> AllFiles(IEnumerable<LPath> roots)
+        public static IEnumerable<IFileSystemInfo> AllFiles(IEnumerable<LPath> roots)
         {
             var e = new Find()
             {
@@ -70,23 +88,23 @@ namespace Sidi.IO
         /// <summary>
         /// Set this function to decide which files should be returned.
         /// </summary>
-        public Func<LFileSystemInfo, bool> Output { set; get; }
+        public Func<IFileSystemInfo, bool> Output { set; get; }
 
         /// <summary>
         /// Set this function to decide which directories should be followed.
         /// </summary>
-        public Func<LFileSystemInfo, bool> Follow { set; get; }
+        public Func<IFileSystemInfo, bool> Follow { set; get; }
 
         /// <summary>
         /// Set this function to see every file, not matter if output or not.
         /// </summary>
-        public Action<LFileSystemInfo> Visit { set; get; }
+        public Action<IFileSystemInfo> Visit { set; get; }
 
         /// <summary>
         /// Set this function to determine how the child elements of a file system element are determined
-        /// and in which order they are presented to the searcher. Default calls LFileSystemInfo.GetChildren
+        /// and in which order they are presented to the searcher. Default calls IFileSystemInfo.GetChildren
         /// </summary>
-        public Func<LFileSystemInfo, IEnumerable<LFileSystemInfo> > GetChildren { set; get; }
+        public Func<IFileSystemInfo, IEnumerable<IFileSystemInfo> > GetChildren { set; get; }
 
         /// <summary>
         /// Counts the visited files
@@ -113,10 +131,10 @@ namespace Sidi.IO
         /// Recurses all start roots depth-first
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<LFileSystemInfo> Depth()
+        public IEnumerable<IFileSystemInfo> Depth()
         {
             Count = 0;
-            var stack = new List<LFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+            var stack = new List<IFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
 
             for (; stack.Count > 0; )
             {
@@ -141,10 +159,10 @@ namespace Sidi.IO
         /// Recurses all start roots breadth-first
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<LFileSystemInfo> Breadth()
+        public IEnumerable<IFileSystemInfo> Breadth()
         {
             Count = 0;
-            var stack = new List<LFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+            var stack = new List<IFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
 
             for (; stack.Count > 0; )
             {
@@ -168,7 +186,7 @@ namespace Sidi.IO
 
         DateTime nextReport = DateTime.MinValue;
 
-        bool MustFollow(LFileSystemInfo i)
+        bool MustFollow(IFileSystemInfo i)
         {
             var f = i.IsDirectory && Follow(i);
             if (f)
@@ -183,7 +201,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static bool OnlyFiles(LFileSystemInfo i)
+        public static bool OnlyFiles(IFileSystemInfo i)
         {
             return !i.IsDirectory;
         }
@@ -193,7 +211,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static bool NoDotNoHidden(LFileSystemInfo i)
+        public static bool NoDotNoHidden(IFileSystemInfo i)
         {
             return !i.IsHidden && !i.Name.StartsWith(".");
         }

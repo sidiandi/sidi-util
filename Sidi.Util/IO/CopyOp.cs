@@ -28,7 +28,7 @@ namespace Sidi.IO
 
         public static void Move(LPath from, LPath to)
         {
-            if (LFile.Exists(from))
+            if (from.IsFile)
             {
                 to.EnsureParentDirectoryExists();
                 LFile.Move(from, to);
@@ -74,7 +74,7 @@ namespace Sidi.IO
             }
         }
 
-        public Func<LFileSystemInfo, LFileSystemInfo, bool> CopyRequired;
+        public Func<IFileSystemInfo, IFileSystemInfo, bool> CopyRequired;
         public Action<LPath, LPath> DoCopy;
     }
 

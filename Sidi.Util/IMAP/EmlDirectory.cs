@@ -39,11 +39,11 @@ namespace Sidi.Imap
             mails = directory.Info.GetFiles("*.eml");
         }
         LPath directory;
-        IList<LFileSystemInfo> mails;
+        IList<IFileSystemInfo> mails;
 
         public IList<IMail> Items
         {
-            get { return new Sidi.Collections.SelectList<LFileSystemInfo, IMail>(mails, i => new EmlFile(i)); }
+            get { return new Sidi.Collections.SelectList<IFileSystemInfo, IMail>(mails, i => new EmlFile(i)); }
         }
 
         public System.UInt32 GetByUid(System.UInt32 uid)
@@ -68,13 +68,13 @@ namespace Sidi.Imap
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public EmlFile(LFileSystemInfo i)
+        public EmlFile(IFileSystemInfo i)
         {
             fileInfo = i;
             log.Info(i);
         }
 
-        LFileSystemInfo fileInfo;
+        IFileSystemInfo fileInfo;
 
         Rfc822Message _Message;
         Rfc822Message Message

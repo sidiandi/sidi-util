@@ -59,9 +59,9 @@ namespace Sidi.Util
         IEnumerable<IntPtr> GetZOrder(IntPtr parentWindow)
         {
             for (
-                IntPtr w = Sidi.IO.NativeMethods.GetTopWindow(parentWindow); 
+                IntPtr w = Sidi.IO.Windows.NativeMethods.GetTopWindow(parentWindow); 
                 w != IntPtr.Zero;
-                w = Sidi.IO.NativeMethods.GetWindow(w, (uint) Sidi.IO.NativeMethods.GetWindow_Cmd.GW_HWNDNEXT))
+                w = Sidi.IO.Windows.NativeMethods.GetWindow(w, (uint)Sidi.IO.Windows.NativeMethods.GetWindow_Cmd.GW_HWNDNEXT))
             {
                 yield return w;
             }

@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 namespace Sidi.IO
 {
-    [Obsolete("Use LPath and FileSystem methods")]
+    [Obsolete("Use LPath, IFileSystem. IFileSystemInfo methods")]
     public class LDirectory
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -44,17 +44,6 @@ namespace Sidi.IO
         public static void Move(LPath from, LPath to)
         {
             FileSystem.Current.Move(from, to);
-        }
-
-        /// <summary>
-        /// Enumerates found files. Make sure that the Enumerator is closed properly to free the Find handle.
-        /// </summary>
-        /// <param name="searchPath">File search path complete with wildcards, e.g. C:\temp\*.doc</param>
-        /// <returns></returns>
-        [Obsolete("use FileSystem.FindFile")]
-        public static IEnumerable<LFileSystemInfo> FindFile(LPath searchPath)
-        {
-            return FileSystem.Current.FindFile(searchPath);
         }
 
         public static void Create(LPath path)

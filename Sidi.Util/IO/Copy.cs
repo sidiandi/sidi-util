@@ -27,6 +27,8 @@ namespace Sidi.IO
 {
     public class Copy
     {
+        IFileSystem fileSystem = FileSystem.Current;
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         public Copy()
@@ -111,7 +113,7 @@ namespace Sidi.IO
                         for (int unique = 0; unique < 100; ++unique)
                         {
                             oldFile = String.Format("{0}.{1}.{2}", dest, unique, RenameLockedDestinationFilesExtension);
-                            if (!LFile.Exists(oldFile))
+                            if (!new LPath(oldFile).IsFile)
                             {
                                 break;
                             }
@@ -182,7 +184,7 @@ namespace Sidi.IO
                 }
 
                 log.Info(d.FullName);
-                foreach (LFileSystemInfo i in d.GetChildren())
+                foreach (IFileSystemInfo i in d.GetChildren())
                 {
                     CopyRecursive(i.FullName, dest.CatDir(i.Name));
                 }
@@ -213,12 +215,12 @@ namespace Sidi.IO
                         if (FileUtil.FilesAreEqualByTime(s, e))
                         {
                             log.InfoFormat("Link {0} -> {1}", d, e);
-                            FileUtil.CreateHardLink(d, e);
+                            fileSystem.CreateHardLink(d, e);
                         }
                         else
                         {
                             log.InfoFormat("Copy {0} -> {1}", s, d);
-                            LFile.Copy(s, d);
+                            fileSystem.CopyFile(s, d);
                         }
                     }
                 }
