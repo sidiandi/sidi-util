@@ -22,7 +22,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
         <Major>3</Major>
         <Minor>0</Minor>
         <Build>0</Build>
-		<InitialRevision>1158</InitialRevision>
+		<InitialRevision>1176</InitialRevision>
 		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\packages</MSBuildExtensionsPath>
 		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
 	</PropertyGroup>

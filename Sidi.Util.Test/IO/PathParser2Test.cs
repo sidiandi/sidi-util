@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Sidi.IO
 {
     [TestFixture]
-    class ParserTest : TestBase
+    class PathParser2Test : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -31,7 +31,16 @@ asdlfjasldfa s;dlkj;lk
 adkfjahs dfkjha sdfka hsdfkj
 
 ");
-            log.Info(Parser.Whitespace()(text));
+            // log.Info(Parser.Whitespace()(text));
+        }
+
+        [Test]
+        public void ParseNtfs()
+        {
+            var text = new Sidi.Parse2.Text(" ");
+            var ast = PathParser2.NtfsAllowedCharacter()(text);
+            Assert.NotNull(ast);
+            log.Info(ast.Details);
         }
         
         [Test]
@@ -44,9 +53,12 @@ adkfjahs dfkjha sdfka hsdfkj
 @"\temp\hello.txt",
 @"temp\hello.txt"})
             {
-                var p = new LPath(i);
-                log.InfoFormat("{0} = {1}", i, p);
-                Assert.AreEqual(i, p.ToString());
+                var p = PathParser2.Path()(new Sidi.Parse2.Text(i));
+                Assert.NotNull(p);
+                log.Info(p.Details);
+                var path = new LPath(i);
+                log.InfoFormat("{0} = {1}", i, path);
+                Assert.AreEqual(i, path.ToString());
             }
         }
     }

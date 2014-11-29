@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Sidi.IO
@@ -21,5 +22,8 @@ namespace Sidi.IO
 
         System.IO.FileStream Open(LPath fileName, System.IO.FileMode fileMode);
         System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare shareMode);
+
+        IEnumerable<LPath> GetDrives();
+        IEnumerable<LPath> GetAvailableDrives();
     }
 }

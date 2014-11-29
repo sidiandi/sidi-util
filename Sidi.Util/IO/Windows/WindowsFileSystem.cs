@@ -392,5 +392,22 @@ namespace Sidi.IO.Windows
         {
             NativeMethods.SetFileAttributes(path.Param, value).CheckApiCall(path);
         }
+
+        public IEnumerable<LPath> GetDrives()
+        {
+            return System.IO.DriveInfo.GetDrives().Select(_ => new LPath(_.RootDirectory.FullName));
+        }
+
+        public IEnumerable<LPath> GetAvailableDrives()
+        {
+            for (char letter = 'A'; letter <= 'Z'; ++letter)
+            {
+                var d = LPath.GetDriveRoot(letter);
+                if (!d.Exists)
+                {
+                    yield return d;
+                }
+            }
+        }
     }
 }

@@ -118,6 +118,7 @@
     <Compile Include="IO\IFileSystemInfo.cs" />
     <Compile Include="IO\CopyFileOptions.cs" />
     <Compile Include="IO\CopyFileProgress.cs" />
+    <Compile Include="IO\PathParser2.cs" />
     <Compile Include="IO\Windows\WindowsFileSystem.cs" />
     <Compile Include="IO\Windows\FindHandle.cs" />
     <Compile Include="IO\Windows\HardLinkInfo.cs" />
@@ -125,11 +126,12 @@
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IHardLinkInfo.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
-    <Compile Include="IO\LPathParser.cs" />
     <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Prefix.cs" />
-    <Compile Include="Parse\Parser.cs" />
+    <Compile Include="Parse2\AstNode.cs" />
+    <Compile Include="Parse2\Parser.cs" />
+    <Compile Include="Parse2\Text.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
     <Compile Include="IO\CopyProgress.cs" />
@@ -147,7 +149,6 @@
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServer.cs" />
-    <Compile Include="Parse\Text.cs" />
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
     <Compile Include="Util\Base32.cs" />
