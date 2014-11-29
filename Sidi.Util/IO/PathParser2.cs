@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sidi.Parse2;
-using Rule = System.Func<Sidi.Parse2.Text, Sidi.Parse2.Ast>;
+using Sidi.Parse;
+using Rule = System.Func<Sidi.Parse.Text, Sidi.Parse.Ast>;
 using Sidi.Extensions;
 
 namespace Sidi.IO
 {
-    class PathParser2 : Parser
+    /// <summary>
+    /// Parser used by LPath
+    /// </summary>
+    internal class PathParser : Parser
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

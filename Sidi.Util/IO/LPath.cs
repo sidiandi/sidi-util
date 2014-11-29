@@ -27,7 +27,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.IO;
 using System.Runtime.Serialization;
-using Sidi.Parse2;
+using Sidi.Parse;
 
 namespace Sidi.IO
 {
@@ -61,7 +61,7 @@ namespace Sidi.IO
         
         public LPath(string path)
         {
-            var ast = PathParser2.Path()(new Sidi.Parse2.Text(path));
+            var ast = PathParser.Path()(new Sidi.Parse.Text(path));
 
             prefix = GetPrefix(ast[0]);
             parts = ast[1].Childs.Select(x => x.Text.ToString()).ToArray();
@@ -150,7 +150,7 @@ namespace Sidi.IO
 
         static Prefix CheckPrefix(string p)
         {
-            var prefix = PathParser2.Prefix()(new Text(p));
+            var prefix = PathParser.Prefix()(new Text(p));
             if (prefix == null)
             {
                 throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid path prefix.", p.Quote()));
@@ -220,7 +220,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static string GetValidFilename(string x)
         {
-            return PathParser2.MakeValidFilename(new Text(x));
+            return PathParser.MakeValidFilename(new Text(x));
         }
 
         public static bool IsValidFilename(string x)
@@ -232,7 +232,7 @@ namespace Sidi.IO
         {
             try
             {
-                if (!PathParser2.IsMatch(x, PathParser2.NtfsFilename()))
+                if (!PathParser.IsMatch(x, PathParser.NtfsFilename()))
                 {
                     return new ArgumentOutOfRangeException("x");
                 }
@@ -248,7 +248,7 @@ namespace Sidi.IO
         {
             try
             {
-                if (!PathParser2.IsMatch(x, PathParser2.NtfsFilenameWithWildcards()))
+                if (!PathParser.IsMatch(x, PathParser.NtfsFilenameWithWildcards()))
                 {
                     return new ArgumentOutOfRangeException("x");
                 }
