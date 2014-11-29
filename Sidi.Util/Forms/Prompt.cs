@@ -107,7 +107,7 @@ namespace Sidi.Forms
             try
             {
                 tf = Sidi.IO.LPath.GetTempFileName();
-                Sidi.IO.LFile.WriteAllText(tf, text);
+                tf.WriteAllText(text);
 
                 using (var p = new Process())
                 {
@@ -127,7 +127,7 @@ namespace Sidi.Forms
                     p.Start();
                     log.Info(p.DetailedInfo());
                     p.WaitForExit();
-                    return Sidi.IO.LFile.ReadAllText(tf);
+                    return tf.ReadAllText();
                 }
             }
             finally

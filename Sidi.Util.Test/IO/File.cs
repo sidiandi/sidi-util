@@ -24,6 +24,8 @@ using NUnit.Framework;
 using Sidi.Util;
 using Sidi.Test;
 
+#pragma warning disable 618
+
 namespace Sidi.IO
 {
     [TestFixture]
@@ -75,13 +77,7 @@ namespace Sidi.IO
 
         public void CreateSampleFile(LPath lp)
         {
-            using (var f = LFile.Open(lp, System.IO.FileMode.Create))
-            {
-                using (var o = new System.IO.StreamWriter(f))
-                {
-                    o.WriteLine("Hello");
-                }
-            }
+            lp.WriteAllText("Hello");
         }
 
         [Test]

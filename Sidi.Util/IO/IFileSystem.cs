@@ -11,8 +11,8 @@ namespace Sidi.IO
         /// <summary>
         /// Move a file system element (directory or file).
         /// </summary>
-        /// <param name="existingFileName">Existing file system element to be moved.</param>
-        /// <param name="newFileName">New path of the file system element.</param>
+        /// <param name="existingPath">Existing file system element to be moved.</param>
+        /// <param name="newPath">New path of the file system element.</param>
         void Move(LPath existingPath, LPath newPath);
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Sidi.IO
         /// <summary>
         /// Create a new hard link.
         /// </summary>
-        /// Precondition: (existingFileName.IsFile && !fileName.IsFile && fileName.Parent.IsDirectory)
+        /// Precondition: (existingFileName.IsFile &amp;&amp; !fileName.IsFile &amp;&amp; fileName.Parent.IsDirectory)
         /// Postcondition: (fileName.IsFile)
         /// Will throw an exception ? when fileName does not have the same root as existingFileName
         /// <param name="fileName">Path where the new hard link shall be created.</param>
@@ -90,9 +90,9 @@ namespace Sidi.IO
         /// <summary>
         /// Ensure that the specified directory is removed.
         /// </summary>
-        /// Precondition: (directoryName.IsDirectory && !directoryName.Children.Any())
+        /// Precondition: (directoryName.IsDirectory &amp;&amp; !directoryName.Children.Any())
         /// Postcondition: (!directoryName.Exists)
-        /// <param name="directory">Path to the directory.</param>
+        /// <param name="directoryName">Path to the directory.</param>
         void RemoveDirectory(LPath directoryName);
 
         /// <summary>

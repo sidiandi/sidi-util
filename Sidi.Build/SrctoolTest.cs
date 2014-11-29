@@ -83,7 +83,7 @@ namespace Sidi.Build.Test
 
             string pdbFileIndexed = TestFile(pdbFile.FileName);
 
-            Sidi.IO.LFile.Copy(pdbFile, pdbFileIndexed, true);
+            FileSystem.Current.CopyFile(pdbFile, pdbFileIndexed, options: new CopyFileOptions { FailIfExists = false });
 
             StringWriter w = new StringWriter();
 

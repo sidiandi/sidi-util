@@ -53,7 +53,7 @@ namespace Sidi.Visualization
         public void Simple()
         {
             var file = TestFile(@"mail\message-1-1456.eml");
-            var words = Regex.Split(LFile.ReadAllText(new Sidi.IO.LPath(file)), @"\s+");
+            var words = Regex.Split(file.ReadAllText(), @"\s+");
             var st = new SimpleTreeMap();
             st.GroupBy = x =>
                 {

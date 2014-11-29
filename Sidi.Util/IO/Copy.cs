@@ -27,7 +27,7 @@ namespace Sidi.IO
 {
     public class Copy
     {
-        IFileSystem fileSystem = FileSystem.Current;
+        IFileSystem fs = FileSystem.Current;
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -103,7 +103,7 @@ namespace Sidi.IO
 
                 try
                 {
-                    LFile.Copy(source, dest, true);
+                    fs.CopyFile(source, dest, options: new CopyFileOptions { FailIfExists = false });
                 }
                 catch (Exception ex)
                 {
@@ -119,8 +119,8 @@ namespace Sidi.IO
                             }
                         }
                         log.InfoFormat("Move {0} -> {1}", dest, oldFile);
-                        LFile.Move(dest, oldFile);
-                        LFile.Copy(source, dest, true);
+                        fs.Move(dest, oldFile);
+                        fs.CopyFile(source, dest, options: new CopyFileOptions { FailIfExists = false });
                     }
                     else
                     {
@@ -206,7 +206,7 @@ namespace Sidi.IO
 
                 if (sInfo.IsDirectory)
                 {
-                    Sidi.IO.LDirectory.Create(d);
+                    fs.EnsureDirectoryExists(d);
                 }
                 else
                 {
@@ -215,12 +215,12 @@ namespace Sidi.IO
                         if (FileUtil.FilesAreEqualByTime(s, e))
                         {
                             log.InfoFormat("Link {0} -> {1}", d, e);
-                            fileSystem.CreateHardLink(d, e);
+                            fs.CreateHardLink(d, e);
                         }
                         else
                         {
                             log.InfoFormat("Copy {0} -> {1}", s, d);
-                            fileSystem.CopyFile(s, d);
+                            fs.CopyFile(s, d);
                         }
                     }
                 }
@@ -233,27 +233,9 @@ namespace Sidi.IO
         /// <param name="dir"></param>
         public void DeleteAllFilesIn(LPath dir)
         {
-            if (dir.IsDirectory)
+            foreach (var f in dir.GetFiles())
             {
-                log.InfoFormat("Deleting all files in {0}", dir);
-                foreach (var i in dir.Children)
-                {
-                    try
-                    {
-                        Sidi.IO.LFile.Delete(i);
-                    }
-                    catch (System.UnauthorizedAccessException)
-                    {
-                        // try harder
-                        log.WarnFormat("Removing read-only protection from {0}", i);
-                        var info = i.Info;
-                        if (info.IsReadOnly)
-                        {
-                            info.IsReadOnly = false;
-                        }
-                        Sidi.IO.LFile.Delete(i);
-                    }
-                }
+                f.EnsureFileNotExists();
             }
         }
     }

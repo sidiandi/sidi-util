@@ -342,10 +342,8 @@ namespace Sidi.Parse
                         case '\r':
                         case '\n':
                             return true;
-                            break;
                         default:
                             return false;
-                            break;
                     }
                 });
         }

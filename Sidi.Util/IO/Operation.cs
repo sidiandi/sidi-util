@@ -30,6 +30,8 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        IFileSystem fs = FileSystem.Current;
+        
         public Operation()
         {
             Simulate = false;
@@ -58,12 +60,12 @@ namespace Sidi.IO
                 log.InfoFormat("{0}move directory {1} to {2}", this, from, to);
                 if (!Simulate)
                 {
-                    EnsureParentDirectoryExists(to);
+                    to.EnsureParentDirectoryExists();
                     if (Overwrite)
                     {
                         Delete(to);
                     }
-                    LDirectory.Move(from, to);
+                    fs.Move(from, to);
                 }
             }
             else
@@ -71,12 +73,12 @@ namespace Sidi.IO
                 log.InfoFormat("{0}move file {1} to {2}", this, from, to);
                 if (!Simulate)
                 {
-                    EnsureParentDirectoryExists(to);
+                    to.EnsureParentDirectoryExists();
                     if (Overwrite)
                     {
                         Delete(to);
                     }
-                    LFile.Move(from, to);
+                    fs.Move(from, to);
                 }
             }
         }
@@ -96,7 +98,7 @@ namespace Sidi.IO
 
             if (!Simulate)
             {
-                EnsureParentDirectoryExists(to);
+                to.EnsureParentDirectoryExists();
             }
 
             LinkInternal(from, to);
@@ -108,7 +110,7 @@ namespace Sidi.IO
             {
                 if (!Simulate)
                 {
-                    EnsureDirectoryExists(to);
+                    to.EnsureDirectoryExists();
                 }
 
                 foreach (var c in from.Children)
@@ -130,12 +132,9 @@ namespace Sidi.IO
                 Count++;
                 if (Overwrite)
                 {
-                    if (to.IsFile)
-                    {
-                        LFile.Delete(to);
-                    }
+                    to.EnsureFileNotExists();
                 }
-                LFile.CreateHardLink(to, from);
+                fs.CreateHardLink(to, from);
             }
         }
 
@@ -148,12 +147,12 @@ namespace Sidi.IO
         {
             if (!from.Exists)
             {
-                throw new Exception(String.Format("{0} does not exist.", from));
+                throw new System.IO.FileNotFoundException("from does not exist.", from);
             }
 
             if (!Simulate)
             {
-                EnsureParentDirectoryExists(to);
+                to.EnsureParentDirectoryExists();
             }
 
             Count = 0;
@@ -169,7 +168,7 @@ namespace Sidi.IO
             {
                 if (!Simulate)
                 {
-                    EnsureDirectoryExists(to);
+                    to.EnsureDirectoryExists();
                 }
 
                 foreach (var c in from.Children)
@@ -191,7 +190,7 @@ namespace Sidi.IO
                 if (!Simulate)
                 {
                     Count++;
-                    LFile.Copy(from, to, Overwrite);
+                    fs.CopyFile(from, to, options: new CopyFileOptions { Overwrite = this.Overwrite });
                 }
             }
             else
@@ -222,7 +221,7 @@ namespace Sidi.IO
 
                 try
                 {
-                    LDirectory.Delete(path);
+                    fs.RemoveDirectory(path);
                 }
                 catch (System.IO.IOException)
                 {
@@ -237,46 +236,7 @@ namespace Sidi.IO
         /// <param name="tree"></param>
         public void Delete(LPath tree)
         {
-            Count = 0;
-            DeleteInternal(tree);
-        }
-
-        /// <summary>
-        /// Deletes file or directory tree and all files and subdirectories below.
-        /// </summary>
-        /// <param name="tree"></param>
-        public void DeleteInternal(LPath tree)
-        {
-            if (tree.IsDirectory)
-            {
-                foreach (var c in tree.Children)
-                {
-                    DeleteInternal(c);
-                }
-            }
-            DeleteElement(tree);
-        }
-
-        void DeleteElement(LPath path)
-        {
-            if (path.IsDirectory)
-            {
-                log.InfoFormat("{0}delete directory {1}", this, path);
-                if (!Simulate)
-                {
-                    Count++;
-                    LDirectory.Delete(path);
-                }
-            }
-            else if (path.IsFile)
-            {
-                log.InfoFormat("{0}delete file {1}", this, path);
-                if (!Simulate)
-                {
-                    Count++;
-                    LFile.Delete(path);
-                }
-            }
+            tree.EnsureNotExists();
         }
 
         public override string ToString()
@@ -309,25 +269,20 @@ namespace Sidi.IO
         /// Ensures that the parent directory of path exists.
         /// </summary>
         /// <param name="path"></param>
+        [Obsolete]
         public void EnsureParentDirectoryExists(LPath path)
         {
-            EnsureDirectoryExists(path.Parent);
+            path.EnsureParentDirectoryExists();
         }
 
         /// <summary>
         /// Ensures that a directory exists at path.
         /// </summary>
         /// <param name="path"></param>
+        [Obsolete]
         public void EnsureDirectoryExists(LPath path)
         {
-            if (!path.IsDirectory)
-            {
-                log.InfoFormat("{0}create directory {1}", OptionsText, path);
-                if (!Simulate)
-                {
-                    LDirectory.Create(path);
-                }
-            }
+            path.EnsureDirectoryExists();
         }
 
         /// <summary>
@@ -361,7 +316,7 @@ namespace Sidi.IO
                 fast = value;
                 if (fast)
                 {
-                    NeedCopy = (from, to) => !LFile.EqualByTimeAndLength(MaxFileTimeDifference, from, to);
+                    NeedCopy = (from, to) => !FileCompare.EqualByTimeAndLength(MaxFileTimeDifference, from, to);
                 }
                 else
                 {
@@ -395,7 +350,7 @@ namespace Sidi.IO
         {
             if (from.IsDirectory)
             {
-                EnsureDirectoryExists(to);
+                to.EnsureDirectoryExists();
                 foreach (var i in from.Children)
                 {
                     var fn = i.FileName;
@@ -404,7 +359,7 @@ namespace Sidi.IO
             }
             else
             {
-                if (LFile.EqualByTimeAndLength(from, existing))
+                if (FileCompare.EqualByTimeAndLength(from, existing))
                 {
                     LinkFile(from, to);
                 }
@@ -429,7 +384,7 @@ namespace Sidi.IO
             }
             else
             {
-                return LFile.EqualByTimeAndLength(a, b);
+                return FileCompare.EqualByTimeAndLength(a, b);
             }
         }
     }

@@ -892,10 +892,7 @@ namespace Sidi.IO
 
         public void EnsureDirectoryExists()
         {
-            if (!LDirectory.Exists(this))
-            {
-                LDirectory.Create(this);
-            }
+            FS.EnsureDirectoryExists(this);
         }
 
         public string Extension
@@ -1006,12 +1003,20 @@ namespace Sidi.IO
         /// <returns></returns>
         public System.IO.Stream OpenWrite()
         {
-            return LFile.OpenWrite(this); 
+            EnsureParentDirectoryExists();
+
+            return FS.Open(this,
+                System.IO.FileMode.Create,
+                System.IO.FileAccess.ReadWrite,
+                System.IO.FileShare.Read);
         }
 
         public System.IO.Stream OpenRead()
         {
-            return LFile.OpenRead(this);
+            return FS.Open(this,
+                System.IO.FileMode.Open,
+                System.IO.FileAccess.Read,
+                System.IO.FileShare.ReadWrite);
         }
 
         /// <summary>

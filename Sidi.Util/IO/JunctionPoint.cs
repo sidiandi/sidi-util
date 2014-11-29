@@ -233,7 +233,7 @@ namespace Sidi.IO
             }
             else
             {
-                LDirectory.Create(junctionPoint);
+                junctionPoint.EnsureDirectoryExists();
             }
 
             using (SafeFileHandle handle = OpenReparsePoint(junctionPoint, EFileAccess.GenericWrite))
@@ -319,7 +319,7 @@ namespace Sidi.IO
 
                     try
                     {
-                        LDirectory.Delete(junctionPoint);
+                        FileSystem.Current.RemoveDirectory(junctionPoint);
                     }
                     catch (IOException ex)
                     {

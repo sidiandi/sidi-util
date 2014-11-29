@@ -47,8 +47,6 @@ namespace Sidi.Test
             FileType fileType = null;
             Find find = null;
             FindConfig findConfig = null;
-            LDirectory lDirectory = null;
-            LFile lFile = null;
             LPath lPath = null;
             PathList pathList = null;
             SearchPath searchPath = null;

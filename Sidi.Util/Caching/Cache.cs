@@ -60,7 +60,7 @@ namespace Sidi.Caching
             }
 
             var b = new BinaryFormatter();
-            using (var stream = LFile.OpenRead(path))
+            using (var stream = path.OpenRead())
             {
                 var cacheContent = b.Deserialize(stream);
                 return cacheContent;
@@ -75,7 +75,7 @@ namespace Sidi.Caching
         public static void SerializeToFile(LPath path, object t)
         {
             path.EnsureParentDirectoryExists();
-            using (var stream = LFile.OpenWrite(path))
+            using (var stream = path.OpenWrite())
             {
                 if (object.Equals(t, default(object)))
                 {
@@ -191,7 +191,7 @@ namespace Sidi.Caching
         {
             return GetCached(key, _ => provider(),
                 (cachePath) => cachePath,
-                (cachePath, path) => LFile.CopyOrHardLink((LPath)path, cachePath));
+                (cachePath, path) => FileSystem.Current.CopyOrHardLink((LPath)path, cachePath));
         }
 
         /// <summary>
