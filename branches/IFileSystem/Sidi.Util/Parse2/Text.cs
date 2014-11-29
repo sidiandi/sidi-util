@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sidi.Parse
+namespace Sidi.Parse2
 {
     public class Text
     {

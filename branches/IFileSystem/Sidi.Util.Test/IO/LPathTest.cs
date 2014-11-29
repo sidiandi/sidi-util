@@ -145,12 +145,11 @@ namespace Sidi.IO
             Assert.IsFalse(LPath.IsValidFilename(invalidName));
 
             var f = LPath.GetValidFilename(invalidName);
-            Assert.IsTrue(LPath.IsValidFilename(f));
+            Assert.IsTrue(LPath.IsValidFilename(f), f.ToString());
             Assert.AreNotEqual(invalidName, f);
             Assert.AreEqual(System.IO.Path.GetInvalidFileNameChars().Select(c => "_").Join(" "), f);
             Assert.AreEqual(validName, LPath.GetValidFilename(validName));
             var fn = LPath.GetValidFilename(new string(Enumerable.Range(0, 4096).Select(_ => (char)_).ToArray()));
-            log.Info(fn);
             Assert.IsTrue(LPath.IsValidFilename(fn));
         }
 

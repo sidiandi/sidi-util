@@ -27,7 +27,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.IO;
 using System.Runtime.Serialization;
-using Sidi.Parse;
+using Sidi.Parse2;
 
 namespace Sidi.IO
 {
@@ -61,10 +61,42 @@ namespace Sidi.IO
         
         public LPath(string path)
         {
-            var text = new Sidi.Parse.Text(path);
-            prefix = PathParser.Prefix(text);
-            parts = PathParser.Names(text);
+            var ast = PathParser2.Path()(new Sidi.Parse2.Text(path));
+
+            prefix = GetPrefix(ast[0]);
+            parts = ast[1].Childs.Select(x => x.Text.ToString()).ToArray();
             Initialize(prefix, parts);
+        }
+
+        static Prefix GetPrefix(Ast ast)
+        {
+            Ast p = null;
+            try
+            {
+                p = ast.Childs[0];
+                switch ((string)p.Name)
+                {
+                    case "LongUncPrefix":
+                        return new UncPrefix { Text = p.Text.ToString(), Server = p["ServerName"].ToString(), Share = p["ShareName"].ToString() };
+                    case "DeviceNamespacePrefix":
+                        return new DeviceNamespacePrefix { Text = p.Text.ToString() };
+                    case "LongPrefix":
+                        return new LocalDrivePrefix { Text = p.ToString(), Drive = p["DriveLetter"].ToString() };
+                    case "UncPrefix":
+                        return new UncPrefix { Text = p.Text.ToString(), Server = p["ServerName"].ToString(), Share = p["ShareName"].ToString() };
+                    case "LocalDrivePrefix":
+                        return new LocalDrivePrefix { Text = p.ToString(), Drive = p["DriveLetter"].ToString() };
+                    case "RootRelative":
+                        return new RootRelativePrefix { Text = p.ToString() };
+                    case "RelativePrefix":
+                        return new RelativePrefix { Text = p.ToString() };
+                }
+                throw new NotImplementedException();
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentOutOfRangeException("unknown prefix: " + p.Details, ex);
+            }
         }
 
         /// <summary>
@@ -118,12 +150,12 @@ namespace Sidi.IO
 
         static Prefix CheckPrefix(string p)
         {
-            var prefix = PathParser.Prefix(new Sidi.Parse.Text(p));
+            var prefix = PathParser2.Prefix()(new Text(p));
             if (prefix == null)
             {
                 throw new ArgumentOutOfRangeException(String.Format("{0} is not a valid path prefix.", p.Quote()));
             }
-            return prefix;
+            return GetPrefix(prefix);
         }
 
         public static LPath CreateRelative(params string[] parts)
@@ -188,7 +220,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static string GetValidFilename(string x)
         {
-            return PathParser.MakeValidFilename(new Text(x));
+            return PathParser2.MakeValidFilename(new Text(x));
         }
 
         public static bool IsValidFilename(string x)
@@ -200,7 +232,7 @@ namespace Sidi.IO
         {
             try
             {
-                if (!PathParser.IsMatch(x, PathParser.NtfsFilename))
+                if (!PathParser2.IsMatch(x, PathParser2.NtfsFilename()))
                 {
                     return new ArgumentOutOfRangeException("x");
                 }
@@ -216,7 +248,7 @@ namespace Sidi.IO
         {
             try
             {
-                if (!PathParser.IsMatch(x, PathParser.NtfsFilenameWithWildcards))
+                if (!PathParser2.IsMatch(x, PathParser2.NtfsFilenameWithWildcards()))
                 {
                     return new ArgumentOutOfRangeException("x");
                 }
@@ -708,7 +740,7 @@ namespace Sidi.IO
         {
             get
             {
-                return PathParser.IsMatch(Prefix, PathParser.LongUncPrefix) || PathParser.IsMatch(Prefix, PathParser.UncPrefix);
+                return prefix is UncPrefix;
             }
         }
 
@@ -1011,6 +1043,11 @@ namespace Sidi.IO
         public static LPath GetUncRoot(string server, string share)
         {
             return new LPath(shortUncPrefix + server + DirectorySeparator + share + DirectorySeparator, Enumerable.Empty<string>());
+        }
+
+        public static LPath GetDriveRoot(char driveLetter)
+        {
+            return new LPath(String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)

@@ -6,12 +6,29 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Sidi.Extensions;
 
 namespace Sidi.IO
 {
     [TestFixture]
     public class FileSystemTest : TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        [Test]
+        public void Drives()
+        {
+            var available = FS.GetAvailableDrives().ToList();
+            log.Info(available.ListFormat());
+            Assert.IsTrue(available.Any());
+
+            var drives = FS.GetDrives();
+            log.Info(drives.ListFormat());
+            Assert.IsTrue(drives.Any());
+        }
+
+        IFileSystem FS = FileSystem.Current;
+
         [Test]
         public void RemoveDirectory()
         {
