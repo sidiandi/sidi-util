@@ -5,8 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sidi.Parse2
+namespace Sidi.Parse
 {
+    /// <summary>
+    /// Abstract syntax tree (AST).
+    /// </summary>
     public class Ast
     {
         public Ast(Text text, IEnumerable<Ast> childs = null)

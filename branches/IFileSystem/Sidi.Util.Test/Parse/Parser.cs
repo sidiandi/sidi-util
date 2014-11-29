@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Rule = System.Func<Sidi.Parse2.Text>;
+using Rule = System.Func<Sidi.Parse.Text>;
 
-namespace Sidi.Parse2
+namespace Sidi.Parse
 {
     public class Expression : Parser
     {

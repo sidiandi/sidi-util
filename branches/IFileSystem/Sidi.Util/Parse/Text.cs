@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sidi.Parse2
+namespace Sidi.Parse
 {
+    /// <summary>
+    /// Section of a string.
+    /// </summary>
     public class Text
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

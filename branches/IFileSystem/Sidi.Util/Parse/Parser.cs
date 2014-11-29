@@ -5,10 +5,13 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Rule = System.Func<Sidi.Parse2.Text>;
+using Rule = System.Func<Sidi.Parse.Text>;
 
-namespace Sidi.Parse2
+namespace Sidi.Parse
 {
+    /// <summary>
+    /// Simple recursive descent parser.
+    /// </summary>
     public class Parser
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

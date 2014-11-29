@@ -129,9 +129,9 @@
     <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Prefix.cs" />
-    <Compile Include="Parse2\AstNode.cs" />
-    <Compile Include="Parse2\Parser.cs" />
-    <Compile Include="Parse2\Text.cs" />
+    <Compile Include="Parse\Ast.cs" />
+    <Compile Include="Parse\Parser.cs" />
+    <Compile Include="Parse\Text.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\CopyOp.cs" />
     <Compile Include="IO\CopyProgress.cs" />
