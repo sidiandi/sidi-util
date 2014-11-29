@@ -302,22 +302,6 @@ namespace Sidi.IO
             FileSystem.Current.CreateHardLink(fileName, existingFileName);
         }
 
-        public static void CopyOrHardLink(LPath source, LPath destination)
-        {
-            if (!destination.Exists)
-            {
-                destination.EnsureParentDirectoryExists();
-                if (LPath.IsSameFileSystem(source, destination))
-                {
-                    CreateHardLink(destination, source);
-                }
-                else
-                {
-                    LFile.Copy(source, destination);
-                }
-            }
-        }
-
         public static bool EqualByTimeAndLength(params LPath[] files)
         {
             return EqualByTimeAndLength(TimeSpan.Zero, files);

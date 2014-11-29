@@ -65,11 +65,10 @@ namespace Sidi.IO
         {
             var testFile = TestFile("hardlinktest");
             testFile.EnsureNotExists();
-            testFile.EnsureParentDirectoryExists();
-            LFile.WriteAllText(testFile, "hello");
+            testFile.WriteAllText("hello");
             var testFile1 = testFile.CatName(".hl");
             testFile1.EnsureNotExists();
-            LFile.CreateHardLink(testFile1, testFile);
+            FileSystem.Current.CreateHardLink(testFile1, testFile);
             Assert.AreEqual(2, testFile.HardLinkInfo.FileLinkCount);
 
             var hl = (List<LPath>)testFile.HardLinkInfo.HardLinks;
@@ -99,7 +98,7 @@ namespace Sidi.IO
             var p = TestFile("dir.txt");
             var info = p.Info;
             var infoSerialized = TestSerialization(info);
-            LFile.WriteAllText(p, "changed");
+            p.WriteAllText("changed");
             var newInfo = p.Info;
             Assert.AreNotEqual(infoSerialized.LastWriteTimeUtc, newInfo.LastWriteTimeUtc);
             Assert.AreNotEqual(infoSerialized, newInfo);
@@ -110,7 +109,7 @@ namespace Sidi.IO
         {
             var testFile = TestFile("test.txt");
             testFile.EnsureFileNotExists();
-            LFile.WriteAllText(testFile, "hello");
+            testFile.WriteAllText("hello");
 
             var system = new FileInfo(testFile);
             var sidi = testFile.Info;

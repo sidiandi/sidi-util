@@ -164,7 +164,7 @@ namespace Sidi.Util
 
         public static string[] FromFile(LPath file)
         {
-            using (var r = LFile.StreamReader(file))
+            using (var r = file.ReadText())
             {
                 return new Tokenizer(r).Tokens.ToArray();
             }

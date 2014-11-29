@@ -14,5 +14,21 @@ namespace Sidi.IO
         public bool NoBuffering { get; set; }
         public bool OpenSourceForWrite { get; set; }
         public bool Restartable { get; set; }
+
+        /// <summary>
+        /// Negation of FailIfExists
+        /// </summary>
+        public bool Overwrite
+        {
+            get
+            {
+                return !FailIfExists;
+            }
+
+            set
+            {
+                FailIfExists = !value;
+            }
+        }
     }
 }

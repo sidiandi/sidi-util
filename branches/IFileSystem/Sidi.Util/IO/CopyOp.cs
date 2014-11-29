@@ -26,17 +26,19 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void Move(LPath from, LPath to)
+        protected IFileSystem fs = FileSystem.Current;
+
+        public void Move(LPath from, LPath to)
         {
             if (from.IsFile)
             {
                 to.EnsureParentDirectoryExists();
-                LFile.Move(from, to);
+                fs.Move(from, to);
             }
-            else if (LDirectory.Exists(from))
+            else if (from.IsDirectory)
             {
                 to.EnsureParentDirectoryExists();
-                LDirectory.Move(from, to);
+                fs.Move(from, to);
             }
             log.InfoFormat("moved {0} to {1}", from, to);
         }
@@ -47,7 +49,7 @@ namespace Sidi.IO
             DoCopy = (s, d) =>
                 {
                     d.EnsureParentDirectoryExists();
-                    LFile.Copy(s, d);
+                    fs.CopyFile(s, d);
                 };
         }
 
@@ -106,16 +108,16 @@ namespace Sidi.IO
                         {
                             try
                             {
-                                LFile.CreateHardLink(d, s);
+                                fs.CreateHardLink(d, s);
                             }
                             catch (System.IO.IOException)
                             {
-                                LFile.Copy(s, d);
+                                fs.CopyFile(s, d);
                             }
                         }
                         else
                         {
-                            LFile.Copy(s, d, Overwrite);
+                            fs.CopyFile(s, d);
                         }
                     }
                 };

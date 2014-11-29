@@ -28,6 +28,7 @@ using System.Threading;
 using System.Net.Cache;
 using System.Windows.Forms;
 using Sidi.Extensions;
+using Sidi.IO;
 
 namespace Sidi.Util
 {
@@ -53,10 +54,10 @@ namespace Sidi.Util
     {
         public List<VersionInfo> VersionInfo = new List<VersionInfo>();
 
-        public void Write(string outFile)
+        public void Write(LPath outFile)
         {
             XmlSerializer s = new XmlSerializer(typeof(UpdateInfo));
-            using (Stream f = L.LFile.OpenWrite(outFile))
+            using (Stream f = outFile.OpenWrite())
             {
                 s.Serialize(f, this);
             }

@@ -42,19 +42,16 @@ namespace Sidi.IO
             {
                 if (b.IsFile)
                 {
-                    FileInfo ia = new FileInfo(a);
-                    FileInfo ib = new FileInfo(b);
+                    var ia = a.Info;
+                    var ib = b.Info;
                     if (ia.Length != ib.Length)
                     {
                         return false;
                     }
 
-                    Stream fa = null;
-                    Stream fb = null;
-                    try
+                    using (var fa = a.OpenRead())
+                    using (var fb = b.OpenRead())
                     {
-                        fa = LFile.OpenRead(a);
-                        fb = LFile.OpenRead(b);
                         int da;
                         int db;
                         do
@@ -69,11 +66,6 @@ namespace Sidi.IO
                         while (da != -1);
 
                         return true;
-                    }
-                    finally
-                    {
-                        if (fa != null) fa.Close();
-                        if (fb != null) fb.Close();
                     }
                 }
                 else

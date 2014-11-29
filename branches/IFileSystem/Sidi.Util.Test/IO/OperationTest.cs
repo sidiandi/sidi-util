@@ -36,8 +36,7 @@ namespace Sidi.IO
             var param = source.Param;
             log.Info(param);
 
-            op.EnsureParentDirectoryExists(source);
-            LFile.WriteAllText(source, "hello");
+            source.WriteAllText("hello");
             Assert.IsTrue(source.IsFile);
         }
 
@@ -106,7 +105,7 @@ namespace Sidi.IO
         {
             var op = new Operation() { Fast = false };
             op.Copy(sourceRoot, destRoot);
-            op.IsTreeIdentical(sourceRoot, destRoot);
+            Assert.IsTrue(op.IsTreeIdentical(sourceRoot, destRoot));
             op.Copy(sourceRoot, destRoot);
         }
 

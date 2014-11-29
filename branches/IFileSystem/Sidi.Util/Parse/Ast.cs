@@ -86,7 +86,7 @@ namespace Sidi.Parse
                 {
                     return Childs.First(_ => _.Name != null && _.Name.Equals(name));
                 }
-                catch (InvalidOperationException ex)
+                catch (InvalidOperationException)
                 {
                     throw new ArgumentOutOfRangeException("name", name, Details);
                 }
