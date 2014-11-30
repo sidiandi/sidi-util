@@ -55,5 +55,18 @@ namespace Sidi.IO
         {
             existingFilename.FileSystem.CreateHardLink(newHardlinkFilename, existingFilename);
         }
+
+        public static void CopyOrHardLink(this LPath source, LPath destination)
+        {
+            destination.EnsureParentDirectoryExists();
+            if (LPath.IsSameFileSystem(source, destination))
+            {
+                source.CreateHardLink(destination);
+            }
+            else
+            {
+                source.CopyFile(destination);
+            }
+        }
     }
 }
