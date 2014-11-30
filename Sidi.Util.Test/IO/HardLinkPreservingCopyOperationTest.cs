@@ -32,7 +32,7 @@ namespace Sidi.IO
 
             // determine target drive
             var targetDrive = System.IO.DriveInfo.GetDrives()
-                .FirstOrDefault(x => SafeGetDriveFormat(x).Equals("NTFS") && !new LPath(x.RootDirectory.FullName).IsAncestor(sourceDir));
+                .FirstOrDefault(x => SafeGetDriveFormat(x).Equals("NTFS") && !sourceDir.IsDescendantOrSelf(new LPath(x.RootDirectory.FullName)));
 
             if (targetDrive == null)
             {
