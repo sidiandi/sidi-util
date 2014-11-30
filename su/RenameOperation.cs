@@ -23,7 +23,7 @@ namespace Sidi.Tool
             }
 
             To.EnsureParentDirectoryExists();
-            LFile.Move(From, To);
+            FileSystem.Current.Move(From, To);
         }
 
         public static void Rename(IList<RenameOperation> operations)

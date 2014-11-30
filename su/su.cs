@@ -44,7 +44,7 @@ using Sidi.Extensions;
 
     public class TestScript
     {"
-                    + LFile.ReadAllText(csFile) +
+                    + csFile.ReadAllText() +
 @" }
 ";
                 var references = new[] { 

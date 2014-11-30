@@ -53,7 +53,7 @@ namespace Sidi.Util
                 }
                 else
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("{0] of type {1} type is supported", f.Name, f.FieldType.ToString()));
+                    throw new ArgumentOutOfRangeException(String.Format("{0} of type {1} type is supported", f.Name, f.FieldType.ToString()));
                 }
                 f.SetValue(x, value);
             }

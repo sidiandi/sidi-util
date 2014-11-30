@@ -21,6 +21,8 @@ namespace Sidi.Tool
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        IFileSystem fs = FileSystem.Current;
+
         [Usage("Rename specified files interactively")]
         public void Rename(PathList files)
         {
@@ -122,7 +124,7 @@ namespace Sidi.Tool
             if (children.Count == 0)
             {
                 log.InfoFormat("Delete empty directory {0}", path);
-                LDirectory.Delete(path);
+                fs.RemoveDirectory(path);
                 return null;
             }
             else if (children.Count == 1)
@@ -167,12 +169,12 @@ namespace Sidi.Tool
 
         void RemoveEmptyDirectories(LPath path)
         {
-            if (LDirectory.Exists(path))
+            if (path.IsDirectory)
             {
                 var thumbs = path.CatDir("Thumbs.db");
                 if (thumbs.Exists)
                 {
-                    LFile.Delete(thumbs);
+                    fs.DeleteFile(thumbs);
                 }
                 foreach (var d in path.GetDirectories())
                 {
@@ -181,7 +183,7 @@ namespace Sidi.Tool
 
                 try
                 {
-                    LDirectory.Delete(path);
+                    fs.RemoveDirectory(path);
                     log.InfoFormat("Delete {0}", path);
                 }
                 catch
@@ -200,11 +202,11 @@ namespace Sidi.Tool
                     if (path.IsDirectory)
                     {
                         Delete(new PathList(path.Children));
-                        LDirectory.Delete(path);
+                        fs.RemoveDirectory(path);
                     }
                     else
                     {
-                        LFile.Delete(path);
+                        fs.DeleteFile(path);
                     }
                 }
                 catch (Exception ex)

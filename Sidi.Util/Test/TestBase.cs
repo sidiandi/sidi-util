@@ -33,7 +33,7 @@ using System.Xml.Serialization;
 
 namespace Sidi.Test
 {
-    public class TestBase
+    public class TestBase : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -106,6 +106,29 @@ namespace Sidi.Test
             if (!object.Equals(n, n1))
             {
                 throw new Exception("object not equal after serialization and deserialization");
+            }
+        }
+
+        private bool disposed = false;
+
+        //Implement IDisposable.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    // Free other state (managed objects).
+                }
+                // Free your own state (unmanaged objects).
+                // Set large fields to null.
+                disposed = true;
             }
         }
     }
