@@ -22,8 +22,13 @@ using System.Linq;
 
 namespace Sidi.Build
 {
-    public static class DebuggingToolsForWindows
+    public class DebuggingToolsForWindows
     {
+        public DebuggingToolsForWindows()
+        {
+            Directory = GetDirectory();
+        }
+
         public static string DownloadUrl
         {
             get
@@ -31,27 +36,26 @@ namespace Sidi.Build
                 return "http://www.microsoft.com/whdc/devtools/debugging/default.mspx";
             }
         }
-        
-        public static LPath Directory
-        {
-            get
-            {
-                LPath[] searchPath =
-                {
-                    Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles).CatDir(@"Windows Kits\8.0\Debuggers\x86"),
-                    Paths.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).CatDir("Debugging Tools for Windows (x86)"),
-                    Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles).CatDir("Debugging Tools for Windows")
-                };
 
-                try
-                {
-                    return searchPath.First(d => d.IsDirectory);
-                }
-                catch (InvalidOperationException exception)
-                {
-                    throw new DirectoryNotFoundException(String.Format("The Debugging Tools for Windows must be installed at {0}. See {1}",
-                        searchPath[0], DownloadUrl), exception);
-                }
+        public LPath Directory { get; private set; }
+        
+        static LPath GetDirectory()
+        {
+            LPath[] searchPath =
+            {
+                Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles).CatDir(@"Windows Kits\8.0\Debuggers\x86"),
+                Paths.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).CatDir("Debugging Tools for Windows (x86)"),
+                Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles).CatDir("Debugging Tools for Windows")
+            };
+
+            try
+            {
+                return searchPath.First(d => d.IsDirectory);
+            }
+            catch (InvalidOperationException exception)
+            {
+                throw new DirectoryNotFoundException(String.Format("The Debugging Tools for Windows must be installed at {0}. See {1}",
+                    searchPath[0], DownloadUrl), exception);
             }
         }
     }

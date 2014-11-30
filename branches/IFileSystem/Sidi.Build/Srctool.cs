@@ -42,11 +42,13 @@ namespace Sidi.Build
         {
         }
 
-        static Sidi.IO.LPath Program
+        DebuggingToolsForWindows debuggingTools = new DebuggingToolsForWindows();
+
+        Sidi.IO.LPath Program
         {
             get
             {
-                return DebuggingToolsForWindows.Directory.CatDir("srcsrv", "srctool.exe");
+                return debuggingTools.Directory.CatDir("srcsrv", "srctool.exe");
             }
         }
 

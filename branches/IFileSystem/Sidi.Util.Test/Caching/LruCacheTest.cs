@@ -57,17 +57,34 @@ namespace Sidi.Caching
         public class DisposableClass : IDisposable
         {
             public static int instanceCount = 0;
-public DisposableClass()
-{
-    ++instanceCount;
-}
+
+            public DisposableClass()
+            {
+                ++instanceCount;
+            }
+
+            private bool _disposed = false;
 
             public void Dispose()
             {
-                --instanceCount;
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!_disposed)
+                {
+                    if (disposing)
+                    {
+                        --instanceCount;
+                    }
+                    // Free your own state (unmanaged objects).
+                    // Set large fields to null.
+                    _disposed = true;
+                }
             }
         }
-
 
         [Test]
         public void DisposeTest()

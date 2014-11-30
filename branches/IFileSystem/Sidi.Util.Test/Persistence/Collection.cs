@@ -102,8 +102,7 @@ namespace Sidi.Persistence
 
             public override string ToString()
             {
-                return String.Format("{0} {1} {2} {3} {4}",
-                    Id, Name, Street, City, Zip, LastContact);
+                return String.Join(" ", Id, Name, Street, City, Zip, LastContact);
             }
         }
 

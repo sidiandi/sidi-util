@@ -27,55 +27,13 @@ using System.Linq;
 //Test Specific Imports
 using Sidi.CommandLine;
 using System.IO;
+using Sidi.Test;
 
 namespace Sidi.Util
 {
     [TestFixture]
-    public class TokenizerUt
+    public class TokenizerUt : TestBase
     {
-        #region "Custom Trace Listener"
-        MyListener listener = new MyListener();
-
-        internal class MyListener : TraceListener
-        {
-            public override void Write(string message)
-            {
-                Console.Write(message);
-            }
-
-
-            public override void WriteLine(string message)
-            {
-                Console.WriteLine(message);
-            }
-        }
-        #endregion
-
-
-        [SetUp()]
-        public void SetUp()
-        {
-            //Setup our custom trace listener
-            if (!Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Add(listener);
-            }
-
-            //TODO - Setup your test objects here
-        }
-
-        [TearDown()]
-        public void TearDown()
-        {
-            //Remove our custom trace listener
-            if (Trace.Listeners.Contains(listener))
-            {
-                Trace.Listeners.Remove(listener);
-            }
-
-            //TODO - Tidy up your test objects here
-        }
-
         [Test()]
         public void TokenizerTest()
         {

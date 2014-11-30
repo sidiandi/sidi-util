@@ -19,6 +19,8 @@ namespace Sidi.Tool
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        IFileSystem fs = FileSystem.Current;
+
         public Backup()
         {
             VerifyFraction = 1000;
@@ -84,22 +86,19 @@ namespace Sidi.Tool
         [Usage("Create a new backup directory")]
         public void Create()
         {
-            if (LDirectory.Exists(Store))
+            if (Store.IsDirectory)
             {
                 throw new Exception("{0} already exists".F(Store));
             }
 
             ConfigFile.EnsureParentDirectoryExists();
 
-            using (var c = LFile.Open(ConfigFile, System.IO.FileMode.Create))
-            {
-                using (var w = new System.IO.StreamWriter(c))
+                using (var w = ConfigFile.WriteText())
                 {
                     w.WriteLine(@"Include {0}
 ", System.Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).Quote());
 
                 }
-            }
         }
 
         const string incompleteExtension = ".incomplete";
@@ -131,7 +130,7 @@ namespace Sidi.Tool
             var linked = new SizeCount();
             var verified = new SizeCount();
 
-            LDirectory.Create(incompleteBackupSet);
+            incompleteBackupSet.EnsureDirectoryExists();
 
             var errors = new List<Exception>();
             
@@ -145,12 +144,12 @@ namespace Sidi.Tool
                     var bakPath = LPath.CreateRelative(parts);
                     var destination = incompleteBackupSet.CatDir(bakPath);
 
-                    if (LDirectory.Exists(source))
+                    if (source.IsDirectory)
                     {
                         log.Info(source);
                         if (!delta)
                         {
-                            LDirectory.Create(destination);
+                            destination.EnsureDirectoryExists();
                         }
                     }
                     else
@@ -159,7 +158,7 @@ namespace Sidi.Tool
                         {
                             var existing = lastBackupSet.CatDir(bakPath);
 
-                            if (LFile.EqualByTimeAndLength(source, existing))
+                            if (FileCompare.EqualByTimeAndLength(source, existing))
                             {
                                 if (delta)
                                 {
@@ -169,7 +168,7 @@ namespace Sidi.Tool
                                 else
                                 {
                                     log.DebugFormat("Link {0} -> {1}", destination, existing);
-                                    LFile.CreateHardLink(destination, existing);
+                                    FileSystem.Current.CreateHardLink(destination, existing);
                                     linked.Add(existing.Info.Length);
                                 }
                                 goto copied;
@@ -183,7 +182,7 @@ namespace Sidi.Tool
                             {
                                 destination.EnsureParentDirectoryExists();
                             }
-                            LFile.Copy(source, destination);
+                            fs.CopyFile(source, destination);
                             copied.Add(destination.Info.Length);
                         }
 
@@ -197,7 +196,7 @@ namespace Sidi.Tool
                     errors.Add(ex);
                 }
             }
-            LDirectory.Move(incompleteBackupSet, backupSet.UniqueFileName());
+            FileSystem.Current.Move(incompleteBackupSet, backupSet.UniqueFileName());
 
             log.InfoFormat("Copied: {0}", copied);
             log.InfoFormat("Linked: {0}", linked);
@@ -242,7 +241,7 @@ namespace Sidi.Tool
             {
                 log.InfoFormat("Verify: {0} == {1}", source, destination);
                 verified.Add(source.Info.Length);
-                if (!LFile.EqualByContent(source, destination))
+                if (!FileCompare.EqualByContent(source, destination))
                 {
                     throw new System.IO.IOException(String.Format("{0} and {1} are not equal", source, destination));
                 }
@@ -279,7 +278,7 @@ namespace Sidi.Tool
 
                 b.Store = root;
 
-                using (var w = LFile.TextWriter(b.ConfigFile))
+                using (var w = b.ConfigFile.WriteText())
                 {
                     w.WriteLine("Include {0}", Sidi.IO.Paths.BinDir);
                     w.WriteLine("Exclude test");

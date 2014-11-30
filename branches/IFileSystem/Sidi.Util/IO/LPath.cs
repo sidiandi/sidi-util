@@ -1055,7 +1055,7 @@ namespace Sidi.IO
             return new LPath(String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("p", ToString());
         }

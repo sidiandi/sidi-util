@@ -33,11 +33,13 @@ namespace Sidi.Build
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static string Program
+        DebuggingToolsForWindows debuggingTools = new DebuggingToolsForWindows();
+
+        private string Program
         {
             get
             {
-                LPath f = new LPath(DebuggingToolsForWindows.Directory).CatDir("srcsrv", "pdbstr.exe");
+                LPath f = debuggingTools.Directory.CatDir("srcsrv", "pdbstr.exe");
 
                 if (!f.Exists)
                 {

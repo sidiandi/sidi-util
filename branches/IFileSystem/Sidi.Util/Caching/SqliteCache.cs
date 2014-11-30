@@ -289,12 +289,20 @@ namespace Sidi.Caching
     
         public void Dispose()
         {
-            if (transaction != null)
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                transaction.Commit();
-                transaction = null;
+                if (transaction != null)
+                {
+                    transaction.Commit();
+                    transaction = null;
+                }
+                db.Dispose();
             }
-            db.Dispose();
         }
 
         public static R Get<X, R>(X x, Func<X, R> uncachedFunction)
