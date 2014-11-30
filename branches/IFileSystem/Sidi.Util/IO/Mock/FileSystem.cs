@@ -101,8 +101,6 @@ namespace Sidi.IO.Mock
             return Open(fileName, fileMode, FileAccess.ReadWrite, System.IO.FileShare.None);
         }
 
-        LPath content;
-
         public IFileSystem RealFs = new Sidi.IO.Windows.FileSystem();
 
         public System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare shareMode)

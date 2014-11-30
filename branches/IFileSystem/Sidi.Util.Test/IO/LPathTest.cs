@@ -497,5 +497,21 @@ namespace Sidi.IO
             Assert.IsFalse(f.Exists);
             f.GetChildren();
         }
+
+        [Test]
+        public void IsDescendantOrSelf()
+        {
+            var a = new LPath(@"a\b\c");
+            var b = new LPath(@"a\b");
+
+            Assert.IsTrue(a.IsDescendantOrSelf(b));
+            Assert.IsTrue(a.IsDescendant(b));
+            
+            Assert.IsTrue(a.IsDescendantOrSelf(a));
+            Assert.IsFalse(a.IsDescendant(a));
+
+            Assert.IsFalse(b.IsDescendantOrSelf(a));
+            Assert.IsFalse(b.IsDescendant(a));
+        }
     }
 }

@@ -107,6 +107,7 @@ namespace Sidi.IO
         /// <summary>
         /// Only to be called from Ctors.
         /// </summary>
+        /// <param name="fileSystem">File system for which the path is valid.</param>
         /// <param name="prefix"></param>
         /// <param name="parts"></param>
         void Initialize(IFileSystem fileSystem, Prefix prefix, IEnumerable<string> parts)
@@ -1048,14 +1049,41 @@ namespace Sidi.IO
             return new LPath(System.IO.Path.GetRandomFileName());
         }
 
-        public bool IsAncestor(LPath c)
+        /// <summary>
+        /// True, if this path is a descendant of or identical to other
+        /// </summary>
+        /// <param name="ancestor"></param>
+        /// <returns></returns>
+        public bool IsDescendantOrSelf(LPath ancestor)
         {
-            if (c.Equals(this))
+            if (object.Equals(this, ancestor))
             {
                 return true;
             }
 
-            return IsAncestor(c.Parent);
+            var p = Parent;
+            if (p == null)
+            {
+                return false;
+            }
+
+            return p.IsDescendantOrSelf(ancestor);
+        }
+
+        /// <summary>
+        /// True, if this path is a descendant of other
+        /// </summary>
+        /// <param name="ancestor"></param>
+        /// <returns></returns>
+        public bool IsDescendant(LPath ancestor)
+        {
+            var p = this.Parent;
+            if (p == null)
+            {
+                return false;
+            }
+
+            return p.IsDescendantOrSelf(ancestor);
         }
 
         public static LPath GetUncRoot(string server, string share, IFileSystem fileSystem = null)
