@@ -26,7 +26,7 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        protected IFileSystem fs = FileSystem.Current;
+        protected IFileSystem fs;
 
         public void Move(LPath from, LPath to)
         {
@@ -43,8 +43,10 @@ namespace Sidi.IO
             log.InfoFormat("moved {0} to {1}", from, to);
         }
         
-        public CopyOp()
+        public CopyOp(IFileSystem fs = null)
         {
+            this.fs = fs.OrDefault();
+
             CopyRequired = (s, d) => true;
             DoCopy = (s, d) =>
                 {

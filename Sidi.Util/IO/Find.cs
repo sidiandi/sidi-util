@@ -134,7 +134,7 @@ namespace Sidi.IO
         public IEnumerable<IFileSystemInfo> Depth()
         {
             Count = 0;
-            var stack = new List<IFileSystemInfo>(Roots.Where(x => x.Exists).Select(x => x.Info));
+            var stack = Roots.Where(x => x.Exists).Select(x => x.Info).ToList();
 
             for (; stack.Count > 0; )
             {

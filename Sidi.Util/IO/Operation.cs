@@ -30,10 +30,12 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        IFileSystem fs = FileSystem.Current;
+        IFileSystem fileSystem;
         
-        public Operation()
+        public Operation(IFileSystem fileSystem = null)
         {
+            this.fileSystem = fileSystem.OrDefault();
+
             Simulate = false;
             Overwrite = false;
             Fast = true;
@@ -65,7 +67,7 @@ namespace Sidi.IO
                     {
                         Delete(to);
                     }
-                    fs.Move(from, to);
+                    fileSystem.Move(from, to);
                 }
             }
             else
@@ -78,7 +80,7 @@ namespace Sidi.IO
                     {
                         Delete(to);
                     }
-                    fs.Move(from, to);
+                    fileSystem.Move(from, to);
                 }
             }
         }
@@ -134,7 +136,7 @@ namespace Sidi.IO
                 {
                     to.EnsureFileNotExists();
                 }
-                fs.CreateHardLink(to, from);
+                fileSystem.CreateHardLink(to, from);
             }
         }
 
@@ -190,7 +192,7 @@ namespace Sidi.IO
                 if (!Simulate)
                 {
                     Count++;
-                    fs.CopyFile(from, to, options: new CopyFileOptions { Overwrite = this.Overwrite });
+                    fileSystem.CopyFile(from, to, options: new CopyFileOptions { Overwrite = this.Overwrite });
                 }
             }
             else
@@ -221,7 +223,7 @@ namespace Sidi.IO
 
                 try
                 {
-                    fs.RemoveDirectory(path);
+                    fileSystem.RemoveDirectory(path);
                 }
                 catch (System.IO.IOException)
                 {

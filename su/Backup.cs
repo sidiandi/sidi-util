@@ -168,7 +168,7 @@ namespace Sidi.Tool
                                 else
                                 {
                                     log.DebugFormat("Link {0} -> {1}", destination, existing);
-                                    FileSystem.Current.CreateHardLink(destination, existing);
+                                    destination.FileSystem.CreateHardLink(destination, existing);
                                     linked.Add(existing.Info.Length);
                                 }
                                 goto copied;
@@ -196,7 +196,8 @@ namespace Sidi.Tool
                     errors.Add(ex);
                 }
             }
-            FileSystem.Current.Move(incompleteBackupSet, backupSet.UniqueFileName());
+
+            incompleteBackupSet.Move(backupSet.UniqueFileName());
 
             log.InfoFormat("Copied: {0}", copied);
             log.InfoFormat("Linked: {0}", linked);

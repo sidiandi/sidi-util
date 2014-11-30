@@ -383,9 +383,17 @@ namespace Sidi.IO.Windows
                 .CheckApiCall(String.Format("copy from {0} to {1}", existingFileName, newFileName));
         }
 
-        public LPath GetCurrentDirectory()
+        public LPath CurrentDirectory
         {
-            return new LPath(System.Environment.CurrentDirectory);
+            get
+            {
+                return new LPath(System.Environment.CurrentDirectory);
+            }
+
+            set
+            {
+                System.Environment.CurrentDirectory = value;
+            }
         }
 
         public void SetFileAttribute(LPath path, System.IO.FileAttributes value)

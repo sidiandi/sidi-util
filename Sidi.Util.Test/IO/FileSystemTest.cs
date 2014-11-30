@@ -33,9 +33,8 @@ namespace Sidi.IO
         public void RemoveDirectory()
         {
             var d = TestFile("ReadOnlyDirectory");
-            var f = FileSystem.Current;
-            f.EnsureDirectoryExists(d);
-            f.RemoveDirectory(d);
+            d.EnsureDirectoryExists();
+            d.RemoveDirectory();
             Assert.IsFalse(d.Exists);
         }
 
@@ -60,7 +59,7 @@ namespace Sidi.IO
             var progress = new Progress<CopyFileProgress>();
             progress.ProgressChanged += progress_ProgressChanged;
             var cts = new CancellationTokenSource();
-            var copyTask = Task.Factory.StartNew(() => FileSystem.Current.CopyFile(from, to, progress, cts.Token));
+            var copyTask = Task.Factory.StartNew(() => from.CopyFile(to, progress, cts.Token));
 
             // cancel
             Thread.Sleep(50);

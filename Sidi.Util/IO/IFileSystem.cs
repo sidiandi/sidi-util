@@ -99,7 +99,11 @@ namespace Sidi.IO
         /// Returns the current directory of the process. Use wisely.
         /// </summary>
         /// <returns>Current directory.</returns>
-        LPath GetCurrentDirectory();
+        LPath CurrentDirectory
+        {
+            get;
+            set;
+        }
 
         System.Collections.Generic.IEnumerable<IFileSystemInfo> FindFile(LPath searchPath);
 

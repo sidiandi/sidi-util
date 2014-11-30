@@ -121,6 +121,8 @@
     <Compile Include="IO\CopyFileOptions.cs" />
     <Compile Include="IO\CopyFileProgress.cs" />
     <Compile Include="IO\LPathExtensions.cs" />
+    <Compile Include="IO\Mock\FileSystem.cs" />
+    <Compile Include="IO\Mock\FileSystemInfo.cs" />
     <Compile Include="IO\PathParser2.cs" />
     <Compile Include="IO\Windows\WindowsFileSystem.cs" />
     <Compile Include="IO\Windows\FindHandle.cs" />

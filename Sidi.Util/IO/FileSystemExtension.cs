@@ -20,5 +20,19 @@ namespace Sidi.IO
                 fs.CopyFile(source, destination);
             }
         }
+
+        /// <summary>
+        /// Will return the default file system if called on a null reference.
+        /// </summary>
+        /// <param name="fs"></param>
+        /// <returns></returns>
+        public static IFileSystem OrDefault(this IFileSystem fs)
+        {
+            if (fs == null)
+            {
+                fs = FileSystem.Current;
+            }
+            return fs;
+        }
     }
 }
