@@ -33,7 +33,7 @@ namespace Sidi.IO
 
         public static void Delete(LPath directory)
         {
-            FileSystem.Current.RemoveDirectory(directory);
+            directory.RemoveDirectory();
         }
 
         public static bool Exists(LPath directory)
@@ -43,19 +43,19 @@ namespace Sidi.IO
 
         public static void Move(LPath from, LPath to)
         {
-            FileSystem.Current.Move(from, to);
+            from.Move(to);
         }
 
         public static void Create(LPath path)
         {
-            FileSystem.Current.EnsureDirectoryExists(path);
+            path.EnsureDirectoryExists();
         }
 
         public static LPath Current
         {
             get
             {
-                return new LPath(System.Environment.CurrentDirectory);
+                return FileSystem.Current.CurrentDirectory;
             }
         }
     }

@@ -14,6 +14,11 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public HardLinkPreservingCopyOperation(IFileSystem fs = null)
+        {
+            this.fileSystem = fs.OrDefault();
+        }
+        
         void CheckVolume(LPath path, ref LPath volume)
         {
             if (volume == null)
@@ -81,6 +86,6 @@ namespace Sidi.IO
         Dictionary<long, LPath> sourceFileIdToDestinationPath = new Dictionary<long, LPath>();
         LPath sourceVolume;
         LPath destinationVolume;
-        IFileSystem fileSystem = FileSystem.Current;
+        IFileSystem fileSystem;
     }
 }

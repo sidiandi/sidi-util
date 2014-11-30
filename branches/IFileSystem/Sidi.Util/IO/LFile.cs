@@ -35,7 +35,7 @@ namespace Sidi.IO
 
         public static void Delete(LPath path)
         {
-            FileSystem.Current.DeleteFile(path);
+            path.DeleteFile();
         }
 
         public static void WriteAllText(LPath path, string contents)
@@ -70,7 +70,7 @@ namespace Sidi.IO
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode)
         {
-            return FileSystem.Current.Open(path, fileMode);
+            return path.FileSystem.Open(path, fileMode);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -80,7 +80,7 @@ namespace Sidi.IO
             System.IO.FileAccess fileAccess,
             System.IO.FileShare shareMode)
         {
-            return FileSystem.Current.Open(fileName, fileMode, fileAccess, shareMode);
+            return fileName.FileSystem.Open(fileName, fileMode, fileAccess, shareMode);
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace Sidi.IO
                 };
 
             CancellationToken ct;
-            FileSystem.Current.CopyFile(sourceFileName, destFileName, null, ct, new CopyFileOptions { FailIfExists = !overwrite });
+            sourceFileName.CopyFile(destFileName, null, ct, new CopyFileOptions { FailIfExists = !overwrite });
         }
 
         //
@@ -294,12 +294,12 @@ namespace Sidi.IO
         //     sourceFileName or destFileName is in an invalid format.
         public static void Move(LPath sourceFileName, LPath destFileName)
         {
-            FileSystem.Current.Move(sourceFileName, destFileName);
+            sourceFileName.Move(destFileName);
         }
 
         public static void CreateHardLink(LPath fileName, LPath existingFileName)
         {
-            FileSystem.Current.CreateHardLink(fileName, existingFileName);
+            existingFileName.CreateHardLink(fileName);
         }
 
         public static bool EqualByTimeAndLength(params LPath[] files)

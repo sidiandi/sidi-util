@@ -191,7 +191,7 @@ namespace Sidi.Caching
         {
             return GetCached(key, _ => provider(),
                 (cachePath) => cachePath,
-                (cachePath, path) => FileSystem.Current.CopyOrHardLink((LPath)path, cachePath));
+                (cachePath, path) => ((LPath)path).FileSystem.CopyOrHardLink((LPath)path, cachePath));
         }
 
         /// <summary>

@@ -146,7 +146,7 @@ namespace Sidi.IO
 
                     try
                     {
-                        FileSystem.Current.RemoveDirectory(junctionPoint);
+                        junctionPoint.RemoveDirectory();
                     }
                     catch (IOException ex)
                     {

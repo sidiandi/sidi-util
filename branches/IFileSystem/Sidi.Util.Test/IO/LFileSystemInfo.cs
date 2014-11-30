@@ -36,7 +36,7 @@ namespace Sidi.IO
         [Test]
         public void DriveRoot()
         {
-            var drive = FileSystem.Current.GetCurrentDirectory().Root;
+            var drive = FileSystem.Current.CurrentDirectory.Root;
             Assert.IsTrue(drive.IsRoot);
             var c = drive.Info;
             Assert.IsTrue(c.Exists);
@@ -68,7 +68,7 @@ namespace Sidi.IO
             testFile.WriteAllText("hello");
             var testFile1 = testFile.CatName(".hl");
             testFile1.EnsureNotExists();
-            FileSystem.Current.CreateHardLink(testFile1, testFile);
+            testFile.CreateHardLink(testFile1);
             Assert.AreEqual(2, testFile.HardLinkInfo.FileLinkCount);
 
             var hl = (List<LPath>)testFile.HardLinkInfo.HardLinks;

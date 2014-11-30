@@ -27,12 +27,13 @@ namespace Sidi.IO
 {
     public class Copy
     {
-        IFileSystem fs = FileSystem.Current;
+        IFileSystem fs;
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
-        public Copy()
+        public Copy(IFileSystem fileSystem = null)
         {
+            this.fs = fileSystem.OrDefault();
             CopyCondition = x => true;
         }
 

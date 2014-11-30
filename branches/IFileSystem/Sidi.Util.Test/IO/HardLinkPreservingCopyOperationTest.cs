@@ -47,7 +47,7 @@ namespace Sidi.IO
             f.WriteAllText("hello");
             for (int i = 0; i < count; ++i)
             {
-                FileSystem.Current.CreateHardLink(f.CatName(i.ToString()), f);
+                f.CreateHardLink(f.CatName(i.ToString()));
             }
             Assert.AreEqual(count + 1, f.HardLinkInfo.FileLinkCount);
 
