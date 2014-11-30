@@ -8,19 +8,6 @@ namespace Sidi.IO
 {
     public static class FileSystemExtension
     {
-        public static void CopyOrHardLink(this IFileSystem fs, LPath source, LPath destination)
-        {
-            destination.EnsureParentDirectoryExists();
-            if (LPath.IsSameFileSystem(source, destination))
-            {
-                fs.CreateHardLink(destination, source);
-            }
-            else
-            {
-                fs.CopyFile(source, destination);
-            }
-        }
-
         /// <summary>
         /// Will return the default file system if called on a null reference.
         /// </summary>
