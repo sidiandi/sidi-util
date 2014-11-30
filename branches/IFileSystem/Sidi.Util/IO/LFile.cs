@@ -374,5 +374,10 @@ namespace Sidi.IO
 
             return true;
         }
+
+        public static bool Exists(LPath filename)
+        {
+            return filename.IsFile;
+        }
     }
 }
