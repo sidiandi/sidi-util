@@ -1,3 +1,1 @@
-copy /y %~dp0Sidi.Build\google.code.Targets %~dp0lib\sidi-util\google.code.Targets
-set msbuild="%ProgramFiles(x86)%\MSBuild\12.0\Bin\msbuild.exe"
-%msbuild% %~dp0sidi-util.msbuild /t:Publish
+%~dp0build Publish

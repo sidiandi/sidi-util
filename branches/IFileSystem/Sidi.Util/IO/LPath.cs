@@ -382,18 +382,42 @@ namespace Sidi.IO
             return !p1.IsRelative && !p2.IsRelative && object.Equals(p1.Root, p2.Root);
         }
 
+        /// <summary>
+        /// Returns the drive letter for local absolute paths, null otherwise
+        /// </summary>
         public string DriveLetter
         {
             get
             {
-                if (prefix is LocalDrivePrefix)
-                {
-                    return ((LocalDrivePrefix)prefix).Drive;
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
+                var p = prefix as LocalDrivePrefix;
+                if (p == null) return null;
+                return p.Drive;
+            }
+        }
+
+        /// <summary>
+        /// Returns the server name for UNC paths, null otherwise
+        /// </summary>
+        public string Server
+        {
+            get
+            {
+                var p = prefix as UncPrefix;
+                if (p == null) return null;
+                return p.Server;
+            }
+        }
+
+        /// <summary>
+        /// Returns the share name for UNC paths, null otherwise
+        /// </summary>
+        public string Share
+        {
+            get
+            {
+                var p = prefix as UncPrefix;
+                if (p == null) return null;
+                return p.Share;
             }
         }
 
@@ -1096,6 +1120,15 @@ namespace Sidi.IO
             return new LPath(fileSystem.OrDefault(), String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
         }
 
+        public static LPath GetDriveRoot(string driveLetter, IFileSystem fileSystem = null)
+        {
+            if (driveLetter.Length != 1)
+            {
+                throw new ArgumentOutOfRangeException("driveLetter");
+            }
+            return GetDriveRoot(driveLetter[0], fileSystem);
+        }
+
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("p", ToString());
@@ -1104,6 +1137,28 @@ namespace Sidi.IO
         protected LPath(SerializationInfo info, StreamingContext context)
         : this(info.GetString("p"))
         {
+        }
+
+        /// <summary>
+        /// Converts an absolute path into a relative path by converting its prefix into file names
+        /// Example: C:\temp => local\C\temp
+        /// Example: \\server\share\somfile => unc\server\share\somefile
+        /// </summary>
+        /// <returns></returns>
+        public LPath ToRelative()
+        {
+            if (prefix is LocalDrivePrefix)
+            {
+                return CreateRelative("local", LPath.GetValidFilename(DriveLetter)).CatDir(Parts);
+            }
+            else if (prefix is UncPrefix)
+            {
+                return CreateRelative("unc", LPath.GetValidFilename(Server), LPath.GetValidFilename(Share)).CatDir(Parts);
+            }
+            else
+            {
+                return this;
+            }
         }
     }
 }

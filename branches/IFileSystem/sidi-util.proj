@@ -25,6 +25,8 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<InitialRevision>1176</InitialRevision>
 		<MSBuildExtensionsPath>$(MSBuildProjectDirectory)\packages</MSBuildExtensionsPath>
 		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
+
+    <NugetLocalFeed>\\cala.myds.me\doc\nuget</NugetLocalFeed>
 	</PropertyGroup>
     
 	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
@@ -103,15 +105,22 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <RemoveDir Directories="$(TestDir)" />
   </Target>
 
-  <Target Name="Release" DependsOnTargets="GetVersion;Build;UnitTest" />
+  <Target Name="Release" DependsOnTargets="NugetPushLocal" />
 
-  <Target Name="NugetPack" DependsOnTargets="GetVersion" >
+  <Target Name="NugetPack" DependsOnTargets="GetVersion;Build;UnitTest" >
     <MakeDir Directories="$(PackageDir)"/>
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(NuSpec) -Version $(Version) -Verbose -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(NuSpec) -Version $(Version) -Verbosity detailed -OutputDirectory $(PackageDir) -BasePath $(OutputDir) -Properties RootDir=$(RootDir)" />
+    <CreateProperty Value="$(PackageDir)\$(ProjectName).$(Version).nupkg">
+      <Output PropertyName="Nupkg" TaskParameter="Value"/>
+    </CreateProperty>
   </Target>
 
-  <Target Name="NugetPush" DependsOnTargets="Release;NugetPack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(PackageDir)\$(ProjectName).$(Version).nupkg" />
+  <Target Name="NugetPush" DependsOnTargets="NugetPack">
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(Nupkg)" />
+  </Target>
+
+  <Target Name="NugetPushLocal" DependsOnTargets="NugetPack">
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(Nupkg)" />
   </Target>
 
   <Target Name="Publish" DependsOnTargets="NugetPush" />
