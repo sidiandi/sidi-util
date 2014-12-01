@@ -66,10 +66,12 @@ namespace Sidi.Visualization
                 
             LayoutManager.DivideAndConquer(c);
 
+            /*
             foreach (var l in c.Layout)
             {
                 Console.WriteLine("{0}: {1}", l.Bounds.Area, l.Bounds);
             }
+            */
         }
 
         public void Display(Tree tree)
