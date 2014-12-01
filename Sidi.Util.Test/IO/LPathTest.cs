@@ -113,26 +113,24 @@ namespace Sidi.IO
             var tempDir = LPath.GetTempPath();
             Assert.IsTrue(tempDir.IsDirectory);
 
-            log.Info(tempDir.DriveLetter);
-            var unc = LPath.GetUncRoot(System.Environment.MachineName, tempDir.DriveLetter + "$");
-            log.Info(unc);
+            var server = System.Environment.MachineName;
+            var share = tempDir.DriveLetter + "$";
+            var unc = LPath.GetUncRoot(server, share);
+
             Assert.IsTrue(System.IO.Directory.Exists(unc));
+            Assert.AreEqual(server, unc.Server);
+            Assert.AreEqual(share, unc.Share);
 
             var longNameUnc = new Sidi.IO.LPath(unc);
-            log.Info(longNameUnc);
             Assert.IsTrue(longNameUnc.IsDirectory);
             Assert.IsTrue(longNameUnc.IsUnc);
 
-            tempDir = longNameUnc;
-            Assert.IsTrue(System.IO.Directory.Exists(tempDir));
+            Assert.IsTrue(System.IO.Directory.Exists(longNameUnc));
+            Assert.IsNull(unc.Parent);
+            Assert.IsTrue(unc.Children.Any());
 
-            for (var i = longNameUnc; i != null; i = i.Parent)
-            {
-                Console.WriteLine(i);
-                Console.WriteLine(i.Parts.Join("|"));
-                Console.WriteLine(i.Children.Join());
-                Assert.IsTrue(i.IsDirectory);
-            }
+            log.Info(unc.ToRelative());
+
         }
 
         [Test]
