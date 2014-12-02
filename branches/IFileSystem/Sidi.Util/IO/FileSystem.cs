@@ -6,26 +6,6 @@ using System.Threading.Tasks;
 
 namespace Sidi.IO
 {
-    public sealed class OnDispose : IDisposable
-    {
-        public OnDispose(Action action)
-        {
-            this.action = action;
-        }
-
-        Action action;
-        bool disposed;
-
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                action();
-                disposed = true;
-            }
-        }
-    }
-
     public class FileSystem
     {
         public static IFileSystem Current

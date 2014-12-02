@@ -225,6 +225,7 @@
     <Compile Include="Util\ListFormat.cs" />
     <Compile Include="Util\LogScope.cs" />
     <Compile Include="Util\MetricPrefix.cs" />
+    <Compile Include="Util\OnDispose.cs" />
     <Compile Include="Util\ProcessEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Progress.cs" />
