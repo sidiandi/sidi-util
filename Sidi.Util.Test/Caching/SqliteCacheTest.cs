@@ -213,7 +213,7 @@ namespace Sidi.Caching
                 var cache = SqliteCache.Local(MethodBase.GetCurrentMethod());
                 cache.Clear();
                 int count = 1000;
-                new LogScope(log.Info, "Caching {0} items", count);
+                using (new LogScope(log.Info, "Caching {0} items", count))
                 {
                     for (int i = 0; i < count; ++i)
                     {
@@ -225,7 +225,7 @@ namespace Sidi.Caching
             {
                 var cache = SqliteCache.Local(MethodBase.GetCurrentMethod());
                 int count = 1000;
-                new LogScope(log.Info, "Caching {0} items", count);
+                using (new LogScope(log.Info, "Caching {0} items", count))
                 {
                     for (int i = 0; i < count; ++i)
                     {
