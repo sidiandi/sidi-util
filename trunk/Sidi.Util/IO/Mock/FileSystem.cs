@@ -15,8 +15,11 @@ namespace Sidi.IO.Mock
 
         public FileSystem()
         {
-            ContentDirectory = new LPath(RealFs, Paths.Temp).CatDir(typeof(FileSystem).FullName, LPath.GetValidFilename(DateTime.UtcNow.ToString("o")));
-            ContentDirectory.EnsureDirectoryExists();
+            ContentDirectory = new LPath(Paths.Temp).CatDir(typeof(FileSystem).FullName, LPath.GetValidFilename(DateTime.UtcNow.ToString("o")));
+            using (Sidi.IO.FileSystem.SetCurrent(RealFs))
+            {
+                ContentDirectory.EnsureDirectoryExists();
+            }
             log.InfoFormat("Mock file system is using content directory {0}", ContentDirectory);
         }
 
@@ -36,8 +39,11 @@ namespace Sidi.IO.Mock
             {
                 if (disposing)
                 {
-                    ContentDirectory.EnsureNotExists();
-                    log.InfoFormat("Delete {0}", ContentDirectory);
+                    using (Sidi.IO.FileSystem.SetCurrent(RealFs))
+                    {
+                        ContentDirectory.EnsureNotExists();
+                        log.InfoFormat("Delete {0}", ContentDirectory);
+                    }
                 }
                 _disposed = true;
             }
@@ -45,7 +51,7 @@ namespace Sidi.IO.Mock
 
         public void CreateRoot(LPath root)
         {
-            roots[root.Prefix] = new FileSystemInfo(root.Root, true);
+            roots[root.Prefix] = new FileSystemInfo(this, root.Root, true);
         }
 
         public void Move(LPath existingPath, LPath newPath)
@@ -91,7 +97,7 @@ namespace Sidi.IO.Mock
             var i = TryGetElement(path);
             if (i == null)
             {
-                i = new FileSystemInfo(path, false);
+                i = new FileSystemInfo(this, path, false);
             }
             return i;
         }
@@ -120,7 +126,7 @@ namespace Sidi.IO.Mock
             var e = TryGetElement(path);
             if (e == null)
             {
-                e = GetElement(path.Parent).AddChild(new FileSystemInfo(path.FileName, false));
+                e = GetElement(path.Parent).AddChild(new FileSystemInfo(this, path.FileName, false));
             }
             else if (!e.IsFile)
             {
@@ -136,7 +142,7 @@ namespace Sidi.IO.Mock
             if (d == null)
             {
                 d = CreateFile(newFileName);
-                e.Content.CopyFile(d.Content);
+                RealFs.CopyFile(e.Content, d.Content);
             }
         }
 
@@ -165,7 +171,7 @@ namespace Sidi.IO.Mock
             }
             EnsureDirectoryExists(parent);
             var parentElement = GetElement(parent);
-            parentElement.AddChild(new FileSystemInfo(directoryName.FileName, true));
+            parentElement.AddChild(new FileSystemInfo(this, directoryName.FileName, true));
         }
 
         public void RemoveDirectory(LPath directoryName)

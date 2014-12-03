@@ -13,11 +13,44 @@ namespace Sidi.IO
         {
             get
             {
+                if (current == null)
+                {
+                    current = DefaultThreadCurrent;
+                }
                 return current;
+            }
+
+            set
+            {
+                current = value;
             }
         }
 
-        static IFileSystem current = new Sidi.IO.Windows.FileSystem();
+        public static IFileSystem DefaultThreadCurrent
+        {
+            get
+            {
+                lock (syncRoot)
+                {
+                    if (defaultThreadCurrent == null)
+                    {
+                        defaultThreadCurrent = new Windows.FileSystem();
+                    }
+                    return defaultThreadCurrent;
+                }
+            }
+
+            set
+            {
+                defaultThreadCurrent = value;
+            }
+        }
+
+        private static object syncRoot = new Object(); 
+        static IFileSystem defaultThreadCurrent;
+
+        [ThreadStatic]
+        static IFileSystem current = null;
 
         public static IDisposable SetCurrent(IFileSystem fileSystem)
         {

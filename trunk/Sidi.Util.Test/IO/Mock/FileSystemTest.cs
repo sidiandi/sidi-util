@@ -23,9 +23,9 @@ namespace Sidi.IO.Mock
             using (var fs = new FileSystem())
             using (Sidi.IO.FileSystem.SetCurrent(fs))
             {
-                var drive = LPath.GetDriveRoot('C', fs);
+                var drive = LPath.GetDriveRoot('C');
                 fs.CreateRoot(drive);
-                fs.CreateRoot(LPath.GetUncRoot("server", "share", fs));
+                fs.CreateRoot(LPath.GetUncRoot("server", "share"));
                 fs.CurrentDirectory = drive;
                 
                 log.Info(fs.CurrentDirectory);

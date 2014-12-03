@@ -11,14 +11,16 @@ namespace Sidi.IO.Mock
         public readonly Dictionary<string, FileSystemInfo> Childs = new Dictionary<string, FileSystemInfo>();
         private LPath path;
 
-        public FileSystemInfo(string name, bool isDirectory)
+        public FileSystemInfo(FileSystem fileSystem, string name, bool isDirectory)
         {
+            this.fileSystem = fileSystem;
             this.Name = name;
             this.isDirectory = isDirectory;
         }
-        
-        public FileSystemInfo(LPath path, bool isDirectory)
+
+        public FileSystemInfo(FileSystem fileSystem, LPath path, bool isDirectory)
         {
+            this.fileSystem = fileSystem;
             this.path = path;
             this.isDirectory = isDirectory;
         }
@@ -26,11 +28,13 @@ namespace Sidi.IO.Mock
 
         public LPath _content;
 
+        FileSystem fileSystem;
+
         FileSystem MockFs
         {
             get
             {
-                return (FileSystem) FullName.FileSystem;
+                return fileSystem;
             }
         }
         
@@ -48,7 +52,7 @@ namespace Sidi.IO.Mock
             {
                 if (_content == null)
                 {
-                    _content = new LPath(RealFs, MockFs.ContentDirectory.CatDir(LPath.GetRandomFileName()));
+                    _content = new LPath(MockFs.ContentDirectory.CatDir(LPath.GetRandomFileName()));
                     _content.EnsureParentDirectoryExists();
                 }
                 return _content;
