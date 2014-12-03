@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace Sidi.Util
 {
@@ -11,13 +12,11 @@ namespace Sidi.Util
         public LogScope(Action<object> logger, string text, params object[] parameters)
         {
             this.logger = logger;
-            this.text = text;
-            this.parameters = parameters;
-            this.start = DateTime.Now;
+            this.stopwatch = Stopwatch.StartNew();
 
-            var msg = String.Format(text, parameters);
-            context = log4net.ThreadContext.Stacks["NDC"].Push(msg);
-            logger("begin");
+            this.contextString = String.Format(text, parameters);
+            context = log4net.ThreadContext.Stacks["NDC"].Push(contextString);
+            logger(String.Format("begin {0}", contextString));
         }
 
         IDisposable context;
@@ -37,7 +36,8 @@ namespace Sidi.Util
           {
             if (disposing)
             {
-                var msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s", (DateTime.Now - start).TotalSeconds);
+                stopwatch.Stop();
+                var msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s: {1}", stopwatch.Elapsed.TotalSeconds, contextString);
                 logger(msg);
                 context.Dispose();
             }
@@ -56,8 +56,7 @@ namespace Sidi.Util
     
 
         Action<object> logger;
-        string text;
-        object[] parameters;
-        DateTime start;
+        string contextString;
+        Stopwatch stopwatch;
     }
 }

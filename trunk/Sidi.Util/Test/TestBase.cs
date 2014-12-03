@@ -39,12 +39,9 @@ namespace Sidi.Test
 
         static TestBase()
         {
-            var traceAppender = new TraceAppender()
+            var traceAppender = new ConsoleAppender()
             {
-                Layout = new PatternLayout()
-                {
-                    ConversionPattern = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline",
-                },
+                Layout = new PatternLayout("%utcdate{ISO8601} [%thread] %level %logger %ndc - %message%newline")
             };
 
             traceAppender.ActivateOptions();
@@ -65,6 +62,7 @@ namespace Sidi.Test
                 Paths.BinDir
                 .Parent
                 .CatDir("test", relPath);
+            log.DebugFormat("Using test file {0}", testFile);
             return testFile;
         }
 
