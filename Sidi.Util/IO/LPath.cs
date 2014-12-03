@@ -47,7 +47,6 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        IFileSystem fileSystem;
         Prefix prefix;
         string[] parts;
 
@@ -55,22 +54,17 @@ namespace Sidi.IO
         {
         }
 
-        LPath(IFileSystem fileSystem, string prefix, IEnumerable<string> parts)
+        LPath(string prefix, IEnumerable<string> parts)
         {
-            Initialize(fileSystem, CheckPrefix(prefix), parts);
+            Initialize(CheckPrefix(prefix), parts);
         }
         
         public LPath(string path)
-        :this(null, path)
-        {
-        }
-
-        public LPath(IFileSystem fileSystem, string path)
         {
             var ast = PathParser.Path()(new Sidi.Parse.Text(path));
             prefix = GetPrefix(ast[0]);
             parts = ast[1].Childs.Select(x => x.Text.ToString()).ToArray();
-            Initialize(fileSystem.OrDefault(), prefix, parts);
+            Initialize(prefix, parts);
         }
 
         static Prefix GetPrefix(Ast ast)
@@ -107,15 +101,10 @@ namespace Sidi.IO
         /// <summary>
         /// Only to be called from Ctors.
         /// </summary>
-        /// <param name="fileSystem">File system for which the path is valid.</param>
         /// <param name="prefix"></param>
         /// <param name="parts"></param>
-        void Initialize(IFileSystem fileSystem, Prefix prefix, IEnumerable<string> parts)
+        void Initialize(Prefix prefix, IEnumerable<string> parts)
         {
-            if (fileSystem == null)
-            {
-                throw new ArgumentNullException("fileSystem");
-            }
             if (prefix == null)
             {
                 throw new ArgumentNullException("prefix");
@@ -125,7 +114,6 @@ namespace Sidi.IO
                 throw new ArgumentNullException("path");
             }
 
-            this.fileSystem = fileSystem;
             this.prefix = prefix;
             this.parts = parts.ToArray();
 
@@ -174,19 +162,19 @@ namespace Sidi.IO
             return CreateRelative((IEnumerable<string>)parts);
         }
 
-        public static LPath CreateRelative(IEnumerable<string> parts, IFileSystem fileSystem = null)
+        public static LPath CreateRelative(IEnumerable<string> parts)
         {
-            return new LPath(fileSystem.OrDefault(), RelativePrefix, parts);
+            return new LPath(RelativePrefix, parts);
         }
 
         /// <summary>
-        /// File system interface on which the path will operate.
+        /// File system interface on which the path will operate if not specified otherwise.
         /// </summary>
         public IFileSystem FileSystem
         {
             get
             {
-                return fileSystem;
+                return Sidi.IO.FileSystem.Current;
             }
         }
         
@@ -288,7 +276,7 @@ namespace Sidi.IO
         {
             get
             {
-                return new LPath(FileSystem, Prefix, Parts.Where(x => !x.Equals(".")));
+                return new LPath(Prefix, Parts.Where(x => !x.Equals(".")));
             }
         }
 
@@ -357,7 +345,7 @@ namespace Sidi.IO
         {
             get
             {
-                return new LPath(FileSystem, Prefix, Enumerable.Empty<string>());
+                return new LPath(Prefix, Enumerable.Empty<string>());
             }
         }
 
@@ -481,7 +469,7 @@ namespace Sidi.IO
                 }
             }
 
-            return new LPath(FileSystem, Prefix, Parts.Concat(relativePaths.SelectMany(_ => _.Parts)));
+            return new LPath(Prefix, Parts.Concat(relativePaths.SelectMany(_ => _.Parts)));
         }
 
         public LPath CatDir(params string[] parts)
@@ -491,7 +479,7 @@ namespace Sidi.IO
 
         public LPath CatName(string namePostfix)
         {
-            return new LPath(FileSystem, Prefix, Parts.TakeAllBut(1).Concat(new[] { FileName + namePostfix }));
+            return new LPath(Prefix, Parts.TakeAllBut(1).Concat(new[] { FileName + namePostfix }));
         }
 
         public const int MaxFilenameLength = 255;
@@ -557,7 +545,7 @@ namespace Sidi.IO
 
             var p = Parts.ToArray();
             p[p.Length - 1] = FileNameWithoutExtension + newExtension;
-            return new LPath(FileSystem, Prefix, p);
+            return new LPath(Prefix, p);
         }
 
         public LPath Sibling(string siblingName)
@@ -598,7 +586,7 @@ namespace Sidi.IO
                 result.Add(p[i]);
             }
 
-            return new LPath(FileSystem, String.Empty, result);
+            return new LPath(String.Empty, result);
         }
         
         /// <summary>
@@ -610,7 +598,7 @@ namespace Sidi.IO
             {
                 if (Parts.Any())
                 {
-                    return new LPath(FileSystem, Prefix, Parts.TakeAllBut(1));
+                    return new LPath(Prefix, Parts.TakeAllBut(1));
                 }
                 else
                 {
@@ -745,7 +733,7 @@ namespace Sidi.IO
                     p = longUncPrefix + u.Server + DirectorySeparator + u.Share + DirectorySeparator;
                 }
 
-                return new LPath(FileSystem, p, Parts).ToString();
+                return new LPath(p, Parts).ToString();
             }
         }
 
@@ -933,6 +921,18 @@ namespace Sidi.IO
             FileSystem.EnsureDirectoryExists(this);
         }
 
+        IFileSystem OrDefault(IFileSystem fileSystem)
+        {
+            if (fileSystem == null)
+            {
+                return this.FileSystem;
+            }
+            else
+            {
+                return fileSystem;
+            }
+        }
+
         public string Extension
         {
             get
@@ -1110,23 +1110,23 @@ namespace Sidi.IO
             return p.IsDescendantOrSelf(ancestor);
         }
 
-        public static LPath GetUncRoot(string server, string share, IFileSystem fileSystem = null)
+        public static LPath GetUncRoot(string server, string share)
         {
-            return new LPath(fileSystem.OrDefault(), shortUncPrefix + server + DirectorySeparator + share + DirectorySeparator, Enumerable.Empty<string>());
+            return new LPath(shortUncPrefix + server + DirectorySeparator + share + DirectorySeparator, Enumerable.Empty<string>());
         }
 
-        public static LPath GetDriveRoot(char driveLetter, IFileSystem fileSystem = null)
+        public static LPath GetDriveRoot(char driveLetter)
         {
-            return new LPath(fileSystem.OrDefault(), String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
+            return new LPath(String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
         }
 
-        public static LPath GetDriveRoot(string driveLetter, IFileSystem fileSystem = null)
+        public static LPath GetDriveRoot(string driveLetter)
         {
             if (driveLetter.Length != 1)
             {
                 throw new ArgumentOutOfRangeException("driveLetter");
             }
-            return GetDriveRoot(driveLetter[0], fileSystem);
+            return GetDriveRoot(driveLetter[0]);
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
