@@ -79,13 +79,6 @@ namespace Sidi.Util
             Assert.IsTrue(c.IsUpdateRequired);
         }
 
-        [Test]
-        public void Test404()
-        {
-            UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), new Uri("http://andreas-grimme.gmxhome.de/ThisFileDoesNotExist"));
-            c.Check();
-        }
-
         [Test, Explicit("interactive")]
         public void TestSimple()
         {
