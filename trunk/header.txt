@@ -1,4 +1,4 @@
- Copyright (c) 2009-2013, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+ Copyright (c) 2009-2014, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
 
  This file is part of sidi-util.
 

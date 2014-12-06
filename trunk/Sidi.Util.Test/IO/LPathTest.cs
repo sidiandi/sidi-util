@@ -95,6 +95,7 @@ namespace Sidi.IO
         {
             Assert.AreEqual(new LPath(""), new LPath(@"a").Parent);
             Assert.AreEqual(new LPath(@"a"), new LPath(@"a\b").Parent);
+            Assert.AreEqual(null, FileSystem.Current.GetDrives().First().Parent);
         }
 
         [Test]
@@ -115,22 +116,20 @@ namespace Sidi.IO
 
             var server = System.Environment.MachineName;
             var share = tempDir.DriveLetter + "$";
-            var unc = LPath.GetUncRoot(server, share);
+            var unc = tempDir.GetAdministrativeShareUnc();
 
             Assert.IsTrue(System.IO.Directory.Exists(unc));
             Assert.AreEqual(server, unc.Server);
             Assert.AreEqual(share, unc.Share);
+            Assert.IsNull(unc.DriveLetter);
 
             var longNameUnc = new Sidi.IO.LPath(unc);
             Assert.IsTrue(longNameUnc.IsDirectory);
             Assert.IsTrue(longNameUnc.IsUnc);
 
             Assert.IsTrue(System.IO.Directory.Exists(longNameUnc));
-            Assert.IsNull(unc.Parent);
+            Assert.IsNull(unc.Root.Parent);
             Assert.IsTrue(unc.Children.Any());
-
-            log.Info(unc.ToRelative());
-
         }
 
         [Test]
@@ -231,7 +230,26 @@ namespace Sidi.IO
         [Test]
         public void Sibling()
         {
-            Assert.IsTrue(new Sidi.IO.LPath(@"a\b").Sibling("c").ToString().EndsWith(@"a\c"));
+            var p = new Sidi.IO.LPath(@"a\b");
+            var s = p.Sibling("c");
+            Assert.AreEqual(p.Parent, s.Parent);
+            Assert.AreEqual(new LPath(@"a\c"), s);
+        }
+
+        [Test]
+        public void Sibling2()
+        {
+            var p = new Sidi.IO.LPath(@"a");
+            var s = p.Sibling("c");
+            Assert.AreEqual(p.Parent, s.Parent);
+            Assert.AreEqual(new LPath(@"c"), s);
+        }
+
+        [Test, ExpectedException(typeof(InvalidOperationException))]
+        public void Sibling3()
+        {
+            var p = new Sidi.IO.LPath(@"");
+            var s = p.Sibling("c");
         }
 
         [Test]

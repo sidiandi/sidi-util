@@ -550,7 +550,12 @@ namespace Sidi.IO
 
         public LPath Sibling(string siblingName)
         {
-            return Parent.CatDir(siblingName);
+            var p = Parent;
+            if (p == null)
+            {
+                throw new InvalidOperationException("the path cannot have siblings since it does not have a parent");
+            }
+            return p.CatDir(siblingName);
         }
 
         /// <summary>
