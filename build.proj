@@ -72,7 +72,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     </CreateProperty>
     <Message Text="Version is $(Version)" />
     <AssemblyInfo CodeLanguage="CS"
-        AssemblyCopyright = "Copyright (c) Andreas Grimme 2010"
+        AssemblyCopyright = "Copyright (c) Andreas Grimme 2008-$([System.DateTime]::Now.ToString(`yyyy`))"
         AssemblyCompany="sidi"
         AssemblyProduct="sidi-util"
         OutputFile="VersionInfo.cs"
@@ -105,7 +105,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <RemoveDir Directories="$(TestDir)" />
   </Target>
 
-  <Target Name="Release" DependsOnTargets="NugetPushLocal" />
+  <Target Name="Release" DependsOnTargets="CreateVersion;NugetPushLocal" />
 
   <Target Name="NugetPack" DependsOnTargets="GetVersion;Build;UnitTest" >
     <MakeDir Directories="$(PackageDir)"/>
