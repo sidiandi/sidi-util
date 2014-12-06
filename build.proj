@@ -22,6 +22,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
         <Minor>0</Minor>
         <Build>0</Build>
 		<InitialRevision>1176</InitialRevision>
+		
 		<NugetLocalFeed>\\cala.myds.me\doc\nuget</NugetLocalFeed>
 	</PropertyGroup>
 	<Import Project="svn-nuget-library.Targets" />
