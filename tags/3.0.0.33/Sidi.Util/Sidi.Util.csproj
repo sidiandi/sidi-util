@@ -1,0 +1,359 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <CodeAnalysisRuleSet>..\sidi-util.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <Import Project="..\Common.props" />
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\nuget-packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.94.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\lib\net451\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Caching\SqliteCache.cs" />
+    <Compile Include="Caching\ICache.cs" />
+    <Compile Include="Caching\LruCache.cs" />
+    <Compile Include="Caching\LruCacheBackground.cs" />
+    <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Collections\EnumList.cs" />
+    <Compile Include="Collections\SelectList.cs" />
+    <Compile Include="CommandLine\Action.cs" />
+    <Compile Include="CommandLine\ActionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommandLine\ComplexValueParser.cs" />
+    <Compile Include="CommandLine\DateTimeParser.cs" />
+    <Compile Include="CommandLine\ItemSource.cs" />
+    <Compile Include="CommandLine\ArrayValueParser.cs" />
+    <Compile Include="CommandLine\Attributes.cs" />
+    <Compile Include="CommandLine\BasicValueParsers.cs" />
+    <Compile Include="CommandLine\EnumValueParser.cs" />
+    <Compile Include="CommandLine\ExampleAttribute.cs" />
+    <Compile Include="CommandLine\LogOptions.cs" />
+    <Compile Include="CommandLine\LPathParser.cs" />
+    <Compile Include="CommandLine\Manual.cs" />
+    <Compile Include="CommandLine\NativeMethods.cs" />
+    <Compile Include="CommandLine\Parameter.cs" />
+    <Compile Include="CommandLine\PathListParser.cs" />
+    <Compile Include="CommandLine\ShellSupport.cs" />
+    <Compile Include="CommandLine\IParserItem.cs" />
+    <Compile Include="CommandLine\Option.cs" />
+    <Compile Include="CommandLine\StandardValueParser.cs" />
+    <Compile Include="CommandLine\StaticMethodValueParser.cs" />
+    <Compile Include="CommandLine\SubCommand.cs" />
+    <Compile Include="CommandLine\TimeIntervalParser.cs" />
+    <Compile Include="CommandLine\TimeSpanParser.cs" />
+    <Compile Include="CommandLine\IValueParser.cs" />
+    <Compile Include="CommandLine\ValueParser.cs" />
+    <Compile Include="CommandLine\ValueParserAttribute.cs" />
+    <Compile Include="CommandLine\WebServer.cs" />
+    <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppender.cs" />
+    <Compile Include="Extensions\AssemblyExtensions.cs" />
+    <Compile Include="Extensions\DumpExtensions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
+    <Compile Include="Extensions\IListExtensions.cs" />
+    <Compile Include="Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Extensions\RegistryExtension.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Forms\ChooseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChooseDialog.designer.cs">
+      <DependentUpon>ChooseDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ControlTree.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\ControlTree.Designer.cs">
+      <DependentUpon>ControlTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\GenericListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Job.cs" />
+    <Compile Include="Forms\JobList.cs" />
+    <Compile Include="Forms\JobListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\NativeMethods.cs" />
+    <Compile Include="Forms\PanZoomController.cs" />
+    <Compile Include="Forms\Prompt.cs" />
+    <Compile Include="Forms\SelectObjectsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SelectObjectsDialog.designer.cs">
+      <DependentUpon>SelectObjectsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IMAP\ArgParser.cs" />
+    <Compile Include="IMAP\EmlDirectory.cs" />
+    <Compile Include="IMAP\IMailbox.cs" />
+    <Compile Include="IMAP\Rfc822Message.cs" />
+    <Compile Include="IMAP\Session.cs" />
+    <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\FileCompare.cs" />
+    <Compile Include="IO\FileSystem.cs" />
+    <Compile Include="IO\FileSystemExtension.cs" />
+    <Compile Include="IO\IFileSystemInfo.cs" />
+    <Compile Include="IO\CopyFileOptions.cs" />
+    <Compile Include="IO\CopyFileProgress.cs" />
+    <Compile Include="IO\LPathExtensions.cs" />
+    <Compile Include="IO\Mock\FileSystem.cs" />
+    <Compile Include="IO\Mock\FileSystemInfo.cs" />
+    <Compile Include="IO\PathParser2.cs" />
+    <Compile Include="IO\Windows\WindowsFileSystem.cs" />
+    <Compile Include="IO\Windows\FindHandle.cs" />
+    <Compile Include="IO\Windows\HardLinkInfo.cs" />
+    <Compile Include="IO\HardLinkPreservingCopyOperation.cs" />
+    <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="IO\IHardLinkInfo.cs" />
+    <Compile Include="IO\JunctionPoint.cs" />
+    <Compile Include="IO\LPathWriteTime.cs" />
+    <Compile Include="IO\Operation.cs" />
+    <Compile Include="IO\Prefix.cs" />
+    <Compile Include="Parse\Ast.cs" />
+    <Compile Include="Parse\Parser.cs" />
+    <Compile Include="Parse\Text.cs" />
+    <Compile Include="IO\Paths.cs" />
+    <Compile Include="IO\CopyOp.cs" />
+    <Compile Include="IO\CopyProgress.cs" />
+    <Compile Include="IO\LDirectory.cs" />
+    <Compile Include="IO\Find.cs" />
+    <Compile Include="IO\LFile.cs" />
+    <Compile Include="IO\FindConfig.cs" />
+    <Compile Include="IO\PathList.cs" />
+    <Compile Include="IO\Windows\FileSystemInfo.cs" />
+    <Compile Include="IO\FileType.cs" />
+    <Compile Include="IO\Windows\FindData.cs" />
+    <Compile Include="IO\LPath.cs" />
+    <Compile Include="IO\PathTypeConverter.cs" />
+    <Compile Include="IO\Windows\NativeMethods.cs" />
+    <Compile Include="Net\HtmlCodeWriter.cs" />
+    <Compile Include="Net\HtmlGenerator.cs" />
+    <Compile Include="Net\WebServer.cs" />
+    <Compile Include="Persistence\SharedConnection.cs" />
+    <Compile Include="Util\AsyncCalculation.cs" />
+    <Compile Include="Util\Base32.cs" />
+    <Compile Include="Util\BinaryPrefix.cs" />
+    <Compile Include="Util\ByteArrayEx.cs" />
+    <Compile Include="CommandLine\ShowHelp.cs" />
+    <Compile Include="CommandLine\ShowUserInterface.cs" />
+    <Compile Include="Util\Comparer.cs" />
+    <Compile Include="IO\Copy.cs" />
+    <Compile Include="Forms\BossController.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\DirectoryDialog.cs" />
+    <Compile Include="Forms\FullScreenManager.cs" />
+    <Compile Include="Forms\ImageView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\ItemFormatColumn.cs" />
+    <Compile Include="Forms\ItemLayout.cs" />
+    <Compile Include="Forms\ItemView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\MouseDelta.cs" />
+    <Compile Include="Forms\MouseWheelSupport.cs" />
+    <Compile Include="Forms\PointExtensions.cs" />
+    <Compile Include="Forms\Support.cs" />
+    <Compile Include="Forms\TextPrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TextPrompt.designer.cs">
+      <DependentUpon>TextPrompt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Util.cs" />
+    <Compile Include="Forms\VerbMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\ViewIList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Viewport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Util\Dump.cs" />
+    <Compile Include="Util\EncryptString.cs" />
+    <Compile Include="Util\GraMath.cs" />
+    <Compile Include="Collections\History.cs" />
+    <Compile Include="Util\IArchive.cs" />
+    <Compile Include="Util\IndentWriter.cs" />
+    <Compile Include="Util\Interval.cs" />
+    <Compile Include="Collections\IntSet.cs" />
+    <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="IO\PathExtensions.cs" />
+    <Compile Include="IO\SearchPath.cs" />
+    <Compile Include="Util\ListEx.cs" />
+    <Compile Include="Collections\LruCache.cs" />
+    <Compile Include="Collections\LruCacheBackground.cs" />
+    <Compile Include="Collections\LruCacheBackgroundAutoInvalidate.cs" />
+    <Compile Include="CommandLine\Parser.cs" />
+    <Compile Include="IO\FileUtil.cs" />
+    <Compile Include="Persistence\Attributes.cs" />
+    <Compile Include="Persistence\Collection.cs" />
+    <Compile Include="Persistence\Dictionary.cs" />
+    <Compile Include="Pop3\Server.cs" />
+    <Compile Include="..\VersionInfo.cs" />
+    <Compile Include="Util\ListFormat.cs" />
+    <Compile Include="Util\LogScope.cs" />
+    <Compile Include="Util\MetricPrefix.cs" />
+    <Compile Include="Util\OnDispose.cs" />
+    <Compile Include="Util\ProcessEx.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\Progress.cs" />
+    <Compile Include="Util\RandomEx.cs" />
+    <Compile Include="Pop3\Session.cs" />
+    <Compile Include="Util\RegexIgnoreCase.cs" />
+    <Compile Include="Util\RegistrySerializer.cs" />
+    <Compile Include="Util\ShellAccess.cs" />
+    <Compile Include="Util\Stats.cs" />
+    <Compile Include="Util\StringEx.cs" />
+    <Compile Include="Net\TcpClientEx.cs" />
+    <Compile Include="Test\TestBase.cs" />
+    <Compile Include="Util\TileGeometry.cs" />
+    <Compile Include="Util\TimeInterval.cs" />
+    <Compile Include="Util\TimeIntervalParser.cs" />
+    <Compile Include="Util\Tokenizer.cs" />
+    <Compile Include="Util\UnixTime.cs" />
+    <Compile Include="Util\UpdateCheck.cs" />
+    <Compile Include="Util\UpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Util\UpdateForm.Designer.cs">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Visualization\Bins.cs" />
+    <Compile Include="Visualization\Bounds.cs" />
+    <Compile Include="Visualization\ColorScale.cs" />
+    <Compile Include="Visualization\CushionPainter.cs" />
+    <Compile Include="Visualization\DistinctColor.cs" />
+    <Compile Include="Visualization\FileSystemTree.cs" />
+    <Compile Include="Visualization\Layout.cs" />
+    <Compile Include="Visualization\TreeEventArgs.cs" />
+    <Compile Include="Visualization\TreeMapExtensions.cs" />
+    <Compile Include="Visualization\TypedTreeMap.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Visualization\HSLColor.cs" />
+    <Compile Include="Visualization\ITree.cs" />
+    <Compile Include="Visualization\LabelPainter.cs" />
+    <Compile Include="Visualization\PercentileColorScale.cs" />
+    <Compile Include="Visualization\SimpleTreeMap.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Visualization\Tile.cs" />
+    <Compile Include="Visualization\Tiles.cs" />
+    <Compile Include="Visualization\Tree.cs" />
+    <Compile Include="Visualization\TreeMap.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Visualization\LayoutManager.cs" />
+    <Compile Include="Visualization\Util.cs" />
+    <Compile Include="Visualization\ZoomPanController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Sidi.Util.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\ChooseDialog.resx">
+      <DependentUpon>ChooseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ControlTree.resx">
+      <DependentUpon>ControlTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SelectObjectsDialog.resx">
+      <DependentUpon>SelectObjectsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Util\UpdateForm.resx">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="SHDocVw">
+      <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project="..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\build\net451\System.Data.SQLite.Core.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
