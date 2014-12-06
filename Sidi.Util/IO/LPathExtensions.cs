@@ -68,5 +68,14 @@ namespace Sidi.IO
                 source.CopyFile(destination);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="localPath"></param>
+        public static LPath GetAdministrativeShareUnc(this LPath localPath)
+        {
+            return LPath.GetUncRoot(System.Environment.MachineName, localPath.DriveLetter + "$").CatDir(localPath.Parts);
+        }
     }
 }
