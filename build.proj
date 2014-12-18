@@ -23,7 +23,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
         <Build>0</Build>
 		<InitialRevision>1176</InitialRevision>
 		
-		<NugetLocalFeed>\\cala.myds.me\doc\nuget</NugetLocalFeed>
+		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
 	</PropertyGroup>
 	<Import Project="svn-nuget-library.Targets" />
 </Project>

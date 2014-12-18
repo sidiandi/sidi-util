@@ -73,6 +73,7 @@
     <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppender.cs" />
     <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
+    <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
