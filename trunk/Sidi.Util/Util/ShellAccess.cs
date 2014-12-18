@@ -71,22 +71,47 @@ namespace Sidi.Util
         /// 
         /// </summary>
         /// <returns>Topmost Windows Explorer or Internet Explorer window or null if no such window is open</returns>
-        public SHDocVw.InternetExplorer GetForegroundWindow()
+        public bool TryGetForegroundWindow(out SHDocVw.InternetExplorer explorerWindow)
         {
             var shellWindows = ((IEnumerable)shell.Windows()).OfType<InternetExplorer>()
-                .Select(x => { try { return new { Handle = x.HWND, Instance = x }; } catch { return null; } } )
+                .Select(x => { try { return new { Handle = x.HWND, Instance = x }; } catch { return null; } })
+                .Where(x => x != null)
+                .ToDictionary(x => x.Handle, x => x.Instance);
+
+            explorerWindow = GetZOrder(IntPtr.Zero)
+                .Select(hwnd => shellWindows.GetValueOrDefault((int)hwnd, null))
+                .FirstOrDefault();
+
+            return explorerWindow != null;
+        }
+
+        public SHDocVw.InternetExplorer GetForegroundWindow()
+        {
+            InternetExplorer e;
+            if (TryGetForegroundWindow(out e))
+            {
+                return e;
+            }
+            else
+            {
+                throw new InvalidOperationException("The foreground window is not a Windows Explorer window.");
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>All Windows Explorer or Internet Explorer windows, sorted from topmost.</returns>
+        public IEnumerable<SHDocVw.InternetExplorer> GetExplorerWindows()
+        {
+            var shellWindows = ((IEnumerable)shell.Windows()).OfType<InternetExplorer>()
+                .Select(x => { try { return new { Handle = x.HWND, Instance = x }; } catch { return null; } })
                 .Where(x => x != null)
                 .ToDictionary(x => x.Handle, x => x.Instance);
 
             return GetZOrder(IntPtr.Zero)
-                .Select(hwnd =>
-                    {
-                        InternetExplorer x = null;
-                        shellWindows.TryGetValue((int)hwnd, out x);
-                        return x;
-                    })
-                .Where(x => x != null)
-                .FirstOrDefault();
+                .Select(hwnd => shellWindows.GetValueOrDefault((int)hwnd, null))
+                .Where(x => x != null);
         }
 
         /// <summary>
@@ -96,7 +121,15 @@ namespace Sidi.Util
         {
             get
             {
-                return GetForegroundWindow().GetSelectedFiles();
+                InternetExplorer e;
+                if (TryGetForegroundWindow(out e))
+                {
+                    return e.GetSelectedFiles();
+                }
+                else
+                {
+                    return Enumerable.Empty<LPath>();
+                }
             }
         }
 
