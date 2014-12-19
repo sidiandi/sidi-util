@@ -106,6 +106,15 @@ namespace Sidi.IO
             }
         }
 
+        public static LPath GetTempFile(string extensionWithDot = null)
+        {
+            if (extensionWithDot == null)
+            {
+                extensionWithDot = String.Empty;
+            }
+            return Temp.CatDir(LPath.GetRandomFileName()).CatName(extensionWithDot);
+        }
+
         public static LPath GetFolderPath(Environment.SpecialFolder sf)
         {
             return new LPath(System.Environment.GetFolderPath(sf));

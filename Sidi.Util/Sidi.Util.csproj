@@ -135,6 +135,7 @@
     <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Prefix.cs" />
+    <Compile Include="Net\HtmlPage.cs" />
     <Compile Include="Parse\Ast.cs" />
     <Compile Include="Parse\Parser.cs" />
     <Compile Include="Parse\Text.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
     <Compile Include="Test\TestBase.cs" />
+    <Compile Include="Util\Taggable.cs" />
     <Compile Include="Util\TileGeometry.cs" />
     <Compile Include="Util\TimeInterval.cs" />
     <Compile Include="Util\TimeIntervalParser.cs" />
