@@ -26,6 +26,7 @@ using Sidi.Forms;
 using System.Diagnostics;
 using Sidi.Test;
 using Sidi.IO;
+using Sidi.Net;
 
 namespace Sidi.Util
 {
@@ -176,6 +177,31 @@ namespace Sidi.Util
                 .AddColumn("Name", f => f.ToString())
                 .Property("Id")
                 .Chart().RunFullScreen();
+        }
+
+        [Test, Explicit]
+        public void AsHtml()
+        {
+            var data = Process.GetProcesses();
+            var list = data
+                .ListFormat()
+                .AllPublic();
+
+            var h = new HtmlGenerator();
+
+            var f = list.Columns[0].Tag<HtmlCellFormat<Process>>();
+            var oldF = f.Format;
+            f.Format = (r, i, c) => h.a(h.href("http://www.spiegel.de"), oldF(r,i,c));
+
+            var page = h.html
+            (
+                h.body
+                (
+                    h.Table(list)
+                )
+            );
+
+            HtmlPage.Show(page);
         }
     }
 }

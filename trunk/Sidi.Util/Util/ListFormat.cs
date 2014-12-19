@@ -25,10 +25,11 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Collections;
+using Sidi.Net;
 
 namespace Sidi.Util
 {
-    public class ListFormat<T>
+    public class ListFormat<T> : Taggable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -39,7 +40,7 @@ namespace Sidi.Util
 
         public IEnumerable<T> Data { get; private set; }
 
-        public class Column
+        public class Column : Taggable
         {
             public Column()
             {
