@@ -136,15 +136,13 @@ namespace Sidi.Caching
         }
 
         /// <summary>
-        /// Uses a local cache with an ID derived from calculation
+        /// Caches a read file operation
         /// </summary>
-        /// <typeparam name="TInput1"></typeparam>
-        /// <typeparam name="TInput2"></typeparam>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="input1"></param>
-        /// <param name="input2"></param>
-        /// <param name="calculation"></param>
-        /// <returns></returns>
+        /// Uses a local cache with an ID derived from readFileOperation.
+        /// <typeparam name="TOutput">Result of the read file operation</typeparam>
+        /// <param name="file">Path to the file or directory to be read</param>
+        /// <param name="readFileOperation">Function that reads a file/directory and returns an TOutput value</param>
+        /// <returns>Result of the readFileOperation function call.</returns>
         public static TOutput ReadFile<TOutput>(LPath file, Func<LPath, TOutput> readFileOperation)
         {
             return Cache.Local(readFileOperation.Method).Read(file, readFileOperation);
