@@ -169,7 +169,7 @@ namespace Sidi.Caching
         /// <returns></returns>
         public T ReadFile<T>(LPath path, Func<LPath, T> fileReader)
         {
-            return GetCached(new LPathWriteTime(path), _ => fileReader(_.Path));
+            return GetCached(new FileVersion(path), _ => fileReader(_.Path));
         }
 
         /// <summary>

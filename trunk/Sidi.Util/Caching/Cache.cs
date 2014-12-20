@@ -135,6 +135,21 @@ namespace Sidi.Caching
             return Cache.Local(calculation.Method).GetCached(new object[]{input1, input2}, _ => calculation(input1, input2));
         }
 
+        /// <summary>
+        /// Uses a local cache with an ID derived from calculation
+        /// </summary>
+        /// <typeparam name="TInput1"></typeparam>
+        /// <typeparam name="TInput2"></typeparam>
+        /// <typeparam name="TOutput"></typeparam>
+        /// <param name="input1"></param>
+        /// <param name="input2"></param>
+        /// <param name="calculation"></param>
+        /// <returns></returns>
+        public static TOutput ReadFile<TOutput>(LPath file, Func<LPath, TOutput> readFileOperation)
+        {
+            return Cache.Local(readFileOperation.Method).Read(file, readFileOperation);
+        }
+
         public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> calculation)
         {
             return GetCached(key, calculation, DeSerializeFromFile, SerializeToFile);
@@ -201,9 +216,9 @@ namespace Sidi.Caching
         /// <param name="path">File path</param>
         /// <param name="fileReader">Function to read a file and return its contents as type T</param>
         /// <returns></returns>
-        public T ReadFile<T>(LPath path, Func<LPath, T> fileReader)
+        public T Read<T>(LPath path, Func<LPath, T> fileReader)
         {
-            return GetCached(path.Info, _ => fileReader(_.FullName));
+            return GetCached(new FileVersion(path), _ => fileReader(_.Path));
         }
 
         /// <summary>
