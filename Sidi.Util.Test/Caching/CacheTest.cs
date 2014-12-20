@@ -219,16 +219,30 @@ namespace Sidi.Caching
             var file = TestFile("file-with-content");
             file.WriteAllText(content);
             var cache = Cache.Local(MethodBase.GetCurrentMethod());
-            var readContent = cache.ReadFile(file, path => path.ReadAllText());
+            var readContent = cache.Read(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
             content = "new content";
             file.WriteAllText(content);
-            readContent = cache.ReadFile(file, path => path.ReadAllText());
+            readContent = cache.Read(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
 
             Assert.IsTrue(cache.IsCached(file.Info));
             cache.Clear();
             Assert.IsFalse(cache.IsCached(file.Info));
+        }
+
+        [Test]
+        public void ReadFileStatic()
+        {
+            var content = "hello";
+            var file = TestFile("file-with-content");
+            file.WriteAllText(content);
+            var readContent = Cache.ReadFile(file, path => path.ReadAllText());
+            Assert.AreEqual(content, readContent);
+            content = "new content";
+            file.WriteAllText(content);
+            readContent = Cache.ReadFile(file, path => path.ReadAllText());
+            Assert.AreEqual(content, readContent);
         }
     }
 }

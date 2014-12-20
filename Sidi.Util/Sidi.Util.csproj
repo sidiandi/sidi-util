@@ -118,6 +118,8 @@
     <Compile Include="IO\FileCompare.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\FileSystemExtension.cs" />
+    <Compile Include="IO\FileVersion.cs" />
+    <Compile Include="IO\IEquatable.cs" />
     <Compile Include="IO\IFileSystemInfo.cs" />
     <Compile Include="IO\CopyFileOptions.cs" />
     <Compile Include="IO\CopyFileProgress.cs" />
@@ -132,7 +134,6 @@
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IHardLinkInfo.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
-    <Compile Include="IO\LPathWriteTime.cs" />
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Prefix.cs" />
     <Compile Include="Net\HtmlPage.cs" />
