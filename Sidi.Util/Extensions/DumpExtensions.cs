@@ -57,9 +57,21 @@ namespace Sidi.Extensions
 
         public static void DumpProperties(this object x, TextWriter o)
         {
-            var list = new[] { x };
+            object[] list;
+            if (x is System.Collections.IEnumerable && !(x is string))
+            {
+                list = ((System.Collections.IEnumerable)x).Cast<object>().ToArray();
+                x = list[0];
+            }
+            else
+            {
+                list = new object[] { x };
+            }
 
             var lf = list.ListFormat();
+
+            lf.AddColumn("ToString", _ => _.ToString());
+            lf.AddColumn("Type", _ => _.GetType());
 
             foreach (var i in x.GetType().GetProperties())
             {
@@ -73,6 +85,15 @@ namespace Sidi.Extensions
             }
 
             lf.RenderDetails(o);
+        }
+
+        public static string DumpProperties(this object x)
+        {
+            using (var w = new StringWriter())
+            {
+                x.DumpProperties(w);
+                return w.ToString();
+            }
         }
 
         public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e)

@@ -202,6 +202,14 @@ namespace Sidi.Util
         public IList<Column> Columns = new List<Column>();
         public string ColumnSeparator = "|";
 
+        public Column this[string columnName]
+        {
+            get
+            {
+                return Columns.First(x => object.Equals(x.Name, columnName));
+            }
+        }
+
         public void RenderText()
         {
             RenderText(Console.Out);
@@ -303,8 +311,10 @@ namespace Sidi.Util
                 .Select((item, index) => Columns.Select(x => x.GetText(item, index)).ToArray());
 
             var rowFormat = String.Format("{{0,-{0}}}: {{1}}", columnWidth);
+            int rowIndex = 0;
             foreach (var i in rows)
             {
+                o.WriteLine("[{0}]", rowIndex++);
                 for (int c = 0; c < Columns.Count; ++c)
                 {
                     o.WriteLine(rowFormat, Columns[c].Name, i[c]);
