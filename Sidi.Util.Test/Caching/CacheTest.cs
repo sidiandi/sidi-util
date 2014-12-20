@@ -226,9 +226,9 @@ namespace Sidi.Caching
             readContent = cache.Read(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
 
-            Assert.IsTrue(cache.IsCached(file.Info));
+            Assert.IsTrue(cache.IsCached(new FileVersion(file)));
             cache.Clear();
-            Assert.IsFalse(cache.IsCached(file.Info));
+            Assert.IsFalse(cache.IsCached(new FileVersion(file)));
         }
 
         [Test]
