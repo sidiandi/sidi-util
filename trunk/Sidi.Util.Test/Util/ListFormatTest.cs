@@ -185,7 +185,12 @@ namespace Sidi.Util
             var data = Process.GetProcesses();
             var list = data
                 .ListFormat()
-                .AllPublic();
+                .AllPublic()
+                .AddColumn("Details", x => StringExtensions.ToString(x.DumpProperties));
+
+            list.Columns.Last().Tag<HtmlCellFormat<Process>>().HasDedicatedRow = true;
+            list["Threads"].GetHtmlCellFormat().HasDedicatedRow = true;
+                
 
             var h = new HtmlGenerator();
 
@@ -195,9 +200,41 @@ namespace Sidi.Util
 
             var page = h.html
             (
+                h.head(h.TableStyle()),
                 h.body
                 (
                     h.Table(list)
+                )
+            );
+
+            HtmlPage.Show(page);
+        }
+
+        [Test, Explicit]
+        public void AsHtmlDetails()
+        {
+            var data = Process.GetProcesses();
+            var list = data
+                .ListFormat()
+                .AllPublic()
+                .AddColumn("Details", x => StringExtensions.ToString(x.DumpProperties));
+
+            list.Columns.Last().Tag<HtmlCellFormat<Process>>().HasDedicatedRow = true;
+            list["Threads"].GetHtmlCellFormat().HasDedicatedRow = true;
+
+
+            var h = new HtmlGenerator();
+
+            var f = list.Columns[0].Tag<HtmlCellFormat<Process>>();
+            var oldF = f.Format;
+            f.Format = (r, i, c) => h.a(h.href("http://www.spiegel.de"), oldF(r, i, c));
+
+            var page = h.html
+            (
+                h.head(h.TableStyle()),
+                h.body
+                (
+                    h.DetailsTable(list)
                 )
             );
 

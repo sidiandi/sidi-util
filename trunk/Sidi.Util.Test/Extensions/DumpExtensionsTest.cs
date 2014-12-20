@@ -44,10 +44,34 @@ namespace Sidi.Extensions
         }
 
         [Test]
-        public void DumpProperties()
+        public void DumpProperties_DumpsProperties()
         {
             Process p = Process.GetCurrentProcess();
-            p.DumpProperties(Console.Out);
+            using (var w = new StringWriter())
+            {
+                p.DumpProperties(w);
+                Assert.That(w.ToString().Length, Is.GreaterThan(256));
+            }
+        }
+
+        [Test]
+        public void DumpProperties_ListsAllItems()
+        {
+            var p = Process.GetProcesses();
+            var count = p.Length;
+            var s = p.DumpProperties();
+            for (int i = 0; i < count; ++i)
+            {
+                Assert.That(s, Contains.Substring(String.Format("[{0}]", i)));
+            }
+        }
+
+        [Test]
+        public void DumpProperties_MentionsString()
+        {
+            var p = "Hello".DumpProperties();
+            Assert.That(p, Contains.Substring("Hello"));
+            Assert.That(p, Contains.Substring("System.String"));
         }
 
         [Test]
