@@ -206,6 +206,8 @@
     <Compile Include="Util\EncryptString.cs" />
     <Compile Include="Util\GraMath.cs" />
     <Compile Include="Collections\History.cs" />
+    <Compile Include="Util\HtmlCellFormat.cs" />
+    <Compile Include="Util\HtmlRowFormat.cs" />
     <Compile Include="Util\IArchive.cs" />
     <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\Interval.cs" />
@@ -226,6 +228,7 @@
     <Compile Include="Pop3\Server.cs" />
     <Compile Include="..\VersionInfo.cs" />
     <Compile Include="Util\ListFormat.cs" />
+    <Compile Include="Extensions\ListFormatHtmlExtension.cs" />
     <Compile Include="Util\LogScope.cs" />
     <Compile Include="Util\MetricPrefix.cs" />
     <Compile Include="Util\OnDispose.cs" />

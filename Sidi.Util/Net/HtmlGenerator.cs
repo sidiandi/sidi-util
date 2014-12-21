@@ -38,6 +38,12 @@ namespace Sidi.Net
         {
             return o =>
             {
+                if (childs.Length == 0)
+                {
+                    o.Write("<{0} />", tag);
+                    return;
+                }
+
                 try
                 {
                     o.Write("<{0}", tag);
@@ -68,6 +74,15 @@ namespace Sidi.Net
                 }
             };
         }
+
+        public static HtmlGenerator Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+        static readonly HtmlGenerator instance = new HtmlGenerator();
 
         void RenderChild(TextWriter o, object i)
         {
@@ -172,6 +187,21 @@ namespace Sidi.Net
             return new AttributeItem(childs);
         }
 
+        /// <summary>
+        /// Writes raw html. The text will not be escaped or changed.
+        /// </summary>
+        /// <param name="rawHtml"></param>
+        /// <returns></returns>
+        public Action<TextWriter> Raw(string rawHtml)
+        {
+            return new Action<TextWriter>(w => w.Write(rawHtml));
+        }
+
+        /// <summary>
+        /// Writes pre-formatted text in a code tag
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public Action<TextWriter> Verbose(Action<TextWriter> a)
         {
             return new Action<TextWriter>(x =>
@@ -181,6 +211,16 @@ namespace Sidi.Net
                     a(cw);
                 }
             });
+        }
+
+        /// <summary>
+        /// Returns an html format object that keeps text line breaks.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public object Text(string text)
+        {
+            return text.Lines().Select(line => new object[] { line, this.br() });
         }
 
         public object If(bool condition, Func<object> value)
@@ -222,7 +262,7 @@ namespace Sidi.Net
         [SuppressMessage("Microsoft.Naming", "CA1709")]
         public Action<TextWriter> body(params object[] childs) { return Tag("body", childs); }
         [SuppressMessage("Microsoft.Naming", "CA1709")]
-        public Action<TextWriter> br(params object[] childs) { return Tag("br", childs); }
+        public Action<TextWriter> br() { return Tag("br"); }
         [SuppressMessage("Microsoft.Naming", "CA1709")]
         public Action<TextWriter> button(params object[] childs) { return Tag("button", childs); }
         [SuppressMessage("Microsoft.Naming", "CA1709")]
