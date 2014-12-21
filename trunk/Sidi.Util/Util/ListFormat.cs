@@ -301,24 +301,33 @@ namespace Sidi.Util
             }
         }
 
+        public void RenderDetails(TextWriter o, T i)
+        {
+            var columnWidth = Columns.Max(x => x.Name.Length);
+            var rowFormat = String.Format("{{0,-{0}}}: {{1}}", columnWidth);
+            RenderDetails(o, i, 0, rowFormat);
+        }
+        
+        void RenderDetails(TextWriter o, T i, int rowIndex, string rowFormat)
+        {
+            for (int c = 0; c < Columns.Count; ++c)
+            {
+                o.WriteLine(rowFormat, Columns[c].Name, Columns[c].GetText(i, rowIndex));
+            }
+        }
+        
         public void RenderDetails(TextWriter o)
         {
             DefaultColumns();
 
             var columnWidth = Columns.Max(x => x.Name.Length);
 
-            var rows = Data
-                .Select((item, index) => Columns.Select(x => x.GetText(item, index)).ToArray());
-
             var rowFormat = String.Format("{{0,-{0}}}: {{1}}", columnWidth);
             int rowIndex = 0;
-            foreach (var i in rows)
+            foreach (var i in Data)
             {
                 o.WriteLine("[{0}]", rowIndex++);
-                for (int c = 0; c < Columns.Count; ++c)
-                {
-                    o.WriteLine(rowFormat, Columns[c].Name, i[c]);
-                }
+                RenderDetails(o, i, rowIndex, rowFormat);
                 o.WriteLine();
             }
         }

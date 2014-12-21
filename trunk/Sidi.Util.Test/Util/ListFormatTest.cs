@@ -27,6 +27,7 @@ using System.Diagnostics;
 using Sidi.Test;
 using Sidi.IO;
 using Sidi.Net;
+using Sidi.Util;
 
 namespace Sidi.Util
 {

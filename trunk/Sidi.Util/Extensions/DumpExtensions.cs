@@ -57,6 +57,7 @@ namespace Sidi.Extensions
 
         public static void DumpProperties(this object x, TextWriter o)
         {
+            bool singleInstance = false;
             object[] list;
             if (x is System.Collections.IEnumerable && !(x is string))
             {
@@ -66,6 +67,7 @@ namespace Sidi.Extensions
             else
             {
                 list = new object[] { x };
+                singleInstance = true;
             }
 
             var lf = list.ListFormat();
@@ -84,7 +86,14 @@ namespace Sidi.Extensions
                 lf.AddColumn(i.Name, y => field.GetValue(y));
             }
 
-            lf.RenderDetails(o);
+            if (singleInstance)
+            {
+                lf.RenderDetails(o, x);
+            }
+            else
+            {
+                lf.RenderDetails(o);
+            }
         }
 
         public static string DumpProperties(this object x)
