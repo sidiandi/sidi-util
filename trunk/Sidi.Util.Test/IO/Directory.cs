@@ -31,7 +31,7 @@ namespace Sidi.IO
         [Test]
         public void Exists()
         {
-            var p = new LPath(String.Format(@"\\{0}\C$", System.Environment.MachineName));
+            var p = LPath.GetUncRoot(System.Environment.MachineName, "C$");
             Assert.IsTrue(System.IO.Directory.Exists(p)); 
             Assert.IsTrue(p.IsDirectory);
         }
