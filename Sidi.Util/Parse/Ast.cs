@@ -25,7 +25,7 @@ namespace Sidi.Parse
             Text = text;
         }
 
-        public Ast[] Childs { get; private set; }
+        public Ast[] Childs { get; set; }
         public Text Text { get; set; }
         public object Name { get; set; }
 

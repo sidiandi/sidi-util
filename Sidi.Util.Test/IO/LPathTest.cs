@@ -27,6 +27,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Sidi.Test;
 using System.Diagnostics;
+using Sidi.Parse;
 
 namespace Sidi.IO
 {
@@ -42,7 +43,25 @@ namespace Sidi.IO
             Assert.AreEqual(@"\some\root\relative\path", p.ToString());
 
             p = new LPath(@"\\server\share\a\b\c");
+            Assert.AreEqual("server", p.Server);
+            Assert.AreEqual("share", p.Share);
             Assert.AreEqual(@"\\server\share\a\b\c", p.ToString());
+
+            p = new LPath(@"\\server\share\");
+            Assert.AreEqual("server", p.Server);
+            Assert.AreEqual("share", p.Share);
+            Assert.AreEqual(@"\\server\share\", p.ToString());
+        }
+
+        [TestCase(@"C:", ExpectedException = typeof(ArgumentOutOfRangeException))]
+        [TestCase(@":", ExpectedException = typeof(ArgumentOutOfRangeException))]
+        [TestCase(@"asda:\", ExpectedException = typeof(ArgumentOutOfRangeException))]
+        [TestCase(@"_:", ExpectedException = typeof(ArgumentOutOfRangeException))]
+        public void CtorEx(string pathSpec)
+        {
+            var p = new LPath(pathSpec);
+            log.Info(p.Prefix);
+            log.Info(p.Parts);
         }
 
         [Test, ExpectedException(typeof(System.ArgumentOutOfRangeException))]
@@ -423,27 +442,6 @@ namespace Sidi.IO
             paths.WriteClipboard();
             var p = LPath.Parse(":paste");
             Assert.AreEqual(paths.First(), p);
-        }
-
-        [Test]
-        public void DriveRootsExist()
-        {
-            Assert.IsFalse(new LPath(@"a:\").Exists);
-            var drives = DriveInfo.GetDrives();
-            var allDrives = Enumerable.Range('a', 'z' - 'a').Select(x => new String((char)x, 1))
-                .Select(x => new
-                    {
-                        Letter = x,
-                        Exists = drives.Any(d => d.RootDirectory.FullName.StartsWith(x, StringComparison.InvariantCultureIgnoreCase)),
-                    });
-
-            foreach (var i in allDrives)
-            {
-                if (new DriveInfo(i.Letter).DriveType != DriveType.CDRom)
-                {
-                    Assert.AreEqual(i.Exists, new LPath(i.Letter + @":\").IsDirectory, i.Letter);
-                }
-            }
         }
 
         [Test]

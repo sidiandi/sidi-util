@@ -61,9 +61,22 @@ namespace Sidi.IO
         
         public LPath(string path)
         {
-            var ast = PathParser.Path()(new Sidi.Parse.Text(path));
-            prefix = GetPrefix(ast[0]);
-            parts = ast[1].Childs.Select(x => x.Text.ToString()).ToArray();
+            try
+            {
+                var text = new Sidi.Parse.Text(path);
+                var t = text.Copy();
+                var ast = PathParser.Path()(t);
+                if (t.Length > 0)
+                {
+                    throw new ParserException(text);
+                }
+                prefix = GetPrefix(ast[0]);
+                parts = ast[1].Childs.Select(x => x.Text.ToString()).ToArray();
+            }
+            catch (ParserException e)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("not a valid file system path: {0}", path), e);
+            }
             Initialize(prefix, parts);
         }
 
