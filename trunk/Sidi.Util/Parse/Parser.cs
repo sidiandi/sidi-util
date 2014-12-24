@@ -9,6 +9,21 @@ using Rule = System.Func<Sidi.Parse.Text>;
 
 namespace Sidi.Parse
 {
+    public class ParserException: Exception
+    {
+        public ParserException(Text text)
+        {
+            this.Text = text;
+        }
+
+        public Text Text { get; private set; }
+
+        public override string ToString()
+        {
+            return Text.ToString();
+        }
+    }
+
     /// <summary>
     /// Simple recursive descent parser.
     /// </summary>
@@ -191,6 +206,29 @@ namespace Sidi.Parse
                     }
                     return null;
                 };
+        }
+
+        public static Func<Text, Ast> MandatoryAlternative(params Func<Text, Ast>[] production)
+        {
+            return text =>
+            {
+                var index = 0;
+                foreach (var i in production)
+                {
+                    var t = text.Copy();
+                    var m = i(t);
+                    if (m != null)
+                    {
+                        text.Set(t);
+                        return new Ast(m.Text, new[] { m })
+                        {
+                            Name = index
+                        };
+                    }
+                    ++index;
+                }
+                throw new ParserException(text);
+            };
         }
 
         public static Func<Text, Ast> Expect(string searchString)

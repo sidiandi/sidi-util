@@ -24,13 +24,33 @@ namespace Sidi.IO
         public static Rule Prefix()
         {
             return Rename(() => Alternative(
-                LongUncPrefix(), 
-                DeviceNamespacePrefix(),
-                LongPrefix(),
-                UncPrefix(), 
+                SpecialPrefix(),
                 LocalDrivePrefix(),
                 RootRelative(),
                 RelativePrefix()));
+        }
+
+        public static Rule SpecialPrefix()
+        {
+            var special = Concatenation(Separator(), Separator(), MandatoryAlternative(
+                LongUncPrefix(), 
+                DeviceNamespacePrefix(),
+                LongPrefix(),
+                UncPrefix()
+                ));
+
+            return text =>
+                {
+                    var t = text.Copy();
+                    var a = special(t);
+                    if (a != null)
+                    {
+                        a.Name = a.Childs[2].Childs[0].Name;
+                        a.Childs = a.Childs[2].Childs[0].Childs;
+                        text.Set(t);
+                    }
+                    return a;
+                };
         }
 
         public static Rule RelativePrefix()
@@ -40,17 +60,17 @@ namespace Sidi.IO
 
         public static Rule LongPrefix()
         {
-            return Rename(() => Concatenation(Expect(@"\\?\"), DriveLetter(), Colon(), Separator()));
+            return Rename(() => Concatenation(Expect(@"?\"), DriveLetter(), Colon(), Separator()));
         }
 
         public static Rule LongUncPrefix()
         {
-            return Rename(() => Concatenation(Expect(@"\\?\UNC\"), ServerName(), Separator(), ShareName(), Separator()));
+            return Rename(() => Concatenation(Expect(@"?\UNC\"), ServerName(), Separator(), ShareName(), Separator()));
         }
 
         public static Rule DeviceNamespacePrefix()
         {
-            return Enclose(() => Expect(@"\\.\"));
+            return Enclose(() => Expect(@".\"));
         }
 
         public static Rule List(Rule element, Rule separator)
@@ -143,7 +163,7 @@ namespace Sidi.IO
 
         public static Rule UncPrefix()
         {
-            return Rename(() => Concatenation(Separator(), Separator(), ServerName(), Separator(), ShareName(), Separator()));
+            return Rename(() => Concatenation(ServerName(), Separator(), ShareName(), Separator()));
         }
 
         public static Rule ServerName()
@@ -183,7 +203,7 @@ namespace Sidi.IO
 
         public static Rule LocalDrivePrefix()
         {
-            return Rename(() => Concatenation(DriveLetter(), Colon(), Separator()));
+            return Rename(() => Concatenation(DriveLetter(), Colon(), MandatoryAlternative(Separator())));
         }
 
         public static Rule DriveLetter()
