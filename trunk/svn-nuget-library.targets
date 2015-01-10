@@ -35,9 +35,9 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </PropertyGroup>
 
 	<PropertyGroup>
-	<MSBuildCommunityTasksPath>$(NugetPackagesDirectory)\MSBuildTasks.1.4.0.78\tools</MSBuildCommunityTasksPath>
+	<MSBuildCommunityTasksPath>$(NugetPackagesDirectory)\MSBuildTasks.1.4.0.88\tools</MSBuildCommunityTasksPath>
   </PropertyGroup>
-	<Import Project="$(NugetPackagesDirectory)\MSBuildTasks.1.4.0.78\tools\MSBuild.Community.Tasks.Targets" />
+	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
 
   <Target Name="Update" >
     <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
