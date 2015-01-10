@@ -22,7 +22,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<SvnRoot>https://$(ProjectName).googlecode.com/svn</SvnRoot>
 		<NugetPackagesDirectory>$(RootDir)\..\nuget-packages</NugetPackagesDirectory>
 		
-		<NUnitBin>$(NugetPackagesDirectory)\NUnit.Runners.2.6.3\tools</NUnitBin>
+		<NUnitBin>$(NugetPackagesDirectory)\NUnit.Runners.2.6.4\tools</NUnitBin>
 		<NUnitConsole>$(NUnitBin)\nunit-console.exe</NUnitConsole>
 		
 		<OutputRoot>$(RootDir)\..\..\build\$(ProjectName)</OutputRoot>
