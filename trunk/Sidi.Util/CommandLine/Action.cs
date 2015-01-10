@@ -24,6 +24,7 @@ using System.ComponentModel;
 using Sidi.Util;
 using System.IO;
 using Sidi.Extensions;
+using System.Threading;
 
 namespace Sidi.CommandLine
 {
@@ -156,7 +157,17 @@ namespace Sidi.CommandLine
             {
                 if (execute)
                 {
-                    return MethodInfo.Invoke(Source.Instance, parameterValues);
+                    var result = MethodInfo.Invoke(Source.Instance, parameterValues);
+                    if (result is IAsyncResult)
+                    {
+                        var ar = (IAsyncResult)result;
+                        WaitHandle.WaitAll(new[] { ar.AsyncWaitHandle });
+                        return ar.AsyncState;
+                    }
+                    else
+                    {
+                        return result;
+                    }
                 }
                 else
                 {

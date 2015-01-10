@@ -799,15 +799,7 @@ found:
 
         void HandleResult(object result)
         {
-            if (result is Task)
-            {
-                var task = (Task)result;
-                task.Wait();
-            }
-            else
-            {
-                ProcessResult(result);
-            }
+            ProcessResult(result);
         }
 
         Action<object> ProcessResult;
