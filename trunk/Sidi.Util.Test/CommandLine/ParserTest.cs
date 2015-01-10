@@ -33,6 +33,7 @@ using Sidi.IO;
 using Sidi.Extensions;
 using System.IO;
 using Sidi.Test;
+using System.Threading.Tasks;
 
 namespace Sidi.CommandLine.Test
 {
@@ -901,6 +902,41 @@ namespace Sidi.CommandLine.Test
             p.Run(new[]{"Hello", "DoSomething"});
             Assert.AreEqual(2, a.beforeParseCalls);
             Assert.AreEqual("Hello", a.unknownArgument);
+        }
+
+
+        [Usage("Tests commands that return tasks")]
+        public class TaskApp
+        {
+            [Usage("Command")]
+            public async Task Action1()
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                lock (this)
+                {
+                    ++count;
+                }
+            }
+
+            [Usage("Command")]
+            public async Task Action2()
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                lock(this)
+                {
+                    ++count;
+                }
+            }
+
+            public int count = 0;
+        }
+
+        [Test]
+        public void TaskActions()
+        {
+            var app = new TaskApp();
+            Parser.Run(app, new[] { "Action1", "Action2" });
+            Assert.AreEqual(2, app.count);
         }
     }
 }

@@ -35,6 +35,8 @@ using log4net;
 using log4net.Appender;
 using log4net.Layout;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Sidi.CommandLine
 {
@@ -791,8 +793,21 @@ found:
 
             args.PopHead();
             result = parserItem.Handle(args, execute);
-            ProcessResult(result);
+            HandleResult(result);
             return true;
+        }
+
+        void HandleResult(object result)
+        {
+            if (result is Task)
+            {
+                var task = (Task)result;
+                task.Wait();
+            }
+            else
+            {
+                ProcessResult(result);
+            }
         }
 
         Action<object> ProcessResult;
