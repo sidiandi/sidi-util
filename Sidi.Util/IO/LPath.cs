@@ -524,14 +524,7 @@ namespace Sidi.IO
 
                 if (exception != null)
                 {
-                    if (i == 0 && IsValidDriveRoot(parts[i]))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return exception;
-                    }
+                    return exception;
                 }
             }
             return null;
@@ -770,14 +763,8 @@ namespace Sidi.IO
         {
             get
             {
-                var p = Parts;
-                return p.Length == 1 && IsValidDriveRoot(p[0]);
+                return Parts.Length == 0 && this.prefix is LocalDrivePrefix;
             }
-        }
-
-        public static bool IsValidDriveRoot(string driveRoot)
-        {
-            return Regex.IsMatch(driveRoot, @"^[A-Z]\:$", RegexOptions.IgnoreCase);
         }
 
         public bool IsUnc

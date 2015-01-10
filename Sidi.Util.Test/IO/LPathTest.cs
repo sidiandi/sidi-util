@@ -527,5 +527,12 @@ namespace Sidi.IO
             Assert.IsFalse(b.IsDescendantOrSelf(a));
             Assert.IsFalse(b.IsDescendant(a));
         }
+
+        [Test]
+        public void DriveRoot()
+        {
+            var r = LPath.GetDriveRoot('x');
+            Assert.IsTrue(r.IsDriveRoot);
+        }
     }
 }
