@@ -501,33 +501,17 @@ namespace Sidi.IO
 
         public static bool IsValid(string path)
         {
-            return CheckPath(path) == null;
-        }
-
-        static Exception CheckPath(string path)
-        {
-            if (path.Length > MaxPathLength)
+            var text = new Sidi.Parse.Text(path);
+            var t = text.Copy();
+            try
             {
-                return new System.IO.PathTooLongException("Path is {0} characters too long. Actual length: {1}, allowed: {2}".F(
-                    path.Length - MaxPathLength,
-                    path.Length,
-                    MaxPathLength));
+                var ast = PathParser.Path()(t);
+                return t.Length == 0;
             }
-
-            var parts = path.Split(DirectorySeparatorChar);
-
-            for (int i = 0; i < Math.Min(1, parts.Length); ++i)
+            catch (Exception ex)
             {
-                var exception = (i == parts.Length - 1) ? 
-                    CheckFilenameWithWildcards(parts[i]) : 
-                    CheckFilename(parts[i]);
-
-                if (exception != null)
-                {
-                    return exception;
-                }
+                return false;
             }
-            return null;
         }
 
         /// <summary>
