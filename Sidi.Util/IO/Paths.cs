@@ -48,6 +48,17 @@ namespace Sidi.IO
         }
 
         /// <summary>
+        /// Returns the Documents sub directory for a Type:
+        /// [Documents]\[Company name] [product name]
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static LPath GetDocumentsDirectory(Type type)
+        {
+            return GetFolderPath(type, System.Environment.SpecialFolder.LocalApplicationData);
+        }
+
+        /// <summary>
         /// Returns the sub directory of a special folder for a Type:
         /// [special folder]\[company name]\[assembly name]\[version]\[full type name]
         /// </summary>
@@ -76,6 +87,21 @@ namespace Sidi.IO
                 LPath.GetValidFilename(a.GetName().Name),
                 new []{ v.Major, v.Minor }.Join(LPath.ExtensionSeparator)
                 );
+        }
+
+        /// <summary>
+        /// Returns a relative path for an assembly. Can be used to determine the sub-directory
+        /// for the AppData directories.
+        /// [company name]\[product name]
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static LPath GetApplicationDirectory(this Assembly a)
+        {
+            var v = a.GetName().Version;
+            return LPath.CreateRelative(
+                LPath.GetValidFilename(a.GetCustomAttribute<AssemblyCompanyAttribute>().Company),
+                LPath.GetValidFilename(a.GetCustomAttribute<AssemblyProductAttribute>().Product));
         }
 
         /// <summary>
