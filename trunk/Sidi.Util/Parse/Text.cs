@@ -36,7 +36,7 @@ namespace Sidi.Parse
                     }
                     else
                     {
-                        this.text = this.ToString() + i.ToString();
+                        this.text = this.AsString() + i.AsString();
                         this.begin = 0;
                         this.end = text.Length;
                     }
@@ -63,6 +63,11 @@ namespace Sidi.Parse
         int end;
 
         public override string ToString()
+        {
+            return AsString();
+        }
+
+        public string AsString()
         {
             return text.Substring(begin, end - begin);
         }
@@ -150,7 +155,7 @@ namespace Sidi.Parse
                 }
             }
 
-            return this.ToString().Equals(other.ToString());
+            return this.AsString().Equals(other.AsString());
         }
 
         public override bool Equals(object obj)
@@ -165,7 +170,7 @@ namespace Sidi.Parse
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return AsString().GetHashCode();
         }
     }
 }
