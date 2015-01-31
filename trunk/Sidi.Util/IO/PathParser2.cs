@@ -163,7 +163,25 @@ namespace Sidi.IO
 
         public static Rule UncPrefix()
         {
-            return Rename(() => Concatenation(ServerName(), Separator(), ShareName(), Separator()));
+            return Rename(() => Concatenation(ServerName(), Separator(), ShareName(), SeparatorOrEnd()));
+        }
+
+        static Rule SeparatorOrEnd()
+        {
+            return OrEnd(Separator(), @"\");
+        }
+
+        public static Rule OrEnd(Rule rule, string defaultString)
+        {
+            return (text) =>
+                {
+                    if (text.Length == 0)
+                    {
+                        return new Ast(new Text(defaultString));
+                    }
+
+                    return rule(text);
+                };
         }
 
         public static Rule ServerName()
@@ -203,7 +221,7 @@ namespace Sidi.IO
 
         public static Rule LocalDrivePrefix()
         {
-            return Rename(() => Concatenation(DriveLetter(), Colon(), MandatoryAlternative(Separator())));
+            return Rename(() => Concatenation(DriveLetter(), Colon(), SeparatorOrEnd()));
         }
 
         public static Rule DriveLetter()

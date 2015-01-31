@@ -77,5 +77,29 @@ namespace Sidi.Parse
 
             return;
         }
+
+        [Test]
+        public void Text_can_be_concatenated()
+        {
+            var x = "Hello, World!";
+            var texts = new[]
+            {
+                new Text(x, 0, 5),
+                new Text(x, 5, x.Length)
+            };
+
+            var a = new Text(texts);
+            Assert.AreEqual(x, a.ToString());
+
+            texts = new[]
+            {
+                new Text("Hello, "),
+                new Text("World!")
+            };
+            var b = new Text(texts);
+            Assert.AreEqual(x, b.ToString());
+
+            Assert.IsTrue(object.Equals(a, b));
+        }
     }
 }

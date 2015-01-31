@@ -22,7 +22,8 @@ namespace Sidi.Parse
             {
                 Childs = childs.ToArray();
             }
-            Text = text;
+
+            Text = text ?? new Text(Childs.Select(x => x.Text));
         }
 
         public Ast[] Childs { get; set; }

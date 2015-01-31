@@ -9,9 +9,40 @@ namespace Sidi.Parse
     /// <summary>
     /// Section of a string.
     /// </summary>
-    public class Text
+    public class Text : IEquatable<Text>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public Text(IEnumerable<Text> texts)
+        {
+            foreach (var i in texts)
+            {
+                if (i.IsEmpty)
+                {
+                    continue;
+                }
+
+                if (this.text == null)
+                {
+                    this.text = i.text;
+                    this.begin = i.begin;
+                    this.end = i.end;
+                }
+                else
+                {
+                    if (this.text == i.text && this.end == i.begin)
+                    {
+                        this.end = i.end;
+                    }
+                    else
+                    {
+                        this.text = this.ToString() + i.ToString();
+                        this.begin = 0;
+                        this.end = text.Length;
+                    }
+                }
+            }
+        }
 
         public Text(string text)
         {
@@ -107,6 +138,34 @@ namespace Sidi.Parse
                 }
             }
             return new Text(s, begin, end);
+        }
+
+        public bool Equals(Text other)
+        {
+            if (this.text == other.text)
+            {
+                if (this.begin == other.begin && this.end == other.end)
+                {
+                    return true;
+                }
+            }
+
+            return this.ToString().Equals(other.ToString());
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Text;
+            if (other == null)
+            {
+                return false;
+            }
+            return this.Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
         }
     }
 }
