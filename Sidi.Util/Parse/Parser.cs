@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using Rule = System.Func<Sidi.Parse.Text>;
@@ -10,7 +12,7 @@ using Rule = System.Func<Sidi.Parse.Text>;
 namespace Sidi.Parse
 {
     [Serializable]
-    public class ParserException: Exception
+    public sealed class ParserException: Exception
     {
         public ParserException(Text text)
         {
@@ -22,6 +24,24 @@ namespace Sidi.Parse
         public override string ToString()
         {
             return Text.ToString();
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        // Serialization constructor is private, as this class is sealed
+        private ParserException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.Text = new Text(info.GetString("Text"));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException("info");
+            }
+            info.AddValue("Text", this.Text.AsString());
+            base.GetObjectData(info, context);
         }
     }
 
