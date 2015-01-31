@@ -362,6 +362,14 @@ namespace Sidi.IO
             }
         }
 
+        public bool IsAbsolute
+        {
+            get
+            {
+                return prefix is LocalDrivePrefix || prefix is UncPrefix || prefix is DeviceNamespacePrefix;
+            }
+        }
+        
         public bool IsRelative
         {
             get

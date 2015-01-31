@@ -568,5 +568,21 @@ namespace Sidi.IO
             var r = LPath.GetDriveRoot('x');
             Assert.IsTrue(r.IsDriveRoot);
         }
+
+        [Test]
+        public void AbsolutePaths()
+        {
+            var p = new LPath(@"C:\");
+            Assert.IsTrue(p.IsAbsolute);
+            Assert.IsFalse(p.IsRelative);
+
+            p = new LPath(@"\\server\share\someFile.txt");
+            Assert.IsTrue(p.IsAbsolute);
+            Assert.IsFalse(p.IsRelative);
+
+            p = new LPath(@"1\2\3");
+            Assert.IsFalse(p.IsAbsolute);
+            Assert.IsTrue(p.IsRelative);
+        }
     }
 }
