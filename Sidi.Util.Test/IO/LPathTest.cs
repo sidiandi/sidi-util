@@ -51,9 +51,16 @@ namespace Sidi.IO
             Assert.AreEqual("server", p.Server);
             Assert.AreEqual("share", p.Share);
             Assert.AreEqual(@"\\server\share\", p.ToString());
+
+            p = new LPath(@"C:");
+            Assert.AreEqual("C", p.DriveLetter);
+            Assert.AreEqual(@"C:\", p.Prefix);
+            Assert.IsFalse(p.IsRelative);
+            Assert.AreEqual(0, p.Parts.Count());
+            p = p.CatDir("someDir");
+            Assert.AreEqual(new LPath(@"C:\someDir"), p);
         }
 
-        [TestCase(@"C:", ExpectedException = typeof(ArgumentOutOfRangeException))]
         [TestCase(@":", ExpectedException = typeof(ArgumentOutOfRangeException))]
         [TestCase(@"asda:\", ExpectedException = typeof(ArgumentOutOfRangeException))]
         [TestCase(@"_:", ExpectedException = typeof(ArgumentOutOfRangeException))]
@@ -186,9 +193,36 @@ namespace Sidi.IO
         }
 
         [Test]
-        public void IsValid()
+        public void valid_paths_are_recognized_as_valid([Values(
+            @"C:",
+            @"C:\",
+            @"C:\temp",
+            @"\\server\share",
+            @"\\server\share\",
+            @"\\server\share\somedir",
+            @"\\?\C:\"
+            )] string path)
         {
-            Assert.IsTrue(LPath.IsValid(@"C:\temp"));
+            Assert.IsTrue(LPath.IsValid(path), path);
+        }
+
+        [Test]
+        public void invalid_paths_are_recognized_as_invalid([Values(
+            @":C:\",
+            @"\\\server\share"
+            )] string path)
+        {
+            Assert.IsFalse(LPath.IsValid(path), path);
+        }
+
+        [Test]
+        public void paths_with_invalid_characters_are_recognized_as_invalid()
+        {
+            foreach (var c in System.IO.Path.GetInvalidPathChars())
+            {
+                var path = new string(c, 1);
+                Assert.IsFalse(LPath.IsValid(path), path);
+            }
         }
 
         public class ObjectGraph

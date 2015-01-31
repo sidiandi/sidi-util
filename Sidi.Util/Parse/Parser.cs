@@ -9,6 +9,7 @@ using Rule = System.Func<Sidi.Parse.Text>;
 
 namespace Sidi.Parse
 {
+    [Serializable]
     public class ParserException: Exception
     {
         public ParserException(Text text)
@@ -101,8 +102,7 @@ namespace Sidi.Parse
                     if (n != null)
                     {
                         var consumedText = text.Remove(t);
-                        n.Text = consumedText;
-                        var ast = new Ast(consumedText, n.Childs)
+                        var ast = new Ast(n.Text, n.Childs)
                         {
                             Name = name
                         };
