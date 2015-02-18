@@ -162,5 +162,51 @@ namespace Sidi.Extensions
             var count = data.Count();
             return data.Take(Math.Max(0, count - excludedCount));
         }
+
+        /// <summary>
+        /// Logs progress information (1x per second) while iterating over data
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> LogProgress<T>(this IEnumerable<T> data, Action<string> logger = null, TimeSpan progressInterval = default(TimeSpan))
+        {
+            progressInterval = default(TimeSpan) == progressInterval ? TimeSpan.FromSeconds(1) : progressInterval;
+            logger = logger ?? log.Info;
+
+            if (data is IList<T>)
+            {
+                return LogProgress((IList<T>)data, logger, progressInterval);
+            }
+
+            var nextProgress = DateTime.UtcNow + progressInterval;
+            return data.Select((x, i) =>
+            {
+                var now = DateTime.UtcNow;
+                if (now > nextProgress)
+                {
+                    nextProgress = now + progressInterval;
+                    logger(String.Format("{0}: {1}", i, x.SafeToString()));
+                }
+                return x;
+            });
+        }
+
+        static IEnumerable<T> LogProgress<T>(IList<T> data, Action<string> logger, TimeSpan progressInterval)
+        {
+            var total = data.Count;
+            var nextProgress = DateTime.UtcNow + progressInterval;
+            return data.Select((x, i) =>
+            {
+                var now = DateTime.UtcNow;
+                if (now > nextProgress)
+                {
+                    nextProgress = now + progressInterval;
+                    logger(String.Format("{0}/{1}: {2}", i, total, x.SafeToString()));
+                }
+                return x;
+            });
+        }
     }
 }

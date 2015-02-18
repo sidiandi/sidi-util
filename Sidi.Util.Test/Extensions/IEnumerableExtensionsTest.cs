@@ -21,12 +21,15 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Sidi.Extensions;
+using System.Threading;
 
 namespace Sidi.Extensions
 {
     [TestFixture]
-    public class IEnumerableExtensionsTest
+    public class IEnumerableExtensionsTest : Sidi.Test.TestBase
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [Test]
         public void Best()
         {
@@ -40,6 +43,37 @@ namespace Sidi.Extensions
             var x = Enumerable.Range(0, 10).ToList();
             var y = x.SafeSelect(i => 100 / i);
             Assert.AreEqual(x.Count() - 1, y.Count());
+        }
+
+        [Test]
+        public void LogProgress()
+        {
+            var e = Enumerable.Range(0, 5);
+
+            var result = e
+                .LogProgress(log.Info)
+                .Select(i =>
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+                        return i.ToString();
+                    })
+                .ToList();
+        }
+
+        [Test]
+        public void LogProgressForAList()
+        {
+            var e = Enumerable.Range(0, 5);
+
+            var result = e
+                .ToList()
+                .LogProgress(log.Info)
+                .Select(i =>
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(0.5));
+                    return i.ToString();
+                })
+                .ToList();
         }
     }
 }
