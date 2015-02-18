@@ -15,7 +15,7 @@
     <RootNamespace>Sidi</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Sidi.Util\Sidi.Util.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <RestorePackages>true</RestorePackages>
 	<PackagesDir>..\..\nuget-packages</PackagesDir>
