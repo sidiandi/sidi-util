@@ -167,8 +167,9 @@ namespace Sidi.Extensions
         /// Logs progress information (1x per second) while iterating over data
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="logger"></param>
+        /// <param name="data">Enumerable that has its enumeration progress logged.</param>
+        /// <param name="logger">Function to output log messages. Defaults to log.Info</param>
+        /// <param name="progressInterval">Time interval between progress log messages. Defaults to 1 second</param>
         /// <returns></returns>
         public static IEnumerable<T> LogProgress<T>(this IEnumerable<T> data, Action<string> logger = null, TimeSpan progressInterval = default(TimeSpan))
         {
