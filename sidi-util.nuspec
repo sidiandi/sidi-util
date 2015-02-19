@@ -23,13 +23,13 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Sidi.Util.dll" target="lib\net40" />
-    <file src="Sidi.Util.pdb" target="lib\net40" />
-    <file src="Sidi.Util.xml" target="lib\net40" />
+    <file src="Sidi.Util.dll" target="lib\net45" />
+    <file src="Sidi.Util.pdb" target="lib\net45" />
+    <file src="Sidi.Util.xml" target="lib\net45" />
     
-    <file src="Sidi.Office.dll" target="lib\net40" />
-    <file src="Sidi.Office.pdb" target="lib\net40" />
-    <file src="Sidi.Office.xml" target="lib\net40" />
+    <file src="Sidi.Office.dll" target="lib\net45" />
+    <file src="Sidi.Office.pdb" target="lib\net45" />
+    <file src="Sidi.Office.xml" target="lib\net45" />
 
     <file src="su.exe" target="tools" />
     
