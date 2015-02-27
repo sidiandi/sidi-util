@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>sidi-util</id>
+    <version>0.0.0</version>
+    <authors>Andreas Grimme</authors>
+    <owners>Andreas Grimme</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-2.1-standalone.html</licenseUrl>
+    <projectUrl>http://code.google.com/p/sidi-util/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Collection of general purpose .NET utility classes</description>
+    <releaseNotes>
+    </releaseNotes>
+    <copyright>Copyright 2012-2013 Andreas Grimme</copyright>
+    <tags>
+    </tags>
+    <dependencies>
+      <group targetFramework="net40">
+        <dependency id="log4net" version="2.0.3" />
+        <dependency id="SharpZipLib" version="0.86.0"  />
+        <dependency id="System.Data.SQLite.Core" version="1.0.94.0"  />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Sidi.Util.dll" target="lib\net45" />
+    <file src="Sidi.Util.pdb" target="lib\net45" />
+    <file src="Sidi.Util.xml" target="lib\net45" />
+    
+    <file src="Sidi.Office.dll" target="lib\net45" />
+    <file src="Sidi.Office.pdb" target="lib\net45" />
+    <file src="Sidi.Office.xml" target="lib\net45" />
+
+    <file src="su.exe" target="tools" />
+    
+    <file src="$RootDir$\COPYING*" target="" />
+	<file src="$RootDir$\NOTICE.txt" target="" />
+  </files>
+</package>
