@@ -224,6 +224,13 @@ namespace Sidi.IO.Windows
                     throw new NotImplementedException(fileMode.ToString());
             }
 
+            if (fileName.Prefix.Equals(@"\\.\"))
+            {
+                shareMode = System.IO.FileShare.Write;
+                desiredAccess = System.IO.FileAccess.ReadWrite;
+                access = System.IO.FileAccess.ReadWrite;
+            }
+
             SafeFileHandle h;
             try
             {
