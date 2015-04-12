@@ -85,7 +85,6 @@
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\VersionInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Test\TestBaseTest.cs" />
     <Compile Include="Util\Base32Test.cs" />
@@ -163,9 +162,17 @@
 exit 0</PostBuildEvent>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}</ProjectGuid>
+    <NuGetPackageImportStamp>c4e3bace</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.94.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

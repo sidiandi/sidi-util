@@ -42,13 +42,6 @@
           PropertyName="Version" />
     </CreateProperty>
     <Message Text="Version is $(Version)" />
-    <AssemblyInfo CodeLanguage="CS"
-        AssemblyCopyright = "Copyright (c) Andreas Grimme 2010"
-        AssemblyCompany="sidi"
-        AssemblyProduct="sidi-util"
-        OutputFile="VersionInfo.cs"
-        AssemblyVersion="$(Version)"
-        AssemblyFileVersion="$(Version)" />
   </Target>
 
   <Target Name="CreateVersion" DependsOnTargets="GetVersion">

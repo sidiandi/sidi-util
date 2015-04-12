@@ -36,10 +36,6 @@
             SourcePath="$(SvnRoot)/trunk"
             DestinationPath="$(SvnRoot)/tags/$(Version)" 
             Message="Automatic build of $(ProjectName)" />
-        <AssemblyInfo CodeLanguage="CS"
-            OutputFile="VersionInfo.cs" 
-            AssemblyVersion="$(Version)" 
-            AssemblyFileVersion="$(Version)" />
     </Target>
 
     <Target Name="GetVersion" >
