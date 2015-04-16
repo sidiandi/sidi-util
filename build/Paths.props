@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\Build.props" />
+  <PropertyGroup>
+	<BuildDir>$(OutDir)</BuildDir>
+	<BuildDir Condition="$(OutDir) == ''" >$(USERPROFILE)\build\$(ProductName)\$(Configuration)-$(Platform)</BuildDir>
+	<OutDir>$(BuildDir)\bin</OutDir>
+	<OutputPath>$(OutDir)</OutputPath>
+	<BaseIntermediateOutputPath>$(BuildDir)\obj</BaseIntermediateOutputPath>
+    <LibDir>$(SolutionDir)lib\</LibDir>
+	<TestDir>$(BuildDir)\test</TestDir>
+	<SetupWixproj>$(SourceDir)\setup\setup.wixproj</SetupWixproj>
+  </PropertyGroup>
+</Project>

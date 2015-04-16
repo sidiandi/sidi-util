@@ -5,7 +5,7 @@
     <ProjectGuid>{5B2F9332-D998-4E50-B51E-F36D0A01A896}</ProjectGuid>
     <NuGetPackageImportStamp>c211bdde</NuGetPackageImportStamp>
   </PropertyGroup>
-  <Import Project="..\Console.props" />
+  <Import Project="..\build\ConsoleExe.props" />
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\..\nuget-packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>

@@ -11,7 +11,7 @@
     <CodeAnalysisRuleSet>..\sidi-util.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
-  <Import Project="..\Common.props" />
+  <Import Project="..\build\Common.props" />
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\nuget-packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>

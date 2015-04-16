@@ -5,7 +5,7 @@
     <ProjectGuid>{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}</ProjectGuid>
     <NuGetPackageImportStamp>fbc04dd9</NuGetPackageImportStamp>
   </PropertyGroup>
-  <Import Project="..\Common.props" />
+  <Import Project="..\build\Common.props" />
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\..\nuget-packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
