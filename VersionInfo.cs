@@ -9,9 +9,7 @@
 //------------------------------------------------------------------------------
 
 [assembly: System.Reflection.AssemblyCopyright("Copyright (c) Andreas Grimme 2008-2015")]
-[assembly: System.Reflection.AssemblyCompany("sidi")]
+[assembly: System.Reflection.AssemblyCompany("Andreas Grimme")]
 [assembly: System.Reflection.AssemblyProduct("sidi-util")]
-[assembly: System.Reflection.AssemblyVersion("3.0.0.103")]
-[assembly: System.Reflection.AssemblyFileVersion("3.0.0.103")]
 
 

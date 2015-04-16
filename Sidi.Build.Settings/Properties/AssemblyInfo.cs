@@ -25,9 +25,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Sidi.Build.Settings")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Sidi.Build.Settings")]
-[assembly: AssemblyCopyright("Copyright ©  2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

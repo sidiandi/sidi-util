@@ -615,7 +615,15 @@ namespace Sidi.Persistence
         {
             using (var reader = select.ExecuteReader())
             {
-                return new ResultProxy<T>(this, reader.Cast<DbDataRecord>().Select(r => (long)r[0]).ToList());
+                return new ResultProxy<T>(this, ToEnumerable(reader).Select(r => (long)r[0]).ToList());
+            }
+        }
+
+        static IEnumerable<IDataRecord> ToEnumerable(DbDataReader reader)
+        {
+            for (; reader.Read();)
+            {
+                yield return reader;
             }
         }
 

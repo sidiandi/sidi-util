@@ -31,4 +31,7 @@
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\VersionInfo.cs" />
+  </ItemGroup>
 </Project>

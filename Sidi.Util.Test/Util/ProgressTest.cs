@@ -40,7 +40,7 @@ namespace Sidi.Util
 
             var s = p.ToString();
             log.Info(s);
-            Assert.AreEqual("0.0% (1.00/1E+99, rate=31.7n/s, rem=10675199.02:48:05.4775807, eta=12/31/9999 23:59:59)", s);
+            Assert.AreEqual("0.0% (1.00/1E+99, rate=31.6n/s, rem=10675199.02:48:05.4775807, eta=12/31/9999 23:59:59)", s);
         }
 
         [Test]

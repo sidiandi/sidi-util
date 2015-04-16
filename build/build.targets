@@ -18,7 +18,6 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<SourceDir>$([System.IO.Directory]::GetParent($(MSBuildProjectDirectory)))</SourceDir>
-		<SvnRoot Condition="$(SvnRoot) == ''">https://$(ProductName).googlecode.com/svn</SvnRoot>
 
 		<NugetPackagesDir>$(SourceDir)\..\nuget-packages</NugetPackagesDir>
 		
@@ -31,13 +30,9 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </PropertyGroup>
 
 	<PropertyGroup>
-	<MSBuildCommunityTasksPath>$(SourceDir)\.build</MSBuildCommunityTasksPath>
+	<MSBuildCommunityTasksPath>$(SourceDir)\build</MSBuildCommunityTasksPath>
   </PropertyGroup>
 	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
-
-  <Target Name="Update" >
-    <SvnUpdate LocalPath="$(MSBuildProjectDirectory)" />
-  </Target>
 
   <Target Name="GetVersion" >
     <SvnVersion LocalPath=".">
@@ -59,15 +54,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	</ItemGroup>
   </Target>
 
-  <Target Name="CreateVersion" DependsOnTargets="GetVersion">
-    <SvnCommit Targets="." Message="Automatic build of $(ProductName)" />
-    <SvnCopy
-		SourcePath="$(SvnRoot)/trunk"
-		DestinationPath="$(SvnRoot)/tag/$(Version)"
-		Message="Automatic build of $(ProductName)" />
-  </Target>
-
-  <Target Name="Build" DependsOnTargets="GetVersion">
+  <Target Name="Build">
     <MSBuild
         Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
       <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
@@ -123,6 +110,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   
   <!-- This target puts the build.log file into the build directory -->
   <Target Name="StartWrapper" >
+	<MakeDir Directories="$(BuildDir)"/>
     <Exec
 		Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:$(BuildTarget) &quot;/fileLoggerParameters:LogFile=$(BuildDir)\build.log;Verbosity=diagnostic;Encoding=UTF-8&quot;"
 		/>
