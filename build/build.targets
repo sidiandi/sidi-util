@@ -59,50 +59,20 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
         Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
       <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
+	<CreateProperty Value="$(OutDir)\sidi-util.3.1.0.0.nupkg">
+            <Output
+                TaskParameter="Value"
+                PropertyName="Nupkg" />
+	</CreateProperty>
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
     <Exec Command="$(NUnitConsole) /xml=$(TestDir)\TestResult.xml /labels @(Targets, ' ')" />
   </Target>
 
-  <Target Name="BuildSetup" Condition="Exists($(SetupWixproj))" DependsOnTargets="GetVersion">
-    <MSBuild
-        Projects="$(SetupWixproj)" Properties="
-			CompanyName=$(CompanyName);
-			ProductName=$(ProductName);
-			Version=$(Version);
-			Configuration=Release;
-			Platform=Any CPU;
-			Version=$(Version);
-			OutputPath=$(BuildDir)\setup;
-			BinDir=$(OutDir);
-			UpgradeCode=$(UpgradeCode);
-			IntermediateOutputPath=$(BaseIntermediateOutputPath)\setup\
-			">
-      <Output ItemName="SetupFile" TaskParameter="TargetOutputs"/>
-    </MSBuild>
-  </Target>
-  
-  <Target Name="Install" DependsOnTargets="BuildSetup">
-    <Message Text="@(SetupFile, ' ')" />
-	<Exec Command="@(SetupFile, ' ')" />
-  </Target>
-  
-  <Target Name="Release" DependsOnTargets="Build;Test;BuildSetup" />
+  <Target Name="Release" DependsOnTargets="Build;Test" />
 
-  <Target Name="NugetPack" DependsOnTargets="GetVersion;Build;Test" >
-    <MakeDir Directories="$(PackageDir)"/>
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(NuSpec) -Version $(Version) -Verbosity detailed -OutputDirectory $(NugetPackDir) -BasePath $(OutputDir) -Properties RootDir=$(SourceDir)" />
-    <CreateProperty Value="$(PackageDir)\$(ProductName).$(Version).nupkg">
-      <Output PropertyName="Nupkg" TaskParameter="Value"/>
-    </CreateProperty>
-  </Target>
-
-  <Target Name="NugetPush" DependsOnTargets="NugetPack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(Nupkg)" />
-  </Target>
-
-  <Target Name="NugetPushLocal" DependsOnTargets="NugetPack">
+  <Target Name="PushLocal" DependsOnTargets="Build">
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(Nupkg)" />
   </Target>
 

@@ -35,10 +35,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sidi.Build\Sidi.Build.csproj">
-      <Project>{301FEFFE-0D7C-4700-8E9A-1C9F5984815C}</Project>
-      <Name>Sidi.Build</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sidi.Util\Sidi.Util.csproj">
       <Project>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</Project>
       <Name>Sidi.Util</Name>

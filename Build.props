@@ -6,5 +6,7 @@
         <ProductName>sidi-util</ProductName>
 		<Configuration>Release</Configuration>
 		<Platform>AnyCPU</Platform>
+		
+		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
 	</PropertyGroup>
 </Project>
