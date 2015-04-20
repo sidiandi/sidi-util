@@ -32,34 +32,41 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	<PropertyGroup>
 	<MSBuildCommunityTasksPath>$(SourceDir)\build</MSBuildCommunityTasksPath>
   </PropertyGroup>
-	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
+  
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
+  <Import Project="$(NugetPackagesDir)\GitVersionTask.2.0.1\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" />
 
-  <Target Name="GetVersion" >
-    <SvnVersion LocalPath=".">
-      <Output TaskParameter="Revision" PropertyName="Revision" />
-    </SvnVersion>
-    <CreateProperty
-        Value="$(Major).$(Minor).$(Build).$([MSBuild]::Subtract($(Revision), $(InitialRevision)))">
-      <Output
-          TaskParameter="Value"
-          PropertyName="Version" />
-    </CreateProperty>
-    <Message Text="Version is $(Version)" />
-	<ItemGroup>
-		<AssemblyAttributes Include="AssemblyCopyright"><_Parameter1>Copyright (c) $(CompanyName) 2008-$([System.DateTime]::Now.ToString(`yyyy`))</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyCompany"><_Parameter1>$(CompanyName)</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyProduct"><_Parameter1>$(ProductName)</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyVersion"><_Parameter1>$(Version)</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyFileVersion"><_Parameter1>$(Version)</_Parameter1></AssemblyAttributes>
-	</ItemGroup>
-  </Target>
+  <Target Name="GetVersion">
+		<GetVersion SolutionDirectory="$(SolutionDir)">
+		  <Output TaskParameter="Major" PropertyName="GfvMajor" />
+		  <Output TaskParameter="Minor" PropertyName="GfvMinor" />
+		  <Output TaskParameter="Patch" PropertyName="GfvPatch" />
+		  <Output TaskParameter="BuildMetaData" PropertyName="GfvBuildMetaData" />
+		  <Output TaskParameter="FullBuildMetaData" PropertyName="GfvFullBuildMetaData" />
+		  <Output TaskParameter="BranchName" PropertyName="GfvBranchName" />
+		  <Output TaskParameter="Sha" PropertyName="GfvSha" />
+		  <Output TaskParameter="MajorMinorPatch" PropertyName="GfvMajorMinorPatch" />
+		  <Output TaskParameter="SemVer" PropertyName="GfvSemVer" />
+		  <Output TaskParameter="LegacySemVer" PropertyName="GfvLegacySemVer" />
+		  <Output TaskParameter="LegacySemVerPadded" PropertyName="GfvLegacySemVerPadded" />
+		  <Output TaskParameter="FullSemVer" PropertyName="GfvFullSemVer" />
+		  <Output TaskParameter="AssemblySemVer" PropertyName="GfvAssemblySemVer" />
+		  <Output TaskParameter="NuGetVersion" PropertyName="GfvNuGetVersion" />
+		  <Output TaskParameter="ClassicVersion" PropertyName="GfvClassicVersion" />
+		  <Output TaskParameter="ClassicVersionWithTag" PropertyName="GfvClassicVersionWithTag" />
+		  <Output TaskParameter="PreReleaseTag" PropertyName="GfvPreReleaseTag" />
+		  <Output TaskParameter="PreReleaseTagWithDash" PropertyName="GfvPreReleaseTagWithDash" />
+		  <Output TaskParameter="InformationalVersion" PropertyName="GfvInformationalVersion" />
+		</GetVersion>
+		<Message Text="$(GfvSemVer)" />
+	</Target>
 
-  <Target Name="Build">
+  <Target Name="Build" DependsOnTargets="GetVersion" >
     <MSBuild
         Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
       <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
-	<CreateProperty Value="$(OutDir)\sidi-util.3.1.0.0.nupkg">
+	<CreateProperty Value="$(OutDir)\sidi-util.$(GfvAssemblySemVer).nupkg">
             <Output
                 TaskParameter="Value"
                 PropertyName="Nupkg" />
@@ -72,11 +79,15 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
   <Target Name="Release" DependsOnTargets="Build;Test" />
 
-  <Target Name="PushLocal" DependsOnTargets="Build">
+  <Target Name="PushLocal" DependsOnTargets="Build;GetVersion">
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(Nupkg)" />
   </Target>
 
-  <Target Name="Publish" DependsOnTargets="Release;NugetPush" />
+  <Target Name="Push" DependsOnTargets="Build;GetVersion">
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(Nupkg)" />
+  </Target>
+
+  <Target Name="Publish" DependsOnTargets="Release;Push" />
   
   <!-- This target puts the build.log file into the build directory -->
   <Target Name="StartWrapper" >
