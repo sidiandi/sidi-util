@@ -1,44 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Copyright (c) 2014, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
-
-This file is part of sidi-util.
-
-sidi-util is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-sidi-util is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <Target Name="UpdateVersionInfo" >
-    <CreateProperty
-        Value="$(Major).$(Minor).$(Build).$([MSBuild]::Subtract($(Revision), $(InitialRevision)))">
-      <Output
-          TaskParameter="Value"
-          PropertyName="Version" />
-    </CreateProperty>
-    <Message Text="Version is $(Version)" />
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<ItemGroup>
-		<AssemblyAttributes Include="AssemblyCopyright"><_Parameter1>Copyright (c) $(CompanyName) 2008-$([System.DateTime]::Now.ToString(`yyyy`))</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyCompany"><_Parameter1>$(CompanyName)</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyProduct"><_Parameter1>$(ProductName)</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyVersion"><_Parameter1>$(Version)</_Parameter1></AssemblyAttributes>
-		<AssemblyAttributes Include="AssemblyFileVersion"><_Parameter1>$(Version)</_Parameter1></AssemblyAttributes>
-	</ItemGroup>
-'  </Target>
-  
-	<ItemGroup>
-		<TestFiles Include="test\**\*" />
+		<TestFiles Include="test-data\**\*" />
 	</ItemGroup>
 
-	<Target Name="CopyTestFiles" >
+	<Target Name="CopyTestFiles" AfterTargets="CoreCompile" >
 	<Copy
 		SourceFiles="@(TestFiles)"
 		DestinationFolder="$(TestDir)\%(RecursiveDir)"
@@ -49,12 +15,4 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	/>
   </Target>
 
-  <Target Name="BeforeBuild" DependsOnTargets="UpdateVersionInfo;CopyTestFiles">
-  </Target>
-  
-  <PropertyGroup>
-	<BuildDependsOn>$(BuildDependsOn);UpdateVersionInfo</BuildDependsOn>
-	<Revision Condition="$(Revision) == ''" >$(InitialRevision)</Revision>
-  </PropertyGroup>
-  
 </Project>

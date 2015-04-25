@@ -61,7 +61,7 @@ namespace Sidi.Test
             var testFile =
                 Paths.BinDir
                 .Parent
-                .CatDir("test", relPath);
+                .CatDir("test-data", relPath);
             log.DebugFormat("Using test file {0}", testFile);
             return testFile;
         }

@@ -60,7 +60,7 @@ namespace Sidi.IO
                 Assert.IsFalse(d.Except(b).Any());
             }
 
-            readonly LPath _testTree = Paths.BinDir.CatDir(".");
+            readonly LPath _testTree = Paths.BinDir;
 
             [Test]
             public void Output()
@@ -113,17 +113,17 @@ namespace Sidi.IO
             [Test]
             public void FileType()
             {
-                var fileType = new FileType("exe");
+                var fileType = new FileType("dll");
                 var e = new Find()
                 {
                     Output = x => Find.OnlyFiles(x) && fileType.Is(x.Name),
-                    Follow = x => Find.NoDotNoHidden(x) && x.Name != "test",
+                    Follow = x => Find.NoDotNoHidden(x),
                     Root = _testTree
                 };
                 
                 var files = e.Depth().ToList();
                 Assert.IsTrue(files.Any());
-                Assert.IsTrue(files.All(x => x.Extension == ".exe"));
+                Assert.IsTrue(files.All(x => x.Extension == ".dll"));
             }
 
             [Test]

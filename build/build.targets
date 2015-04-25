@@ -61,16 +61,13 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<Message Text="$(GfvSemVer)" />
 	</Target>
 
-  <Target Name="Build" DependsOnTargets="GetVersion" >
-    <MSBuild
-        Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
-      <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
+	<Target Name="Build" DependsOnTargets="GetVersion" >
+    <MSBuild Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
+		<Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
-	<CreateProperty Value="$(OutDir)\sidi-util.$(GfvAssemblySemVer).nupkg">
-            <Output
-                TaskParameter="Value"
-                PropertyName="Nupkg" />
-	</CreateProperty>
+	<ItemGroup>
+		<Package Include="$(OutDir)\sidi-util.$(GfvAssemblySemVer)" />
+	</ItemGroup>
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
@@ -80,15 +77,18 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   <Target Name="Release" DependsOnTargets="Build;Test" />
 
   <Target Name="PushLocal" DependsOnTargets="Build;GetVersion">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(Nupkg)" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).nupkg" />
   </Target>
 
-  <Target Name="Push" DependsOnTargets="Build;GetVersion">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(Nupkg)" />
+  <Target Name="Push" DependsOnTargets="Test">
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push %(Package.Identity).nupkg" />
   </Target>
 
-  <Target Name="Publish" DependsOnTargets="Release;Push" />
-  
+  <Target Name="TestPush" DependsOnTargets="Build">
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push %(Package.Identity).symbols.nupkg" />
+  </Target>
+
   <!-- This target puts the build.log file into the build directory -->
   <Target Name="StartWrapper" >
 	<MakeDir Directories="$(BuildDir)"/>

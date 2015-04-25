@@ -8,7 +8,7 @@
 	<OutputPath>$(OutDir)</OutputPath>
 	<BaseIntermediateOutputPath>$(BuildDir)\obj</BaseIntermediateOutputPath>
     <LibDir>$(SolutionDir)lib\</LibDir>
-	<TestDir>$(BuildDir)\test</TestDir>
+	<TestDir>$(BuildDir)\test-data</TestDir>
 	<SetupWixproj>$(SourceDir)\setup\setup.wixproj</SetupWixproj>
   </PropertyGroup>
 </Project>

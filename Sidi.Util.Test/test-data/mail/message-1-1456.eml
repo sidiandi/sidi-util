@@ -1,0 +1,36 @@
+Return-Path: <from@gmx.de>
+Delivered-To: GMX delivery to to@gmx.net
+Received: (qmail invoked by alias); 25 Oct 2011 13:02:42 -0000
+Received: from nrbg-4d074084.pool.mediaWays.net (EHLO KB) [77.7.64.132]
+  by mail.gmx.net (mp039) with SMTP; 25 Oct 2011 15:02:42 +0200
+X-Authenticated: #7939531
+X-Provags-ID: V01U2FsdGVkX19SSTE9eb9STchVx2b351ggTygQZlHvrz7wGURfla
+	/Su9aAypiJ791Q
+From: "FromName" <from@gmx.de>
+To: "ToName" <to@gmx.de>,
+	"OtherToName" <to@gmail.com>
+References: <20111025125833.5434gmx1@mx039.gmx.net>
+In-Reply-To: <20111025125833.5434gmx1@mx039.gmx.net>
+Subject: some subject 
+Date: Tue, 25 Oct 2011 15:02:43 +0200
+Message-ID: <003a01cc9316$62c9d5e0$285d81a0$@gmx.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
+X-Mailer: Microsoft Outlook 14.0
+thread-index: AQH8REsgNl+XvAkLzrlyijOS5x/4ZJUto4kQ
+Content-Language: de
+X-GMX-Antivirus: 0 (no virus found)
+X-GMX-Antispam: 0 (Sender is in whitelist: from@gmx.de);
+ Detail=5D7Q89H36p4L00VTXC6D4q0N+AH0PUCnCJ3cRc9segt8tad00rjn3WrRrl4BLFAdJpwlC
+ jsqMt4jrXTwhVu1MQ==V1;
+X-MailStoreOLK-Original-Content-Transfer-Encoding: quoted-printable
+X-MailStoreMapiMimePostProcessor: 5.0.0.6684
+X-MailStore-Folder-UTF7: default/Outlook to+AEA-gmx.net/Inbox
+X-MailStore-Message-ID: <003a01cc9316$62c9d5e0$285d81a0$@gmx.de>
+X-MailStore-Header-Hash: ee6a8ddc90809ea6f051614431392eaab0d27960
+X-MailStore-Date: 20111025130242
+X-MailStore-Flags: 0
+
+some body text 
