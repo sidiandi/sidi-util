@@ -2,8 +2,10 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\Build.props" />
   <PropertyGroup>
+	<SourceDir>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileFullPath)))))</SourceDir>
 	<BuildDir>$(OutDir)</BuildDir>
-	<BuildDir Condition="$(OutDir) == ''" >$(USERPROFILE)\build\$(ProductName)\$(Configuration)-$(Platform)</BuildDir>
+	<!-- <BuildDir Condition="$(OutDir) == ''" >$(USERPROFILE)\build\$([System.IO.Path]::GetFileName($(SourceDir)))\$(Configuration)-$(Platform)</BuildDir> -->
+	<BuildDir Condition="$(OutDir) == ''" >$(SourceDir).build</BuildDir>
 	<OutDir>$(BuildDir)\bin</OutDir>
 	<OutputPath>$(OutDir)</OutputPath>
 	<BaseIntermediateOutputPath>$(BuildDir)\obj</BaseIntermediateOutputPath>
