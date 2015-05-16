@@ -40,7 +40,7 @@ namespace Sidi.CommandLine.Test
         public void ActionControl()
         {
             var p = ParserTest.ParserWithAllTestApps();
-            var ui = new ShowUserInterface(p);
+            var ui = new UserInterface(p);
             var c = ui.ToDialog(p.GetAction("Greet"));
             c.ShowAndExecute();
         }

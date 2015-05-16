@@ -8,5 +8,10 @@
 		<Platform>AnyCPU</Platform>
 		
 		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
+
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Package Include="sidi-util" />
+	</ItemGroup>
 </Project>

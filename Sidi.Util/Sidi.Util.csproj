@@ -82,6 +82,7 @@
     <Compile Include="CommandLine\TimeIntervalParser.cs" />
     <Compile Include="CommandLine\TimeSpanParser.cs" />
     <Compile Include="CommandLine\IValueParser.cs" />
+    <Compile Include="CommandLine\UserInterface.cs" />
     <Compile Include="CommandLine\ValueParser.cs" />
     <Compile Include="CommandLine\ValueParserAttribute.cs" />
     <Compile Include="CommandLine\WebServer.cs" />

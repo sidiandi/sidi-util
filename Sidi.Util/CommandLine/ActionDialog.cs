@@ -71,13 +71,13 @@ namespace Sidi.CommandLine
             {
                 var p = ParameterTextBoxes.Select(x => x.Text).ToList();
                 Action.Handle(p, true);
-                ShowUserInterface.ClearError(Button);
+                UserInterface.ClearError(Button);
             }                   
             catch (Exception ex)
             {
                 log.Error(String.Format("{0} failed", this.Action), ex);
                 var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
-                ShowUserInterface.SetError(Button, msg);
+                UserInterface.SetError(Button, msg);
             }
         }
     }

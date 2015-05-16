@@ -25,8 +25,6 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
 		
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
-		<NuSpec>$(SourceDir)\$(ProductName).nuspec</NuSpec>
-		<NugetPackDir>$(OutDir)\NugetPack</NugetPackDir>
   </PropertyGroup>
 
 	<PropertyGroup>
@@ -65,28 +63,23 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <MSBuild Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
 		<Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
-	<ItemGroup>
-		<Package Include="$(OutDir)\sidi-util.$(GfvAssemblySemVer)" />
-	</ItemGroup>
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
     <Exec Command="$(NUnitConsole) /xml=$(TestDir)\TestResult.xml /labels @(Targets, ' ')" />
   </Target>
 
-  <Target Name="Release" DependsOnTargets="Build;Test" />
-
   <Target Name="PushLocal" DependsOnTargets="Build;GetVersion">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" />
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).nupkg" />
+    <!-- <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" /> -->
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).nupkg" />
   </Target>
 
   <Target Name="Push" DependsOnTargets="Test">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push %(Package.Identity).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).nupkg" />
   </Target>
 
   <Target Name="TestPush" DependsOnTargets="Build">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push %(Package.Identity).symbols.nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).symbols.nupkg" />
   </Target>
 
   <!-- This target puts the build.log file into the build directory -->
