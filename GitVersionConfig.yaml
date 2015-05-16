@@ -1,0 +1,5 @@
+# assembly-versioning-scheme: MajorMinorPatchMetadata | MajorMinorPatch | MajorMinor | Major
+# develop-branch-tag: alpha
+# release-branch-tag: rc
+# tag-prefix: '[vV|version-] # regex to match git tag prefix
+# next-version: 1.0.0

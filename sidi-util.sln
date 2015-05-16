@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Common.Targets = Common.Targets
 		COPYING = COPYING
 		COPYING.LESSER = COPYING.LESSER
+		GitVersionConfig.yaml = GitVersionConfig.yaml
 		header.txt = header.txt
 		NOTICE.txt = NOTICE.txt
 		publish.cmd = publish.cmd
