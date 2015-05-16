@@ -36,7 +36,7 @@ namespace Sidi.Caching
             var maxCount = 10;
             Func<int, int> provider = x =>
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
                     return x * 2;
                 };
 
@@ -54,7 +54,7 @@ namespace Sidi.Caching
                     Assert.AreEqual(-1, c[i]);
                 }
 
-                Thread.Sleep(200);
+                Thread.Sleep(1000);
                 Assert.AreEqual(maxCount, updateCount);
 
                 for (int i = 0; i < maxCount; ++i)
