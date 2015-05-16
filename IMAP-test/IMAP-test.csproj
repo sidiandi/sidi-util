@@ -3,7 +3,7 @@
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{FDA69690-DE87-41F7-AB0D-D3A492D98912}</ProjectGuid>
-    <NuGetPackageImportStamp>7e6a8462</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>779698bc</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="..\build\Common.props" />
   <ItemGroup>

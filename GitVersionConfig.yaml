@@ -1,4 +1,0 @@
-assembly-versioning-scheme: MajorMinorPatch
-# develop-branch-tag: alpha
-# release-branch-tag: rc
-# tag-prefix: '[vV|version-] # regex to match git tag prefix

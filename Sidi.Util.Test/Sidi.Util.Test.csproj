@@ -171,7 +171,7 @@
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}</ProjectGuid>
-    <NuGetPackageImportStamp>d03edb50</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>b8c61bd7</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="$(SolutionDir)\build\Common.targets" />
