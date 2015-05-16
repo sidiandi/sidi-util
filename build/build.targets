@@ -71,7 +71,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
   <Target Name="PushLocal" DependsOnTargets="Build;GetVersion">
     <!-- <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" /> -->
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).nupkg" />
   </Target>
 
   <Target Name="Push" DependsOnTargets="Test">
