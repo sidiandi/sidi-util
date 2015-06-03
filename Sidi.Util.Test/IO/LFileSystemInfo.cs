@@ -40,7 +40,7 @@ namespace Sidi.IO
             Assert.IsTrue(drive.IsRoot);
             var c = drive.Info;
             Assert.IsTrue(c.Exists);
-            c.DumpProperties(Console.Out);
+            Dumper.Instance.Write(c, Console.Out);
             log.Info(c.GetChildren().Join());
         }
 
@@ -56,7 +56,7 @@ namespace Sidi.IO
         {
             var currentDirectory = new LPath(System.Environment.CurrentDirectory);
             var dot = new LPath(".");
-            dot.Info.DumpProperties(Console.Out);
+            Dumper.Instance.Write(dot.Info);
             Assert.AreEqual(currentDirectory, dot.Info.FullName);
         }
 

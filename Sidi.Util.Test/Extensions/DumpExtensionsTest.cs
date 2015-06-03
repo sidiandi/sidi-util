@@ -23,6 +23,8 @@ using NUnit.Framework;
 using System.IO;
 using System.Diagnostics;
 using Sidi.Test;
+using Sidi.Util;
+using Sidi.IO;
 
 namespace Sidi.Extensions
 {
@@ -44,22 +46,30 @@ namespace Sidi.Extensions
         }
 
         [Test]
-        public void DumpProperties_DumpsProperties()
+        public void Dump_DumpsProperties()
         {
             Process p = Process.GetCurrentProcess();
-            using (var w = new StringWriter())
-            {
-                p.DumpProperties(w);
-                Assert.That(w.ToString().Length, Is.GreaterThan(256));
-            }
+            Assert.That(p.Dump().Length, Is.GreaterThan(256));
+        }
+
+        [Test]
+        public void Log_dump()
+        {
+            Process p = Process.GetCurrentProcess();
+            log.Trace(() => this);
+            log.Trace(() => p);
+            int a = 123;
+            log.Trace(() => a);
+            log.Trace(() => "Hello");
+            log.Trace(() => Paths.BinDir.Info);
         }
 
         [Test]
         public void DumpProperties_ListsAllItems()
         {
             var p = Process.GetProcesses();
-            var count = p.Length;
-            var s = p.DumpProperties();
+            var count = Math.Min(p.Length, Dumper.Instance.MaxEnumElements);
+            var s = p.Dump();
             for (int i = 0; i < count; ++i)
             {
                 Assert.That(s, Contains.Substring(String.Format("[{0}]", i)));
@@ -69,9 +79,9 @@ namespace Sidi.Extensions
         [Test]
         public void DumpProperties_MentionsString()
         {
-            var p = "Hello".DumpProperties();
+            var p = "Hello".Dump();
+            log.Info(p);
             Assert.That(p, Contains.Substring("Hello"));
-            Assert.That(p, Contains.Substring("System.String"));
         }
 
         [Test]

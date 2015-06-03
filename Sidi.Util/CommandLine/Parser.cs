@@ -206,7 +206,7 @@ namespace Sidi.CommandLine
 
         internal Parser()
         {
-            var dumper = new Dump() { MaxLevel = 1 };
+            var dumper = new Dumper() { MaxLevel = 1 };
             ProcessResult = result => { };
 
             Prefix = new Dictionary<Type, string[]>();

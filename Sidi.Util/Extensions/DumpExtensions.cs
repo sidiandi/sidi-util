@@ -22,11 +22,15 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using Sidi.Util;
+using log4net;
+using System.Linq.Expressions;
 
 namespace Sidi.Extensions
 {
     public static class DumpExtensions
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static string GetString(this PropertyInfo info, object x)
         {
             try
@@ -52,56 +56,6 @@ namespace Sidi.Extensions
             catch (Exception e)
             {
                 return "Exception: {0}".F(e.Message);
-            }
-        }
-
-        public static void DumpProperties(this object x, TextWriter o)
-        {
-            bool singleInstance = false;
-            object[] list;
-            if (x is System.Collections.IEnumerable && !(x is string))
-            {
-                list = ((System.Collections.IEnumerable)x).Cast<object>().ToArray();
-                x = list[0];
-            }
-            else
-            {
-                list = new object[] { x };
-                singleInstance = true;
-            }
-
-            var lf = list.ListFormat();
-
-            lf.AddColumn("ToString", _ => _.ToString());
-            lf.AddColumn("Type", _ => _.GetType());
-
-            foreach (var i in x.GetType().GetProperties())
-            {
-                var property = i;
-                lf.AddColumn(i.Name, y => property.GetValue(y, new object[]{}));
-            }
-            foreach (var i in x.GetType().GetFields())
-            {
-                var field = i;
-                lf.AddColumn(i.Name, y => field.GetValue(y));
-            }
-
-            if (singleInstance)
-            {
-                lf.RenderDetails(o, x);
-            }
-            else
-            {
-                lf.RenderDetails(o);
-            }
-        }
-
-        public static string DumpProperties(this object x)
-        {
-            using (var w = new StringWriter())
-            {
-                x.DumpProperties(w);
-                return w.ToString();
             }
         }
 
@@ -139,6 +93,40 @@ namespace Sidi.Extensions
                 .AddColumn("Key", x => x.Key)
                 .AddColumn("Count", x => x.Value)
                 .AddColumn("Percent", x => String.Format("{0:F2}%", pf * x.Value));
+        }
+
+        public static string Dump(this object o)
+        {
+            var sw = new StringWriter();
+            Dumper.Instance.Write(o, sw);
+            return sw.ToString();
+        }
+
+        static string GuessVariableName(Expression e)
+        {
+            if (e is MemberExpression)
+            {
+                var m = ((MemberExpression)e).Member;
+                return m.Name;
+            }
+            else if (e is UnaryExpression)
+            {
+                return GuessVariableName(((UnaryExpression)e).Operand);
+            }
+            else
+            {
+                return e.ToString();
+            }
+        }
+
+        public static void Trace(this ILog log, Expression<Func<object>> getter)
+        {
+            if (log.IsInfoEnabled)
+            {
+                var me = getter.Body as MemberExpression;
+                var name = GuessVariableName(getter.Body);
+                log.InfoFormat("{0} = {1}", name, getter.Compile()().Dump());
+            }
         }
     }
 }
