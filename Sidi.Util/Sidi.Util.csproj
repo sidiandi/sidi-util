@@ -3,7 +3,7 @@
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
-    <NuGetPackageImportStamp>e442d611</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>ad5b0391</NuGetPackageImportStamp>
     <BuildPackage>true</BuildPackage>
   </PropertyGroup>
   <Import Project="..\build\Common.props" />
@@ -376,11 +376,11 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets'))" />
-    <Error Condition="!Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets'))" />
     <Error Condition="!Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets'))" />
   </Target>
-  <Import Project="..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" />
   <Import Project="..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

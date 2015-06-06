@@ -46,22 +46,15 @@ namespace Sidi.Extensions
         }
 
         [Test]
-        public void Dump_DumpsProperties()
-        {
-            Process p = Process.GetCurrentProcess();
-            Assert.That(p.Dump().Length, Is.GreaterThan(256));
-        }
-
-        [Test]
         public void Log_dump()
         {
             Process p = Process.GetCurrentProcess();
-            log.Trace(() => this);
-            log.Trace(() => p);
+            log.Info(() => this);
+            log.Info(() => p);
             int a = 123;
-            log.Trace(() => a);
-            log.Trace(() => "Hello");
-            log.Trace(() => Paths.BinDir.Info);
+            log.Info(() => a);
+            log.Info(() => "Hello");
+            log.Info(() => Paths.BinDir.Info);
         }
 
         [Test]
@@ -69,19 +62,11 @@ namespace Sidi.Extensions
         {
             var p = Process.GetProcesses();
             var count = Math.Min(p.Length, Dumper.Instance.MaxEnumElements);
-            var s = p.Dump();
+            var s = Dumper.Instance.ToString(p);
             for (int i = 0; i < count; ++i)
             {
                 Assert.That(s, Contains.Substring(String.Format("[{0}]", i)));
             }
-        }
-
-        [Test]
-        public void DumpProperties_MentionsString()
-        {
-            var p = "Hello".Dump();
-            log.Info(p);
-            Assert.That(p, Contains.Substring("Hello"));
         }
 
         [Test]

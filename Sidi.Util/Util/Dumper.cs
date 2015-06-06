@@ -24,6 +24,8 @@ using Sidi.Util;
 using Sidi.Extensions;
 using System.Reflection;
 using System.Collections;
+using System.Windows;
+using System.Linq.Expressions;
 
 namespace Sidi.Util
 {
@@ -48,11 +50,25 @@ namespace Sidi.Util
         }
         static Dumper s_instance;
 
-        public Dumper()
+        public string ToString(object x)
         {
+            using (var w = new StringWriter())
+            {
+                Write(w, x);
+                return w.ToString();
+            }
         }
 
-        public void Write(object x, TextWriter output = null)
+        public string ToString(Expression<Func<object>> getObjectToDump)
+        {
+            using (var w = new StringWriter())
+            {
+                Write(w, getObjectToDump);
+                return w.ToString();
+            }
+        }
+
+        public void Write(TextWriter output, object x)
         {
             if (output == null)
             {
@@ -61,6 +77,14 @@ namespace Sidi.Util
 
             seen = new HashSet<object>();
             RenderValue(x, output, 0);
+        }
+
+        public void Write(TextWriter w, Expression<Func<object>> getObjectToDump)
+        {
+            var name = Dumper.GuessVariableName(getObjectToDump);
+            w.Write("{0} = ", name);
+            var objectToDump = getObjectToDump.Compile()();
+            Write(w, objectToDump);
         }
 
         HashSet<object> seen;
@@ -192,6 +216,28 @@ namespace Sidi.Util
 
             var m = t.GetMethod("ToString", new Type[] { });
             return m.DeclaringType != typeof(Object) && t.IsValueType;
+        }
+
+        public static string GuessVariableName(System.Linq.Expressions.Expression e)
+        {
+            if (e is LambdaExpression)
+            {
+                e = ((LambdaExpression)e).Body;
+            }
+
+            if (e is MemberExpression)
+            {
+                var m = ((MemberExpression)e).Member;
+                return m.Name;
+            }
+            else if (e is UnaryExpression)
+            {
+                return GuessVariableName(((UnaryExpression)e).Operand);
+            }
+            else
+            {
+                return e.ToString();
+            }
         }
     }
 }

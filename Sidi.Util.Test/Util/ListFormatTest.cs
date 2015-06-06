@@ -187,7 +187,7 @@ namespace Sidi.Util
             var list = data
                 .ListFormat()
                 .AllPublic()
-                .AddColumn("Details", x => x.Dump());
+                .AddColumn("Details", Dumper.Instance.ToString);
 
             list.Columns.Last().Tag<HtmlCellFormat<Process>>().HasDedicatedRow = true;
             list["Threads"].GetHtmlCellFormat().HasDedicatedRow = true;
@@ -218,7 +218,7 @@ namespace Sidi.Util
             var list = data
                 .ListFormat()
                 .AllPublic()
-                .AddColumn("Details", x => x.Dump());
+                .AddColumn("Details", x => Dumper.Instance.ToString(x));
 
             list.Columns.Last().Tag<HtmlCellFormat<Process>>().HasDedicatedRow = true;
             list["Threads"].GetHtmlCellFormat().HasDedicatedRow = true;

@@ -95,37 +95,29 @@ namespace Sidi.Extensions
                 .AddColumn("Percent", x => String.Format("{0:F2}%", pf * x.Value));
         }
 
-        public static string Dump(this object o)
-        {
-            var sw = new StringWriter();
-            Dumper.Instance.Write(o, sw);
-            return sw.ToString();
-        }
-
-        static string GuessVariableName(Expression e)
-        {
-            if (e is MemberExpression)
-            {
-                var m = ((MemberExpression)e).Member;
-                return m.Name;
-            }
-            else if (e is UnaryExpression)
-            {
-                return GuessVariableName(((UnaryExpression)e).Operand);
-            }
-            else
-            {
-                return e.ToString();
-            }
-        }
-
-        public static void Trace(this ILog log, Expression<Func<object>> getter)
+        /// <summary>
+        /// Dumps the content of a variable to the log
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="getter"></param>
+        public static void Info(this ILog log, Expression<Func<object>> getter)
         {
             if (log.IsInfoEnabled)
             {
-                var me = getter.Body as MemberExpression;
-                var name = GuessVariableName(getter.Body);
-                log.InfoFormat("{0} = {1}", name, getter.Compile()().Dump());
+                log.Info(Dumper.Instance.ToString(getter));
+            }
+        }
+
+        /// <summary>
+        /// Dumps the content of a variable to the log
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="getter"></param>
+        public static void Debug(this ILog log, Expression<Func<object>> getter)
+        {
+            if (log.IsDebugEnabled)
+            {
+                log.Debug(Dumper.Instance.ToString(getter));
             }
         }
     }

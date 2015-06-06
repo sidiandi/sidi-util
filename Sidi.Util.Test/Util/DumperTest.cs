@@ -28,29 +28,31 @@ using Sidi.Test;
 
 namespace Sidi.Util
 {
-        [TestFixture]
-        public class DumperTest : TestBase
+    [TestFixture]
+    public class DumperTest : TestBase
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        Process[] processArray = Process.GetProcesses();
+
+        [Test]
+        public void Dump()
         {
-            Process[] processArray = Process.GetProcesses();
-            
-            [Test]
-            public void Dump()
-            {
-                var dump = new Dumper();
-                dump.Write(processArray);
-            }
+            var dump = new Dumper();
+            dump.Write(Console.Out, processArray);
+        }
 
-            [Test]
-            public void DumpADictionary()
-            {
-                var dump = new Dumper();
-                dump.Write(processArray.ToDictionary(_ => _.Id));
-            }
+        [Test]
+        public void DumpADictionary()
+        {
+            var dump = new Dumper();
+            dump.Write(Console.Out, processArray.ToDictionary(_ => _.Id));
+        }
 
-            [Test]
-            public void DumpBinaryData()
-            {
-                byte[] data = ASCIIEncoding.ASCII.GetBytes(@"using NUnit.Framework;
+        [Test]
+        public void DumpBinaryData()
+        {
+            byte[] data = ASCIIEncoding.ASCII.GetBytes(@"using NUnit.Framework;
 using Sidi.Test;
 using System;
 using System.Collections.Generic;
@@ -59,35 +61,54 @@ using System.Text;
 using System.Threading.Tasks;
 ");
 
-                var sw = new StringWriter();
-                var dump = new Dumper();
-                dump.Write(data, sw);
-                StringAssert.EndsWith(@"000000A0 3B 0D 0A                                        ;..             
+            var sw = new StringWriter();
+            var dump = new Dumper();
+            dump.Write(sw, data);
+            StringAssert.EndsWith(@"000000A0 3B 0D 0A                                        ;..             
 ", sw.ToString());
-                Console.Out.WriteLine(sw.ToString());
-            }
-
-            class A
-            {
-                public A next { set; get; }
-            }
-            
-
-            [Test]
-            public void Recursion()
-            {
-                var a = new A();
-                a.next = a;
-                var dump = new Dumper();
-                dump.Write(a);
-            }
-
-            [Test]
-            public void Path()
-            {
-                var d = new Dumper();
-                var x = new Sidi.IO.LPath(@"C:\temp");
-                d.Write(x);
-            }
+            Console.Out.WriteLine(sw.ToString());
         }
+
+        class A
+        {
+            public A next { set; get; }
+        }
+
+
+        [Test]
+        public void Recursion()
+        {
+            var a = new A();
+            a.next = a;
+            var dump = new Dumper();
+            dump.Write(Console.Out, a);
+        }
+
+        [Test]
+        public void Path()
+        {
+            var d = new Dumper();
+            var x = new Sidi.IO.LPath(@"C:\temp");
+        }
+
+        [Test()]
+        public void ToStringTest()
+        {
+            var d = new Dumper();
+            var a = "Hello";
+            var dumpText = d.ToString(a);
+            log.Info(() => dumpText);
+            StringAssert.Contains(a, dumpText);
+        }
+
+        [Test()]
+        public void ToStringTest1()
+        {
+            var d = new Dumper();
+            var a = "Hello";
+            var dumpText = d.ToString(() => a);
+            log.Info(() => dumpText);
+            StringAssert.Contains("a = ", dumpText);
+        }
+    }
 }
