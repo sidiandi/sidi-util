@@ -97,6 +97,24 @@ namespace Sidi.IO
             return new WriteResult(hash, added);
         }
 
+        public WriteResult ImportHardlink(LPath content)
+        {
+            var hash = hashAlgorithm.Get(content);
+            bool added;
+            if (Contains(hash))
+            {
+                added = false;
+            }
+            else
+            {
+                var dest = CalculatePath(hash);
+                dest.EnsureParentDirectoryExists();
+                content.CreateHardLink(dest);
+                added = true;
+            }
+            return new WriteResult(hash, added);
+        }
+
         LPath GetTempFile()
         {
             return rootDirectory.CatDir(Path.GetRandomFileName());
@@ -153,7 +171,12 @@ namespace Sidi.IO
 
         LPath CalculatePath(Hash hash)
         {
-            return rootDirectory.CatDir(hash.Value.Window(4, 4).Select(_ => _.HexString()));
+            return rootDirectory.CatDir(
+                new[]{
+                hash.Value.Skip(0).Take(1),
+                hash.Value.Skip(1).Take(1),
+                hash.Value.Skip(2)
+                }.Select(_ => _.HexString()));
         }
 
         /// <summary>
