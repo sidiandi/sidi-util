@@ -56,6 +56,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		</GetVersion>
 		<Message Text="$(GfvSemVer)" />
 		<Message Text="$(NuGetVersion)" />
+		<Message Text="$(GfvNuGetVersion)" />
 	</Target>
 
 	<Target Name="Build" DependsOnTargets="GetVersion" >
@@ -70,15 +71,15 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
   <Target Name="PushLocal" DependsOnTargets="Build;GetVersion">
     <!-- <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" /> -->
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
   </Target>
 
   <Target Name="Push" DependsOnTargets="Test">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
   </Target>
 
   <Target Name="TestPush" DependsOnTargets="Build">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvAssemblySemVer).symbols.nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).symbols.nupkg" />
   </Target>
 
   <!-- This target puts the build.log file into the build directory -->
