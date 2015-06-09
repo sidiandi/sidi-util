@@ -37,74 +37,80 @@ namespace Sidi.Persistence
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        Sidi.Persistence.Dictionary<string, string> dictionary;
-
-        [SetUp()]
+        /*
         public void SetUp()
         {
-            path = TestFile("dictionary_test.sqlite");
-            path.EnsureNotExists();
-            dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options");
+            
         }
 
-        Sidi.IO.LPath path;
-
-        [TearDown()]
         public void TearDown()
         {
             dictionary.Dispose();
             path.EnsureNotExists();
         }
+         */
 
         [Test()]
         public void ReadWrite()
         {
-            string verboseValue = "on";
-            string userValue = "sidi";
-            dictionary["verbose"] = verboseValue;
-            dictionary["user"] = userValue;
+            var path = TestFile("dictionary_test.sqlite");
+            path.EnsureNotExists();
+            using (var dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options"))
+            {
+                string verboseValue = "on";
+                string userValue = "sidi";
+                dictionary["verbose"] = verboseValue;
+                dictionary["user"] = userValue;
 
-            Assert.AreEqual(verboseValue, dictionary["verbose"]);
-            Assert.AreEqual(userValue, dictionary["user"]);
+                Assert.AreEqual(verboseValue, dictionary["verbose"]);
+                Assert.AreEqual(userValue, dictionary["user"]);
+            }
         }
 
         [Test()]
         public void Enumerate()
         {
-            var count = 10;
-            var lasti = count - 1;
-            foreach (var i in Enumerable.Range(0, count))
+            var path = TestFile("dictionary_test.sqlite");
+            path.EnsureNotExists();
+            using (var dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options"))
             {
-                dictionary[i.ToString()] = (i * i).ToString();
-            }
+                var count = 10;
+                var lasti = count - 1;
+                foreach (var i in Enumerable.Range(0, count))
+                {
+                    dictionary[i.ToString()] = (i * i).ToString();
+                }
 
-            Assert.AreEqual(count, dictionary.Count);
-            Assert.AreEqual(count, dictionary.Keys.Count());
-            Assert.IsTrue(dictionary.Keys.Any(x => x == lasti.ToString()));
-            Assert.IsTrue(dictionary.Values.Any(x => x == (lasti*lasti).ToString()));
-
-            foreach (var i in dictionary)
-            {
-                Console.WriteLine(i);
+                Assert.AreEqual(count, dictionary.Count);
+                Assert.AreEqual(count, dictionary.Keys.Count());
+                Assert.IsTrue(dictionary.Keys.Any(x => x == lasti.ToString()));
+                Assert.IsTrue(dictionary.Values.Any(x => x == (lasti * lasti).ToString()));
             }
         }
 
         [Test()]
         public void MassReadWrite()
         {
-            Stopwatch w = new Stopwatch();
-            w.Start();
-            using (DbTransaction t = dictionary.BeginTransaction())
+            const int elementCount = 1000;
+            
+            var path = TestFile("dictionary_test.sqlite");
+            path.EnsureNotExists();
+            using (var dictionary = new Sidi.Persistence.Dictionary<string, string>(path, "options"))
             {
-                for (long i = 0; i < 1000; ++i)
+                Stopwatch w = new Stopwatch();
+                w.Start();
+                using (DbTransaction t = dictionary.BeginTransaction())
                 {
-                    string key = String.Join(".", BitConverter.GetBytes(i).Select(x => "Parameter " + x.ToString()).ToArray());
-                    string value = String.Format("Value{0}", i);
-                    dictionary[key] = value;
+                    for (long i = 0; i < elementCount; ++i)
+                    {
+                        string key = String.Join(".", BitConverter.GetBytes(i).Select(x => "Parameter " + x.ToString()).ToArray());
+                        string value = String.Format("Value{0}", i);
+                        dictionary[key] = value;
+                    }
+                    t.Commit();
                 }
-                t.Commit();
+                log.InfoFormat("{0} to insert {1} elements", w.Elapsed, elementCount);
             }
-            Console.WriteLine(w.Elapsed);
         }
 
         [Test]
@@ -122,6 +128,25 @@ namespace Sidi.Persistence
             using (var d = Dictionary<string, string>.UserSetting(GetType(), dictionaryName))
             {
                 Assert.AreEqual(value, d[key]);
+            }
+        }
+
+        [Test]
+        public void UseSerializableTypes()
+        {
+            var path = TestFile("dictionary_test2.sqlite");
+            path.EnsureFileNotExists();
+            using (var d = new Sidi.Persistence.Dictionary<FileVersion, FileVersion>(path, "fileversion"))
+            {
+                var fv = new FileVersion("a", 1, DateTime.MinValue);
+                d[fv] = fv;
+
+                FileVersion outValue;
+                Assert.IsTrue(d.TryGetValue(fv, out outValue));
+                Assert.AreEqual(fv, outValue);
+                Assert.AreEqual(1, d.Count);
+                Assert.IsTrue(d.Remove(fv));
+                Assert.AreEqual(0, d.Count);
             }
         }
     }

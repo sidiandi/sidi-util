@@ -29,6 +29,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using Sidi.Extensions;
 using Sidi.IO;
+using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Sidi.Persistence
 {
@@ -573,6 +575,11 @@ namespace Sidi.Persistence
             }
         }
 
+        /// <summary>
+        /// Finds a single item that matches the select commmand
+        /// </summary>
+        /// <param name="select"></param>
+        /// <returns>Single item that matches the query or default(T) if no such item is found.</returns>
         T Find(SQLiteCommand select)
         {
             using (var reader = (SQLiteDataReader)select.ExecuteReader())
@@ -585,13 +592,18 @@ namespace Sidi.Persistence
             }
         }
 
+        /// <summary>
+        /// Executes a SQL select and returns a list of objects
+        /// </summary>
+        /// <param name="query">part of SQL select statement after "where"</param>
+        /// <returns>Single item that matches the query or default(T) if no such item is found.</returns>
         public T Find(string query, string paramName, object param)
         {
             using (var select = CreateCommand(String.Format("select {0} from @table where {1}", rowIdColumn, query)))
             {
                 SQLiteParameter p = new SQLiteParameter(paramName);
                 select.Parameters.Add(p);
-                select.Parameters[paramName].Value = param;
+                select.Parameters[paramName].Value = GetParameterValue(param);
                 return Find(select);
             }
         }
@@ -676,109 +688,139 @@ namespace Sidi.Persistence
         {
             foreach (MemberInfo i in Members)
             {
-                object v = i.GetValue(item);
-                if (FieldType(i).Equals(typeof(String)))
-                {
-                    if (v == null)
-                    {
-                        v = String.Empty;
-                    }
-                }
-                if (IsAutoIncrement(i) && v is long && (long)v == 0)
-                {
-                    v = null;
-                }
-                cmd.Parameters[i.Name].Value = v;
+                WriteValue(i, item, cmd.Parameters);
             }
         }
 
-        Type FieldType(MemberInfo member)
+        /// <summary>
+        /// Writes the value of member i of item to paramters
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="item"></param>
+        /// <param name="parameters"></param>
+        void WriteValue(MemberInfo i, T item, SQLiteParameterCollection parameters)
         {
-            if (member is FieldInfo)
+            object v = i.GetValue(item);
+        
+            if (IsAutoIncrement(i) && v is long && (long)v == 0)
             {
-                return ((FieldInfo)member).FieldType;
-            }
-            else if (member is PropertyInfo)
-            {
-                return ((PropertyInfo)member).PropertyType;
+                v = null;
             }
             else
             {
-                throw new InvalidOperationException();
+                v = GetParameterValue(v);
             }
+
+            parameters[i.Name].Value = v;
+
         }
+
+        public object GetParameterValue(object v)
+        {
+            if (v == null)
+            {
+                return null;
+            }
+
+            if (v is string)
+            {
+                if (v == null)
+                {
+                    v = String.Empty;
+                }
+            }
+            else if (supportedTypes.Contains(v.GetType()))
+            {
+
+            }
+            else
+            {
+                // use serializer
+                var s = new BinaryFormatter();
+                using (var w = new MemoryStream())
+                {
+                    s.Serialize(w, v);
+                    v = w.ToArray();
+                }
+            }
+            return v;
+        }
+
+        static HashSet<Type> supportedTypes = new HashSet<Type>
+        {
+            typeof(string),typeof(DateTime),typeof(bool),typeof(decimal),typeof(short),typeof(int),typeof(long),typeof(byte[]),typeof(Guid)
+        };
 
         T FromReader(SQLiteDataReader reader)
         {
             T item = new T();
             int index = 0;
-            SetValue(rowIdMember, item, reader, index);
+            ReadValue(rowIdMember, item, reader, index);
             ++index;
             foreach (MemberInfo i in Members)
             {
-                SetValue(i, item, reader, index);
+                ReadValue(i, item, reader, index);
 
                 ++index;
             }
             return item;
         }
 
-        void SetValue(MemberInfo i, T item, SQLiteDataReader reader, int index)
+        void ReadValue(MemberInfo i, T item, SQLiteDataReader reader, int index)
         {
             try
             {
-                var mt = i.GetMemberType();
+                var memberType = i.GetMemberType();
 
                 if (reader.IsDBNull(index))
                 {
                     i.SetValue(item, null);
                 }
-                else if (mt == typeof(string))
+                else if (memberType == typeof(string))
                 {
                     i.SetValue(item, reader.GetString(index));
                 }
-                else if (mt == typeof(DateTime))
+                else if (memberType == typeof(DateTime))
                 {
                     i.SetValue(item, reader.GetDateTime(index));
                 }
-                else if (mt == typeof(bool))
+                else if (memberType == typeof(bool))
                 {
                     i.SetValue(item, reader.GetBoolean(index));
                 }
-                else if (mt == typeof(decimal))
+                else if (memberType == typeof(decimal))
                 {
                     i.SetValue(item, reader.GetDecimal(index));
                 }
-                else if (mt == typeof(short))
+                else if (memberType == typeof(short))
                 {
                     i.SetValue(item, reader.GetInt16(index));
                 }
-                else if (mt == typeof(int))
+                else if (memberType == typeof(int))
                 {
                     i.SetValue(item, reader.GetInt32(index));
                 }
-                else if (mt == typeof(long))
+                else if (memberType == typeof(long))
                 {
                     i.SetValue(item, reader.GetInt64(index));
                 }
-                else if (mt == typeof(byte[]))
+                else if (memberType == typeof(byte[]))
                 {
                     i.SetValue(item, (byte[])reader[index]);
                 }
-                else if (mt == typeof(Guid))
+                else if (memberType == typeof(Guid))
                 {
                     i.SetValue(item, reader.GetGuid(index));
                 }
-                else if (reader.GetFieldType(index) == typeof(string))
-                {
-                    // FieldType must be constructible from string
-                    var stringConstructor = mt.GetConstructor(new Type[] { typeof(string) });
-                    var value = stringConstructor.Invoke(new object[] { reader.GetString(index) });
-                    i.SetValue(item, value);
-                }
                 else
                 {
-                    i.SetValue(item, reader.GetValue(index));
+                    // use serializer
+                    var s = new BinaryFormatter();
+                    var data = (byte[])reader[index];
+                    using (var r = new MemoryStream(data))
+                    {
+                       i.SetValue(item, s.Deserialize(r));
+                    }
                 }
             }
             catch (Exception ex)

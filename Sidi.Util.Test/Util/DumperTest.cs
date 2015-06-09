@@ -102,6 +102,16 @@ using System.Threading.Tasks;
         }
 
         [Test()]
+        public void TruncateLongEnumerables()
+        {
+            var d = new Dumper();
+            var a = Enumerable.Range(0, 1000);
+            var dumpText = d.ToString(a);
+            StringAssert.DoesNotContain("[100]", dumpText);
+            StringAssert.Contains("--- truncated after 100 elements ---", dumpText);
+        }
+
+        [Test()]
         public void ToStringTest1()
         {
             var d = new Dumper();

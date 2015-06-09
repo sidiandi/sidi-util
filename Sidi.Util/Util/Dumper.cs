@@ -182,10 +182,18 @@ namespace Sidi.Util
                     else if (value is System.Collections.IEnumerable)
                     {
                         var en = (IEnumerable) value;
-                        foreach (var i in en.Cast<object>().Counted().Take(MaxEnumElements))
+                        foreach (var i in en.Cast<object>().Counted())
                         {
-                            w.Write("[{0}] ", i.Key);
-                            RenderValue(i.Value, new IndentWriter(w, Indent, false), level + 1);
+                            if (i.Key >= MaxEnumElements)
+                            {
+                                w.WriteLine("--- truncated after {0} elements ---", MaxEnumElements);
+                                break;
+                            }
+                            else
+                            {
+                                w.Write("[{0}] ", i.Key);
+                                RenderValue(i.Value, new IndentWriter(w, Indent, false), level + 1);
+                            }
                         }
                     }
                 }

@@ -21,6 +21,10 @@ namespace Sidi.IO
             return String.Format("{0} [{1}, {2}]", Path, LastWriteTimeUtc, Length);
         }
 
+        FileVersion()
+        {
+        }
+        
         public FileVersion(LPath path)
         {
             this.path = path;
@@ -38,6 +42,13 @@ namespace Sidi.IO
                 this.length = info.Length;
                 this.lastWriteTimeUtc = info.LastWriteTimeUtc;
             }
+        }
+        
+        public FileVersion(LPath path, long length, DateTime lastWriteTimeUtc)
+        {
+            this.path = path;
+            this.length = length;
+            this.lastWriteTimeUtc = lastWriteTimeUtc;
         }
 
         public LPath Path { get { return path; } }

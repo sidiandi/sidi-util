@@ -131,6 +131,7 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\ContentAddressableStorage.cs" />
     <Compile Include="IO\FileCompare.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\FileSystemExtension.cs" />
@@ -173,6 +174,7 @@
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServer.cs" />
+    <Compile Include="Persistence\Set.cs" />
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
     <Compile Include="Util\Base32.cs" />
@@ -222,6 +224,7 @@
     <Compile Include="Util\EncryptString.cs" />
     <Compile Include="Util\GraMath.cs" />
     <Compile Include="Collections\History.cs" />
+    <Compile Include="Util\Hash.cs" />
     <Compile Include="Util\HexDump.cs" />
     <Compile Include="Util\HtmlCellFormat.cs" />
     <Compile Include="Util\HtmlRowFormat.cs" />

@@ -98,15 +98,9 @@ namespace Sidi.Persistence
 
         public bool Remove(TKey key)
         {
-            if (ContainsKey(key))
-            {
-                collection.Remove(new Record(key, default(TValue)));
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            var deleteCommand = collection.CreateCommand("delete from @table where key = @param0", collection.GetParameterValue(key));
+            var rowsAffected = deleteCommand.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
 
         public bool TryGetValue(TKey key, out TValue value)
@@ -157,7 +151,12 @@ namespace Sidi.Persistence
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return ContainsKey(item.Key) && item.Equals(this[item.Key]);
+            TValue value;
+            if (!TryGetValue(item.Key, out value))
+            {
+                return false;
+            }
+            return object.Equals(item.Value, value);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)

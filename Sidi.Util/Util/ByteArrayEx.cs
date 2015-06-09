@@ -23,13 +23,13 @@ using System.IO;
 
 namespace Sidi.Extensions
 {
-    public static class ByteArrayExtensions
+    public static class IEnumerableByteExtensions
     {
-        public static string HexString(this byte[] x)
+        public static string HexString(this IEnumerable<byte> x)
         {
             using (var w = new StringWriter())
             {
-                foreach (byte i in x)
+                foreach (var i in x)
                 {
                     w.Write(String.Format("{0:x2}", i));
                 }

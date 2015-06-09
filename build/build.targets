@@ -32,7 +32,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </PropertyGroup>
   
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
-  <Import Project="$(NugetPackagesDir)\GitVersionTask.2.0.1\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" />
+  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets')" />
 
   <Target Name="GetVersion">
 		<GetVersion SolutionDirectory="$(SolutionDir)">
@@ -50,13 +50,12 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		  <Output TaskParameter="FullSemVer" PropertyName="GfvFullSemVer" />
 		  <Output TaskParameter="AssemblySemVer" PropertyName="GfvAssemblySemVer" />
 		  <Output TaskParameter="NuGetVersion" PropertyName="GfvNuGetVersion" />
-		  <Output TaskParameter="ClassicVersion" PropertyName="GfvClassicVersion" />
-		  <Output TaskParameter="ClassicVersionWithTag" PropertyName="GfvClassicVersionWithTag" />
 		  <Output TaskParameter="PreReleaseTag" PropertyName="GfvPreReleaseTag" />
 		  <Output TaskParameter="PreReleaseTagWithDash" PropertyName="GfvPreReleaseTagWithDash" />
 		  <Output TaskParameter="InformationalVersion" PropertyName="GfvInformationalVersion" />
 		</GetVersion>
 		<Message Text="$(GfvSemVer)" />
+		<Message Text="$(NuGetVersion)" />
 	</Target>
 
 	<Target Name="Build" DependsOnTargets="GetVersion" >

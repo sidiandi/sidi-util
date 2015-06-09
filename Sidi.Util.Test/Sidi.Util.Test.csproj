@@ -73,6 +73,7 @@
     <Compile Include="IMAP\ServerTest.cs" />
     <Compile Include="IMAP\SessionTest.cs" />
     <Compile Include="IntSetTest.cs" />
+    <Compile Include="IO\ContentAddressableStorageTests.cs" />
     <Compile Include="IO\CopyTest.cs" />
     <Compile Include="IO\CopyProgressTest.cs" />
     <Compile Include="IO\Directory.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Parse\Parser.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\DictionaryTest.cs" />
+    <Compile Include="Persistence\SetTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Test\TestBaseTest.cs" />
