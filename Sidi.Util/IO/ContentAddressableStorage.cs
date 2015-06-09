@@ -80,7 +80,7 @@ namespace Sidi.IO
             }
             else
             {
-                var dest = GetPath(hash);
+                var dest = CalculatePath(hash);
                 var tempFile = GetTempFile();
                 try
                 {

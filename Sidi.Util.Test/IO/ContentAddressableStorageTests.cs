@@ -41,6 +41,12 @@ namespace Sidi.IO
             s.Write(new MemoryStream());
             Assert.IsTrue(s.Contains(emptyHash));
 
+            var f = TestFile("content-file");
+            f.WriteAllText("hello, i am a content file");
+            var writeResult = s.Write(f);
+            Assert.IsTrue(writeResult.Added);
+            Assert.IsTrue(s.Contains(writeResult.Hash));
+
             using (var reader = new StreamReader(s.Read(hash)))
             {
                 Assert.AreEqual(text, reader.ReadToEnd());
