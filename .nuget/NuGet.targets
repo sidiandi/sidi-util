@@ -52,7 +52,7 @@
         <RequireConsentSwitch Condition=" $(RequireRestoreConsent) == 'true' ">-RequireConsent</RequireConsentSwitch>
         <!-- Commands -->
         <RestoreCommand>$(NuGetCommand) install "$(PackagesConfig)" -source "$(PackageSources)"  $(RequireConsentSwitch) -o "$(PackagesDir)"</RestoreCommand>
-        <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
+        <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -Version $(GfvNuGetVersion) -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
 
         <!-- We need to ensure packages are restored prior to assembly resolve -->
         <ResolveReferencesDependsOn Condition="$(RestorePackages) == 'true'">
@@ -93,10 +93,16 @@
     </Target>
 
     <Target Name="BuildPackage" DependsOnTargets="CheckPrerequisites">
-        <Exec Command="$(BuildCommand)" 
+        <PropertyGroup>
+			<BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -Version $(GfvNuGetVersion) -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
+		</PropertyGroup>
+
+		<Message Text="$(BuildCommand)" />
+
+		<Exec Command="$(BuildCommand)" 
               Condition=" '$(OS)' != 'Windows_NT' " />
               
-        <Exec Command="$(BuildCommand)"
+		<Exec Command="$(BuildCommand)"
               LogStandardErrorAsError="true"
               Condition=" '$(OS)' == 'Windows_NT' " />
     </Target>
