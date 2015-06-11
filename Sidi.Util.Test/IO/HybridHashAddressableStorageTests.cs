@@ -64,5 +64,41 @@ namespace Sidi.IO.Tests
             }
         }
 
+        [Test]
+        public void extensions()
+        {
+            var root = TestFile("HybridHashAddressableStorageTests");
+            log.Info(() => root);
+            root.EnsureNotExists();
+            var hp = HashProvider.GetDefault();
+            var key = "hello";
+            var value = "world";
+
+            using (var a = new HybridHashAddressableStorage(root))
+            {
+                a.Write(key, value);
+                Assert.AreEqual(value, a.Read(key));
+            }
+        }
+
+        [Test]
+        public void do_not_lock_files()
+        {
+            var root = TestFile("HybridHashAddressableStorageTests");
+            log.Info(() => root);
+            root.EnsureNotExists();
+            var hp = HashProvider.GetDefault();
+            var key = "hello";
+            var value = "world";
+
+            using (var a = new HybridHashAddressableStorage(root))
+            {
+                using (var b = new HybridHashAddressableStorage(root))
+                {
+                    a.Write(key, value);
+                    Assert.AreEqual(value, b.Read(key));
+                }
+            }
+        }
     }
 }
