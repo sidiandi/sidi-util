@@ -83,6 +83,7 @@
     <Compile Include="IO\FileListTest.cs" />
     <Compile Include="IO\FileVersionTest.cs" />
     <Compile Include="IO\HashAddressableStorageTests.cs" />
+    <Compile Include="IO\HybridHashAddressableStorageTests.cs" />
     <Compile Include="IO\LFileSystemInfo.cs" />
     <Compile Include="IO\FileSystemTest.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperationTest.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="IO\PathParserTest.cs" />
     <Compile Include="IO\PathsTest.cs" />
     <Compile Include="IO\SQLiteHashAddressableStorageTests.cs" />
+    <Compile Include="IO\Windows\FileSystemTests.cs" />
     <Compile Include="LruBackgroundCache.cs" />
     <Compile Include="CommandLine\ParserTest.cs" />
     <Compile Include="IO\FileUtilTest.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Util\ByteArrayExtensionsTest.cs" />
     <Compile Include="Util\DumperTest.cs" />
     <Compile Include="Util\HexDumpTests.cs" />
+    <Compile Include="Util\IHashProviderExtensionTests.cs" />
     <Compile Include="Util\IndentWriter.cs" />
     <Compile Include="Util\ListFormatTest.cs" />
     <Compile Include="Util\LogScopeTest.cs" />

@@ -32,6 +32,12 @@ namespace Sidi.Caching
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        [TearDown]
+        public void TearDown()
+        {
+            Cache.DisposeLocalCaches();
+        }
+        
         [Serializable]
         class Key
         {

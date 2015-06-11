@@ -52,18 +52,8 @@ namespace Sidi.IO
         public void Write(Hash key, LPath content)
         {
             var dest = CalculatePath(key);
-            var tempFile = GetTempFile();
-            try
-            {
-                content.CopyFile(tempFile);
-                dest.EnsureParentDirectoryExists();
-                dest.EnsureFileNotExists();
-                tempFile.Move(dest);
-            }
-            finally
-            {
-                tempFile.EnsureFileNotExists();
-            }
+            dest.EnsureParentDirectoryExists();
+            content.CopyFile(dest, options: new CopyFileOptions { Overwrite = true });
         }
 
         class WriteStream : FileStream

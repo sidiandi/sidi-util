@@ -61,12 +61,18 @@ namespace Sidi.IO.Windows
                 switch (Marshal.GetLastWin32Error())
                 {
                     case ERROR_ALREADY_EXISTS:
-                        return;
+                        {
+                            if (!this.GetInfo(directory).IsDirectory)
+                            {
+                                throw new System.IO.IOException(String.Format("Cannot create a directory at {0} because a file with that name already exists.", directory));
+                            }
+                            break;
+                        }
                     case ERROR_PATH_NOT_FOUND:
                         {
                             var p = directory.Parent;
                             EnsureDirectoryExists(p);
-                            NativeMethods.CreateDirectory(directory.Param, IntPtr.Zero).CheckApiCall(directory);
+                            EnsureDirectoryExists(directory);
                         }
                         break;
                     default:
@@ -267,19 +273,17 @@ namespace Sidi.IO.Windows
             var creationDisposition = System.IO.FileMode.Open;
             var flagsAndAttributes = System.IO.FileAttributes.Normal;
             var hTemplateFile = IntPtr.Zero;
-            var access = System.IO.FileAccess.Read;
 
             switch (fileMode)
             {
                 case System.IO.FileMode.Create:
-                    fileAccess = System.IO.FileAccess.Write;
                     creationDisposition = System.IO.FileMode.Create;
-                    access = System.IO.FileAccess.ReadWrite;
                     break;
                 case System.IO.FileMode.Open:
-                    fileAccess = System.IO.FileAccess.Read;
                     creationDisposition = System.IO.FileMode.Open;
-                    access = System.IO.FileAccess.Read;
+                    break;
+                case System.IO.FileMode.CreateNew:
+                    creationDisposition = System.IO.FileMode.CreateNew;
                     break;
                 default:
                     throw new NotImplementedException(fileMode.ToString());
@@ -307,7 +311,7 @@ namespace Sidi.IO.Windows
                 throw new System.IO.IOException(String.Format("Cannot open file: {0}", path), ex);
             }
 
-            return new System.IO.FileStream(h, access);
+            return new System.IO.FileStream(h, fileAccess);
         }
 
         /// <summary>

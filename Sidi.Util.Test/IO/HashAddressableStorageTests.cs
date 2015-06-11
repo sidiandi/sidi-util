@@ -9,6 +9,7 @@ using Sidi.Test;
 using Sidi.Util;
 using System.IO;
 using Sidi.Extensions;
+using System.Diagnostics;
 
 namespace Sidi.IO.Tests
 {
@@ -83,6 +84,50 @@ namespace Sidi.IO.Tests
 
             Assert.IsFalse(s.Contains(key));
 
+        }
+        
+        public static void Performance(IHashAddressableStorage s)
+        {
+            var keys = Enumerable.Range(0, 1000)
+                .Select(x => HashProvider.GetDefault().GetObjectHash(x))
+                .ToList();
+
+            var data = ASCIIEncoding.ASCII.GetBytes("Hello, world.");
+
+            var stopWatch = Stopwatch.StartNew();
+            {
+                foreach (var i in keys)
+                {
+                    using (var w = s.Write(i))
+                    {
+                        w.Write(data, 0, data.Length);
+                    }
+                }
+            }
+            log.InfoFormat("Write: {0}", stopWatch.ElapsedMilliseconds);
+
+            stopWatch = Stopwatch.StartNew();
+            {
+                foreach (var i in keys)
+                {
+                    using (var w = s.Read(i))
+                    {
+                        byte[] buf = new byte[255];
+                        w.Read(buf, 0, buf.Length);
+                    }
+                }
+            }
+            log.InfoFormat("Read: {0}", stopWatch.ElapsedMilliseconds);
+
+            stopWatch = Stopwatch.StartNew();
+            {
+                foreach (var i in keys)
+                {
+                    StorageItemInfo info;
+                    Assert.IsTrue(s.TryGetInfo(i, out info));
+                }
+            }
+            log.InfoFormat("Info: {0}", stopWatch.ElapsedMilliseconds);
         }
     }
 }

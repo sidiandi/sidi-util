@@ -48,6 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\CacheBase.cs" />
     <Compile Include="Caching\SqliteCache.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Caching\LruCache.cs" />
@@ -93,7 +94,9 @@
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Extensions\MethodBaseExtensions.cs" />
     <Compile Include="Extensions\RegistryExtension.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Forms\ChooseDialog.cs">
       <SubType>Form</SubType>
@@ -131,6 +134,7 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\HybridHashAddressableStorage.cs" />
     <Compile Include="IO\SQLiteHashAddressableStorage.cs" />
     <Compile Include="IO\HashAddressableStorage.cs" />
     <Compile Include="IO\ContentAddressableStorage.cs" />
@@ -223,6 +227,7 @@
     <Compile Include="Forms\Viewport.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Util\DisposeHelper.cs" />
     <Compile Include="Util\Dumper.cs" />
     <Compile Include="Util\EncryptString.cs" />
     <Compile Include="Util\GraMath.cs" />

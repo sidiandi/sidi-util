@@ -32,53 +32,13 @@ namespace Sidi.IO.Tests
         [Test]
         public void Performance()
         {
-            var keys = Enumerable.Range(0, 1000)
-                .Select(x => HashProvider.GetDefault().GetObjectHash(x))
-                .ToList();
-
-            var data = ASCIIEncoding.ASCII.GetBytes("Hello, world.");
-
             var sqliteDatabase = TestFile("SQLiteHashAddressableStorage.sqlite");
             log.Info(() => sqliteDatabase);
             sqliteDatabase.EnsureFileNotExists();
-
-            var stopWatch = Stopwatch.StartNew();
             using (var s = new SQLiteHashAddressableStorage(sqliteDatabase))
             {
-                foreach (var i in keys)
-                {
-                    using (var w = s.Write(i))
-                    {
-                        w.Write(data, 0, data.Length);
-                    }
-                }
+                HashAddressableStorageTests.Performance(s);
             }
-            log.InfoFormat("Write: {0}", stopWatch.ElapsedMilliseconds);
-
-            stopWatch = Stopwatch.StartNew();
-            using (var s = new SQLiteHashAddressableStorage(sqliteDatabase))
-            {
-                foreach (var i in keys)
-                {
-                    using (var w = s.Read(i))
-                    {
-                        byte[] buf = new byte[255];
-                        w.Read(buf, 0, buf.Length);
-                    }
-                }
-            }
-            log.InfoFormat("Read: {0}", stopWatch.ElapsedMilliseconds);
-
-            stopWatch = Stopwatch.StartNew();
-            using (var s = new SQLiteHashAddressableStorage(sqliteDatabase))
-            {
-                foreach (var i in keys)
-                {
-                    StorageItemInfo info;
-                    Assert.IsTrue(s.TryGetInfo(i, out info));
-                }
-            }
-            log.InfoFormat("Info: {0}", stopWatch.ElapsedMilliseconds);
         }
     }
 }

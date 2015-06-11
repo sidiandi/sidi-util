@@ -59,8 +59,11 @@ namespace Sidi.Util
         {
             using (var m = new MemoryStream())
             {
-                var ser = new BinaryFormatter();
-                ser.Serialize(m, x);
+                if (x != null)
+                {
+                    var ser = new BinaryFormatter();
+                    ser.Serialize(m, x);
+                }
                 m.Seek(0, SeekOrigin.Begin);
                 return hashProvider.Get(m);
             }

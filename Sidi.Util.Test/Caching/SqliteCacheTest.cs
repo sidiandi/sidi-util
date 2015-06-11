@@ -33,6 +33,12 @@ namespace Sidi.Caching
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        [TearDown]
+        public void TearDown()
+        {
+            Cache.DisposeLocalCaches();
+        }
+
         [Serializable]
         class Key
         {
@@ -54,7 +60,7 @@ namespace Sidi.Caching
         {
             public string Lookup(string id)
             {
-                return SqliteCache.Get(id, LookupUncached);
+                return Cache.Get(id, LookupUncached);
             }
 
             public string LookupUncached(string id)
@@ -64,7 +70,7 @@ namespace Sidi.Caching
 
             public int Add(int x, int y)
             {
-                return SqliteCache.Get(x, y, AddUncached);
+                return Cache.Get(x, y, AddUncached);
             }
 
             public int AddUncached(int x, int y)
@@ -90,7 +96,7 @@ namespace Sidi.Caching
         [Test]
         public void HashCodeCollision()
         {
-            var c = SqliteCache.Local(MethodBase.GetCurrentMethod());
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
             {
                 var key1 = new Key() { Value = 1 };
                 var key2 = new Key() { Value = 2 };
@@ -104,13 +110,13 @@ namespace Sidi.Caching
         [Test]
         public void Clear()
         {
-            var c = SqliteCache.Local(MethodBase.GetCurrentMethod());
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
             {
                 c.Clear();
                 Assert.AreEqual(1, c.GetCached(1, _ => 1));
-                Assert.IsTrue(c.Contains(1));
-                c.Reset(1);
-                Assert.IsFalse(c.Contains(1));
+                Assert.IsTrue(c.IsCached(1));
+                c.Clear(1);
+                Assert.IsFalse(c.IsCached(1));
                 Assert.AreEqual(2, c.GetCached(1, _ => 2));
             }
         }
@@ -119,27 +125,31 @@ namespace Sidi.Caching
         public void DoCache()
         {
             {
-                var c = SqliteCache.Local(MethodBase.GetCurrentMethod());
-                c.Clear();
-
-                for (int i = 0; i < 10; ++i)
+                var c = Cache.Local(MethodBase.GetCurrentMethod());
                 {
-                    var result = c.GetCached(i, _ => _ * _);
-                    Assert.AreEqual(i * i, result);
+                    c.Clear();
+
+                    for (int i = 0; i < 10; ++i)
+                    {
+                        var result = c.GetCached(i, _ => _ * _);
+                        Assert.AreEqual(i * i, result);
+                    }
                 }
             }
 
             {
-                var c = SqliteCache.Local(MethodBase.GetCurrentMethod());
-                for (int i = 0; i < 10; ++i)
+                var c = Cache.Local(MethodBase.GetCurrentMethod());
                 {
-                    Assert.IsTrue(c.IsCached(i));
-                }
+                    for (int i = 0; i < 10; ++i)
+                    {
+                        Assert.IsTrue(c.IsCached(i));
+                    }
 
-                c.Clear();
-                for (int i = 0; i < 10; ++i)
-                {
-                    Assert.IsFalse(c.IsCached(i));
+                    c.Clear();
+                    for (int i = 0; i < 10; ++i)
+                    {
+                        Assert.IsFalse(c.IsCached(i));
+                    }
                 }
             }
         }
@@ -147,7 +157,7 @@ namespace Sidi.Caching
         [Test]
         public void ExceptionRemembered()
         {
-            var c = SqliteCache.Local(MethodBase.GetCurrentMethod());
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
             {
                 c.Clear();
                 c.RememberExceptions = true;
@@ -181,7 +191,7 @@ namespace Sidi.Caching
         [Test]
         public void ExceptionNotRemembered()
         {
-            var c = SqliteCache.Local(MethodBase.GetCurrentMethod());
+            var c = Cache.Local(MethodBase.GetCurrentMethod());
             {
                 c.Clear();
                 c.RememberExceptions = false;
@@ -210,10 +220,10 @@ namespace Sidi.Caching
         public void Performance()
         {
             {
-                var cache = SqliteCache.Local(MethodBase.GetCurrentMethod());
+                var cache = Cache.Local(MethodBase.GetCurrentMethod());
                 cache.Clear();
                 int count = 1000;
-                using (new LogScope(log.Info, "Caching {0} items", count))
+                using (new LogScope(log.Info, "Caching {0} items (first time)", count))
                 {
                     for (int i = 0; i < count; ++i)
                     {
@@ -223,9 +233,9 @@ namespace Sidi.Caching
             }
 
             {
-                var cache = SqliteCache.Local(MethodBase.GetCurrentMethod());
+                var cache = Cache.Local(MethodBase.GetCurrentMethod());
                 int count = 1000;
-                using (new LogScope(log.Info, "Caching {0} items", count))
+                using (new LogScope(log.Info, "Caching {0} items (second time)", count))
                 {
                     for (int i = 0; i < count; ++i)
                     {
@@ -241,14 +251,14 @@ namespace Sidi.Caching
             var content = "hello";
             var file = TestFile("file-with-content");
             file.WriteAllText(content);
-            var cache = SqliteCache.Local(MethodBase.GetCurrentMethod());
+            var cache = Cache.Local(MethodBase.GetCurrentMethod());
             {
-                var readContent = cache.ReadFile(file, _ => _.ReadAllText());
+                var readContent = cache.Read(file, _ => _.ReadAllText());
 
                 Assert.AreEqual(content, readContent);
                 content = "new content";
                 file.WriteAllText(content);
-                readContent = cache.ReadFile(file, _ => _.ReadAllText());
+                readContent = cache.Read(file, _ => _.ReadAllText());
                 Assert.AreEqual(content, readContent);
 
                 Assert.IsTrue(cache.IsCached(new FileVersion(file)));
