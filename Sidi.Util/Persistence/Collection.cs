@@ -836,6 +836,7 @@ namespace Sidi.Persistence
         {
             SetFieldParams(insert, item);
             insert.ExecuteNonQuery();
+            cache.Clear();
         }
 
         public void AddRange(IEnumerable<T> range)

@@ -33,19 +33,61 @@ namespace Sidi.Caching
     /// Pre-computes values and stores them as flat files. The computation results will be persistent between runs 
     /// of the program.
     /// </summary>
-    public class Cache
+    public class Cache : CacheBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public Cache(LPath storeDirectory)
+        :base(new HashAddressableStorage(storeDirectory))
         {
-            log.Debug(storeDirectory);
-            this.storeDirectory = storeDirectory;
+        }
+
+        /// <summary>
+        /// Returns a default instance, which stores values in local AppData
+        /// Typical use:
+        /// var cache = Cache.Local(MethodBase.GetCurrentMethod());
+        /// </summary>
+        /// <param name="id">Identifier of the cache</param>
+        /// <returns>A cache object specific to id</returns>
+        public static Cache Local(object id)
+        {
+            Type type = null;
+            if (id is MethodBase)
+            {
+                type = ((MethodBase)id).DeclaringType;
+            }
+            else if (id is Type)
+            {
+                type = (Type)id;
+            }
+            else
+            {
+                type = id.GetType();
+            }
+
+            return new Cache(
+                Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                .CatDir(Paths.Get(type), "cache", Digest(id).Value.HexString()));
+        }
+
+    }
+    
+    /// <summary>
+    /// Pre-computes values and stores them as flat files. The computation results will be persistent between runs 
+    /// of the program.
+    /// </summary>
+    public class CacheBase
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public CacheBase(IHashAddressableStorage store)
+        {
+            this.store = store;
             this.MaxAge = TimeSpan.MaxValue;
             this.RememberExceptions = false;
         }
 
-        readonly LPath storeDirectory;
+        readonly IHashAddressableStorage store;
 
         /// <summary>
         /// Use binary serialization to read an object from a file
@@ -65,6 +107,35 @@ namespace Sidi.Caching
                 var cacheContent = b.Deserialize(stream);
                 return cacheContent;
             }
+        }
+
+        /// <summary>
+        /// Use binary serialization to write an object to a file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="t"></param>
+        public static void SerializeToStream(Stream stream, object t)
+        {
+            if (object.Equals(t, default(object)))
+            {
+            }
+            else
+            {
+                var b = new BinaryFormatter();
+                b.Serialize(stream, t);
+            }
+        }
+
+        /// <summary>
+        /// Use binary serialization to read an object from a file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static object DeSerializeFromStream(Stream stream)
+        {
+            var b = new BinaryFormatter();
+            var cacheContent = b.Deserialize(stream);
+            return cacheContent;
         }
 
         /// <summary>
@@ -95,17 +166,17 @@ namespace Sidi.Caching
         /// <param name="cacheEntry"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool IsValid(LPath cacheEntry, object key)
+        public bool IsValid(StorageItemInfo storageItemInfo, object key)
         {
-            if (!Valid(cacheEntry, key))
+            if (!Valid(storageItemInfo, key))
             {
                 return false;
             }
 
-            return (DateTime.UtcNow - cacheEntry.Info.LastWriteTimeUtc) < MaxAge;
+            return (DateTime.UtcNow - storageItemInfo.LastWriteTimeUtc) < MaxAge;
         }
 
-        public static Func<LPath, object, bool> Valid = (p, k) => true;
+        public static Func<StorageItemInfo, object, bool> Valid = (p, k) => true;
 
         /// <summary>
         /// Uses a local cache with an ID derived from calculation
@@ -150,23 +221,28 @@ namespace Sidi.Caching
 
         public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> calculation)
         {
-            return GetCached(key, calculation, DeSerializeFromFile, SerializeToFile);
+            return GetCached(key, calculation, DeSerializeFromStream, SerializeToStream);
         }
 
-        public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> provider, Func<LPath, object> reader, Action<LPath, object> writer)
+        public TResult GetCached<TKey, TResult>(TKey key, Func<TKey, TResult> provider, Func<Stream, object> reader, Action<Stream, object> writer)
         {
-            var p = CachePath(key);
-            if (p.IsFile && IsValid(p, key))
+            var hash = Digest(key);
+            StorageItemInfo info;
+
+            if (store.TryGetInfo(hash, out info) && IsValid(info, key))
             {
                 if (log.IsDebugEnabled)
                 {
-                    log.DebugFormat("Cache hit: {0} was cached in {1} at {2}", key, p, p.Info.LastWriteTimeUtc);
+                    log.DebugFormat("Cache hit: {0} was cached under {1} at {2}", key, hash, info.LastWriteTimeUtc);
                 }
 
                 object cachedValue = default(TResult);
                 try
                 {
-                    cachedValue = reader(p);
+                    using (var readStream = store.Read(hash))
+                    {
+                        cachedValue = reader(readStream);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -185,26 +261,24 @@ namespace Sidi.Caching
                 try
                 {
                     var result = provider(key);
-                    p.EnsureParentDirectoryExists();
-                    writer(p, result);
+                    using (var writeStream = store.Write(hash))
+                    {
+                        writer(writeStream, result);
+                    }
                     return result;
                 }
                 catch (Exception e)
                 {
                     if (RememberExceptions)
                     {
-                        writer(p, e);
+                        using (var writeStream = store.Write(hash))
+                        {
+                            writer(writeStream, e);
+                        }
                     }
                     throw;
                 }
             }
-        }
-
-        public LPath GetCachedFile(object key, Func<LPath> provider)
-        {
-            return GetCached(key, _ => provider(),
-                (cachePath) => cachePath,
-                (cachePath, path) => ((LPath)path).CopyOrHardLink(cachePath));
         }
 
         /// <summary>
@@ -224,28 +298,23 @@ namespace Sidi.Caching
         /// </summary>
         public void Clear()
         {
-            storeDirectory.EnsureNotExists();
+            store.Clear();
         }
 
         public void Clear(object id)
         {
             log.DebugFormat("Clear {0} from cache", id);
-            CachePath(id).EnsureNotExists();
+            store.Remove(Digest(id));
         }
 
         public bool IsCached(object key)
         {
-            return CachePath(key).Exists;
+            return store.Contains(Digest(key));
         }
 
-        LPath CachePath(object key)
-        {
-            return storeDirectory.CatDir(Digest(key));
-        }
+        static IHashProvider hashProvider = HashProvider.GetDefault();
 
-        readonly static SHA1 sha = new SHA1CryptoServiceProvider();
-
-        public static string Digest(object x)
+        protected static Hash Digest(object x)
         {
             if (x is MethodBase)
             {
@@ -253,40 +322,8 @@ namespace Sidi.Caching
             }
             else
             {
-                var b = new BinaryFormatter();
-                var s = new MemoryStream();
-                b.Serialize(s, x);
-                var hash = sha.ComputeHash(s.ToArray());
-                return LPath.GetValidFilename(Base32.Encode(hash));
+                return hashProvider.GetObjectHash(x);
             }
-        }
-
-        /// <summary>
-        /// Returns a default instance, which stores values in local AppData
-        /// Typical use:
-        /// var cache = Cache.Local(MethodBase.GetCurrentMethod());
-        /// </summary>
-        /// <param name="id">Identifier of the cache</param>
-        /// <returns>A cache object specific to id</returns>
-        public static Cache Local(object id)
-        {
-            Type type = null;
-            if (id is MethodBase)
-            {
-                type = ((MethodBase)id).DeclaringType;
-            }
-            else if (id is Type)
-            {
-                type = (Type)id;
-            }
-            else
-            {
-                type = id.GetType();
-            }
-
-            return new Cache(
-                Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-                .CatDir(Paths.Get(type), "cache", Digest(id)));
         }
 
         public TimeSpan MaxAge { set; get; }

@@ -190,29 +190,6 @@ namespace Sidi.Caching
         }
 
         [Test]
-        public void GetCachedFile()
-        {
-            var key = "hello";
-            var c = Cache.Local(MethodBase.GetCurrentMethod());
-            c.Clear();
-            var file = c.GetCachedFile(key, () =>
-                {
-                    var f = TestFile("hello");
-                    f.WriteAllText("hello");
-                    return f;
-                });
-
-            log.Info(file);
-            Assert.IsTrue(c.IsCached(key));
-            log.Info(c.GetCachedFile(key, () =>
-                {
-                    var f = TestFile("hello");
-                    f.WriteAllText("hello");
-                    return f;
-                }));
-        }
-
-        [Test]
         public void ReadFile()
         {
             var content = "hello";

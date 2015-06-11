@@ -233,12 +233,12 @@ namespace Sidi.Caching
             return db.Find("Key = {0}".F(key.Quote()));
         }
 
-        string GetCacheKey(object key)
-        {
-            return Cache.Digest(key);
-        }
+        static IHashProvider hashProvider = HashProvider.GetDefault();
 
-        readonly static SHA1 sha = new SHA1CryptoServiceProvider();
+        static string GetCacheKey(object key)
+        {
+            return hashProvider.GetObjectHash(key).Value.HexString();
+        }
 
         /// <summary>
         /// Returns a default instance, which stores values in local AppData
@@ -279,7 +279,7 @@ namespace Sidi.Caching
 
             return new SqliteCache(
                 Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-                .CatDir(Paths.Get(type), "cache", Cache.Digest(id) + ".sqlite"));
+                .CatDir(Paths.Get(type), "cache", hashProvider.GetObjectHash(id).ToString() + ".sqlite"));
         }
 
         static System.Collections.Generic.Dictionary<object, SqliteCache> s_localInstances = new System.Collections.Generic.Dictionary<object, SqliteCache>();
