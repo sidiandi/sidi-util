@@ -48,8 +48,8 @@ namespace Sidi.Caching
                 Assert.AreEqual(provider(i), c[i]);
             }
             Assert.AreEqual(maxCount, c.Count);
-            Assert.IsTrue(c.Contains(maxCount));
-            Assert.IsFalse(c.Contains(0));
+            Assert.IsTrue(c.ContainsKey(maxCount));
+            Assert.IsFalse(c.ContainsKey(0));
             c.Clear();
             Assert.AreEqual(0, c.Count);
         }

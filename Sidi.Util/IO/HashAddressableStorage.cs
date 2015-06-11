@@ -33,7 +33,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="hash"></param>
         /// <returns></returns>
-        public bool Contains(Hash hash)
+        public bool ContainsKey(Hash hash)
         {
             var p = CalculatePath(hash);
             return p.IsFile;
@@ -143,10 +143,15 @@ namespace Sidi.IO
             }
         }
 
-        public void Remove(Hash key)
+        public bool Remove(Hash key)
         {
             var d = CalculatePath(key);
-            d.EnsureFileNotExists();
+            var exists = d.IsFile;
+            if (exists)
+            {
+                d.EnsureFileNotExists();
+            }
+            return exists;
         }
 
         public void Clear()

@@ -32,7 +32,7 @@ namespace Sidi.IO.Tests
             var hp = HashProvider.GetDefault();
             var key = hp.GetObjectHash("hello");
 
-            Assert.IsFalse(s.Contains(key));
+            Assert.IsFalse(s.ContainsKey(key));
 
             using (var w = s.Write(key))
             {
@@ -42,7 +42,7 @@ namespace Sidi.IO.Tests
                 }
             }
 
-            Assert.IsTrue(s.Contains(key));
+            Assert.IsTrue(s.ContainsKey(key));
 
             using (var r = s.Read(key))
             {
@@ -59,7 +59,7 @@ namespace Sidi.IO.Tests
 
             s.Remove(key);
 
-            Assert.IsFalse(s.Contains(key));
+            Assert.IsFalse(s.ContainsKey(key));
 
             using (var w = s.Write(key))
             {
@@ -69,7 +69,7 @@ namespace Sidi.IO.Tests
                 }
             }
 
-            Assert.IsTrue(s.Contains(key));
+            Assert.IsTrue(s.ContainsKey(key));
 
             using (var r = s.Read(key))
             {
@@ -82,7 +82,7 @@ namespace Sidi.IO.Tests
 
             s.Clear();
 
-            Assert.IsFalse(s.Contains(key));
+            Assert.IsFalse(s.ContainsKey(key));
 
         }
         

@@ -108,7 +108,7 @@ namespace Sidi.Caching
             var c = Cache.Local(MethodBase.GetCurrentMethod());
             c.Clear();
             Assert.AreEqual(1, c.GetCached(1, _ => 1));
-            c.Clear(1);
+            c.Remove(1);
             Assert.AreEqual(2, c.GetCached(1, _ => 2));
         }
         
@@ -127,13 +127,13 @@ namespace Sidi.Caching
             c = Cache.Local(MethodBase.GetCurrentMethod());
             for (int i = 0; i < 10; ++i)
             {
-                Assert.IsTrue(c.IsCached(i));
+                Assert.IsTrue(c.ContainsKey(i));
             }
 
             c.Clear();
             for (int i = 0; i < 10; ++i)
             {
-                Assert.IsFalse(c.IsCached(i));
+                Assert.IsFalse(c.ContainsKey(i));
             }
         }
 
@@ -209,9 +209,9 @@ namespace Sidi.Caching
             readContent = cache.Read(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
 
-            Assert.IsTrue(cache.IsCached(new FileVersion(file)));
+            Assert.IsTrue(cache.ContainsKey(new FileVersion(file)));
             cache.Clear();
-            Assert.IsFalse(cache.IsCached(new FileVersion(file)));
+            Assert.IsFalse(cache.ContainsKey(new FileVersion(file)));
         }
 
         [Test]

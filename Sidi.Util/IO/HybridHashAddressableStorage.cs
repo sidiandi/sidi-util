@@ -150,7 +150,7 @@ namespace Sidi.IO
             }
         }
 
-        public bool Contains(Hash key)
+        public bool ContainsKey(Hash key)
         {
             return Find(key) != null;
         }
@@ -160,16 +160,21 @@ namespace Sidi.IO
             return entries.Find("Key = @key", "key", key.Value.ToArray());
         }
 
-        public void Remove(Hash key)
+        public bool Remove(Hash key)
         {
             var e = Find(key);
-            if (e != null)
+            if (e == null)
+            {
+                return false;
+            }
+            else
             {
                 if (e.Value == null)
                 {
                     fileStorage.Remove(key);
                 }
                 entries.Remove(e);
+                return true;
             }
         }
 

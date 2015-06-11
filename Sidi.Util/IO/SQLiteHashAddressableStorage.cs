@@ -103,7 +103,7 @@ namespace Sidi.IO
             return new MemoryStream(e.Value);
         }
 
-        public bool Contains(Hash key)
+        public bool ContainsKey(Hash key)
         {
             return Find(key) != null;
         }
@@ -113,12 +113,17 @@ namespace Sidi.IO
             return entries.Find("Key = @key", "key", key.Value.ToArray());
         }
 
-        public void Remove(Hash key)
+        public bool Remove(Hash key)
         {
             var e = Find(key);
-            if (e != null)
+            if (e == null)
+            {
+                return false;
+            }
+            else
             {
                 entries.Remove(e);
+                return true;
             }
         }
 

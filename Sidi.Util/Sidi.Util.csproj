@@ -48,8 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\CacheBase.cs" />
-    <Compile Include="Caching\ICache.cs" />
+    <Compile Include="Caching\IReadOnlyStore.cs" />
     <Compile Include="Caching\LruCache.cs" />
     <Compile Include="Caching\LruCacheBackground.cs" />
     <Compile Include="Caching\Cache.cs" />

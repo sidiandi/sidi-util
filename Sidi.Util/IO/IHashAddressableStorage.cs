@@ -23,8 +23,8 @@ namespace Sidi.IO
         Stream Write(Hash key);
         Stream Read(Hash key);
 
-        bool Contains(Hash hash);
-        void Remove(Hash key);
+        bool ContainsKey(Hash hash);
+        bool Remove(Hash key);
         bool TryGetInfo(Hash key, out StorageItemInfo info);
 
         void Clear();
@@ -51,6 +51,15 @@ namespace Sidi.IO
             {
                 var b = new BinaryFormatter();
                 return b.Deserialize(stream);
+            }
+        }
+
+        public static T Read<T>(this IHashAddressableStorage s, Hash key, Func<Stream, T> reader)
+        {
+            var hash = hashProvider.GetObjectHash(key);
+            using (var stream = s.Read(hash))
+            {
+                return reader(stream);
             }
         }
     }

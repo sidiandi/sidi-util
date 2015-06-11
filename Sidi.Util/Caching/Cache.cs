@@ -33,13 +33,33 @@ namespace Sidi.Caching
     /// Pre-computes values and stores them as flat files. The computation results will be persistent between runs 
     /// of the program.
     /// </summary>
-    public class Cache
+    public class Cache : IReadOnlyStore<object, object>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        readonly IHashAddressableStorage store;
+        readonly IHashProvider hashProvider;
 
         public Cache(LPath storeDirectory)
             : this(new HybridHashAddressableStorage(storeDirectory), HashProvider.GetDefault())
         {
+        }
+
+        public Cache(IHashAddressableStorage store, IHashProvider hashProvider)
+        {
+            if (store == null)
+            {
+                throw new ArgumentNullException("store");
+            }
+            if (hashProvider == null)
+            {
+                throw new ArgumentNullException("hashProvider");
+            }
+
+            this.store = store;
+            this.hashProvider = hashProvider;
+            this.MaxAge = TimeSpan.MaxValue;
+            this.RememberExceptions = false;
         }
 
         internal static LPath GetLocalCachePath(MethodBase method)
@@ -105,26 +125,6 @@ namespace Sidi.Caching
             return new Cache(
                 Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
                 .CatDir(Paths.Get(type), "cache", HashProvider.GetDefault().GetObjectHash(id).Value.HexString()));
-        }
-
-        readonly IHashAddressableStorage store;
-        readonly IHashProvider hashProvider;
-
-        public Cache(IHashAddressableStorage store, IHashProvider hashProvider)
-        {
-            if (store == null)
-            {
-                throw new ArgumentNullException("store");
-            }
-            if (hashProvider == null)
-            {
-                throw new ArgumentNullException("hashProvider");
-            }
-
-            this.store = store;
-            this.hashProvider = hashProvider;
-            this.MaxAge = TimeSpan.MaxValue;
-            this.RememberExceptions = false;
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Sidi.Caching
         /// <param name="cacheEntry"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool IsValid(StorageItemInfo storageItemInfo, object key)
+        bool IsValid(StorageItemInfo storageItemInfo, object key)
         {
             if (!Valid(storageItemInfo, key))
             {
@@ -339,15 +339,15 @@ namespace Sidi.Caching
             store.Clear();
         }
 
-        public void Clear(object id)
+        public bool Remove(object key)
         {
-            log.DebugFormat("Clear {0} from cache", id);
-            store.Remove(GetHash(id));
+            log.DebugFormat("Remove {0} from cache", key);
+            return store.Remove(GetHash(key));
         }
 
-        public bool IsCached(object key)
+        public bool ContainsKey(object key)
         {
-            return store.Contains(GetHash(key));
+            return store.ContainsKey(GetHash(key));
         }
 
         Hash GetHash(object x)
@@ -376,6 +376,26 @@ namespace Sidi.Caching
             {
                 DisposeHelper.Dispose(store);
             }
+        }
+
+        public bool TryGetValue(object key, out object value)
+        {
+            var hash = GetHash(key);
+            if (store.ContainsKey(hash))
+            {
+                value = store.Read(hash, DeSerializeFromStream);
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
+        public object this[object key]
+        {
+            get { return store.Read(GetHash(key), DeSerializeFromStream); }
         }
     }
 }

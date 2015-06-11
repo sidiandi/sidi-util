@@ -33,7 +33,7 @@ namespace Sidi.Caching
         Exception
     };
 
-    public class LruCacheBackground<Key, Value> : IDisposable, ICache<Key, Value>
+    public class LruCacheBackground<Key, Value> : IDisposable, IReadOnlyStore<Key, Value>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -349,12 +349,30 @@ namespace Sidi.Caching
             }
         }
 
+        public bool TryGetValue(Key key, out Value value)
+        {
+            lock (this)
+            {
+                CacheEntry ce;
+                if (cache.TryGetValue(key, out ce))
+                {
+                    value = ce.m_value;
+                    return true;
+                }
+                else
+                {
+                    value = default(Value);
+                    return false;
+                }
+            }
+        }
+
         /// <summary>
         /// Returns true if the item specified by key is in the cache. 
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool Contains(Key key)
+        public bool ContainsKey(Key key)
         {
             lock (this)
             {

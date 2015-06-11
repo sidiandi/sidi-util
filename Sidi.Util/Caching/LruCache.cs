@@ -27,7 +27,7 @@ namespace Sidi.Caching
     /// </summary>
     /// <typeparam name="Key"></typeparam>
     /// <typeparam name="Value"></typeparam>
-    public class LruCache<Key, Value> : ICache<Key, Value>, IDisposable
+    public class LruCache<Key, Value> : IReadOnlyStore<Key, Value>, IDisposable
     {
         /// <summary>
         /// 
@@ -132,7 +132,7 @@ namespace Sidi.Caching
         {
             lock (this)
             {
-                if (Contains(key))
+                if (ContainsKey(key))
                 {
                     dictionary[key].value = value;
                 }
@@ -197,7 +197,7 @@ namespace Sidi.Caching
             get { lock (this) { return dictionary[usage.Last.Value].usageTime; }  }
         }
 
-        public bool Contains(Key key)
+        public bool ContainsKey(Key key)
         {
             lock (this) { return dictionary.ContainsKey(key); }
         }
