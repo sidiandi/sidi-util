@@ -8,6 +8,7 @@ using Sidi.IO;
 using System.Security.Cryptography;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 namespace Sidi.Util
 {
@@ -15,14 +16,20 @@ namespace Sidi.Util
     /// Wrapper for a byte[] hash that was created by a cryptographic hash function
     /// </summary>
     [Serializable]
-    public class Hash
+    public class Hash : IXmlSerializable
     {
-        public IReadOnlyCollection<byte> Value { get { return Array.AsReadOnly(hash);  } }
-        readonly byte[] hash;
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public IReadOnlyCollection<byte> Value { get { return Array.AsReadOnly(hash); } }
+        byte[] hash;
 
         public Hash(byte[] hash)
         {
             this.hash = hash;
+        }
+
+        Hash()
+        {
         }
 
         public override bool Equals(object obj)
@@ -44,6 +51,24 @@ namespace Sidi.Util
         public override string ToString()
         {
             return hash.HexString();
+        }
+
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+            reader.ReadStartElement();
+            var hexString = new LPath(reader.ReadString());
+            this.hash = IEnumerableByteExtensions.HexStringToBytes(hexString).ToArray();
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            writer.WriteString(this.Value.HexString());
         }
     }
 

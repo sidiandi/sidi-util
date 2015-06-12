@@ -36,5 +36,14 @@ namespace Sidi.Extensions
                 return w.ToString();
             }
         }
+
+        public static IEnumerable<byte> HexStringToBytes(string hexString)
+        {
+            for (int i = 0; i < hexString.Length; i += 2)
+            {
+                var s = hexString.Substring(i, 2);
+                yield return Byte.Parse(s, System.Globalization.NumberStyles.HexNumber);
+            }
+        }
     }
 }
