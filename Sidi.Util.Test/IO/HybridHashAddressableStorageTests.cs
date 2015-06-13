@@ -65,6 +65,18 @@ namespace Sidi.IO.Tests
         }
 
         [Test]
+        public void PerformanceFlushAfter100()
+        {
+            var root = TestFile("HybridHashAddressableStorageTests");
+            log.Info(() => root);
+            root.EnsureNotExists();
+            using (var s = new HybridHashAddressableStorage(root) { FlushAfterNWrites = 100 })
+            {
+                HashAddressableStorageTests.Performance(s);
+            }
+        }
+
+        [Test]
         public void extensions()
         {
             var root = TestFile("HybridHashAddressableStorageTests");

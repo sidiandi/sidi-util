@@ -22,7 +22,7 @@ namespace Sidi.IO
         Sidi.Persistence.Collection<Entry> entries;
         SQLiteTransaction transaction = null;
         int writes = 0;
-        int FlushAfterNWrites = 1;
+        public int FlushAfterNWrites { get; set; }
         public long MaxInternalBlobSize { get; set; }
 
         public HybridHashAddressableStorage(LPath directory)
@@ -32,10 +32,7 @@ namespace Sidi.IO
             var databaseFile = directory.CatDir("store.sqlite");
             fileStorage = new HashAddressableStorage(directory.CatDir("content"));
             entries = new Collection<Entry>(databaseFile);
-            if (FlushAfterNWrites > 1)
-            {
-                transaction = entries.BeginTransaction();
-            }
+            FlushAfterNWrites = 1;
             MaxInternalBlobSize = 100 * 1024 * 1024;
         }
 
