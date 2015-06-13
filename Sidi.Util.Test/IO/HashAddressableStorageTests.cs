@@ -29,8 +29,8 @@ namespace Sidi.IO.Tests
 
         public static void TestIHashAddressableStorage(IHashAddressableStorage s)
         {
-            var hp = HashProvider.GetDefault();
-            var key = hp.GetObjectHash("hello");
+            var hp = ObjectHashProvider.GetDefault();
+            var key = hp.Get("hello");
 
             Assert.IsFalse(s.ContainsKey(key));
 
@@ -89,7 +89,7 @@ namespace Sidi.IO.Tests
         public static void Performance(IHashAddressableStorage s)
         {
             var keys = Enumerable.Range(0, 1000)
-                .Select(x => HashProvider.GetDefault().GetObjectHash(x))
+                .Select(x => ObjectHashProvider.GetDefault().Get(x))
                 .ToList();
 
             var data = ASCIIEncoding.ASCII.GetBytes("Hello, world.");

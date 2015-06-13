@@ -27,37 +27,33 @@ namespace Sidi.IO
         
         public FileVersion(LPath path)
         {
-            this.path = path;
+            this.Path = path;
             var c = path.GetChildren();
 
             if (c.Any())
             {
                 var versions = c.Select(x => new FileVersion(x)).ToList();
-                this.length = versions.Sum(_ => _.length);
-                this.lastWriteTimeUtc = versions.Max(_ => _.lastWriteTimeUtc);
+                this.Length = versions.Sum(_ => _.Length);
+                this.LastWriteTimeUtc = versions.Max(_ => _.LastWriteTimeUtc);
             }
             else
             {
                 var info = path.Info;
-                this.length = info.Length;
-                this.lastWriteTimeUtc = info.LastWriteTimeUtc;
+                this.Length = info.Length;
+                this.LastWriteTimeUtc = info.LastWriteTimeUtc;
             }
         }
         
         public FileVersion(LPath path, long length, DateTime lastWriteTimeUtc)
         {
-            this.path = path;
-            this.length = length;
-            this.lastWriteTimeUtc = lastWriteTimeUtc;
+            this.Path = path;
+            this.Length = length;
+            this.LastWriteTimeUtc = lastWriteTimeUtc;
         }
 
-        public LPath Path { get { return path; } }
-        public long Length { get { return length; } }
-        public DateTime LastWriteTimeUtc { get { return lastWriteTimeUtc; } }
-
-        readonly LPath path;
-        readonly long length;
-        readonly DateTime lastWriteTimeUtc;
+        public string Path { get; set; }
+        public long Length { get; set; }
+        public DateTime LastWriteTimeUtc { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -82,18 +78,18 @@ namespace Sidi.IO
             unchecked // Overflow is fine, just wrap
             {
                 int hash = (int)2166136261;
-                hash = hash * 16777619 ^ path.GetHashCode();
-                hash = hash * 16777619 ^ length.GetHashCode();
-                hash = hash * 16777619 ^ lastWriteTimeUtc.GetHashCode();
+                hash = hash * 16777619 ^ Path.GetHashCode();
+                hash = hash * 16777619 ^ Length.GetHashCode();
+                hash = hash * 16777619 ^ LastWriteTimeUtc.GetHashCode();
                 return hash;
             }
         }
 
         public bool Equals(FileVersion other)
         {
-            return object.Equals(path, other.path)
-                && object.Equals(length, other.length)
-                && object.Equals(lastWriteTimeUtc, other.lastWriteTimeUtc);
+            return object.Equals(Path, other.Path)
+                && object.Equals(Length, other.Length)
+                && object.Equals(LastWriteTimeUtc, other.LastWriteTimeUtc);
         }
     }
 }

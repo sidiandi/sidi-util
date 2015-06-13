@@ -14,12 +14,11 @@ namespace Sidi.Util.Tests
         [Test()]
         public void GetObjectHashTest()
         {
-            var hp = HashProvider.GetDefault();
-
-            hp.GetObjectHash(1);
-            hp.GetObjectHash("Hello");
-            hp.GetObjectHash(null);
-            hp.GetObjectHash(MethodBase.GetCurrentMethod());
+            var hp = ObjectHashProvider.GetDefault();
+            hp.Get(1);
+            hp.Get("Hello");
+            hp.Get(null);
+            hp.Get(MethodBase.GetCurrentMethod());
         }
     }
 }

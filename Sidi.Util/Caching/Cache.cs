@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Security.Cryptography;
+using System.Xml.Serialization;
 
 namespace Sidi.Caching
 {
@@ -38,14 +39,14 @@ namespace Sidi.Caching
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         readonly IHashAddressableStorage store;
-        readonly IHashProvider hashProvider;
+        readonly IObjectHashProvider hashProvider;
 
         public Cache(LPath storeDirectory)
-            : this(new HybridHashAddressableStorage(storeDirectory), HashProvider.GetDefault())
+            : this(new HybridHashAddressableStorage(storeDirectory), ObjectHashProvider.GetDefault())
         {
         }
 
-        public Cache(IHashAddressableStorage store, IHashProvider hashProvider)
+        public Cache(IHashAddressableStorage store, IObjectHashProvider hashProvider)
         {
             if (store == null)
             {
@@ -124,7 +125,7 @@ namespace Sidi.Caching
 
             return new Cache(
                 Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-                .CatDir(Paths.Get(type), "cache", HashProvider.GetDefault().GetObjectHash(id).Value.HexString()));
+                .CatDir(Paths.Get(type), "cache", new BinaryFormatterObjectHashProvider(HashProvider.GetDefault()).Get(id).Value.HexString()));
         }
 
         /// <summary>
@@ -328,7 +329,12 @@ namespace Sidi.Caching
         /// <returns></returns>
         public T Read<T>(LPath path, Func<LPath, T> fileReader)
         {
-            return GetCached(new FileVersion(path), _ => fileReader(_.Path));
+            var fv = new FileVersion(path);
+
+            var s = new XmlSerializer(typeof(FileVersion));
+            s.Serialize(Console.Out, fv);
+
+            return GetCached(fv, _ => fileReader(_.Path));
         }
 
         /// <summary>
@@ -352,14 +358,7 @@ namespace Sidi.Caching
 
         Hash GetHash(object x)
         {
-            if (x is MethodBase)
-            {
-                return GetHash(x.ToString());
-            }
-            else
-            {
-                return hashProvider.GetObjectHash(x);
-            }
+            return hashProvider.Get(x);
         }
 
         public TimeSpan MaxAge { set; get; }

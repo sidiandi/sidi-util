@@ -38,8 +38,7 @@ namespace Sidi.Caching
             Cache.DisposeLocalCaches();
         }
         
-        [Serializable]
-        class Key
+        public class Key
         {
             public int Value;
 

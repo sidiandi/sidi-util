@@ -50,13 +50,13 @@ namespace Sidi.Persistence
             collection.Add(GetRecord(item));
         }
 
-        Sidi.Util.IHashProvider hashProvider = Sidi.Util.HashProvider.GetDefault();
+        Sidi.Util.IObjectHashProvider hashProvider = ObjectHashProvider.GetDefault();
 
         Record GetRecord(T item)
         {
             return new Record
             {
-                HashValue = hashProvider.GetObjectHash(item).Value.ToArray()
+                HashValue = hashProvider.Get(item).Value.ToArray()
             };
         }
 

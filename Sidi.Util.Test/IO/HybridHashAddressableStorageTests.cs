@@ -25,7 +25,7 @@ namespace Sidi.IO.Tests
             {
                 HashAddressableStorageTests.TestIHashAddressableStorage(s);
 
-                var bigDataKey = HashProvider.GetDefault().GetObjectHash("big_data");
+                var bigDataKey = ObjectHashProvider.GetDefault().Get("big_data");
                 var bigData = new byte[s.MaxInternalBlobSize * 2];
                 new Random().NextBytes(bigData);
 

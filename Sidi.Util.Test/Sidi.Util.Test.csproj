@@ -29,6 +29,10 @@
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\..\nuget-packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\nuget-packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -51,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCalculationTest.cs" />
+    <Compile Include="Caching\ProtoContract.cs" />
     <Compile Include="Caching\SqliteCacheTest.cs" />
     <Compile Include="Caching\LruCacheBackgroundTest.cs" />
     <Compile Include="Caching\LruCacheTest.cs" />
@@ -121,6 +126,7 @@
     <Compile Include="Util\LogScopeTest.cs" />
     <Compile Include="Util\MetricPrefixTest.cs" />
     <Compile Include="Util\ProgressTest.cs" />
+    <Compile Include="Util\ProtobufObjectHashProviderTests.cs" />
     <Compile Include="Util\Setup.cs" />
     <Compile Include="Util\ShellTest.cs" />
     <Compile Include="Util\SizeCount.cs" />
@@ -129,6 +135,7 @@
     <Compile Include="UpdateCheckTest.cs" />
     <Compile Include="Util\TimeIntervalTest.cs" />
     <Compile Include="Util\UseInvariantCultureForTest.cs" />
+    <Compile Include="Util\XmlSerializerObjectHashProviderTests.cs" />
     <Compile Include="Visualization\SimpleTreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTestData.cs" />

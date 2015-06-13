@@ -32,11 +32,11 @@ namespace Sidi.IO
 
     public static class IHashAddressableStorageExtensions
     {
-        static IHashProvider hashProvider = HashProvider.GetDefault();
+        static IObjectHashProvider hashProvider = new BinaryFormatterObjectHashProvider(HashProvider.GetDefault());
 
         public static void Write(this IHashAddressableStorage s, object key, object value)
         {
-            var hash = hashProvider.GetObjectHash(key);
+            var hash = hashProvider.Get(key);
             using (var stream = s.Write(hash))
             {
                 var b = new BinaryFormatter();
@@ -46,7 +46,7 @@ namespace Sidi.IO
 
         public static object Read(this IHashAddressableStorage s, object key)
         {
-            var hash = hashProvider.GetObjectHash(key);
+            var hash = hashProvider.Get(key);
             using (var stream = s.Read(hash))
             {
                 var b = new BinaryFormatter();
@@ -56,7 +56,7 @@ namespace Sidi.IO
 
         public static T Read<T>(this IHashAddressableStorage s, Hash key, Func<Stream, T> reader)
         {
-            var hash = hashProvider.GetObjectHash(key);
+            var hash = hashProvider.Get(key);
             using (var stream = s.Read(hash))
             {
                 return reader(stream);
