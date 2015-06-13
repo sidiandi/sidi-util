@@ -120,5 +120,18 @@ using System.Threading.Tasks;
             log.Info(() => dumpText);
             StringAssert.Contains("a = ", dumpText);
         }
+
+        class ClassWithPublicField
+        {
+            public string Greeting = "hello";
+        }
+
+        [Test]
+        public void DumpPublicFields()
+        {
+            var dumpString = Dumper.Instance.ToString(new ClassWithPublicField());
+            log.Info(() => dumpString);
+            StringAssert.Contains("hello", dumpString);
+        }
     }
 }

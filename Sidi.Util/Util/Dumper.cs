@@ -50,6 +50,18 @@ namespace Sidi.Util
         }
         static Dumper s_instance;
 
+        /// <summary>
+        /// Maximal tree levels to be output
+        /// </summary>
+        public int MaxLevel = 1;
+
+        public int MaxEnumElements = 100;
+
+        public Dumper()
+        {
+            GetMembers = GetMembersDefault;
+        }
+        
         public string ToString(object x)
         {
             using (var w = new StringWriter())
@@ -89,26 +101,29 @@ namespace Sidi.Util
 
         HashSet<object> seen;
 
-        /// <summary>
-        /// Maximal tree levels to be output
-        /// </summary>
-        public int MaxLevel = 1;
+        public Func<Type, IEnumerable<MemberInfo>> GetMembers;
 
-        public int MaxEnumElements = 100;
+        /// <summary>
+        /// Default implementation returns public methods and properties
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        static IEnumerable<MemberInfo> GetMembersDefault(Type t)
+        {
+            return t.GetProperties().Cast<MemberInfo>()
+                .Concat(t.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                .OrderBy(_ => _.Name);
+        }
 
         void WriteTree(object x, TextWriter w, int level)
         {
             var t = x.GetType();
-            foreach (var p in t.GetProperties())
+            foreach (var p in GetMembers(t))
             {
-                if (p.GetIndexParameters().Any())
-                {
-                    continue;
-                }
                 w.Write("{0}: ", p.Name);
                 try
                 {
-                    var value = p.GetValue(x, new object[] { });
+                    var value = p.GetValue(x);
                     RenderValue(value, new IndentWriter(w, Indent, false), level);
                 }
                 catch (Exception ex)

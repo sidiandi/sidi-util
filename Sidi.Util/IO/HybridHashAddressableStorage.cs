@@ -33,7 +33,7 @@ namespace Sidi.IO
             fileStorage = new HashAddressableStorage(directory.CatDir("content"));
             entries = new Collection<Entry>(databaseFile);
             FlushAfterNWrites = 1;
-            MaxInternalBlobSize = 100 * 1024 * 1024;
+            MaxInternalBlobSize = 100 * 1024;
         }
 
         void Flush()
