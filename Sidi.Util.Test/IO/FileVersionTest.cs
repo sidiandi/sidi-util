@@ -19,17 +19,17 @@ namespace Sidi.IO
             var f0 = TestFile("hello");
             f0.WriteAllText("hello");
 
-            var v0 = new FileVersion(f0);
-            var d0 = new FileVersion(f0.Parent);
-            var v1 = new FileVersion(f0);
-            var d1 = new FileVersion(f0.Parent);
+            var v0 = FileVersion.Get(f0);
+            var d0 = FileVersion.Get(f0.Parent);
+            var v1 = FileVersion.Get(f0);
+            var d1 = FileVersion.Get(f0.Parent);
             Assert.That(v0, Is.EqualTo(v1));
             Assert.That(d0, Is.EqualTo(d1));
             log.Info(d1);    
 
             f0.WriteAllText("hello");
-            v1 = new FileVersion(f0);
-            d1 = new FileVersion(f0.Parent);
+            v1 = FileVersion.Get(f0);
+            d1 = FileVersion.Get(f0.Parent);
             Assert.That(v0, Is.Not.EqualTo(v1));
             Assert.That(d0, Is.Not.EqualTo(d1));
             log.Info(d1);

@@ -162,7 +162,7 @@ namespace Sidi.IO.Windows
                 }
             }
 
-            if (path.IsUnc && path.Parts.Length == 2)
+            if (path.IsUnc && path.IsRoot)
             {
                 if (System.IO.Directory.Exists(path))
                 {

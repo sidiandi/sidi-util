@@ -25,23 +25,24 @@ namespace Sidi.IO
         {
         }
         
-        public FileVersion(LPath path)
+        public static FileVersion Get(LPath path)
         {
-            this.Path = path;
+            var fv = new FileVersion { Path = path };
             var c = path.GetChildren();
 
             if (c.Any())
             {
-                var versions = c.Select(x => new FileVersion(x)).ToList();
-                this.Length = versions.Sum(_ => _.Length);
-                this.LastWriteTimeUtc = versions.Max(_ => _.LastWriteTimeUtc);
+                var versions = c.Select(x => FileVersion.Get(x)).ToList();
+                fv.Length = versions.Sum(_ => _.Length);
+                fv.LastWriteTimeUtc = versions.Max(_ => _.LastWriteTimeUtc);
             }
             else
             {
                 var info = path.Info;
-                this.Length = info.Length;
-                this.LastWriteTimeUtc = info.LastWriteTimeUtc;
+                fv.Length = info.Length;
+                fv.LastWriteTimeUtc = info.LastWriteTimeUtc;
             }
+            return fv;
         }
         
         public FileVersion(LPath path, long length, DateTime lastWriteTimeUtc)

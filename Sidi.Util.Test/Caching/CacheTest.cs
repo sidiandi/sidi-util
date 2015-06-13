@@ -208,9 +208,9 @@ namespace Sidi.Caching
             readContent = cache.Read(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
 
-            Assert.IsTrue(cache.ContainsKey(new FileVersion(file)));
+            Assert.IsTrue(cache.ContainsKey(FileVersion.Get(file)));
             cache.Clear();
-            Assert.IsFalse(cache.ContainsKey(new FileVersion(file)));
+            Assert.IsFalse(cache.ContainsKey(FileVersion.Get(file)));
         }
 
         [Test]

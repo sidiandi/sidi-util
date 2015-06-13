@@ -755,7 +755,7 @@ namespace Sidi.IO
         {
             get
             {
-                return Parts.Length == 0 && this.prefix is LocalDrivePrefix;
+                return IsRoot && this.prefix is LocalDrivePrefix;
             }
         }
 

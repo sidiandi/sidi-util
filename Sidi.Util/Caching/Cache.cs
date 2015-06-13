@@ -329,11 +329,7 @@ namespace Sidi.Caching
         /// <returns></returns>
         public T Read<T>(LPath path, Func<LPath, T> fileReader)
         {
-            var fv = new FileVersion(path);
-
-            var s = new XmlSerializer(typeof(FileVersion));
-            s.Serialize(Console.Out, fv);
-
+            var fv = FileVersion.Get(path);
             return GetCached(fv, _ => fileReader(_.Path));
         }
 
