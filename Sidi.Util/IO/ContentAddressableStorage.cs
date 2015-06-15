@@ -143,6 +143,7 @@ namespace Sidi.IO
                     }
                     var dest = storage.CalculatePath(hash).CatName(importExtension);
                     dest.EnsureParentDirectoryExists();
+                    dest.EnsureFileNotExists();
                     tempFile.Move(dest);
                     return hash;
                 }
