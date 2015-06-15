@@ -44,6 +44,21 @@ namespace Sidi.Util
                     var s = GetSerializer(x.GetType());
                     s.Serialize(m, x);
                     m.Seek(0, SeekOrigin.Begin);
+                    var tr = new StreamReader(m);
+
+                    /*
+                    for (; ; )
+                    {
+                        var line = tr.ReadLine();
+                        if (line == null)
+                        {
+                            break;
+                        }
+                        Console.Out.WriteLine(line);
+                    }
+                    */
+
+                    m.Seek(0, SeekOrigin.Begin);
                 }
                 return hashProvider.Get(m);
             }

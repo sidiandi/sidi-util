@@ -15,9 +15,144 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        IHashProvider hashAlgorithm;
+        InternalHashProvider hashAlgorithm;
         LPath rootDirectory;
 
+        const string importExtension = ".import";
+
+        class InternalHashProvider : IHashProvider
+        {
+            ContentAddressableStorage storage;
+            public IHashProvider hashProvider;
+            Sidi.Caching.Cache cache;
+            
+            public InternalHashProvider(ContentAddressableStorage storage, IHashProvider hashProvider)
+            {
+                this.storage = storage;
+                this.hashProvider = hashProvider;
+                this.cache = new Caching.Cache(storage.rootDirectory.CatDir("hash"));
+            }
+
+            public Hash Get(IFileSystemInfo file)
+            {
+                var fv = FileVersion.Get(file);
+                object hashObject = null;
+                if (cache.TryGetValue(fv, out hashObject))
+                {
+                    var hash = (Hash)hashObject;
+                    return hash;
+                }
+                else
+                {
+                    return cache.GetCached(fv, _ => GetHashAndImport(_));
+                }
+            }
+
+            public Hash Get(Stream stream)
+            {
+                return hashProvider.Get(stream);
+            }
+
+            class CopyStream : Stream
+            {
+                Stream input;
+                Stream copyDestination;
+                
+                public CopyStream(Stream input, Stream copyDestination)
+                {
+                    this.input = input;
+                    this.copyDestination = copyDestination;
+                }
+
+                public override bool CanRead
+                {
+                    get { return input.CanRead; }
+                }
+
+                public override bool CanSeek
+                {
+                    get { return false; }
+                }
+
+                public override bool CanWrite
+                {
+                    get { return false; }
+                }
+
+                public override void Flush()
+                {
+                    throw new NotImplementedException();
+                }
+
+                public override long Length
+                {
+                    get { throw new NotImplementedException(); }
+                }
+
+                public override long Position
+                {
+                    get
+                    {
+                        throw new NotImplementedException();
+                    }
+                    set
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+
+                public override int Read(byte[] buffer, int offset, int count)
+                {
+                    var bytesRead = input.Read(buffer, offset, count);
+                    if (bytesRead > 0)
+                    {
+                        copyDestination.Write(buffer, offset, bytesRead);
+                    }
+                    return bytesRead;
+                }
+
+                public override long Seek(long offset, SeekOrigin origin)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public override void SetLength(long value)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public override void Write(byte[] buffer, int offset, int count)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            Hash GetHashAndImport(FileVersion fv)
+            {
+                var p = new LPath(fv.Path);
+                var tempFile = storage.GetTempFile();
+                try
+                {
+                    Hash hash = null;
+                    using (var write = tempFile.OpenWrite())
+                    {
+                        using (var read = p.OpenRead())
+                        {
+                            hash = Get(read);
+                        }
+                    }
+                    var dest = storage.CalculatePath(hash).CatName(importExtension);
+                    dest.EnsureParentDirectoryExists();
+                    tempFile.Move(dest);
+                    return hash;
+                }
+                finally
+                {
+                    tempFile.EnsureFileNotExists();
+                }
+            }
+        }
+        
         public ContentAddressableStorage(LPath rootDirectory, IHashProvider hashAlgorithm)
         {
             if (rootDirectory == null)
@@ -32,7 +167,7 @@ namespace Sidi.IO
 
             this.rootDirectory = rootDirectory;
             rootDirectory.EnsureDirectoryExists();
-            this.hashAlgorithm = hashAlgorithm;
+            this.hashAlgorithm = new InternalHashProvider(this, hashAlgorithm);
         }
 
         /// <summary>
@@ -70,7 +205,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public WriteResult Write(LPath content)
+        public WriteResult Write(IFileSystemInfo content)
         {
             var hash = hashAlgorithm.Get(content);
             bool added;
@@ -81,17 +216,23 @@ namespace Sidi.IO
             else
             {
                 var dest = CalculatePath(hash);
-                var tempFile = GetTempFile();
+                var importTempFile = dest.CatName(importExtension);
+                importTempFile.EnsureParentDirectoryExists();
                 try
                 {
-                    content.CopyFile(tempFile);
-                    dest.EnsureParentDirectoryExists();
-                    tempFile.Move(dest);
+                    if (importTempFile.IsFile)
+                    {
+                    }
+                    else
+                    {
+                        content.FullName.CopyFile(importTempFile);
+                    }
+                    importTempFile.Move(dest);
                     added = true;
                 }
                 finally
                 {
-                    tempFile.EnsureFileNotExists();
+                    importTempFile.EnsureFileNotExists();
                 }
             }
             return new WriteResult(hash, added);
@@ -99,7 +240,7 @@ namespace Sidi.IO
 
         public WriteResult ImportHardlink(LPath content)
         {
-            var hash = hashAlgorithm.Get(content);
+            var hash = hashAlgorithm.Get(content.Info);
             bool added;
             if (Contains(hash))
             {
@@ -132,7 +273,7 @@ namespace Sidi.IO
             {
                 content.CopyTo(w);
             }
-            var hash = hashAlgorithm.Get(tempFile);
+            var hash = hashAlgorithm.hashProvider.Get(tempFile.Info);
             bool added;
             if (Contains(hash))
             {

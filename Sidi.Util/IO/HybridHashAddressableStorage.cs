@@ -69,11 +69,12 @@ namespace Sidi.IO
             public byte[] Value;
         }
 
-        class WriteStream : FileStream
+        class WriteStream : Stream
         {
             HybridHashAddressableStorage storage;
             Hash key;
             LPath tempFile;
+            Stream stream;
 
             static LPath GetTempFile(HybridHashAddressableStorage storage, Hash key)
             {
@@ -81,12 +82,11 @@ namespace Sidi.IO
             }
             
             public WriteStream(HybridHashAddressableStorage storage, Hash key)
-            : base(GetTempFile(storage, key), FileMode.CreateNew)
             {
                 this.tempFile = GetTempFile(storage, key);
                 this.storage = storage;
                 this.key = key;
-
+                this.stream = new MemoryStream();
             }
 
             public override void Close()
@@ -94,10 +94,103 @@ namespace Sidi.IO
                 base.Close();
                 if (storage != null)
                 {
-                    storage.Write(key, tempFile);
+                    if (tempFile == null)
+                    {
+                        stream.Close();
+                        storage.MoveInto(key, tempFile);
+                    }
+                    else
+                    {
+                        stream.Seek(0, SeekOrigin.Begin);
+                        storage.DoWrite(key, stream);
+                        stream.Close();
+                        stream = null;
+                    }
+
                     storage = null;
                 }
             }
+
+            public override bool CanRead
+            {
+                get { return false; }
+            }
+
+            public override bool CanSeek
+            {
+                get { return false; }
+            }
+
+            public override bool CanWrite
+            {
+                get { return true; }
+            }
+
+            public override void Flush()
+            {
+                stream.Flush();
+            }
+
+            public override long Length
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public override long Position
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                stream.Write(buffer, offset, count);
+                if (tempFile == null)
+                {
+                    if (stream.Position > storage.MaxInternalBlobSize)
+                    {
+                        tempFile = GetTempFile(storage, key);
+                        var fileStream = tempFile.OpenWrite();
+                        var memoryStream = (MemoryStream)stream;
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        memoryStream.CopyTo(fileStream);
+                        stream = fileStream;
+                    }
+                }
+            }
+        }
+
+        void MoveInto(Hash key, LPath tempFile)
+        {
+            Remove(key);
+
+            var e = new Entry { Key = key.Value.ToArray(), LastWriteTimeUtc = DateTime.UtcNow, Value = null };
+            fileStorage.Write(key, tempFile);
+            tempFile.EnsureFileNotExists();
+
+            entries.Add(e);
+            Flush();
         }
 
         void Write(Hash key, LPath tempFile)
@@ -120,6 +213,29 @@ namespace Sidi.IO
                 }
             }
             tempFile.EnsureFileNotExists();
+
+            entries.Add(e);
+            Flush();
+        }
+
+        void DoWrite(Hash key, Stream reader)
+        {
+            Remove(key);
+
+            var e = new Entry { Key = key.Value.ToArray(), LastWriteTimeUtc = DateTime.UtcNow };
+            if (reader.Length > MaxInternalBlobSize)
+            {
+                e.Value = null;
+                using (var w = fileStorage.Write(key))
+                {
+                    reader.CopyTo(w);
+                }
+            }
+            else
+            {
+                e.Value = new byte[reader.Length];
+                reader.Read(e.Value, 0, (int)reader.Length);
+            }
 
             entries.Add(e);
             Flush();

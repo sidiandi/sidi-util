@@ -22,9 +22,9 @@ namespace Sidi.Util
             this.algorithm = algorithm;
         }
 
-        public Hash Get(LPath file)
+        public Hash Get(IFileSystemInfo file)
         {
-            return file.Read(Get);
+            return file.FullName.Read(Get);
         }
 
         public Hash Get(Stream stream)

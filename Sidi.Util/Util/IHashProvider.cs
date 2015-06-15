@@ -10,7 +10,7 @@ namespace Sidi.Util
 {
     public interface IHashProvider
     {
-        Hash Get(LPath file);
+        Hash Get(IFileSystemInfo file);
         Hash Get(Stream stream);
     }
 }

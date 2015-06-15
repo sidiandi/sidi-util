@@ -45,6 +45,19 @@ namespace Sidi.IO
         }
 
         /// <summary>
+        /// Writes the contents of file content to the storage. Then removes file content
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public void MoveInto(Hash key, LPath content)
+        {
+            var dest = CalculatePath(key);
+            dest.EnsureParentDirectoryExists();
+            dest.EnsureFileNotExists();
+            content.Move(dest);
+        }
+
+        /// <summary>
         /// Writes the contents of file content to the storage.
         /// </summary>
         /// <param name="content"></param>

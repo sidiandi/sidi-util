@@ -8,6 +8,8 @@ using NUnit.Framework;
 using Sidi.Test;
 using Sidi.Extensions;
 using Sidi.Util;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Sidi.IO.Tests
 {
@@ -86,10 +88,12 @@ namespace Sidi.IO.Tests
             var key = "hello";
             var value = "world";
 
+            var ohp = ObjectHashProvider.GetDefault();
+
             using (var a = new HybridHashAddressableStorage(root))
             {
-                a.Write(key, value);
-                Assert.AreEqual(value, a.Read(key));
+                a.Write(key, ohp, value, (w, v) => new BinaryFormatter().Serialize(w, v));
+                Assert.AreEqual(value, a.Read(key, ohp, r => (string) new BinaryFormatter().Deserialize(r)));
             }
         }
 
@@ -103,12 +107,14 @@ namespace Sidi.IO.Tests
             var key = "hello";
             var value = "world";
 
+            var ohp = ObjectHashProvider.GetDefault();
+
             using (var a = new HybridHashAddressableStorage(root))
             {
                 using (var b = new HybridHashAddressableStorage(root))
                 {
-                    a.Write(key, value);
-                    Assert.AreEqual(value, b.Read(key));
+                    a.Write(key, ohp, value, BinaryFormatterHelper.Serialize);
+                    Assert.AreEqual(value, b.Read(key, ohp, BinaryFormatterHelper.Deserialize<string>));
                 }
             }
         }

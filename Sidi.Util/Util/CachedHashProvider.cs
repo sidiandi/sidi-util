@@ -24,9 +24,9 @@ namespace Sidi.Util
         /// </summary>
         /// <param name="file"></param>
         /// <returns>Hash value of file contents</returns>
-        public Hash Get(LPath file)
+        public Hash Get(IFileSystemInfo fileInfo)
         {
-            return Sidi.Caching.Cache.ReadFile(file, hashProvider.Get);
+            return Sidi.Caching.Cache.Get(FileVersion.Get(fileInfo), fv => hashProvider.Get(new LPath(fv.Path).Info));
         }
 
         public Hash Get(Stream stream)

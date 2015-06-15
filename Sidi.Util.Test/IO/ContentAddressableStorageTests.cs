@@ -43,7 +43,7 @@ namespace Sidi.IO
 
             var f = TestFile("content-file");
             f.WriteAllText("hello, i am a content file");
-            var writeResult = s.Write(f);
+            var writeResult = s.Write(f.Info);
             Assert.IsTrue(writeResult.Added);
             Assert.IsTrue(s.Contains(writeResult.Hash));
 

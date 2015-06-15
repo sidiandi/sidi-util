@@ -274,6 +274,7 @@
     <Compile Include="Pop3\Session.cs" />
     <Compile Include="Util\RegexIgnoreCase.cs" />
     <Compile Include="Util\RegistrySerializer.cs" />
+    <Compile Include="Util\SerializeHelpers.cs" />
     <Compile Include="Util\ShellAccess.cs" />
     <Compile Include="Util\Stats.cs" />
     <Compile Include="Util\StringEx.cs" />
