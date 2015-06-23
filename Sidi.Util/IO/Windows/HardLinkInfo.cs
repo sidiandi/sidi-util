@@ -21,10 +21,18 @@ namespace Sidi.IO.Windows
 
         LPath path;
 
+        Sidi.IO.Windows.FileSystem FileSystem
+        {
+            get
+            {
+                return (Sidi.IO.Windows.FileSystem) path.FileSystem;
+            }
+        }
+
         NativeMethods.BY_HANDLE_FILE_INFORMATION GetByHandleFileInformation()
         {
             using (var handle = NativeMethods.CreateFile(
-                path.Param,
+                FileSystem.GetLongPathApiParameter(path),
                 System.IO.FileAccess.Read,
                 System.IO.FileShare.Read, IntPtr.Zero,
                 System.IO.FileMode.Open, System.IO.FileAttributes.Normal,
@@ -61,13 +69,15 @@ namespace Sidi.IO.Windows
 
         static string[] GetFileSiblingHardLinks(LPath filepath)
         {
+            var fs = (Sidi.IO.Windows.FileSystem)filepath.FileSystem;
+
             List<string> result = new List<string>();
             uint stringLength = 256;
             StringBuilder sb = new StringBuilder(256);
-            NativeMethods.GetVolumePathName(filepath.Param, sb, stringLength);
+            NativeMethods.GetVolumePathName(fs.GetLongPathApiParameter(filepath), sb, stringLength);
             string volume = sb.ToString();
             sb.Length = 0; stringLength = 256;
-            IntPtr findHandle = NativeMethods.FindFirstFileNameW(filepath.Param, 0, ref stringLength, sb);
+            IntPtr findHandle = NativeMethods.FindFirstFileNameW(fs.GetLongPathApiParameter(filepath), 0, ref stringLength, sb);
             if (findHandle.ToInt32() != -1)
             {
                 do

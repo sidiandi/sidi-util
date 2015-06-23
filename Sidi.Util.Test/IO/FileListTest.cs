@@ -47,7 +47,8 @@ namespace Sidi.IO
             log.Info(nwPath);
 
             var i = nwPath.Info;
-            Assert.IsTrue(i.GetFiles().Any());
+            Assert.IsTrue(i.IsDirectory);
+            Assert.IsTrue(i.GetChildren().Any());
         }
     }
 }

@@ -242,7 +242,9 @@ namespace Sidi.IO
 
         private static SafeFileHandle OpenReparsePoint(LPath reparsePoint, NativeMethods.EFileAccess accessMode)
         {
-            var h  = NativeMethods.CreateFile(reparsePoint.Param, accessMode,
+            var fs = (Sidi.IO.Windows.FileSystem)reparsePoint.FileSystem;
+
+            var h  = NativeMethods.CreateFile(fs.GetLongPathApiParameter(reparsePoint), accessMode,
                 NativeMethods.EFileShare.Read | NativeMethods.EFileShare.Write | NativeMethods.EFileShare.Delete,
                 IntPtr.Zero, NativeMethods.ECreationDisposition.OpenExisting,
                 NativeMethods.EFileAttributes.BackupSemantics | NativeMethods.EFileAttributes.OpenReparsePoint, IntPtr.Zero);

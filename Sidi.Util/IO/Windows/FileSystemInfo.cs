@@ -440,20 +440,6 @@ namespace Sidi.IO.Windows
                 .ToList();
         }
 
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
         public string FileNameWithoutExtension
         {
             get
@@ -461,8 +447,6 @@ namespace Sidi.IO.Windows
                 return System.IO.Path.GetFileNameWithoutExtension(FindData.Name);
             }
         }
-
-        
 
         FindData FindData
         {

@@ -38,7 +38,7 @@ namespace Sidi.IO.Windows
         /// <param name="existingFileName">Path of the existing file to which the link will point</param>
         public void CreateHardLink(LPath fileName, LPath existingFileName)
         {
-            NativeMethods.CreateHardLink(fileName.Param, existingFileName.Param, IntPtr.Zero)
+            NativeMethods.CreateHardLink(GetLongPathApiParameter(fileName), GetLongPathApiParameter(existingFileName), IntPtr.Zero)
                 .CheckApiCall(String.Format("Cannot create hard link: {0} -> {1}", fileName, existingFileName));
         }
 
@@ -56,7 +56,7 @@ namespace Sidi.IO.Windows
         /// <param name="directory"></param>
         public void EnsureDirectoryExists(LPath directory)
         {
-            if (!NativeMethods.CreateDirectory(directory.Param, IntPtr.Zero))
+            if (!NativeMethods.CreateDirectory(GetLongPathApiParameter(directory), IntPtr.Zero))
             {
                 switch (Marshal.GetLastWin32Error())
                 {
@@ -84,7 +84,29 @@ namespace Sidi.IO.Windows
 
         public void RemoveDirectory(LPath directory)
         {
-            NativeMethods.RemoveDirectory(directory.Param).CheckApiCall(directory);
+            NativeMethods.RemoveDirectory(GetLongPathApiParameter(directory)).CheckApiCall(directory);
+        }
+
+        const string longPrefix = @"\\?\";
+        const string longUncPrefix = @"\\?\UNC\";
+        public const string DirectorySeparator = @"\";
+
+        /// <summary>
+        /// Returns a string representation of path that can be used to reference long paths and file names in the native Windows API.
+        /// Example: C:\ will return
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public string GetLongPathApiParameter(LPath path)
+        {
+            if (path.IsUnc)
+            {
+                return longUncPrefix + path.Server + LPath.DirectorySeparator + path.Share + LPath.DirectorySeparator + String.Join(DirectorySeparator, path.Parts);
+            }
+            else
+            {
+                return longPrefix + path.ToString();
+            }
         }
 
         /// <summary>
@@ -94,7 +116,7 @@ namespace Sidi.IO.Windows
         /// <param name="newFileName"></param>
         public void Move(LPath existingFileName, LPath newFileName)
         {
-            NativeMethods.MoveFileEx(existingFileName.Param, newFileName.Param, 0).CheckApiCall(String.Format("{0} -> {1}", existingFileName, newFileName));
+            NativeMethods.MoveFileEx(GetLongPathApiParameter(existingFileName), GetLongPathApiParameter(newFileName), 0).CheckApiCall(String.Format("{0} -> {1}", existingFileName, newFileName));
         }
 
         const string ThisDir = ".";
@@ -127,7 +149,7 @@ namespace Sidi.IO.Windows
         {
             FindData fd;
 
-            using (var fh = NativeMethods.FindFirstFile(searchPath.Param, out fd))
+            using (var fh = NativeMethods.FindFirstFile(GetLongPathApiParameter(searchPath), out fd))
             {
                 if (!fh.IsInvalid)
                 {
@@ -241,7 +263,7 @@ namespace Sidi.IO.Windows
             try
             {
                 h = NativeMethods.CreateFile(
-                    fileName.Param,
+                    GetLongPathApiParameter(fileName),
                     desiredAccess,
                     shareMode,
                     lpSecurityAttributes,
@@ -293,7 +315,7 @@ namespace Sidi.IO.Windows
             try
             {
                 h = NativeMethods.CreateFile(
-                    path.Param,
+                    GetLongPathApiParameter(path),
                     fileAccess,
                     shareMode,
                     lpSecurityAttributes,
@@ -322,13 +344,13 @@ namespace Sidi.IO.Windows
         /// <param name="fileName">File to be deleted.</param>
         public void DeleteFile(LPath fileName)
         {
-            NativeMethods.DeleteFile(fileName.Param).CheckApiCall(fileName);
+            NativeMethods.DeleteFile(GetLongPathApiParameter(fileName)).CheckApiCall(fileName);
         }
 
         public LPath GetVolumePath(LPath path)
         {
             var sb = new StringBuilder(LPath.MaxPathLength);
-            NativeMethods.GetVolumePathName(path.Param, sb, (uint)sb.Capacity).CheckApiCall(path);
+            NativeMethods.GetVolumePathName(GetLongPathApiParameter(path), sb, (uint)sb.Capacity).CheckApiCall(path);
             return new LPath(sb.ToString());
         }
 
@@ -380,8 +402,8 @@ namespace Sidi.IO.Windows
                 }) : null;
 
             NativeMethods.CopyFileEx(
-                existingFileName.Param,
-                newFileName.Param,
+                GetLongPathApiParameter(existingFileName),
+                GetLongPathApiParameter(newFileName),
                 progressCallback,
                 IntPtr.Zero,
                 ref pbCancel,
@@ -409,7 +431,7 @@ namespace Sidi.IO.Windows
 
         public void SetFileAttribute(LPath path, System.IO.FileAttributes value)
         {
-            NativeMethods.SetFileAttributes(path.Param, value).CheckApiCall(path);
+            NativeMethods.SetFileAttributes(GetLongPathApiParameter(path), value).CheckApiCall(path);
         }
 
         public IEnumerable<LPath> GetDrives()

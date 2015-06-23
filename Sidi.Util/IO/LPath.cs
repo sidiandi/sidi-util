@@ -721,25 +721,6 @@ namespace Sidi.IO
             return Prefix + Parts.Join(DirectorySeparator);
         }
 
-        public string Param
-        {
-            get
-            {
-                string p = Prefix;
-                if (prefix is LocalDrivePrefix)
-                {
-                    p = longPrefix + ((LocalDrivePrefix)prefix).Drive + @":\";
-                }
-                else if (prefix is UncPrefix)
-                {
-                    var u = (UncPrefix)prefix;
-                    p = longUncPrefix + u.Server + DirectorySeparator + u.Share + DirectorySeparator;
-                }
-
-                return new LPath(p, Parts).ToString();
-            }
-        }
-
         /// <summary>
         /// Returns true if ParentDirectory would return null
         /// </summary>
@@ -769,15 +750,19 @@ namespace Sidi.IO
 
         public override int GetHashCode()
         {
-            return Param.ToLower().GetHashCode();
+            int hc = Prefix.ToLower().GetHashCode();
+            foreach (var i in Parts)
+            {
+                hc += 17 * i.ToLower().GetHashCode();
+            }
+            return hc;
         }
 
         static public StringComparison StringComparison { get; private set; }
 
         static LPath empty = new LPath();
 
-
-      public override bool Equals(Object right)
+        public override bool Equals(Object right)
        {    
           // check null:
           // this pointer is never null in C# methods.
@@ -795,7 +780,8 @@ namespace Sidi.IO
         public bool Equals(LPath other)
         {
             return other != null
-                && object.Equals(Prefix, other.Prefix)
+                && FileSystem == other.FileSystem
+                && StringComparer.InvariantCultureIgnoreCase.Compare(Prefix, other.Prefix) == 0
                 && Parts.SequenceEqual(other.Parts, StringComparer.InvariantCultureIgnoreCase);
         }
         

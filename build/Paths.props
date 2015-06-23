@@ -4,7 +4,7 @@
   <PropertyGroup>
 	<SourceDir>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileFullPath)))))</SourceDir>
 	<BuildDir>$(OutDir)</BuildDir>
-	<BuildDir Condition="$(OutDir) == ''" >$(SourceDir).build</BuildDir>
+	<BuildDir Condition="$(OutDir) == ''" >$(SourceDir).build\$(Configuration)-$(Platform)</BuildDir>
 	<OutDir>$(BuildDir)\bin</OutDir>
 	<OutputPath>$(OutDir)</OutputPath>
 	<BaseIntermediateOutputPath>$(BuildDir)\obj</BaseIntermediateOutputPath>

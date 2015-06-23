@@ -33,9 +33,6 @@ namespace Sidi.IO
             log.Info(source);
             Assert.IsFalse(source.IsFile);
 
-            var param = source.Param;
-            log.Info(param);
-
             source.WriteAllText("hello");
             Assert.IsTrue(source.IsFile);
         }

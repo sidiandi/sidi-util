@@ -35,5 +35,12 @@ namespace Sidi.IO.Windows
             {
             }
         }
+
+        [Test]
+        public void GetLongPathApiParameter()
+        {
+            var fs = new Sidi.IO.Windows.FileSystem();
+            Assert.AreEqual("\\\\?\\C:\\", fs.GetLongPathApiParameter(new LPath(@"C:\")));
+        }
     }
 }

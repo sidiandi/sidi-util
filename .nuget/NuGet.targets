@@ -94,7 +94,7 @@
 
     <Target Name="BuildPackage" DependsOnTargets="CheckPrerequisites">
         <PropertyGroup>
-			<BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -Version $(GfvNuGetVersion) -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
+			<BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -Version $(GfvNuGetVersion) -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols -verbose</BuildCommand>
 		</PropertyGroup>
 
 		<Message Text="$(BuildCommand)" />

@@ -83,7 +83,7 @@
     <Compile Include="IO\CopyProgressTest.cs" />
     <Compile Include="IO\Directory.cs" />
     <Compile Include="IO\FindTest.cs" />
-    <Compile Include="IO\File.cs" />
+    <Compile Include="IO\FileTest.cs" />
     <Compile Include="IO\EnumConfig.cs" />
     <Compile Include="IO\FileListTest.cs" />
     <Compile Include="IO\FileVersionTest.cs" />
