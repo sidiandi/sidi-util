@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using L = Sidi.IO;
 using System.Linq;
+using Sidi.IO;
 
 namespace Sidi.Util
 {
@@ -59,14 +60,14 @@ namespace Sidi.Util
         {
             var sp = Sidi.IO.SearchPath.PATH;
             sp.Paths.Insert(0, p.StartInfo.WorkingDirectory);
-            string pFilename = Path.GetFullPath(sp.Find(p.StartInfo.FileName)).ToLower();
+            var processFileName = sp.Find(p.StartInfo.FileName).GetFullPath();
 
             return Process.GetProcesses().Any(x =>
                 {
                     try
                     {
-                        string filename = Path.GetFullPath(x.MainModule.FileName).ToLower();
-                        return filename.Equals(pFilename);
+                        var filename = new LPath(x.MainModule.FileName);
+                        return object.Equals(filename, processFileName);
                     }
                     catch (Exception)
                     {

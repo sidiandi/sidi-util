@@ -4,7 +4,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
     <NuGetPackageImportStamp>ad5b0391</NuGetPackageImportStamp>
-    <BuildPackage>true</BuildPackage>
+	<BuildPackage>true</BuildPackage>
   </PropertyGroup>
   <Import Project="..\build\Common.props" />
   <ItemGroup>
@@ -256,7 +256,6 @@
     <Compile Include="Collections\LruCacheBackground.cs" />
     <Compile Include="Collections\LruCacheBackgroundAutoInvalidate.cs" />
     <Compile Include="CommandLine\Parser.cs" />
-    <Compile Include="IO\FileUtil.cs" />
     <Compile Include="Persistence\Attributes.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\Dictionary.cs" />

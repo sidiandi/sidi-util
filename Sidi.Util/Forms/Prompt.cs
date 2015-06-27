@@ -115,7 +115,7 @@ namespace Sidi.Forms
                         Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)).CatDir(
                         "Notepad++", "notepad++.exe");
 
-                    p.StartInfo.FileName = fileName;
+                    p.StartInfo.FileName = fileName.StringRepresentation;
                     p.StartInfo.Arguments = "-multiInst -nosession " + tf.Quote();
 
                     if (!fileName.Exists)

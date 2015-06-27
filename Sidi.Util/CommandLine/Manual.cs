@@ -20,7 +20,7 @@ namespace Sidi.CommandLine
             {
                 m.Write(w, () => m.Page(p));
             }
-            Process.Start(file);
+            Process.Start(file.StringRepresentation);
         }
 
         object ToDt(IParserItem item)

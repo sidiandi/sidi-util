@@ -40,7 +40,7 @@ namespace Sidi.IO.Windows
             {
                 if (handle.IsInvalid)
                 {
-                    throw new Win32Exception(path);
+                    throw new Win32Exception(path.StringRepresentation);
                 }
 
                 var fileInfo = new NativeMethods.BY_HANDLE_FILE_INFORMATION();

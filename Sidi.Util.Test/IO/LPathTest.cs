@@ -87,7 +87,7 @@ namespace Sidi.IO
         public void UseAsString()
         {
             var cd = new LPath(System.Environment.CurrentDirectory);
-            Assert.AreEqual(cd.ToString(), new System.IO.DirectoryInfo(cd).FullName);
+            Assert.AreEqual(cd.ToString(), new System.IO.DirectoryInfo(cd.StringRepresentation).FullName);
         }
 
         [Test]
@@ -144,16 +144,13 @@ namespace Sidi.IO
             var share = tempDir.DriveLetter + "$";
             var unc = tempDir.GetAdministrativeShareUnc();
 
-            Assert.IsTrue(System.IO.Directory.Exists(unc));
+            Assert.IsTrue(unc.IsDirectory);
+            Assert.IsTrue(unc.IsUnc);
+
             Assert.AreEqual(server, unc.Server);
             Assert.AreEqual(share, unc.Share);
             Assert.IsNull(unc.DriveLetter);
 
-            var longNameUnc = new Sidi.IO.LPath(unc);
-            Assert.IsTrue(longNameUnc.IsDirectory);
-            Assert.IsTrue(longNameUnc.IsUnc);
-
-            Assert.IsTrue(System.IO.Directory.Exists(longNameUnc));
             Assert.IsNull(unc.Root.Parent);
             Assert.IsTrue(unc.Children.Any());
         }
@@ -180,7 +177,7 @@ namespace Sidi.IO
         public void PathRoot()
         {
             var n = Sidi.IO.LPath.GetTempPath();
-            Assert.AreEqual(System.IO.Path.GetPathRoot(n), n.Root.ToString());
+            Assert.AreEqual(System.IO.Path.GetPathRoot(n.StringRepresentation), n.Root.ToString());
         }
 
         [Test]
@@ -407,7 +404,7 @@ namespace Sidi.IO
         {
             var p = TestFile("someFile.jpg");
 
-            var files = p.Parent.GetChildren(LPath.JoinFileName(p.FileNameWithoutExtension, "*"));
+            var files = p.Parent.GetChildren(LPath.JoinFileName(p.FileNameWithoutExtension, "*").StringRepresentation);
             log.Info(files.Join());
             foreach (var i in files)
             {

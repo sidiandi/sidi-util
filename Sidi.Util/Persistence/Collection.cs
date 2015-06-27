@@ -166,7 +166,7 @@ namespace Sidi.Persistence
         {
             path = a_path;
             SQLiteConnectionStringBuilder b = new SQLiteConnectionStringBuilder();
-            b.DataSource = path;
+            b.DataSource = path.StringRepresentation;
             b.DateTimeFormat = SQLiteDateFormats.ISO8601;
             b.UseUTF16Encoding = true;
             b.DefaultTimeout = Int32.MaxValue;

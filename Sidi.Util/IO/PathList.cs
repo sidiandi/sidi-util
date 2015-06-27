@@ -55,7 +55,7 @@ namespace Sidi.IO
             var files = new StringCollection();
             foreach (var i in this)
             {
-                files.Add(i);
+                files.Add(i.StringRepresentation);
             }
             Clipboard.SetFileDropList(files);
         }

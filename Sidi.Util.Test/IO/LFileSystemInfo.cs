@@ -111,7 +111,7 @@ namespace Sidi.IO
             testFile.EnsureFileNotExists();
             testFile.WriteAllText("hello");
 
-            var system = new FileInfo(testFile);
+            var system = new FileInfo(testFile.StringRepresentation);
             var sidi = testFile.Info;
 
             Assert.AreEqual(system.Attributes, sidi.Attributes);

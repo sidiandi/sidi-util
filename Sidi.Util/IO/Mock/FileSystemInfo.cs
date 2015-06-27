@@ -52,7 +52,7 @@ namespace Sidi.IO.Mock
             {
                 if (_content == null)
                 {
-                    _content = new LPath(MockFs.ContentDirectory.CatDir(LPath.GetRandomFileName()));
+                    _content = MockFs.ContentDirectory.CatDir(LPath.GetRandomFileName());
                     _content.EnsureParentDirectoryExists();
                 }
                 return _content;

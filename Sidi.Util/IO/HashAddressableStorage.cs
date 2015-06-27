@@ -72,7 +72,7 @@ namespace Sidi.IO
         class WriteStream : FileStream
         {
             public WriteStream(LPath tempPath, LPath finalPath)
-            : base(tempPath, FileMode.CreateNew, FileAccess.Write)
+            : base(tempPath.StringRepresentation, FileMode.CreateNew, FileAccess.Write)
             {
                 this.tempPath = tempPath;
                 this.finalPath = finalPath;

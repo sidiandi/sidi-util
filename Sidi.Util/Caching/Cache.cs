@@ -65,9 +65,8 @@ namespace Sidi.Caching
 
         internal static LPath GetLocalCachePath(MethodBase method)
         {
-            return Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+            return Paths.GetLocalApplicationDataDirectory(method.DeclaringType.Assembly)
                 .CatDir(
-                    Paths.Get(method.DeclaringType.Assembly), 
                     "cache", 
                     LPath.GetValidFilename(method.DeclaringType.FullName),
                     LPath.GetValidFilename(method.Name));
@@ -125,7 +124,11 @@ namespace Sidi.Caching
 
             return new Cache(
                 Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-                .CatDir(Paths.Get(type), "cache", new BinaryFormatterObjectHashProvider(HashProvider.GetDefault()).Get(id).Value.HexString()));
+                .CatDir(Paths.Get(type))
+                .CatDir(
+                    "cache", 
+                    new BinaryFormatterObjectHashProvider(HashProvider.GetDefault()).Get(id).Value.HexString()
+                ));
         }
 
         /// <summary>

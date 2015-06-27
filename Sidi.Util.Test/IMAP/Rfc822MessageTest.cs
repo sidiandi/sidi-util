@@ -22,6 +22,7 @@ using System.Text;
 using System.IO;
 using NUnit.Framework;
 using Sidi.Test;
+using Sidi.IO;
 
 namespace Sidi.Imap
 {
@@ -33,9 +34,8 @@ namespace Sidi.Imap
         [Test]
         public void Parse()
         {
-            string testMessage = TestFile(@"mail\message-1-1456.eml");
-
-            var m = Rfc822Message.Parse(File.OpenText(testMessage));
+            var testMessage = TestFile(@"mail\message-1-1456.eml");
+            var m = testMessage.Read(Rfc822Message.Parse);
             Assert.AreEqual(28, m.Headers.Count);
             log.Info(m.Subject);
             log.Info(m.Date);

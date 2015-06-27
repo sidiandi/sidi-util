@@ -37,25 +37,25 @@ namespace Sidi.IO
             CopyCondition = x => true;
         }
 
-        public void CopyToDir(IEnumerable<LPath> files, LPath destinationDir)
+        public void CopyToDir(IEnumerable<LPath> sourceFiles, LPath destinationDirectory)
         {
-            foreach (var s in files)
+            foreach (var source in sourceFiles)
             {
-                string d = destinationDir.CatDir(s.FileName);
-                FastCopy(s, d);
+                var destination = destinationDirectory.CatDir(source.FileName);
+                FastCopy(source, destination);
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="s"></param>
-        /// <param name="destinationDir"></param>
+        /// <param name="source"></param>
+        /// <param name="destinationDirectory"></param>
         /// <returns>The destination path of the file</returns>
-        public string CopyToDir(LPath s, LPath destinationDir)
+        public LPath CopyToDir(LPath source, LPath destinationDirectory)
         {
-            string d = destinationDir.CatDir(s.FileName);
-            FastCopy(s, d);
+            var d = destinationDirectory.CatDir(source.FileName);
+            FastCopy(source, d);
             return d;
         }
 
@@ -80,7 +80,7 @@ namespace Sidi.IO
                 return true;
             }
 
-            return FileUtil.FilesAreEqualByTime(source, dest);
+            return FileCompare.EqualByTimeAndLength(source, dest);
         }
 
         public string RenameLockedDestinationFilesExtension = "renamed-to-overwrite";
@@ -132,7 +132,7 @@ namespace Sidi.IO
 
                 if (MakeWritable)
                 {
-                    new FileInfo(dest).IsReadOnly = false;
+                    dest.Info.IsReadOnly = false;
                 }
 
                 log.InfoFormat("Copy {0} -> {1}", source, dest);
@@ -154,7 +154,7 @@ namespace Sidi.IO
         public bool MakeWritable { get; set; }
         public bool RenameLockedDestinationFiles { get; set; }
 
-        public void CopyRecursive(string source, string dest)
+        public void CopyRecursive(LPath source, LPath dest)
         {
             CopyRecursive(source, dest, 0);
         }
@@ -213,7 +213,7 @@ namespace Sidi.IO
                 {
                     if (CopyCondition(s))
                     {
-                        if (FileUtil.FilesAreEqualByTime(s, e))
+                        if (FileCompare.EqualByTimeAndLength(s, e))
                         {
                             log.InfoFormat("Link {0} -> {1}", d, e);
                             fs.CreateHardLink(d, e);

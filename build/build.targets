@@ -33,6 +33,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
   <Import Project="$(NugetPackagesDir)\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets')" />
+  <Import Project="C:\work\nugetPackSymbols\CreateNugetSymbolsPackage\bin\Debug\Build\CreateNugetSymbolsPackage.targets" />
 
   <Target Name="GetVersion">
 		<GetVersion SolutionDirectory="$(SolutionDir)">
@@ -55,7 +56,6 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		  <Output TaskParameter="InformationalVersion" PropertyName="GfvInformationalVersion" />
 		</GetVersion>
 		<Message Text="$(GfvSemVer)" />
-		<Message Text="$(NuGetVersion)" />
 		<Message Text="$(GfvNuGetVersion)" />
 	</Target>
 
@@ -69,12 +69,24 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <Exec Command="$(NUnitConsole) /xml=$(TestDir)\TestResult.xml /labels @(Targets, ' ')" />
   </Target>
 
-  <Target Name="PushLocal" DependsOnTargets="Build;GetVersion">
+  <Target Name="Pack" DependsOnTargets="GetVersion;Build">
+    <PropertyGroup>
+		<PackageDir>$(BuildDir)\package</PackageDir>
+	</PropertyGroup>
+	<MakeDir Directories="$(PackageDir)" />
+	<Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(SourceDir)\%(Package.Identity) -OutputDirectory $(PackageDir) -Version $(GfvNuGetVersion)" />
+	<CreateNugetSymbolsPackage
+		Package = "$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg"
+		BinDir = "$(OutDir)"
+		/>
+  </Target>
+
+  <Target Name="PushLocal" DependsOnTargets="Pack">
     <!-- <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" /> -->
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
   </Target>
 
-  <Target Name="Push" DependsOnTargets="Test">
+  <Target Name="Push" DependsOnTargets="Test;Pack">
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
   </Target>
 

@@ -32,7 +32,7 @@ namespace Sidi.IO
         public void Exists()
         {
             var p = LPath.GetUncRoot(System.Environment.MachineName, "C$");
-            Assert.IsTrue(System.IO.Directory.Exists(p)); 
+            Assert.IsTrue(System.IO.Directory.Exists(p.StringRepresentation)); 
             Assert.IsTrue(p.IsDirectory);
         }
     }

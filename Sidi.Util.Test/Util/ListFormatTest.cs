@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using System.IO;
 using Sidi.Extensions;
 using Sidi.Forms;
 using System.Diagnostics;
@@ -36,11 +35,11 @@ namespace Sidi.Util
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        FileInfo[] data;
+        IFileSystemInfo[] data;
 
         public ListFormatTest()
         {
-            data = new DirectoryInfo(TestFile(".")).GetFiles();
+            data = TestFile(".").Info.GetFiles().ToArray();
         }
 
         [Test]
@@ -113,7 +112,7 @@ namespace Sidi.Util
         [Test]
         public void DefaultColumns3()
         {
-            var data = Enumerable.Range(0, 10).Select(_ => new { A = Path.GetRandomFileName(), B = Path.GetRandomFileName(), C = Path.GetRandomFileName() });
+            var data = Enumerable.Range(0, 10).Select(_ => new { A = LPath.GetRandomFileName(), B = LPath.GetRandomFileName(), C = LPath.GetRandomFileName() });
             var lf = data.ListFormat();
             log.Info(lf);
             Assert.AreEqual("#", lf.Columns[0].Name);
@@ -148,7 +147,7 @@ namespace Sidi.Util
         [Test, Explicit]
         public void Chart()
         {
-            var data = new DirectoryInfo(TestFile(".")).GetFiles();
+            var data = TestFile(".").Info.GetFiles();
 
             data.ListFormat()
                 .AddColumn("Created", f => f.CreationTime)

@@ -113,7 +113,7 @@ namespace Sidi.IO
         /// <returns></returns>
         public static LPath Get(this Type type)
         {
-            return LPath.CreateRelative(Get(type.Assembly), type.FullName);
+            return Get(type.Assembly).CatDir(type.FullName);
         }
 
         public static LPath BinDir
@@ -156,6 +156,12 @@ namespace Sidi.IO
         {
             var allDrives = Enumerable.Range('A', 'Z' - 'A').Select(x => new LPath((char)x + @":\"));
             return allDrives.Except(GetDrives());
+        }
+
+        internal static LPath GetLocalApplicationDataDirectory(Assembly assembly)
+        {
+            return Paths.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                .CatDir(Paths.Get(assembly));
         }
     }
 }

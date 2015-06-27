@@ -12,7 +12,7 @@ namespace Sidi.IO
     {
         public LPathSurrogate(LPath p)
         {
-            Value = p;
+            Value = p.StringRepresentation;
         }
 
         [ProtoMember(1)]

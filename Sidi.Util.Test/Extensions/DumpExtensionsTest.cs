@@ -36,7 +36,7 @@ namespace Sidi.Extensions
         [Test]
         public void Test()
         {
-            var files = new DirectoryInfo(TestFile(".")).GetFiles();
+            var files = TestFile(".").Info.GetFiles();
             var w = new StringWriter();
             files
                 .ListFormat()

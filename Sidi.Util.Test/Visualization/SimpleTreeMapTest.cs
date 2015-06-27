@@ -35,20 +35,6 @@ namespace Sidi.Visualization
     [TestFixture, Explicit("interactive")]
     public class SimpleTreeMapTest : TestBase
     {
-        [Test]
-        public void FilesTreeMap()
-        {
-            var items = Find.AllFiles(new LPath(@"V:\new"));
-            var c = items.CreateTreeMap();
-            c.GetLineage = i => i.FullName.Parts;
-            c.GetSize = i => i.Length;
-            c.SetPercentileColorScale(i => i.LastWriteTime, Sidi.Visualization.ColorScale.GetGreenYellowRed());
-            c.GetText = i => i.Name;
-            c.Activate = i => Process.Start(i.FullName);
-
-            c.RunFullScreen();
-        }
-
         [Test, Explicit("interactive")]
         public void Simple()
         {
@@ -69,7 +55,7 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void Simple2()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt"));
+            var files = TestFile("dir.txt").Read(StringExtensions.ReadLines);
             var tm = new SimpleTreeMap();
             tm.Items = files.ToList();
             tm.GetDistinctColor = x => System.IO.Path.GetExtension((string)x);
@@ -79,7 +65,7 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void Simple2ReverseOrder()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt"));
+            var files = TestFile("dir.txt").Read(StringExtensions.ReadLines);
             var tm = new SimpleTreeMap();
             tm.GetDistinctColor = x => System.IO.Path.GetExtension((string)x);
             tm.Items = files.ToList();
@@ -89,7 +75,7 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void TypedVerySimple()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt"));
+            var files = TestFile("dir.txt").ReadAllLines().ToList();
             var tm = new TypedTreeMap<string>();
             tm.Items = files;
             tm.RunFullScreen();
@@ -98,7 +84,9 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void Generic()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.LPath(x)).ToList();
+            var files = TestFile("dir.txt").Read(StringExtensions.ReadLines)
+                .Select(x => new L.LPath(x)).ToList();
+
             var tm = new TypedTreeMap<L.LPath>();
             tm.GetParent = x => x.Parent;
             tm.GetDistinctColor = x => x.Extension;
@@ -112,7 +100,8 @@ namespace Sidi.Visualization
         [Test, Explicit("interactive")]
         public void ColorScale()
         {
-            var files = System.IO.File.ReadAllLines(TestFile("dir.txt")).Select(x => new L.LPath(x)).ToList();
+            var files = TestFile("dir.txt").ReadAllLines().Select(x => new L.LPath(x)).ToList();
+
             var tm = new TypedTreeMap<L.LPath>()
             {
                 GetParent = x => x.Parent,

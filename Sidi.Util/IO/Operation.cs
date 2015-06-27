@@ -149,7 +149,7 @@ namespace Sidi.IO
         {
             if (!from.Exists)
             {
-                throw new System.IO.FileNotFoundException("from does not exist.", from);
+                throw new System.IO.FileNotFoundException("from does not exist.", from.StringRepresentation);
             }
 
             if (!Simulate)

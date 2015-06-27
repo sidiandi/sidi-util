@@ -88,7 +88,7 @@ namespace Sidi.CommandLine
                         var newLf = new FileAppender()
                         {
                             AppendToFile = false,
-                            File = file,
+                            File = file.StringRepresentation,
                             Layout = pattern,
                             Name = logFileAppenderName
                         };

@@ -190,7 +190,7 @@ namespace Sidi.IO
         {
             using (var handle = OpenReparsePoint(junctionPoint, NativeMethods.EFileAccess.GenericRead))
             {
-                string target = InternalGetTarget(handle);
+                var target = InternalGetTarget(handle);
                 if (target == null)
                 {
                     throw new IOException("Path is not a junction point.");

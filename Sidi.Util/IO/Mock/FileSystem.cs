@@ -15,7 +15,7 @@ namespace Sidi.IO.Mock
 
         public FileSystem()
         {
-            ContentDirectory = new LPath(Paths.Temp).CatDir(typeof(FileSystem).FullName, LPath.GetValidFilename(DateTime.UtcNow.ToString("o")));
+            ContentDirectory = Paths.Temp.CatDir(typeof(FileSystem).FullName, LPath.GetValidFilename(DateTime.UtcNow.ToString("o")));
             using (Sidi.IO.FileSystem.SetCurrent(RealFs))
             {
                 ContentDirectory.EnsureDirectoryExists();

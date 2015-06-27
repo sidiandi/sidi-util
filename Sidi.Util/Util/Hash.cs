@@ -72,7 +72,7 @@ namespace Sidi.Util
         public void ReadXml(System.Xml.XmlReader reader)
         {
             reader.ReadStartElement();
-            var hexString = new LPath(reader.ReadString());
+            var hexString = reader.ReadString();
             Set(hexString);
             reader.ReadEndElement();
         }

@@ -39,10 +39,10 @@ namespace Sidi.Persistence
         [Test]
         public void OpenClose()
         {
-            var dbFile = new L.LPath(TestFile(@"test.sqlite"));
+            var dbFile = TestFile(@"test.sqlite");
             dbFile.EnsureNotExists();
             var cs = new SQLiteConnectionStringBuilder();
-            cs.DataSource = dbFile;
+            cs.DataSource = dbFile.StringRepresentation;
             var c = new SQLiteConnection(cs.ConnectionString);
             c.Close();
             dbFile.EnsureNotExists();
@@ -53,7 +53,7 @@ namespace Sidi.Persistence
         {
             for (int i = 0; i < 20; ++i)
             {
-                var dbFile = new L.LPath(TestFile(@"test.sqlite"));
+                var dbFile = TestFile(@"test.sqlite");
                 dbFile.EnsureNotExists();
                 using (var c = new Collection<CollectionTest.Address>(dbFile))
                 {
@@ -528,7 +528,7 @@ namespace Sidi.Persistence
         public void Path()
         {
             var p = TestFile("path.sqlite");
-            new L.LPath(p).EnsureNotExists();
+            p.EnsureNotExists();
             var db = new Collection<FileInfo>(p);
             db.Add(new FileInfo()
             {

@@ -29,6 +29,11 @@ namespace Sidi.IO
             }
         }
 
+        public static IEnumerable<string> ReadAllLines(this LPath path)
+        {
+            return path.Read(Sidi.Extensions.StringExtensions.ReadLines);
+        }
+
         public static void Move(this LPath source, LPath destination)
         {
             source.FileSystem.Move(source, destination);

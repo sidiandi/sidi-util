@@ -32,7 +32,7 @@ namespace Sidi.IO
 
         public static FileVersion Get(IFileSystemInfo info)
         {
-            var fv = new FileVersion { Path = info.FullName };
+            var fv = new FileVersion { Path = info.FullName.StringRepresentation };
 
             if (info.IsDirectory)
             {
@@ -58,7 +58,7 @@ namespace Sidi.IO
 
         public FileVersion(LPath path, long length, DateTime lastWriteTimeUtc)
         {
-            this.Path = path;
+            this.Path = path.StringRepresentation;
             this.Length = length;
             this.LastWriteTimeUtc = lastWriteTimeUtc;
         }

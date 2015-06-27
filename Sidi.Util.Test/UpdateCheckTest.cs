@@ -55,7 +55,7 @@ namespace Sidi.Util
         public void Check()
         {
             UriBuilder u = new UriBuilder();
-            Uri uri = new Uri(TestFile("UpdateInfo.xml"));
+            Uri uri = new Uri(TestFile("UpdateInfo.xml").StringRepresentation);
             log.Info(uri);
             UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), uri);
             c.Check();
@@ -66,7 +66,7 @@ namespace Sidi.Util
         public void CheckAsync()
         {
             UriBuilder u = new UriBuilder();
-            Uri uri = new Uri(TestFile("UpdateInfo.xml"));
+            Uri uri = new Uri(TestFile("UpdateInfo.xml").StringRepresentation);
             UpdateCheck c = new UpdateCheck(Assembly.GetExecutingAssembly(), uri);
             c.CheckAsync(delegate()
             {
@@ -82,7 +82,7 @@ namespace Sidi.Util
         [Test, Explicit("interactive")]
         public void TestSimple()
         {
-            UpdateCheck c = new UpdateCheck(new Uri(TestFile("UpdateInfo.xml")));
+            UpdateCheck c = new UpdateCheck(new Uri(TestFile("UpdateInfo.xml").StringRepresentation));
             c.CheckAsync();
             c.WaitCompleted();
         }

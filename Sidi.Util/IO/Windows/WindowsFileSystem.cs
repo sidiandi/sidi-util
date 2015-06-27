@@ -105,7 +105,7 @@ namespace Sidi.IO.Windows
             }
             else
             {
-                return longPrefix + path.ToString();
+                return longPrefix + path.StringRepresentation;
             }
         }
 
@@ -166,34 +166,14 @@ namespace Sidi.IO.Windows
         {
             if (path.IsRoot)
             {
-                if (System.IO.Directory.Exists(path))
+                if (System.IO.Directory.Exists(path.StringRepresentation))
                 {
                     fd = new FindData()
                     {
                         Attributes = System.IO.FileAttributes.Directory,
                         nFileSizeHigh = 0,
                         nFileSizeLow = 0,
-                        Name = path,
-                    };
-                    return true;
-                }
-                else
-                {
-                    fd = default(FindData);
-                    return false;
-                }
-            }
-
-            if (path.IsUnc && path.IsRoot)
-            {
-                if (System.IO.Directory.Exists(path))
-                {
-                    fd = new FindData()
-                    {
-                        Attributes = System.IO.FileAttributes.Directory,
-                        nFileSizeHigh = 0,
-                        nFileSizeLow = 0,
-                        Name = path,
+                        Name = path.ToString(),
                     };
                     return true;
                 }
@@ -425,7 +405,7 @@ namespace Sidi.IO.Windows
 
             set
             {
-                System.Environment.CurrentDirectory = value;
+                System.Environment.CurrentDirectory = value.StringRepresentation;
             }
         }
 

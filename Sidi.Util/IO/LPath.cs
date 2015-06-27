@@ -208,9 +208,18 @@ namespace Sidi.IO
             return new LPath(text);
         }
 
+        [Obsolete("use StringRepresentation instead.")]
         public static implicit operator string(LPath path)
         {
-            return path.ToString();
+            return path.StringRepresentation;
+        }
+
+        public string StringRepresentation
+        {
+            get
+            {
+                return Prefix + Parts.Join(DirectorySeparator);
+            }
         }
 
         public static LPath GetTempFileName()
@@ -225,7 +234,7 @@ namespace Sidi.IO
 
         public string Quote()
         {
-            return this.ToString().Quote();
+            return this.StringRepresentation.Quote();
         }
 
         /// <summary>
@@ -480,8 +489,11 @@ namespace Sidi.IO
         
         public LPath CatDir(IEnumerable<string> parts)
         {
-            var relativePaths = parts.Select(x => new LPath(x)).ToList();
+            return CatDir(parts.Select(x => new LPath(x)));
+        }
 
+        public LPath CatDir(IEnumerable<LPath> relativePaths)
+        {
             foreach (var i in relativePaths)
             {
                 if (!i.IsRelative)
@@ -496,6 +508,11 @@ namespace Sidi.IO
         public LPath CatDir(params string[] parts)
         {
             return CatDir((IEnumerable<string>)parts);
+        }
+
+        public LPath CatDir(params LPath[] relativePaths)
+        {
+            return CatDir((IEnumerable<LPath>)relativePaths);
         }
 
         public LPath CatName(string namePostfix)
@@ -718,7 +735,7 @@ namespace Sidi.IO
 
         public override string ToString()
         {
-            return Prefix + Parts.Join(DirectorySeparator);
+            return StringRepresentation;
         }
 
         /// <summary>
@@ -787,7 +804,7 @@ namespace Sidi.IO
         
         public bool Contains(string value)
         {
-            return this.ToString().IndexOf(value, StringComparison) >= 0;
+            return this.StringRepresentation.IndexOf(value, StringComparison) >= 0;
         }
 
         static StringComparer partComparer = StringComparer.InvariantCultureIgnoreCase;
@@ -818,12 +835,6 @@ namespace Sidi.IO
         {
             get
             {
-                // TODO: remove special treatment of path roots
-                if (!Parts.Any())
-                {
-                    return System.IO.Directory.Exists(this);
-                }
-
                 var info = this.Info;
                 return info.Exists && info.IsDirectory;
             }
@@ -995,7 +1006,7 @@ namespace Sidi.IO
 
         public void WriteXml(System.Xml.XmlWriter writer)
         {
-            writer.WriteString(ToString());
+            writer.WriteString(StringRepresentation);
         }
 
         public int CompareTo(object obj)
@@ -1005,7 +1016,7 @@ namespace Sidi.IO
             {
                 throw new System.ArgumentException("Parameter must be of Type LPath", "obj");
             }
-            return this.ToString().CompareTo(r.ToString());
+            return this.StringRepresentation.CompareTo(r.StringRepresentation);
         }
 
         public System.IO.StreamWriter WriteText()
@@ -1047,7 +1058,7 @@ namespace Sidi.IO
         {
             get
             {
-                return new Uri(ToString(), UriKind.Absolute);
+                return new Uri(StringRepresentation, UriKind.Absolute);
             }
         }
 
@@ -1114,7 +1125,7 @@ namespace Sidi.IO
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("p", ToString());
+            info.AddValue("p", StringRepresentation);
         }
 
         protected LPath(SerializationInfo info, StreamingContext context)

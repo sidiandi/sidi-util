@@ -19,7 +19,7 @@ namespace Sidi.Net
             {
                 page(w);
             }
-            Process.Start(tempFile);
+            Process.Start(tempFile.StringRepresentation);
         }
     }
 }
