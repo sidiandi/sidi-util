@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 namespace Sidi.IO.Windows
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack=4, Size=44)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack=4, Size=318)]
     [Serializable]
     internal struct WIN32_FIND_DATA
     {
