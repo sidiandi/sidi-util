@@ -343,36 +343,7 @@ namespace Sidi.IO
 
         public static bool EqualByContent(LPath f1, LPath f2)
         {
-            var i1 = f1.Info;
-            var i2 = f2.Info;
-
-            if (!i1.IsFile || !i2.IsFile)
-            {
-                return false;
-            }
-
-            const int bufSize = 0x1000;
-            byte[] b1 = new byte[bufSize];
-            byte[] b2 = new byte[bufSize];
-
-            using (var s1 = Open(f1, System.IO.FileMode.Open))
-            {
-                using (var s2 = Open(f2, System.IO.FileMode.Open))
-                {
-                    int readCount = s1.Read(b1, 0, bufSize);
-                    if (readCount != s2.Read(b2, 0, bufSize))
-                    {
-                        return false;
-                    }
-
-                    if (!Equals(b1, b2, readCount))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
+            return FileCompare.EqualByContent(f1, f2);
         }
 
         public static bool Exists(LPath filename)

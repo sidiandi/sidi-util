@@ -93,6 +93,7 @@
     <Compile Include="IO\FileSystemTest.cs" />
     <Compile Include="IO\HardLinkPreservingCopyOperationTest.cs" />
     <Compile Include="IO\LPathExtensionsTests.cs" />
+    <Compile Include="IO\LPathTests.cs" />
     <Compile Include="IO\Mock\FileSystemTest.cs" />
     <Compile Include="IO\NamespaceCompatibilityTest.cs" />
     <Compile Include="IO\OperationTest.cs" />

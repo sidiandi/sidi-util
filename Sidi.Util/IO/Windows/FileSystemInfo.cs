@@ -60,7 +60,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.Attributes;
+                return (System.IO.FileAttributes) FindData.dwFileAttributes;
             }
 
             set
@@ -93,7 +93,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.ftCreationTime.DateTime;
+                return DateTime.FromFileTime(FindData.ftCreationTime);
             }
         }
 
@@ -123,7 +123,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.ftCreationTime.DateTimeUtc;
+                return DateTime.FromFileTimeUtc(FindData.ftCreationTime);
             }
         }
 
@@ -193,7 +193,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.ftLastAccessTime.DateTime;
+                return DateTime.FromFileTime(FindData.ftLastAccessTime);
             }
         }
 
@@ -219,7 +219,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.ftLastAccessTime.DateTimeUtc;
+                return DateTime.FromFileTimeUtc(FindData.ftLastAccessTime);
             }
         }
 
@@ -244,7 +244,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.ftLastWriteTime.DateTime;
+                return DateTime.FromFileTime(FindData.ftLastWriteTime);
             }
         }
 
@@ -270,7 +270,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.ftLastWriteTime.DateTimeUtc;
+                return DateTime.FromFileTimeUtc(FindData.ftLastWriteTime);
             }
         }
 
@@ -287,7 +287,7 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return FindData.Name;
+                return FindData.cFileName;
             }
         }
 
@@ -334,7 +334,7 @@ namespace Sidi.IO.Windows
         }
         
         LPath path;
-        FindData _findData;
+        WIN32_FIND_DATA _findData;
         bool _findDataValid = false;
 
         internal FileSystemInfo(FileSystem fileSystem, LPath path)
@@ -344,12 +344,12 @@ namespace Sidi.IO.Windows
             Refresh();
         }
 
-        internal FileSystemInfo(FileSystem fileSystem, LPath directory, FindData findData)
+        internal FileSystemInfo(FileSystem fileSystem, LPath directory, WIN32_FIND_DATA findData)
         {
             this._fileSystem = fileSystem;
             _findData = findData;
             _findDataValid = true;
-            path = directory.CatDir(findData.Name).GetFullPath();
+            path = directory.CatDir(findData.cFileName).GetFullPath();
         }
 
         public bool IsReadOnly
@@ -444,11 +444,11 @@ namespace Sidi.IO.Windows
         {
             get
             {
-                return System.IO.Path.GetFileNameWithoutExtension(FindData.Name);
+                return System.IO.Path.GetFileNameWithoutExtension(FindData.cFileName);
             }
         }
 
-        FindData FindData
+        WIN32_FIND_DATA FindData
         {
             get
             {

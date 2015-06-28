@@ -884,24 +884,30 @@ namespace Sidi.IO
         /// </summary>
         public void EnsureNotExists()
         {
-            if (IsDirectory)
+            var info = this.Info;
+            if (!info.Exists)
             {
-                try
-                {
-                    FileSystem.RemoveDirectory(this);
-                }
-                catch
-                {
-                    foreach (var c in this.Children)
-                    {
-                        c.EnsureNotExists();
-                    }
-                    FileSystem.RemoveDirectory(this);
-                }
+                return;
             }
-            else if (IsFile)
+
+            if (info.IsFile)
             {
-                EnsureFileNotExists();
+                FileSystem.DeleteFile(this);
+                return;
+            }
+
+            try
+            {
+                FileSystem.RemoveDirectory(this);
+                return;
+            }
+            catch (System.IO.IOException)
+            {
+                foreach (var i in info.GetChildren())
+                {
+                    i.FullName.EnsureNotExists();
+                }
+                FileSystem.RemoveDirectory(this);
             }
         }
 

@@ -99,6 +99,13 @@ namespace Sidi.IO.Windows
         /// <returns></returns>
         public string GetLongPathApiParameter(LPath path)
         {
+            var p = GetLongPathApiParameterImpl(path);
+            //log.Info(p);
+            return p;
+        }
+        
+        string GetLongPathApiParameterImpl(LPath path)
+        {
             if (path.IsUnc)
             {
                 return longUncPrefix + path.Server + LPath.DirectorySeparator + path.Share + LPath.DirectorySeparator + String.Join(DirectorySeparator, path.Parts);
@@ -136,7 +143,7 @@ namespace Sidi.IO.Windows
         {
             var p = searchPath.Parent;
             return FindFileRaw(searchPath)
-                .Where(x => !(x.Name.Equals(ThisDir) || x.Name.Equals(UpDir)))
+                .Where(x => !(x.cFileName.Equals(ThisDir) || x.cFileName.Equals(UpDir)))
                 .Select(x => new FileSystemInfo(this, p, x));
         }
 
@@ -145,9 +152,9 @@ namespace Sidi.IO.Windows
         /// </summary>
         /// <param name="searchPath"></param>
         /// <returns></returns>
-        private IEnumerable<FindData> FindFileRaw(LPath searchPath)
+        private IEnumerable<WIN32_FIND_DATA> FindFileRaw(LPath searchPath)
         {
-            FindData fd;
+            WIN32_FIND_DATA fd;
 
             using (var fh = NativeMethods.FindFirstFile(GetLongPathApiParameter(searchPath), out fd))
             {
@@ -162,24 +169,24 @@ namespace Sidi.IO.Windows
             }
         }
 
-        internal bool GetFindData(LPath path, out FindData fd)
+        internal bool GetFindData(LPath path, out WIN32_FIND_DATA fd)
         {
             if (path.IsRoot)
             {
                 if (System.IO.Directory.Exists(path.StringRepresentation))
                 {
-                    fd = new FindData()
+                    fd = new WIN32_FIND_DATA()
                     {
-                        Attributes = System.IO.FileAttributes.Directory,
+                        dwFileAttributes = (uint) System.IO.FileAttributes.Directory,
                         nFileSizeHigh = 0,
                         nFileSizeLow = 0,
-                        Name = path.ToString(),
+                        cFileName = path.ToString(),
                     };
                     return true;
                 }
                 else
                 {
-                    fd = default(FindData);
+                    fd = default(WIN32_FIND_DATA);
                     return false;
                 }
             }
@@ -193,7 +200,7 @@ namespace Sidi.IO.Windows
                 }
                 else
                 {
-                    fd = default(FindData);
+                    fd = default(WIN32_FIND_DATA);
                     return false;
                 }
             }

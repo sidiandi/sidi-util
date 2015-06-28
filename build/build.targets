@@ -69,25 +69,29 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <Exec Command="$(NUnitConsole) /xml=$(TestDir)\TestResult.xml /labels @(Targets, ' ')" />
   </Target>
 
-  <Target Name="Pack" DependsOnTargets="GetVersion;Build">
+  <Target Name="Pack" DependsOnTargets="GetVersion">
     <PropertyGroup>
 		<PackageDir>$(BuildDir)\package</PackageDir>
 	</PropertyGroup>
+	<RemoveDir Directories="$(PackageDir)"/>
 	<MakeDir Directories="$(PackageDir)" />
-	<Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(SourceDir)\%(Package.Identity) -OutputDirectory $(PackageDir) -Version $(GfvNuGetVersion)" />
+	<Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(SourceDir)\%(PackageProjects.Identity) -OutputDirectory $(PackageDir) -Version $(GfvNuGetVersion)" />
+	<ItemGroup>
+		<PackageFiles Include="$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg" />
+	</ItemGroup>
 	<CreateNugetSymbolsPackage
-		Package = "$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg"
+		Package = "%(PackageFiles.Identity)"
 		BinDir = "$(OutDir)"
 		/>
   </Target>
 
   <Target Name="PushLocal" DependsOnTargets="Pack">
-    <!-- <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(Package.Identity).symbols.nupkg" /> -->
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(PackageFiles.Identity)" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(PackageFiles.RootDir)%(PackageFiles.Directory)%(PackageFiles.Filename).symbols.nupkg" />
   </Target>
 
   <Target Name="Push" DependsOnTargets="Test;Pack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push %(Package.Identity)" />
   </Target>
 
   <Target Name="TestPush" DependsOnTargets="Build">

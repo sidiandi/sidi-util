@@ -24,81 +24,36 @@ using System.Runtime.InteropServices;
 
 namespace Sidi.IO.Windows
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack=4, Size=44)]
     [Serializable]
-    internal struct FindData
+    internal struct WIN32_FIND_DATA
     {
-        // Summary:
-        //     Represents the number of 100-nanosecond intervals since January 1, 1601.
-        //     This structure is a 64-bit value.
-        [Serializable]
-        internal struct FILETIME
-        {
-            //
-            // Summary:
-            //     Specifies the low 32 bits of the FILETIME.
-            public uint dwLowDateTime;
+        public uint dwFileAttributes;
+        public long ftCreationTime;
+        public long ftLastAccessTime;
+        public long ftLastWriteTime;
+        public uint nFileSizeHigh;
+        public uint nFileSizeLow;
+        public uint dwReserved0;
+        public uint dwReserved1;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string cFileName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
+        public string cAlternateFileName;
 
-            // Summary:
-            //     Specifies the high 32 bits of the FILETIME.
-            public uint dwHighDateTime;
-
-            public DateTime DateTime
-            {
-                get
-                {
-                    ulong h = dwHighDateTime;
-                    h <<= 32;
-                    ulong l = dwLowDateTime;
-                    return DateTime.FromFileTime((long)(h | l));
-                }
-            }
-
-            public DateTime DateTimeUtc
-            {
-                get
-                {
-                    ulong h = dwHighDateTime;
-                    h <<= 32;
-                    ulong l = dwLowDateTime;
-                    return DateTime.FromFileTimeUtc((long)(h | l));
-                }
-            }
-        }
-
-        internal System.IO.FileAttributes Attributes;
-        internal FILETIME ftCreationTime;
-        internal FILETIME ftLastAccessTime;
-        internal FILETIME ftLastWriteTime;
-        internal int nFileSizeHigh;
-        internal int nFileSizeLow;
-        internal int dwReserved0;
-        internal int dwReserved1;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH)]
-        internal string Name;
-        // not using this
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_ALTERNATE)]
-        internal string cAlternate;
-
-        public bool Equals(FindData other)
+        public bool Equals(WIN32_FIND_DATA other)
         {
             return
-                Attributes == other.Attributes &&
-                Equals(ftCreationTime, other.ftCreationTime) && 
-                Equals(ftLastAccessTime, other.ftLastAccessTime) && 
+                dwFileAttributes == other.dwFileAttributes &&
+                Equals(ftCreationTime, other.ftCreationTime) &&
+                Equals(ftLastAccessTime, other.ftLastAccessTime) &&
                 Equals(ftLastWriteTime, other.ftLastWriteTime) &&
                 nFileSizeHigh == other.nFileSizeHigh &&
                 nFileSizeLow == other.nFileSizeLow &&
                 dwReserved0 == other.dwReserved0 &&
                 dwReserved1 == other.dwReserved1 &&
-                Name == other.Name &&
-                cAlternate == other.cAlternate;
-        }
-
-        static bool Equals(FILETIME a, FILETIME b)
-        {
-            return a.dwHighDateTime == b.dwHighDateTime &&
-                a.dwLowDateTime == b.dwLowDateTime;
+                cFileName == other.cFileName &&
+                cAlternateFileName == other.cAlternateFileName;
         }
 
         public bool IsDirectory
@@ -119,16 +74,15 @@ namespace Sidi.IO.Windows
 
         bool Test(System.IO.FileAttributes a)
         {
-            return (Attributes & a) == a;
+            return ((System.IO.FileAttributes)dwFileAttributes & a) == a;
         }
 
         public long Length
         {
             get
             {
-                return (long)(nFileSizeHigh << 32 ) + (long)nFileSizeLow;
+                return (long)(nFileSizeHigh << 32) + (long)nFileSizeLow;
             }
         }
     }
-
 }

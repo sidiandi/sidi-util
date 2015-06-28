@@ -12,6 +12,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Package Include="Sidi.Util\Sidi.Util.csproj" />
+		<PackageProjects Include="Sidi.Util\Sidi.Util.csproj" >
+			<PackageName>sidi-util</PackageName>
+		</PackageProjects>
 	</ItemGroup>
 </Project>

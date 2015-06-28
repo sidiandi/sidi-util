@@ -23,6 +23,7 @@ using System.ComponentModel;
 using NUnit.Framework;
 using Sidi.Util;
 using Sidi.Test;
+using Sidi.Extensions;
 
 #pragma warning disable 618
 
@@ -34,27 +35,22 @@ namespace Sidi.IO
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public LPath root;
-        public LPath lp;
+        public LPath longPath;
 
         [SetUp]
         public void Setup()
         {
             root = Paths.BinDir.CatDir(@"test\LongNameTest");
-
             root.EnsureNotExists();
-
-            lp = root.CatDir(
-                Enumerable.Range(0, 100)
-                    .Select(x => String.Format("PathPart{0}", x)));
-
-            lp.EnsureParentDirectoryExists();
+            longPath = root.CatDir(Enumerable.Range(0, 100).Select(x => String.Format("PathPart{0}", x)));
+            longPath.EnsureParentDirectoryExists();
+            log.Info(() => longPath.StringRepresentation.Length);
         }
 
         [TearDown]
         public void TearDown()
         {
             root.EnsureNotExists();
-            Assert.IsFalse(root.Exists);
         }
 
         [Test]
@@ -67,12 +63,14 @@ namespace Sidi.IO
         public void Enum()
         {
             // create 10 files
+            var root = TestFile("FileTestEnum");
             foreach (var i in Enumerable.Range(0, 10))
             {
                 CreateSampleFile(root.CatDir(i.ToString()));
             }
             var e = root.GetChildren();
             Assert.IsTrue(e.Count() >= 10);
+            root.EnsureNotExists();
         }
 
         public void CreateSampleFile(LPath lp)
@@ -83,12 +81,10 @@ namespace Sidi.IO
         [Test]
         public void Copy()
         {
-            CreateSampleFile(lp);
-            var lpCopy = lp.CatName(".copy");
-            LFile.Copy(lp, lpCopy);
+            CreateSampleFile(longPath);
+            var lpCopy = longPath.CatName(".copy");
+            LFile.Copy(longPath, lpCopy);
             Assert.IsTrue(lpCopy.IsFile);
-            log.Info(lp.Parent.Children);
-            log.Info(lp);
         }
 
         [Test]
@@ -119,61 +115,31 @@ namespace Sidi.IO
         [Test]
         public void HardLink()
         {
-            CreateSampleFile(lp);
-            var lpCopy = lp.CatName(".link");
-            LFile.CreateHardLink(lpCopy, lp);
+            CreateSampleFile(longPath);
+            var lpCopy = longPath.CatName(".link");
+            LFile.CreateHardLink(lpCopy, longPath);
             Assert.IsTrue(lpCopy.IsFile);
-            log.Info(lp.Parent.Children);
-            log.Info(lp);
-            Assert.IsTrue(LFile.EqualByTimeAndLength(lp, lpCopy));
-        }
-
-        [Test]
-        public void Junction()
-        {
-            CreateSampleFile(lp);
-            var d = lp.Parent;
-            var j = d.CatName("-link");
-            Assert.IsFalse(j.Exists);
-            JunctionPoint.Create(j, d);
-            Assert.IsTrue(JunctionPoint.Exists(j));
-            Assert.AreEqual(d, JunctionPoint.GetTarget(j));
-            Assert.IsTrue(j.CatDir(lp.FileName).IsFile);
-            j.EnsureNotExists();
-            Assert.IsTrue(lp.IsFile);
-            lp.EnsureFileNotExists();
-        }
-
-        [Test]
-        public void JunctionExists()
-        {
-            lp.EnsureNotExists();
-            lp.EnsureDirectoryExists();
-            Assert.IsFalse(JunctionPoint.Exists(lp));
-            lp.EnsureNotExists();
-            Assert.IsFalse(JunctionPoint.Exists(lp));
-            var target = lp.Sibling("target");
-            target.EnsureDirectoryExists();
-            JunctionPoint.Create(lp, target);
-            Assert.IsTrue(JunctionPoint.Exists(lp));
+            log.Info(longPath.Parent.Children);
+            log.Info(longPath);
+            Assert.IsTrue(LFile.EqualByTimeAndLength(longPath, lpCopy));
         }
 
         [Test]
         public void Move()
         {
-            CreateSampleFile(lp);
-            var m = lp.Root.CatDir(lp.Parts.Take(20));
+            CreateSampleFile(longPath);
+            var m = longPath.Root.CatDir(longPath.Parts.Take(20));
             var dest = root.CatDir("moved");
             LDirectory.Move(m, dest);
             Assert.IsTrue(LDirectory.Exists(dest));
-            Assert.IsFalse(lp.IsFile);
+            Assert.IsFalse(longPath.IsFile);
             Assert.IsTrue(LDirectory.Exists(root));
         }
 
         [Test]
         public void Equal()
         {
-            var f1 = lp;
+            var f1 = longPath;
             CreateSampleFile(f1);
             var f2 = f1.CatName(".copy");
             LFile.Copy(f1, f2);
@@ -276,9 +242,13 @@ namespace Sidi.IO
             a.EnsureDirectoryExists();
             var b = root.CatDir("b");
             var c = b.CatDir("c");
-            LFile.WriteAllText(c, "hello");
+            c.WriteAllText("hello");
+            Assert.IsTrue(c.IsFile);
+
             JunctionPoint.Create(a.CatDir("b"), b);
+            
             a.EnsureNotExists();
+            
             Assert.IsTrue(b.IsDirectory);
             Assert.IsTrue(c.IsFile);
         }

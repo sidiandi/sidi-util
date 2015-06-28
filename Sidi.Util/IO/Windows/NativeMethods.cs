@@ -62,15 +62,10 @@ namespace Sidi.IO.Windows
         [Flags]
         public enum EFileAccess : uint
         {
-
             GenericRead = 0x80000000,
-
             GenericWrite = 0x40000000,
-
             GenericExecute = 0x20000000,
-
             GenericAll = 0x10000000,
-
         }
 
         [Flags]
@@ -208,19 +203,19 @@ namespace Sidi.IO.Windows
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CloseHandle(SafeHandle hObject);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        internal static extern FindHandle FindFirstFile(string lpFileName, out FindData lpFindFileData);
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        internal static extern FindHandle FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
 
-        [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        internal static extern bool FindNextFile(FindHandle hFindFile, out FindData lpFindFileData);
+        [DllImport("kernel32", CharSet = CharSet.Auto)]
+        internal static extern bool FindNextFile(FindHandle hFindFile, out WIN32_FIND_DATA lpFindFileData);
 
-        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError=true)]
+        [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern bool FindClose(IntPtr hFindFile);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError=true)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern bool CopyFile(string lpExistingFileName, string lpNewFileName, bool bFailIfExists);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern
             bool CreateHardLink(
                 string FileName,
