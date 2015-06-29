@@ -505,6 +505,8 @@ namespace Sidi.IO
             Assert.IsFalse(object.Equals(null, x));
 
             Assert.AreEqual(new LPath("a"), new LPath(@"A"));
+
+            Assert.AreEqual(new LPath(@"c:\temp"), new LPath(@"C:\Temp"));
         }
 
         [Test]

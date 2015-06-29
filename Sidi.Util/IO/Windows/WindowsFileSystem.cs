@@ -147,6 +147,76 @@ namespace Sidi.IO.Windows
                 .Select(x => new FileSystemInfo(this, p, x));
         }
 
+        class RawEnumerable : IEnumerable<WIN32_FIND_DATA>
+        {
+            readonly string fileName;
+
+            public RawEnumerable(string fileName)
+            {
+                this.fileName = fileName;
+            }
+
+            public IEnumerator<WIN32_FIND_DATA> GetEnumerator()
+            {
+                return new RawEnumerator(fileName);
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return new RawEnumerator(fileName);
+            }
+        }
+
+        class RawEnumerator : IEnumerator<WIN32_FIND_DATA>
+        {
+            FindHandle findHandle;
+            readonly string fileName;
+            WIN32_FIND_DATA current;
+
+            public RawEnumerator(string fileName)
+            {
+                this.fileName = fileName;
+            }
+
+            public WIN32_FIND_DATA Current
+            {
+                get { return current; }
+            }
+
+            public void Dispose()
+            {
+                findHandle.Dispose();
+            }
+
+            object System.Collections.IEnumerator.Current
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public bool MoveNext()
+            {
+                if (findHandle == null)
+                {
+                    findHandle = NativeMethods.FindFirstFile(fileName, out current);
+                    return !findHandle.IsInvalid;
+                }
+                else if (!findHandle.IsInvalid)
+                {
+                    return NativeMethods.FindNextFile(findHandle, out current);
+                }
+
+                throw new InvalidOperationException();
+            }
+
+            public void Reset()
+            {
+                if (findHandle != null)
+                {
+                    findHandle.Dispose();
+                }
+            }
+        }
+
         /// <summary>
         /// Thin wrapper around FindFirstFile and FindNextFile. Also will return "." and ".."
         /// </summary>
@@ -154,19 +224,7 @@ namespace Sidi.IO.Windows
         /// <returns></returns>
         private IEnumerable<WIN32_FIND_DATA> FindFileRaw(LPath searchPath)
         {
-            WIN32_FIND_DATA fd;
-
-            using (var fh = NativeMethods.FindFirstFile(GetLongPathApiParameter(searchPath), out fd))
-            {
-                if (!fh.IsInvalid)
-                {
-                    yield return fd;
-                    while (NativeMethods.FindNextFile(fh, out fd))
-                    {
-                        yield return fd;
-                    }
-                }
-            }
+            return new RawEnumerable(GetLongPathApiParameter(searchPath));
         }
 
         internal bool GetFindData(LPath path, out WIN32_FIND_DATA fd)

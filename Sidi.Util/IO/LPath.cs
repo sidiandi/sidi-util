@@ -28,6 +28,8 @@ using System.Reflection;
 using System.IO;
 using System.Runtime.Serialization;
 using Sidi.Parse;
+using System.Collections;
+using System.Threading;
 
 namespace Sidi.IO
 {
@@ -47,6 +49,7 @@ namespace Sidi.IO
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        IFileSystem fileSystem;
         Prefix prefix;
         string[] parts;
 
@@ -54,8 +57,9 @@ namespace Sidi.IO
         {
         }
 
-        LPath(string prefix, IEnumerable<string> parts)
+        LPath(IFileSystem fileSystem, string prefix, IEnumerable<string> parts)
         {
+            this.fileSystem = fileSystem;
             Initialize(CheckPrefix(prefix), parts);
         }
         
@@ -63,6 +67,7 @@ namespace Sidi.IO
         {
             try
             {
+                this.fileSystem = Sidi.IO.FileSystem.Current;
                 var text = new Sidi.Parse.Text(path);
                 var t = text.Copy();
                 var ast = PathParser.Path()(t);
@@ -177,7 +182,12 @@ namespace Sidi.IO
 
         public static LPath CreateRelative(IEnumerable<string> parts)
         {
-            return new LPath(RelativePrefix, parts);
+            return CreateRelative(Sidi.IO.FileSystem.Current, parts);
+        }
+
+        public static LPath CreateRelative(IFileSystem fileSystem, IEnumerable<string> parts)
+        {
+            return new LPath(fileSystem, RelativePrefix, parts);
         }
 
         /// <summary>
@@ -187,7 +197,7 @@ namespace Sidi.IO
         {
             get
             {
-                return Sidi.IO.FileSystem.Current;
+                return fileSystem;
             }
         }
         
@@ -298,7 +308,7 @@ namespace Sidi.IO
         {
             get
             {
-                return new LPath(Prefix, Parts.Where(x => !x.Equals(".")));
+                return new LPath(FileSystem, Prefix, Parts.Where(x => !x.Equals(".")));
             }
         }
 
@@ -367,7 +377,7 @@ namespace Sidi.IO
         {
             get
             {
-                return new LPath(Prefix, Enumerable.Empty<string>());
+                return new LPath(FileSystem, Prefix, Enumerable.Empty<string>());
             }
         }
 
@@ -502,7 +512,7 @@ namespace Sidi.IO
                 }
             }
 
-            return new LPath(Prefix, Parts.Concat(relativePaths.SelectMany(_ => _.Parts)));
+            return new LPath(FileSystem, Prefix, Parts.Concat(relativePaths.SelectMany(_ => _.Parts)));
         }
 
         public LPath CatDir(params string[] parts)
@@ -517,7 +527,7 @@ namespace Sidi.IO
 
         public LPath CatName(string namePostfix)
         {
-            return new LPath(Prefix, Parts.TakeAllBut(1).Concat(new[] { FileName + namePostfix }));
+            return new LPath(FileSystem, Prefix, Parts.TakeAllBut(1).Concat(new[] { FileName + namePostfix }));
         }
 
         public const int MaxFilenameLength = 255;
@@ -560,7 +570,7 @@ namespace Sidi.IO
 
             var p = Parts.ToArray();
             p[p.Length - 1] = FileNameWithoutExtension + newExtension;
-            return new LPath(Prefix, p);
+            return new LPath(FileSystem, Prefix, p);
         }
 
         public LPath Sibling(string siblingName)
@@ -606,7 +616,7 @@ namespace Sidi.IO
                 result.Add(p[i]);
             }
 
-            return new LPath(String.Empty, result);
+            return new LPath(FileSystem, String.Empty, result);
         }
         
         /// <summary>
@@ -618,7 +628,7 @@ namespace Sidi.IO
             {
                 if (Parts.Any())
                 {
-                    return new LPath(Prefix, Parts.TakeAllBut(1));
+                    return new LPath(FileSystem, Prefix, Parts.TakeAllBut(1));
                 }
                 else
                 {
@@ -791,6 +801,7 @@ namespace Sidi.IO
      
           if (this.GetType() != right.GetType())
              return false; 
+
           return this.Equals(right as LPath);
         }
 
@@ -809,8 +820,27 @@ namespace Sidi.IO
 
         static StringComparer partComparer = StringComparer.InvariantCultureIgnoreCase;
 
+        static void AssertCompatibleFileSystems(params LPath[] paths)
+        {
+            var e = ((IEnumerable<LPath>)paths).GetEnumerator();
+            if (!e.MoveNext())
+            {
+                return;
+            }
+            IFileSystem fs = e.Current.FileSystem;
+            for (; e.MoveNext(); )
+            {
+                if (e.Current.FileSystem != fs)
+                {
+                    throw new ArgumentOutOfRangeException("file systems are incompatible");
+                }
+            }
+        }
+
         public LPath RelativeTo(LPath root)
         {
+            AssertCompatibleFileSystems(this, root);
+
             var p = Parts;
             var rp = root.Parts;
 
@@ -823,11 +853,11 @@ namespace Sidi.IO
 
             if (difference.Any())
             {
-                return LPath.CreateRelative(difference);
+                return LPath.CreateRelative(this.FileSystem, difference);
             }
             else
             {
-                return LPath.CreateRelative(new[] { "..", this.FileName });
+                return LPath.CreateRelative(this.FileSystem, new[] { "..", this.FileName });
             }
         }
 
@@ -884,30 +914,45 @@ namespace Sidi.IO
         /// </summary>
         public void EnsureNotExists()
         {
+            // log.InfoFormat("EnsureNotExists({0})", this);
             var info = this.Info;
+            
             if (!info.Exists)
             {
                 return;
             }
-
-            if (info.IsFile)
+            else if (info.IsFile)
             {
                 FileSystem.DeleteFile(this);
                 return;
             }
-
-            try
+            else if (info.IsDirectory)
             {
-                FileSystem.RemoveDirectory(this);
-                return;
-            }
-            catch (System.IO.IOException)
-            {
-                foreach (var i in info.GetChildren())
+                for (int i = 0; i < 100; ++i)
                 {
-                    i.FullName.EnsureNotExists();
+                    try
+                    {
+                        FileSystem.RemoveDirectory(this);
+                        return;
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                    }
+
+                    foreach (var child in this.GetChildren())
+                    {
+                        child.EnsureNotExists();
+                    }
+
+                    if (i > 0)
+                    {
+                        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                    }
                 }
-                FileSystem.RemoveDirectory(this);
+            }
+            else
+            {
+                throw new NotImplementedException(this.ToString());
             }
         }
 
@@ -919,18 +964,6 @@ namespace Sidi.IO
         public void EnsureDirectoryExists()
         {
             FileSystem.EnsureDirectoryExists(this);
-        }
-
-        IFileSystem OrDefault(IFileSystem fileSystem)
-        {
-            if (fileSystem == null)
-            {
-                return this.FileSystem;
-            }
-            else
-            {
-                return fileSystem;
-            }
         }
 
         public string Extension
@@ -1004,6 +1037,7 @@ namespace Sidi.IO
             {
                 reader.ReadStartElement();
                 var p = new LPath(reader.ReadString());
+                fileSystem = Sidi.IO.FileSystem.Current;
                 prefix = p.prefix;
                 parts = p.parts;
                 reader.ReadEndElement();
@@ -1112,12 +1146,12 @@ namespace Sidi.IO
 
         public static LPath GetUncRoot(string server, string share)
         {
-            return new LPath(shortUncPrefix + server + DirectorySeparator + share + DirectorySeparator, Enumerable.Empty<string>());
+            return new LPath(Sidi.IO.FileSystem.Current, shortUncPrefix + server + DirectorySeparator + share + DirectorySeparator, Enumerable.Empty<string>());
         }
 
         public static LPath GetDriveRoot(char driveLetter)
         {
-            return new LPath(String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
+            return new LPath(Sidi.IO.FileSystem.Current, String.Format(@"{0}:\", driveLetter), Enumerable.Empty<string>());
         }
 
         public static LPath GetDriveRoot(string driveLetter)
