@@ -25,7 +25,9 @@ namespace Sidi.CommandLine
                 goto ok;
             }
 
-            throw new InvalidCastException(type.ToString() + " is not supported");
+            throw new CommandLineException(String.Format(@"Type {0} is not supported as a command line argument, because it does not have one of these methods:
+public {0}(string)
+public static {0} Parse(string)", type.Name));
         ok: ;
         }
 
@@ -85,7 +87,7 @@ namespace Sidi.CommandLine
                 return ctor.Invoke(new object[] { stringRepresentation });
             }
 
-            throw new InvalidCastException(ValueType.ToString() + " is not supported");
+            throw new InvalidOperationException();
         }
 
 

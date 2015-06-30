@@ -133,5 +133,14 @@ using System.Threading.Tasks;
             log.Info(() => dumpString);
             StringAssert.Contains("hello", dumpString);
         }
+
+        [Test]
+        public void DumpList()
+        {
+            var list = new List<string> { "a", "b", "c" };
+            var dumpString = Dumper.Instance.ToString(list);
+            log.Info(() => dumpString);
+            StringAssert.DoesNotContain("Exception", dumpString);
+        }
     }
 }

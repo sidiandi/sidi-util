@@ -110,7 +110,8 @@ namespace Sidi.Util
         /// <returns></returns>
         static IEnumerable<MemberInfo> GetMembersDefault(Type t)
         {
-            return t.GetProperties().Cast<MemberInfo>()
+            return t.GetProperties().Where(p => !p.GetIndexParameters().Any())
+                .Cast<MemberInfo>()
                 .Concat(t.GetFields(BindingFlags.Public | BindingFlags.Instance))
                 .OrderBy(_ => _.Name);
         }

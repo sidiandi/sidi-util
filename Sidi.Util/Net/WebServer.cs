@@ -34,6 +34,7 @@ using System.Web.UI;
 using Sidi.IO;
 using Sidi.Net;
 using Sidi.Extensions;
+using Sidi.CommandLine;
 
 namespace Sidi.Net
 {
@@ -44,6 +45,7 @@ namespace Sidi.Net
 
         HttpListener httpListener = null;
         Thread listenThread;
+        Parser parser = new Parser();
 
         public void Start()
         {
@@ -144,7 +146,7 @@ namespace Sidi.Net
                     }
                     else
                     {
-                        return new object[] { Sidi.CommandLine.Parser.ParseValueBuiltIn(pv, p.ParameterType) };
+                        return new object[] { parser.ParseValue(new List<string>{pv}, p.ParameterType) };
                     }
                 })
                 .ToArray();
@@ -195,8 +197,6 @@ namespace Sidi.Net
                 http.Response.Close();
             }
         }
-
-        
 
         private bool disposed = false;
             
