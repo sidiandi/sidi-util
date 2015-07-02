@@ -69,10 +69,10 @@ namespace Sidi.Persistence
         }
 
         /// <summary>
-        /// Determines whether a Set<T> object contains the specified element.
+        /// Determines whether a Set(T) object contains the specified element.
         /// </summary>
-        /// <param name="item">The element to locate in the System.Collections.Generic.HashSet<T> object.</param>
-        /// <returns>true if the System.Collections.Generic.HashSet<T> object contains the specified element; otherwise, false.</returns>
+        /// <param name="item">The element to locate in the System.Collections.Generic.HashSet&lt;T&gt; object.</param>
+        /// <returns>true if the System.Collections.Generic.HashSet&lt;T&gt; object contains the specified element; otherwise, false.</returns>
         public bool Contains(T item)
         {
             var hash = GetRecord(item).HashValue;
@@ -80,10 +80,10 @@ namespace Sidi.Persistence
         }
 
         /// <summary>
-        /// Removes the specified element from a Set<T> object.
+        /// Removes the specified element from a Set(T) object.
         /// </summary>
         /// <param name="item">The element to remove.</param>
-        /// <returns>true if the element is successfully found and removed; otherwise, false. This method returns false if item is not found in the Set<T> object.</returns>
+        /// <returns>true if the element is successfully found and removed; otherwise, false. This method returns false if item is not found in the Set(T) object.</returns>
         public bool Remove(T item)
         {
             var deleteCommand = collection.CreateCommand("delete from @table where HashValue = @param0", GetRecord(item).HashValue);

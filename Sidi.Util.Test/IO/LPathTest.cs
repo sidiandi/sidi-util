@@ -102,7 +102,9 @@ namespace Sidi.IO
         {
             var ln = LPath.CreateRelative(Enumerable.Range(0, 100).Select(x => "0000000000").ToArray());
             var cd = new LPath(System.Environment.CurrentDirectory);
-            Assert.AreEqual(cd.CatDir(ln), ln.GetFullPath());
+            var a = cd.CatDir(ln);
+            var b = ln.GetFullPath();
+            Assert.AreEqual(a, b);
         }
 
         [Test]

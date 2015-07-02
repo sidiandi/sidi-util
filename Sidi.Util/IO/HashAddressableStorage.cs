@@ -47,6 +47,7 @@ namespace Sidi.IO
         /// <summary>
         /// Writes the contents of file content to the storage. Then removes file content
         /// </summary>
+        /// <param name="key">Hash value under which the data will be stored.</param>
         /// <param name="content"></param>
         /// <returns></returns>
         public void MoveInto(Hash key, LPath content)
@@ -60,6 +61,7 @@ namespace Sidi.IO
         /// <summary>
         /// Writes the contents of file content to the storage.
         /// </summary>
+        /// <param name="key">Hash value under which the data will be stored.</param>
         /// <param name="content"></param>
         /// <returns></returns>
         public void Write(Hash key, LPath content)
@@ -121,7 +123,7 @@ namespace Sidi.IO
         /// Copies the content addressed by the specified key to file destinationFile.
         /// </summary>
         /// <param name="key">storage address</param>
-        /// <param name="destinationFiles">destination of the copy operation</param>
+        /// <param name="destinationFile">destination of the copy operation</param>
         /// <returns></returns>
         public void Read(Hash key, LPath destinationFile)
         {

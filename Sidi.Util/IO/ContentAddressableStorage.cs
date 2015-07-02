@@ -305,6 +305,7 @@ namespace Sidi.IO
         /// Copies the content addressed by the specified hash to file destinationFile.
         /// </summary>
         /// <param name="hash"></param>
+        /// <param name="destinationFile">The data stored under hash will be written to this file</param>
         /// <returns></returns>
         public void Read(Hash hash, LPath destinationFile)
         {

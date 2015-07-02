@@ -46,7 +46,7 @@ namespace Sidi.IO
         class Entry
         {
             [RowId]
-            public long Id;
+            public long Id = 0;
 
             [Data, Indexed, Unique]
             public byte[] Key;

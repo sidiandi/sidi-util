@@ -57,7 +57,7 @@ namespace Sidi.IO
         class Entry
         {
             [RowId]
-            public long Id;
+            public long Id = 0;
 
             [Data, Indexed, Unique]
             public byte[] Key;
@@ -78,7 +78,7 @@ namespace Sidi.IO
 
             static LPath GetTempFile(HybridHashAddressableStorage storage, Hash key)
             {
-                return storage.directory.CatDir("import").CatDir(key.Value.HexString());
+                return storage.directory.CatDir("import", key.Value.HexString());
             }
             
             public WriteStream(HybridHashAddressableStorage storage, Hash key)

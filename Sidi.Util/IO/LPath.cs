@@ -218,7 +218,6 @@ namespace Sidi.IO
             return new LPath(text);
         }
 
-        [Obsolete("use StringRepresentation instead.")]
         public static implicit operator string(LPath path)
         {
             return path.StringRepresentation;
@@ -496,10 +495,10 @@ namespace Sidi.IO
                 return !String.IsNullOrEmpty(Extension);
             }
         }
-        
-        public LPath CatDir(IEnumerable<string> parts)
+
+        public LPath CatDir(IEnumerable<string> relativePaths)
         {
-            return CatDir(parts.Select(x => new LPath(x)));
+            return CatDir(relativePaths.Select(x => LPath.CreateRelative(x)));
         }
 
         public LPath CatDir(IEnumerable<LPath> relativePaths)
@@ -511,13 +510,7 @@ namespace Sidi.IO
                     throw new ArgumentOutOfRangeException(String.Format("cannot CatDir non-relative path: {0}", i));
                 }
             }
-
             return new LPath(FileSystem, Prefix, Parts.Concat(relativePaths.SelectMany(_ => _.Parts)));
-        }
-
-        public LPath CatDir(params string[] parts)
-        {
-            return CatDir((IEnumerable<string>)parts);
         }
 
         public LPath CatDir(params LPath[] relativePaths)
@@ -525,6 +518,11 @@ namespace Sidi.IO
             return CatDir((IEnumerable<LPath>)relativePaths);
         }
 
+        /// <summary>
+        /// Attaches a postfix to the filename. can for example be used to add an extension to a path
+        /// </summary>
+        /// <param name="namePostfix"></param>
+        /// <returns>Modified path</returns>
         public LPath CatName(string namePostfix)
         {
             return new LPath(FileSystem, Prefix, Parts.TakeAllBut(1).Concat(new[] { FileName + namePostfix }));
@@ -935,7 +933,7 @@ namespace Sidi.IO
                         FileSystem.RemoveDirectory(this);
                         return;
                     }
-                    catch (System.IO.IOException ex)
+                    catch (System.IO.IOException)
                     {
                     }
 

@@ -22,7 +22,7 @@ namespace Sidi.Util
         /// <summary>
         /// Calculates the hash value of file contents. Returns a cached value if the tuple (path, length, modified date) of the file were not changed.
         /// </summary>
-        /// <param name="file"></param>
+        /// <param name="fileInfo">File to be hashed</param>
         /// <returns>Hash value of file contents</returns>
         public Hash Get(IFileSystemInfo fileInfo)
         {

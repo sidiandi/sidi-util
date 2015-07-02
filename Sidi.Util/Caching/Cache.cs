@@ -154,7 +154,7 @@ namespace Sidi.Caching
         /// <summary>
         /// Use binary serialization to write an object to a file
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="stream"></param>
         /// <param name="t"></param>
         public static void SerializeToStream(Stream stream, object t)
         {
@@ -171,7 +171,7 @@ namespace Sidi.Caching
         /// <summary>
         /// Use binary serialization to read an object from a file
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="stream"></param>
         /// <returns></returns>
         public static object DeSerializeFromStream(Stream stream)
         {
@@ -205,7 +205,7 @@ namespace Sidi.Caching
         /// <summary>
         /// Returns if the cacheEntry is valid for key
         /// </summary>
-        /// <param name="cacheEntry"></param>
+        /// <param name="storageItemInfo"></param>
         /// <param name="key"></param>
         /// <returns></returns>
         bool IsValid(StorageItemInfo storageItemInfo, object key)

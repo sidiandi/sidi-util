@@ -596,6 +596,8 @@ namespace Sidi.Persistence
         /// Executes a SQL select and returns a list of objects
         /// </summary>
         /// <param name="query">part of SQL select statement after "where"</param>
+        /// <param name="paramName">Name of a parameter contained in query without the @ prefix.</param>
+        /// <param name="param">Value of a parameter contained in query</param>
         /// <returns>Single item that matches the query or default(T) if no such item is found.</returns>
         public T Find(string query, string paramName, object param)
         {
