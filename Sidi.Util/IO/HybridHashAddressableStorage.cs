@@ -301,8 +301,15 @@ namespace Sidi.IO
             }
             else
             {
-                info = new StorageItemInfo(e.Value.Length, e.LastWriteTimeUtc);
-                return true;
+                if (e.Value == null)
+                {
+                    return this.fileStorage.TryGetInfo(key, out info);
+                }
+                else
+                {
+                    info = new StorageItemInfo(e.Value.Length, e.LastWriteTimeUtc);
+                    return true;
+                }
             }
         }
 
