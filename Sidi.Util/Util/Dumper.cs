@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Collections;
 using System.Windows;
 using System.Linq.Expressions;
+using System.Data;
 
 namespace Sidi.Util
 {
@@ -210,6 +211,14 @@ namespace Sidi.Util
                                 w.Write("[{0}] ", i.Key);
                                 RenderValue(i.Value, new IndentWriter(w, Indent, false), level + 1);
                             }
+                        }
+                    }
+                    else if (value is IDataRecord)
+                    {
+                        var dr = (IDataRecord) value;
+                        for (int i = 0; i < dr.FieldCount; ++i)
+                        {
+                            w.WriteLine("[{0}] {2} {1} = {3}", i, dr.GetName(i), dr.GetFieldType(i), dr.GetValue(i));
                         }
                     }
                 }

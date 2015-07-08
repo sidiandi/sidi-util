@@ -750,7 +750,7 @@ namespace Sidi.Persistence
 
         static HashSet<Type> supportedTypes = new HashSet<Type>
         {
-            typeof(string),typeof(DateTime),typeof(bool),typeof(decimal),typeof(short),typeof(int),typeof(long),typeof(byte[]),typeof(Guid)
+            typeof(string),typeof(DateTime),typeof(bool),typeof(decimal),typeof(short),typeof(int),typeof(long),typeof(byte[]),typeof(Guid),typeof(double)
         };
 
         T FromReader(SQLiteDataReader reader)
@@ -813,6 +813,10 @@ namespace Sidi.Persistence
                 else if (memberType == typeof(Guid))
                 {
                     i.SetValue(item, reader.GetGuid(index));
+                }
+                else if (memberType == typeof(double))
+                {
+                    i.SetValue(item, reader.GetDouble(index));
                 }
                 else
                 {

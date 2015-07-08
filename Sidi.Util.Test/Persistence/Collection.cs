@@ -30,6 +30,7 @@ using L = Sidi.IO;
 using System.Linq.Expressions;
 using System.Data.SQLite;
 using Sidi.Test;
+using Sidi.Extensions;
 
 namespace Sidi.Persistence
 {
@@ -355,18 +356,27 @@ namespace Sidi.Persistence
                     t.Commit();
                 }
 
-                AllDataTypes def = new AllDataTypes();
-                foreach (AllDataTypes item in c)
-                {
-                    Assert.That(item.aDecimal == def.aDecimal);
+                AllDataTypes item = new AllDataTypes();
 
-                    Assert.That(item.aBool == def.aBool);
-                    Assert.That(item.aDecimal == def.aDecimal);
-                    Assert.That(item.aShort == def.aShort);
-                    Assert.That(item.aInt == def.aInt);
-                    Assert.That(item.aLong == def.aLong);
-                    Assert.That(item.aDouble == def.aDouble);
-                    Assert.AreEqual(item.aString, def.aString);
+                var cmd = c.CreateCommand("select * from AllDataTypes");
+                using (var r = cmd.ExecuteReader())
+                {
+                    foreach (var i in r.Cast<IDataRecord>().Take(1))
+                    {
+                        log.Info(() => i);
+                        Assert.AreEqual(item.aDouble, i.GetDouble(5));
+                    }
+                }
+                
+                foreach (AllDataTypes i in c)
+                {
+                    Assert.AreEqual(item.aBool, i.aBool);
+                    Assert.AreEqual(item.aDecimal, i.aDecimal);
+                    Assert.AreEqual(item.aShort, i.aShort);
+                    Assert.AreEqual(item.aInt, i.aInt);
+                    Assert.AreEqual(item.aLong, i.aLong);
+                    Assert.AreEqual(item.aDouble, i.aDouble);
+                    Assert.AreEqual(item.aString, i.aString);
                 }
             }
         }
