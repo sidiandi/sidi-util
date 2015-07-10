@@ -11,9 +11,10 @@
     <StartArguments>/labels C:\build\sidi-util_Release\Sidi.Util.Test.dll</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>$(TargetDir)Sidi.Util.Test.dll</StartArguments>
+    <StartArguments>C:\work\sidi-util.build\Debug-AnyCPU\bin\Sidi.Util.Test.dll /run=Sidi.Persistence.CollectionTest /labels /stoponerror</StartArguments>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\work\nuget-packages\NUnit.Runners.2.6.3\tools\nunit.exe</StartProgram>
+    <StartProgram>C:\work\nuget-packages\NUnit.Runners.2.6.4\tools\nunit-console.exe</StartProgram>
+    <StartWorkingDirectory>C:\work\sidi-util.build\Debug-AnyCPU\bin</StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory />

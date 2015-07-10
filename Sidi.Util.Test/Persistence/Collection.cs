@@ -158,6 +158,7 @@ namespace Sidi.Persistence
         public void Init()
         {
             testFile.EnsureNotExists();
+            testFile.EnsureParentDirectoryExists();
             addressBook = new Sidi.Persistence.Collection<Address>(testFile, table);
             Write();
         }
@@ -165,8 +166,12 @@ namespace Sidi.Persistence
         [TearDown]
         public void Deinit()
         {
-            addressBook.Dispose();
-            addressBook = null;
+            if (addressBook != null)
+            {
+                addressBook.Dispose();
+                addressBook = null;
+            }
+            testFile.EnsureNotExists();
         }
 
         [Test]
@@ -343,7 +348,7 @@ namespace Sidi.Persistence
         [Test]
         public void DataTypes()
         {
-            using (Sidi.Persistence.Collection<AllDataTypes> c = new Sidi.Persistence.Collection<AllDataTypes>(addressBook.SharedConnection))
+            using (var c = new Sidi.Persistence.Collection<AllDataTypes>(addressBook.SharedConnection))
             {
                 c.Clear();
                 using (DbTransaction t = c.BeginTransaction())
@@ -358,13 +363,15 @@ namespace Sidi.Persistence
 
                 AllDataTypes item = new AllDataTypes();
 
-                var cmd = c.CreateCommand("select * from AllDataTypes");
-                using (var r = cmd.ExecuteReader())
+                using (var cmd = c.CreateCommand("select * from AllDataTypes"))
                 {
-                    foreach (var i in r.Cast<IDataRecord>().Take(1))
+                    using (var r = cmd.ExecuteReader())
                     {
-                        log.Info(() => i);
-                        Assert.AreEqual(item.aDouble, i.GetDouble(5));
+                        foreach (var i in r.Cast<IDataRecord>().Take(1))
+                        {
+                            log.Info(() => i);
+                            Assert.AreEqual(item.aDouble, i.GetDouble(5));
+                        }
                     }
                 }
                 
