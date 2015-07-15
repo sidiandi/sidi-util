@@ -103,12 +103,18 @@ namespace Sidi.IO.Windows
             //log.Info(p);
             return p;
         }
+
+        const string devicePrefix = @"\\.\";
         
         string GetLongPathApiParameterImpl(LPath path)
         {
             if (path.IsUnc)
             {
                 return longUncPrefix + path.Server + LPath.DirectorySeparator + path.Share + LPath.DirectorySeparator + String.Join(DirectorySeparator, path.Parts);
+            }
+            else if (object.Equals(path.Prefix, devicePrefix))
+            {
+                return path.StringRepresentation;
             }
             else
             {
@@ -279,19 +285,16 @@ namespace Sidi.IO.Windows
             var creationDisposition = System.IO.FileMode.Open;
             var flagsAndAttributes = System.IO.FileAttributes.Normal;
             var hTemplateFile = IntPtr.Zero;
-            var access = System.IO.FileAccess.Read;
 
             switch (fileMode)
             {
                 case System.IO.FileMode.Create:
                     desiredAccess = System.IO.FileAccess.Write;
                     creationDisposition = System.IO.FileMode.Create;
-                    access = System.IO.FileAccess.ReadWrite;
                     break;
                 case System.IO.FileMode.Open:
                     desiredAccess = System.IO.FileAccess.Read;
                     creationDisposition = System.IO.FileMode.Open;
-                    access = System.IO.FileAccess.Read;
                     break;
                 default:
                     throw new NotImplementedException(fileMode.ToString());
@@ -300,8 +303,7 @@ namespace Sidi.IO.Windows
             if (fileName.Prefix.Equals(@"\\.\"))
             {
                 shareMode = System.IO.FileShare.Write;
-                desiredAccess = System.IO.FileAccess.ReadWrite;
-                access = System.IO.FileAccess.ReadWrite;
+                desiredAccess = System.IO.FileAccess.Read;
             }
 
             SafeFileHandle h;
@@ -326,7 +328,7 @@ namespace Sidi.IO.Windows
                 throw new System.IO.IOException(String.Format("Cannot open file: {0}", fileName), ex);
             }
 
-            return new System.IO.FileStream(h, access);
+            return new System.IO.FileStream(h, desiredAccess);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]

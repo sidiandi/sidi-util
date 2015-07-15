@@ -69,22 +69,17 @@ namespace Sidi.IO
             Assert.IsTrue(copyTask.IsCanceled);
         }
 
-        /*
-        [Test, Explicit("experimental program")]
-        public void WipeDisk()
+        [Test, Explicit("reading raw disk. Requires elevation")]
+        public void ReadDisk()
         {
             var disk = new LPath(@"\\.\PhysicalDrive1");
-            using (var f = FileSystem.Current.Open(disk, System.IO.FileMode.Open))
+            using (var f = disk.OpenRead())
             {
-                var b = new byte[0x1000];
-                f.Seek(0xF8AEA01700L, System.IO.SeekOrigin.Begin);
-                Console.WriteLine(f.Position);
-                f.Write(b, 0, b.Length);
+                var b = new byte[0x200];
                 f.Read(b, 0, b.Length);
-                Console.WriteLine(b.HexString());
+                Sidi.Util.HexDump.Write(b, Console.Out);
             }
         }
-         */
 
         void progress_ProgressChanged(object sender, CopyFileProgress e)
         {
