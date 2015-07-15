@@ -47,13 +47,21 @@ namespace Sidi.Util
                 MaxWidth = 1000;
                 Width = -1;
                 AutoWidth = true;
+                TextFormat = DefaultTextFormat;
             }
+
+            static string DefaultTextFormat(int index, object value)
+            {
+                return value.SafeToString();
+            }
+
+            public Func<int, object, string> TextFormat { get; set; }
 
             public string GetText(T x, int index)
             {
                 try
                 {
-                    return f(index, x).SafeToString();
+                    return TextFormat(index, GetValue(index, x));
                 }
                 catch
                 {
@@ -65,7 +73,7 @@ namespace Sidi.Util
             {
                 try
                 {
-                    return f(index, x);
+                    return GetValue(index, x);
                 }
                 catch
                 {
@@ -73,19 +81,19 @@ namespace Sidi.Util
                 }
             }
 
-            public string Name { get; private set; }
-            Func<int, T, object> f;
+            public string Name { get; set; }
+            public Func<int, T, object> GetValue { get; set; }
 
             public Column(string name, Func<int, T, object> f) : this()
             {
-                this.f = f;
+                this.GetValue = f;
                 Name = name;
             }
 
             public Column(string name, Func<T, object> f)
                 : this()
             {
-                this.f = (i, x) => f(x);
+                this.GetValue = (i, x) => f(x);
                 Name = name;
             }
 
@@ -98,6 +106,13 @@ namespace Sidi.Util
         {
             Columns.Add(new Column(caption, (i,x) => f(x)));
             return this;
+        }
+
+        public ListFormat<T>.Column AddColumn()
+        {
+            var c = new Column();
+            Columns.Add(c);
+            return c;
         }
 
         public ListFormat<T> AddColumn(string caption, Func<int, T, object> f)

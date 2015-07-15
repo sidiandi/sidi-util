@@ -72,6 +72,21 @@ namespace Sidi.Util
             }
         }
 
+        [Test]
+        public void TextFormat()
+        {
+            var list = data.ListFormat();
+
+            var c = list.AddColumn();
+            c.GetValue = (i, v) => v.LastWriteTimeUtc;
+            c.TextFormat = (i, v) => { return ((DateTime)v).DayOfWeek.ToString(); };
+            c.Name = "Weekday";
+            c.AutoWidth = false;
+            c.Width = 3;
+
+            list.RenderText(Console.Out);
+        }
+
         public class Example
         {
             public string Name { set; get; }
