@@ -85,7 +85,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		/>
   </Target>
 
-  <Target Name="PushLocal" DependsOnTargets="Pack">
+  <Target Name="PushLocal" DependsOnTargets="Test;Pack">
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(PackageFiles.Identity)" />
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(PackageFiles.RootDir)%(PackageFiles.Directory)%(PackageFiles.Filename).symbols.nupkg" />
   </Target>

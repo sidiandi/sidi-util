@@ -1,7 +1,7 @@
 # assembly-versioning-scheme: MajorMinorPatchMetadata | MajorMinorPatch | MajorMinor | Major
 # tag-prefix: '[vV|version-] # regex to match git tag prefix
 # next-version: 1.0.0
-mode: ContinuousDelivery
+mode: ContinuousDeployment
 # continuous-delivery-fallback-tag: ci
 #branches:
 #   release[/-]:
