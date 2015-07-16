@@ -12,4 +12,5 @@ mode: ContinuousDelivery
 #    tag: alpha
 branches:
   master:
-    increment: Minor
+    increment: Patch
+
