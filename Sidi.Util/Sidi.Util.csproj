@@ -350,7 +350,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Sidi.Util.snk" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\ChooseDialog.resx">
