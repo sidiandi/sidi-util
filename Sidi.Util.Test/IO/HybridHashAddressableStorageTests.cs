@@ -39,6 +39,7 @@ namespace Sidi.IO.Tests
                         log.Info(() => Find.AllFiles(root));
                     }
                 }
+
                 StorageItemInfo info;
                 Assert.IsTrue(s.TryGetInfo(bigDataKey, out info));
                 Assert.AreEqual(bigData.Length, info.Length);

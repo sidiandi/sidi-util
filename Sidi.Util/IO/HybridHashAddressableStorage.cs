@@ -165,10 +165,9 @@ namespace Sidi.IO
 
             public override void Write(byte[] buffer, int offset, int count)
             {
-                stream.Write(buffer, offset, count);
                 if (tempFile == null)
                 {
-                    if (stream.Position > storage.MaxInternalBlobSize)
+                    if ((stream.Position + count) > storage.MaxInternalBlobSize)
                     {
                         tempFile = GetTempFile(storage, key);
                         var fileStream = tempFile.OpenWrite();
@@ -178,6 +177,7 @@ namespace Sidi.IO
                         stream = fileStream;
                     }
                 }
+                stream.Write(buffer, offset, count);
             }
         }
 
