@@ -3,7 +3,8 @@
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectGuid>{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}</ProjectGuid>
-    <NuGetPackageImportStamp>ad5b0391</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="..\build\Common.props" />
   <ItemGroup>
@@ -28,17 +29,17 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.97.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\lib\net45\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.98.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\..\nuget-packages\System.Data.SQLite.Core.1.0.98.1\lib\net45\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.97.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\nuget-packages\System.Data.SQLite.EF6.1.0.97.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.98.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\..\nuget-packages\System.Data.SQLite.EF6.1.0.98.1\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.97.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\nuget-packages\System.Data.SQLite.Linq.1.0.97.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.98.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\..\nuget-packages\System.Data.SQLite.Linq.1.0.98.1\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -224,9 +225,7 @@
     <Compile Include="Forms\VerbMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms\ViewIList.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Forms\ViewIList.cs" />
     <Compile Include="Forms\Viewport.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -308,9 +307,7 @@
     <Compile Include="Visualization\ITree.cs" />
     <Compile Include="Visualization\LabelPainter.cs" />
     <Compile Include="Visualization\PercentileColorScale.cs" />
-    <Compile Include="Visualization\SimpleTreeMap.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Visualization\SimpleTreeMap.cs" />
     <Compile Include="Visualization\Tile.cs" />
     <Compile Include="Visualization\Tiles.cs" />
     <Compile Include="Visualization\Tree.cs" />
@@ -389,15 +386,15 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="$(SolutionDir)\build\Common.targets" />
+  <Import Project="..\..\nuget-packages\GitVersionTask.3.1.1\Build\portable-net+sl+win+wpa+wp\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.3.1.1\Build\portable-net+sl+win+wpa+wp\GitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets'))" />
-    <Error Condition="!Exists('..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\..\nuget-packages\GitVersionTask.3.1.1\Build\portable-net+sl+win+wpa+wp\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\GitVersionTask.3.1.1\Build\portable-net+sl+win+wpa+wp\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\nuget-packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets'))" />
   </Target>
-  <Import Project="..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets')" />
-  <Import Project="..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.3.0.0-beta0002\Build\GitVersionTask.targets')" />
+  <Import Project="..\..\nuget-packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\..\nuget-packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
