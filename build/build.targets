@@ -19,7 +19,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	<PropertyGroup>
 		<SourceDir>$([System.IO.Directory]::GetParent($(MSBuildProjectDirectory)))</SourceDir>
 
-		<NugetPackagesDir>$(SourceDir)\..\nuget-packages</NugetPackagesDir>
+		<NugetPackagesDir>$(SourceDir)\..\Packages</NugetPackagesDir>
 		
 		<NUnitBin>$(NugetPackagesDir)\NUnit.Runners.2.6.4\tools</NUnitBin>
 		<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
@@ -27,12 +27,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
   </PropertyGroup>
 
-	<PropertyGroup>
-	<MSBuildCommunityTasksPath>$(SourceDir)\build</MSBuildCommunityTasksPath>
-  </PropertyGroup>
-  
-  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
-  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.1.1\Build\portable-net+sl+win+wpa+wp\GitVersionTask.targets" Condition="Exists('..\..\nuget-packages\GitVersionTask.3.1.1\Build\portable-net+sl+win+wpa+wp\GitVersionTask.targets')" />
+  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.1.1\build\dotnet\GitVersionTask.targets" />
   <Import Project="C:\work\nugetPackSymbols.build\Release-AnyCPU\bin\Build\CreateNugetSymbolsPackage.targets" />
 
   <Target Name="GetVersion">
@@ -75,7 +70,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	</PropertyGroup>
 	<RemoveDir Directories="$(PackageDir)"/>
 	<MakeDir Directories="$(PackageDir)" />
-	<Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(SourceDir)\%(PackageProjects.Identity) -OutputDirectory $(PackageDir) -Version $(GfvNuGetVersion)" />
+	<Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(SourceDir)\%(PackageProjects.Identity) -OutputDirectory $(PackageDir) -Version $(GfvNuGetVersion) -Verbosity detailed" />
 	<ItemGroup>
 		<PackageFiles Include="$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg" />
 	</ItemGroup>
