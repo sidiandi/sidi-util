@@ -149,5 +149,17 @@ namespace Sidi.Persistence
                 Assert.AreEqual(0, d.Count);
             }
         }
+
+        [Test]
+        public void ReadWriteTime()
+        {
+            var dbFile = NewTestFile("StringDateTimeDic.sqlite");
+            var d = new Sidi.Persistence.Dictionary<string, DateTime>(dbFile, "StringDateTimeDic");
+            var id = "Id";
+            var time = DateTime.UtcNow;
+            d[id] = time;
+            Assert.AreEqual(time, d[id]);
+        }
+
     }
 }

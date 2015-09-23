@@ -31,6 +31,7 @@ using Sidi.Extensions;
 using Sidi.IO;
 using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Globalization;
 
 namespace Sidi.Persistence
 {
@@ -784,7 +785,9 @@ namespace Sidi.Persistence
                 }
                 else if (memberType == typeof(DateTime))
                 {
-                    i.SetValue(item, reader.GetDateTime(index));
+                    var timeString = reader.GetString(index);
+                    var d = DateTime.Parse(timeString, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+                    i.SetValue(item, d);
                 }
                 else if (memberType == typeof(bool))
                 {
