@@ -25,6 +25,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
 		
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
+		<Git>git.exe</Git>
   </PropertyGroup>
 
   <Import Project="$(NugetPackagesDir)\GitVersionTask.3.1.1\build\dotnet\GitVersionTask.targets" />
@@ -64,7 +65,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <Exec Command="$(NUnitConsole) /xml=$(TestDir)\TestResult.xml /labels @(Targets, ' ')" />
   </Target>
 
-  <Target Name="Pack" DependsOnTargets="Build">
+  <Target Name="Pack" DependsOnTargets="Build;Tag">
     <PropertyGroup>
 		<PackageDir>$(BuildDir)\package</PackageDir>
 	</PropertyGroup>
@@ -79,6 +80,10 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		BinDir = "$(OutDir)"
 		NugetExePath = "$(Nuget)"
 		/>
+  </Target>
+
+  <Target Name="Tag" DependsOnTargets="GetVersion">
+	<Exec WorkingDirectory="$(SourceDir)" Command="$(Git) tag v$(GfvSemVer)" />
   </Target>
 
   <Target Name="PushLocal" DependsOnTargets="Pack">
