@@ -83,7 +83,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </Target>
 
   <Target Name="Tag" DependsOnTargets="GetVersion">
-	<Exec WorkingDirectory="$(SourceDir)" Command="$(Git) tag v$(GfvSemVer)" />
+	<Exec WorkingDirectory="$(SourceDir)" Command="$(Git) tag --force v$(GfvSemVer)" />
   </Target>
 
   <Target Name="PushLocal" DependsOnTargets="Pack">
