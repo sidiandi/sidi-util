@@ -1,4 +1,4 @@
-Copyright (c) 2012, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
+Copyright (c) 2012-2015, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
 
 This file is part of sidi-util.
 
@@ -14,3 +14,10 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
+
+----
+Build instructions:
+- use git commit messages to bump SemVer:
+  +semver: breaking
+  +semver: feature
+  +semver: fix
