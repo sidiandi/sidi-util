@@ -11,7 +11,7 @@ commit-message-incrementing: Enabled
 #   develop:
 #    mode: ContinuousDelivery | ContinuousDeployment
 #    tag: alpha
-#branches:
-#  master:
-#    increment: Patch
+branches:
+  master:
+    increment: Patch
 
