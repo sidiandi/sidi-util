@@ -2,7 +2,6 @@
 # tag-prefix: '[vV|version-] # regex to match git tag prefix
 # next-version: 1.0.0
 # mode: ContinuousDeployment
-commit-message-incrementing: Enabled
 # continuous-delivery-fallback-tag: ci
 #branches:
 #   release[/-]:
