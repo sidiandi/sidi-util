@@ -58,6 +58,7 @@
     <Compile Include="Caching\LruCache.cs" />
     <Compile Include="Caching\LruCacheBackground.cs" />
     <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Collections\DefaultValueDictionary.cs" />
     <Compile Include="Collections\EnumList.cs" />
     <Compile Include="Collections\SelectList.cs" />
     <Compile Include="CommandLine\Action.cs" />

@@ -64,6 +64,7 @@
     <Compile Include="Caching\LruCacheBackgroundTest.cs" />
     <Compile Include="Caching\LruCacheTest.cs" />
     <Compile Include="Caching\CacheTest.cs" />
+    <Compile Include="Collections\DefaultValueDictionaryTests.cs" />
     <Compile Include="CommandLine\BasicValueParserTest.cs" />
     <Compile Include="CommandLine\ShowUserInterfaceTest.cs" />
     <Compile Include="CommandLine\StandardValueParserTests.cs" />
@@ -185,9 +186,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Collections\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
