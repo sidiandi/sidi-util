@@ -121,6 +121,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Test\TestBaseTest.cs" />
+    <Compile Include="Treemapping\CushionPainterTests.cs" />
+    <Compile Include="Treemapping\TreeMap.cs" />
+    <Compile Include="Treemapping\TreeNode.cs" />
+    <Compile Include="Treemapping\TreeNodeOperationsTest.cs" />
     <Compile Include="Util\Base32Test.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
     <Compile Include="Util\ByteArrayExtensionsTest.cs" />
@@ -196,6 +200,9 @@
     <ProjectGuid>{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}</ProjectGuid>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\build\Common.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

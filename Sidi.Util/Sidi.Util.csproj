@@ -6,6 +6,9 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
   <Import Project="..\build\Common.props" />
   <ItemGroup>
     <Reference Include="EntityFramework">
@@ -189,6 +192,22 @@
     <Compile Include="Net\WebServer.cs" />
     <Compile Include="Persistence\Set.cs" />
     <Compile Include="Persistence\SharedConnection.cs" />
+    <Compile Include="Treemapping\ColorScale.cs" />
+    <Compile Include="Treemapping\CushionPainter.cs" />
+    <Compile Include="Treemapping\LabelPainter.cs" />
+    <Compile Include="Treemapping\RectangleD.cs" />
+    <Compile Include="Treemapping\Extensions.cs" />
+    <Compile Include="Treemapping\RectangleDExtensions.cs" />
+    <Compile Include="Treemapping\RectangleFExtensions.cs" />
+    <Compile Include="Treemapping\TiledCushionPainter.cs" />
+    <Compile Include="Treemapping\TreeNode.cs" />
+    <Compile Include="Treemapping\TreePaintArgs.cs" />
+    <Compile Include="Treemapping\View.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Treemapping\TreeNodeOperations.cs" />
+    <Compile Include="Treemapping\Util.cs" />
+    <Compile Include="Treemapping\ZoomPanController.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
     <Compile Include="Util\Base32.cs" />
     <Compile Include="Util\BinaryFormatterObjectHashProvider.cs" />
@@ -302,6 +321,8 @@
     <Compile Include="Visualization\DistinctColor.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\Layout.cs" />
+    <Compile Include="Visualization\Tile.cs" />
+    <Compile Include="Visualization\Tiles.cs" />
     <Compile Include="Visualization\TreeEventArgs.cs" />
     <Compile Include="Visualization\TreeMapExtensions.cs" />
     <Compile Include="Visualization\TypedTreeMap.cs">
@@ -312,8 +333,8 @@
     <Compile Include="Visualization\LabelPainter.cs" />
     <Compile Include="Visualization\PercentileColorScale.cs" />
     <Compile Include="Visualization\SimpleTreeMap.cs" />
-    <Compile Include="Visualization\Tile.cs" />
-    <Compile Include="Visualization\Tiles.cs" />
+    <Compile Include="Treemapping\Tile.cs" />
+    <Compile Include="Treemapping\Tiles.cs" />
     <Compile Include="Visualization\Tree.cs" />
     <Compile Include="Visualization\TreeMap.cs">
       <SubType>Component</SubType>

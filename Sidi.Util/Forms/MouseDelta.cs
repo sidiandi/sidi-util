@@ -61,7 +61,7 @@ namespace Sidi.Forms
         {
             m_initialCursorPosition = Cursor.Position;
             Application.AddMessageFilter(this);
-            Cursor.Hide();
+            // Cursor.Hide();
             RegisterMouseInput();
         }
 
