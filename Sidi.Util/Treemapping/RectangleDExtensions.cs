@@ -119,5 +119,12 @@ namespace Sidi.Treemapping
                 return n / d;
             }
         }
+
+        public static Matrix GetInverse(this Matrix m)
+        {
+            var i = m;
+            i.Invert();
+            return i;
+        }
     }
 }

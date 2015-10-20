@@ -25,6 +25,16 @@ namespace Sidi.Treemapping
 
         public string Text { get; set; }
 
+        /// <summary>
+        /// Returns the direct child node that contains point or null
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public TreeNode GetNodeAt(System.Windows.Point point)
+        {
+            return Nodes.FirstOrDefault(n => n.Rectangle.Contains(point));
+        }
+
         //
         // Summary:
         //     Gets the parent tree node of the current tree node.

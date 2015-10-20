@@ -195,6 +195,8 @@
     <Compile Include="Treemapping\ColorScale.cs" />
     <Compile Include="Treemapping\CushionPainter.cs" />
     <Compile Include="Treemapping\LabelPainter.cs" />
+    <Compile Include="Treemapping\LabelPainterController.cs" />
+    <Compile Include="Treemapping\LevelZoomPanController.cs" />
     <Compile Include="Treemapping\RectangleD.cs" />
     <Compile Include="Treemapping\Extensions.cs" />
     <Compile Include="Treemapping\RectangleDExtensions.cs" />

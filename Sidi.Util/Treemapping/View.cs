@@ -22,6 +22,13 @@ namespace Sidi.Treemapping
             Size = new Size(100, 100);
 
             zoomPanController = new ZoomPanController(this, () => WorldToScreen.ToMatrixF(), t => this.WorldToScreen = t.ToMatrixD());
+            labelPainterController = new LabelPainterController(this, labelPainter);
+            levelZoomPanController = new LevelZoomPanController(this);
+        }
+
+        public System.Windows.Point GetWorldPoint(Point clientPoint)
+        {
+            return WorldToScreen.GetInverse().Transform(clientPoint.ToPointD());
         }
 
         public TreeNode Tree
@@ -48,7 +55,7 @@ namespace Sidi.Treemapping
             Invalidate();
         }
 
-        System.Windows.Media.Matrix WorldToScreen
+        public System.Windows.Media.Matrix WorldToScreen
         {
             get
             {
@@ -64,6 +71,8 @@ namespace Sidi.Treemapping
         System.Windows.Media.Matrix m_transform = new System.Windows.Media.Matrix();
 
         ZoomPanController zoomPanController;
+        LabelPainterController labelPainterController;
+        LevelZoomPanController levelZoomPanController;
 
         protected override void OnSizeChanged(EventArgs e)
         {
@@ -76,12 +85,15 @@ namespace Sidi.Treemapping
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            var screenToWorld = WorldToScreen.GetInverse();
+
             var tpe = new TreePaintArgs
             {
                 PaintEventArgs = e,
                 WorldToScreen = WorldToScreen,
+                ScreenToWorld = screenToWorld,
                 Tree = this.Tree,
-                ScreenRect = this.ClientRectangle
+                ScreenRect = this.ClientRectangle,
             };
 
             cushionPainter.Paint(tpe);

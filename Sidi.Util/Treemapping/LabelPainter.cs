@@ -22,6 +22,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using Sidi.Extensions;
 
 namespace Sidi.Treemapping
 {
@@ -32,7 +33,7 @@ namespace Sidi.Treemapping
         Max
     };
 
-    public class LabelPainter : IDisposable
+    public class LabelPainter
     {
         public InteractionMode InteractMode { set; get; }
 
@@ -46,7 +47,7 @@ namespace Sidi.Treemapping
             MinArea = 1000;
             MinFontSize = 5;
             LeafsOnly = false;
-            Text = t => t == null ? String.Empty : t.Tag.ToString();
+            Text = t => t == null ? String.Empty : t.Tag.SafeToString();
 
             StringFormat = new StringFormat()
             {
@@ -86,28 +87,26 @@ namespace Sidi.Treemapping
             LevelVisible[index] = !LevelVisible[index];
         }
 
-        public void Focus(Point focusPoint)
+        public void Focus(System.Windows.Point worldFocusPoint)
         {
-            this.focusPoint = focusPoint;
+            this.worldFocusPoint = worldFocusPoint;
             focusPointEnabled = true;
         }
 
         bool focusPointEnabled = false;
-        Point focusPoint;
         System.Windows.Point worldFocusPoint;
-        System.Windows.Media.Matrix worldToScreenTransform;
         double areaScale;
+
         public void Paint(TreePaintArgs pa)
         {
             var g = pa.PaintEventArgs.Graphics;
             double maxArea = pa.Tree.Rectangle.Area;
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
-            worldToScreenTransform = g.Transform.ToMatrixD();
             areaScale = pa.WorldToScreen.Transform(RectangleD.FromLTRB(0, 0, 1, 1)).Area;
 
             if (focusPointEnabled)
             {
-                // PaintFocusPoint(e);
+                PaintFocusPoint(pa);
             }
             else
             {
@@ -115,6 +114,49 @@ namespace Sidi.Treemapping
             }
         }
 
+        void PaintFocusPoint(TreePaintArgs pa)
+        {
+            var g = pa.PaintEventArgs.Graphics;
+            PaintRecursiveFocusPoint(pa, 0);
+        }
+
+        void PaintRecursiveFocusPoint(TreePaintArgs pa, int level)
+        {
+            bool drawLabel = !pa.Tree.Rectangle.Contains(worldFocusPoint) || pa.Tree.IsLeaf;
+
+            if (!drawLabel)
+            {
+                // determine if there is enough area to draw a label in at least 75% of all childs
+                double totalArea = 0;
+                double drawableArea = 0;
+                foreach (var c in pa.Tree.Nodes)
+                {
+                    var a = c.Rectangle.Area * areaScale;
+                    if (a >= MinArea)
+                    {
+                        drawableArea += a;
+                    }
+                    totalArea += a;
+                }
+
+                drawLabel = drawableArea < 0.75 * totalArea;
+            }
+
+            if (drawLabel)
+            {
+                var text = Text(pa.Tree);
+                DrawLabel(pa, text, pa.Tree.Rectangle);
+            }
+            else
+            {
+                foreach (var c in pa.Tree.Nodes)
+                {
+                    var newPa = pa.Clone();
+                    newPa.Tree = c;
+                    PaintRecursiveFocusPoint(newPa, level + 1);
+                };
+            }
+        }
         public Font Font { set; get; }
         public float MinFontSize { set; get; }
         public bool LeafsOnly { get; set; }
@@ -190,9 +232,9 @@ namespace Sidi.Treemapping
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
-        public bool DrawLabel(Graphics graphics, string text, RectangleD rect)
+        public bool DrawLabel(TreePaintArgs pa, string text, RectangleD rect)
         {
-            return DrawLabel1(graphics, text, rect);
+            return DrawLabel1(pa, text, rect);
         }
         
         /// <summary>
@@ -202,14 +244,15 @@ namespace Sidi.Treemapping
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
-        public bool DrawLabel2(Graphics graphics, string text, RectangleD rect)
+        public bool DrawLabel2(TreePaintArgs pa, string text, RectangleD rect)
         {
             try
             {
-                rect = worldToScreenTransform.Transform(rect);
+                rect = pa.WorldToScreen.Transform(rect);
+                var g = pa.PaintEventArgs.Graphics;
 
                 var charDims = Enumerable.Range(0, text.Length)
-                    .Select(i => graphics.MeasureString(text.Substring(i, 1), this.Font))
+                    .Select(i => g.MeasureString(text.Substring(i, 1), this.Font))
                     .ToArray();
 
                 float totalWidth = charDims.Sum(r => r.Width);
@@ -242,7 +285,7 @@ namespace Sidi.Treemapping
                 {
                     for (int i = 0; i < lines.Length; ++i)
                     {
-                        graphics.DrawString(
+                        g.DrawString(
                             lines[i],
                             font,
                             white,
@@ -268,9 +311,10 @@ namespace Sidi.Treemapping
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
-        public bool DrawLabel1(Graphics graphics, string text, RectangleD rect)
+        public bool DrawLabel1(TreePaintArgs pa, string text, RectangleD rect)
         {
-            rect = worldToScreenTransform.Transform(rect);
+            var graphics = pa.PaintEventArgs.Graphics;
+            rect = pa.WorldToScreen.Transform(rect);
 
             var textSize = graphics.MeasureString(text, Font);
             var scale = Math.Min(rect.Width / Math.Max(1.0f, textSize.Width), rect.Height / Math.Max(1.0f, textSize.Height));
@@ -309,9 +353,10 @@ namespace Sidi.Treemapping
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
-        public bool DrawLabel3(Graphics graphics, string text, RectangleD rect)
+        public bool DrawLabel3(TreePaintArgs pa, string text, RectangleD rect)
         {
-            rect = worldToScreenTransform.Transform(rect);
+            var graphics = pa.PaintEventArgs.Graphics;
+            rect = pa.WorldToScreen.Transform(rect);
 
             var textSize = graphics.MeasureString(text, Font);
             textSize.Width = Math.Max(textSize.Width, 1.0f);
@@ -341,12 +386,6 @@ namespace Sidi.Treemapping
             }
             return true;
 
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
         
         protected virtual void Dispose(bool disposing)
