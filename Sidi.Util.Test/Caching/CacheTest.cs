@@ -226,5 +226,17 @@ namespace Sidi.Caching
             readContent = Cache.ReadFile(file, path => path.ReadAllText());
             Assert.AreEqual(content, readContent);
         }
+
+        [Test]
+        public void Dispose()
+        {
+            var dir = this.NewTestFile("dispose-cache");
+            using (var cache = new Cache(dir))
+            {
+                var result = cache.GetCached("world", _ => String.Format("Hello, {0}", _));
+                Assert.AreEqual("Hello, world", result);
+            }
+            dir.EnsureNotExists();
+        }
     }
 }

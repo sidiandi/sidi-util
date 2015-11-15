@@ -34,16 +34,18 @@ namespace Sidi.Caching
     /// Pre-computes values and stores them as flat files. The computation results will be persistent between runs 
     /// of the program.
     /// </summary>
-    public class Cache : IReadOnlyStore<object, object>
+    public class Cache : IReadOnlyStore<object, object>, IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        readonly bool ownsInterfaces;
         readonly IHashAddressableStorage store;
         readonly IObjectHashProvider hashProvider;
 
         public Cache(LPath storeDirectory)
             : this(new HybridHashAddressableStorage(storeDirectory), ObjectHashProvider.GetDefault())
         {
+            this.ownsInterfaces = true;
         }
 
         public Cache(IHashAddressableStorage store, IObjectHashProvider hashProvider)
@@ -372,7 +374,11 @@ namespace Sidi.Caching
         {
             if (disposing)
             {
-                DisposeHelper.Dispose(store);
+                if (ownsInterfaces)
+                {
+                    DisposeHelper.Dispose(store);
+                    DisposeHelper.Dispose(hashProvider);
+                }
             }
         }
 
