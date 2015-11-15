@@ -21,7 +21,7 @@ namespace Sidi.IO
         [Test()]
         public void ContentAddressableStorageTest()
         {
-            var hashProvider = new CachedHashProvider(new HashProvider(new SHA1CryptoServiceProvider()));
+            var hashProvider = new CachedHashProvider(HashProvider.GetDefault());
 
             var dir = TestFile("ContentAddressableStorageTest");
             dir.EnsureNotExists();

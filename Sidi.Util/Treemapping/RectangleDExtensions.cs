@@ -15,6 +15,15 @@ namespace Sidi.Treemapping
             return RectangleD.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom);
         }
 
+        public static RectangleD GetEnvelope(this IEnumerable<RectangleD> rects)
+        {
+            return RectangleD.FromLTRB(
+                rects.Min(_ => _.Left),
+                rects.Min(_ => _.Top),
+                rects.Max(_ => _.Right),
+                rects.Max(_ => _.Bottom));
+        }
+
         public static Point Add(this Point p0, Point p1)
         {
             return new Point(p0.X + p1.X, p0.Y + p1.Y);
@@ -125,6 +134,11 @@ namespace Sidi.Treemapping
             var i = m;
             i.Invert();
             return i;
+        }
+
+        public static void Translate(this Matrix m, Point p)
+        {
+            m.Translate(p.X, p.Y);
         }
     }
 }

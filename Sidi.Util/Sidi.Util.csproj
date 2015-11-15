@@ -142,8 +142,11 @@
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
+    <Compile Include="IO\ConcatStream.cs" />
+    <Compile Include="IO\CopyStream.cs" />
     <Compile Include="IO\HybridHashAddressableStorage.cs" />
     <Compile Include="IO\LPathSurrogate.cs" />
+    <Compile Include="IO\ReadForwardStream.cs" />
     <Compile Include="IO\SQLiteHashAddressableStorage.cs" />
     <Compile Include="IO\HashAddressableStorage.cs" />
     <Compile Include="IO\ContentAddressableStorage.cs" />
@@ -261,6 +264,7 @@
     <Compile Include="Collections\History.cs" />
     <Compile Include="Util\Hash.cs" />
     <Compile Include="Util\HashProvider.cs" />
+    <Compile Include="Util\HashStream.cs" />
     <Compile Include="Util\HexDump.cs" />
     <Compile Include="Util\HtmlCellFormat.cs" />
     <Compile Include="Util\HtmlRowFormat.cs" />

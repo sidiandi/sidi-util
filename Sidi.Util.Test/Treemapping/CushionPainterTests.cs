@@ -13,12 +13,6 @@ namespace Sidi.Treemapping.Test
     public class CushionPainterTests
     {
         [Test()]
-        public void CushionPainterTest()
-        {
-            Assert.Fail();
-        }
-
-        [Test()]
         public void RenderTest()
         {
             var tree = new TreeNodeOperationsTest().CreateTree();

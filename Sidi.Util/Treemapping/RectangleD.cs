@@ -201,5 +201,13 @@ namespace Sidi.Treemapping
         {
             return new RectangleD { P0 = new Point(l, t), P1 = new Point(r, b) };
         }
+
+        public Point Center
+        {
+            get
+            {
+                return new Point((Right + Left) * 0.5, (Top + Bottom) * 0.5);
+            }
+        }
     }
 }

@@ -11,15 +11,16 @@ namespace Sidi.Util
 {
     public class HashProvider : IHashProvider
     {
-        HashAlgorithm algorithm;
+        readonly Func<HashAlgorithm> algorithmProvider;
 
-        public HashProvider(HashAlgorithm algorithm = null)
+        public HashProvider(Func<HashAlgorithm> algorithmProvider)
         {
-            if (algorithm == null)
+            if (algorithmProvider == null)
             {
-                algorithm = new SHA1CryptoServiceProvider();
+                throw new ArgumentNullException("algorithmProvider");
             }
-            this.algorithm = algorithm;
+            this.algorithmProvider = algorithmProvider;
+
         }
 
         public Hash Get(IFileSystemInfo file)
@@ -29,7 +30,7 @@ namespace Sidi.Util
 
         public Hash Get(Stream stream)
         {
-            return new Hash(algorithm.ComputeHash(stream));
+            return new Hash(algorithmProvider().ComputeHash(stream));
         }
 
         /// <summary>
@@ -38,7 +39,12 @@ namespace Sidi.Util
         /// <returns></returns>
         public static IHashProvider GetDefault()
         {
-            return new HashProvider(new SHA1CryptoServiceProvider());
+            return new HashProvider(SHA1CryptoServiceProvider.Create);
+        }
+
+        public HashStream GetStream()
+        {
+            return new HashStream(algorithmProvider());
         }
     }
 }

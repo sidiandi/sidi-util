@@ -13,22 +13,28 @@ namespace Sidi.Treemapping
     {
         public View()
         {
-            Tree = new TreeNode(null) { Size = 1.0 };
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.Selectable, true);
             SetStyle(ControlStyles.StandardClick, true);
-            Size = new Size(100, 100);
 
-            zoomPanController = new ZoomPanController(this, () => WorldToScreen.ToMatrixF(), t => this.WorldToScreen = t.ToMatrixD());
-            labelPainterController = new LabelPainterController(this, labelPainter);
             levelZoomPanController = new LevelZoomPanController(this);
+            zoomPanController = new ZoomPanController(this, () => WorldToScreen, t => this.WorldToScreen = t);
+            labelPainterController = new LabelPainterController(this, labelPainter);
+
+            Tree = new TreeNode(null) { Size = 1.0 };
+            Size = new Size(100, 100);
         }
 
         public System.Windows.Point GetWorldPoint(Point clientPoint)
         {
             return WorldToScreen.GetInverse().Transform(clientPoint.ToPointD());
+        }
+
+        public TreeNode GetNode(Point clientLocation)
+        {
+            return this.Tree.GetNodeAt(GetWorldPoint(clientLocation));
         }
 
         public TreeNode Tree
@@ -52,6 +58,7 @@ namespace Sidi.Treemapping
             Tree.Rectangle = this.ClientRectangle;
             Tree.Squarify();
             this.cushionPainter.Clear();
+            this.zoomPanController.Limits = Tree.Rectangle;
             Invalidate();
         }
 

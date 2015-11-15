@@ -84,6 +84,7 @@
     <Compile Include="IMAP\ServerTest.cs" />
     <Compile Include="IMAP\SessionTest.cs" />
     <Compile Include="IntSetTest.cs" />
+    <Compile Include="IO\ConcatStreamTests.cs" />
     <Compile Include="IO\ContentAddressableStorageTests.cs" />
     <Compile Include="IO\CopyTest.cs" />
     <Compile Include="IO\CopyProgressTest.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Util\BinaryPrefix.cs" />
     <Compile Include="Util\ByteArrayExtensionsTest.cs" />
     <Compile Include="Util\DumperTest.cs" />
+    <Compile Include="Util\HashStreamTests.cs" />
     <Compile Include="Util\HashTests.cs" />
     <Compile Include="Util\HexDumpTests.cs" />
     <Compile Include="Util\IHashProviderExtensionTests.cs" />

@@ -10,13 +10,13 @@ using Sidi.Forms;
 using Sidi.IO;
 using static System.Environment;
 using Sidi.Test;
+using System.Diagnostics;
 
 namespace Sidi.Treemapping.Test
 {
     [TestFixture]
     public class TreeNodeOperationsTest : TestBase
     {
-        [Test]
         public TreeNode CreateTree()
         {
             var leafs = Enumerable.Range(0, 1000);
@@ -40,7 +40,9 @@ namespace Sidi.Treemapping.Test
 
         public TreeNode CreateFileTree()
         {
-            var leafs = Sidi.Caching.Cache.Get(Paths.GetFolderPath(SpecialFolder.MyDocuments), _ => Find.AllFiles(_).ToList());
+            var dir = new LPath(@"Z:\site");
+            // var dir = Paths.GetFolderPath(SpecialFolder.MyDocuments);
+            var leafs = Sidi.Caching.Cache.Get(dir, _ => Find.AllFiles(_).ToList());
 
             var tree = TreeNodeOperations.CreateTree<IFileSystemInfo>(
                 leafs,
@@ -57,7 +59,22 @@ namespace Sidi.Treemapping.Test
             var tree = CreateFileTree();
 
             var v = new View { Tree = tree, Size = new Size(640, 480) };
+
+            v.MouseDoubleClick += (s, e) =>
+            {
+                var n = v.GetNode(e.Location);
+                if (n != null)
+                {
+                    var file = (IFileSystemInfo)n.Tag;
+                    Process.Start(file.FullName);
+                }
+            };
             v.Run();
+        }
+
+        private void V_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

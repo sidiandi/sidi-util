@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,5 +13,8 @@ namespace Sidi.Util
     {
         Hash Get(IFileSystemInfo file);
         Hash Get(Stream stream);
+
+        HashStream GetStream();
     }
+
 }

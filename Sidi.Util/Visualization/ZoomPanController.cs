@@ -100,8 +100,6 @@ namespace Sidi.Visualization
             control.Invalidate();
         }
 
-        
-
         private bool disposed = false;
             
         //Implement IDisposable.

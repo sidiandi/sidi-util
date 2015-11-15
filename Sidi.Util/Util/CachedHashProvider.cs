@@ -38,5 +38,10 @@ namespace Sidi.Util
         {
             return new CachedHashProvider(HashProvider.GetDefault());
         }
+
+        public HashStream GetStream()
+        {
+            return this.hashProvider.GetStream();
+        }
     }
 }

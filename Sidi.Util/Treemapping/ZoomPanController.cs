@@ -20,9 +20,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Drawing.Drawing2D;
 using System.Drawing;
 using Sidi.Forms;
+using System.Windows.Media;
 
 namespace Sidi.Treemapping
 {
@@ -39,17 +39,16 @@ namespace Sidi.Treemapping
             control.MouseWheel += (s, e) =>
                 {
                     float scale = (float) Math.Pow(2.0, ((double)e.Delta) * 0.001);
-                    var screenPoint = new PointF(e.X, e.Y);
-                    
-                    var im = Transform.Clone(); im.Invert();
 
-                    var worldPoint = new[] { screenPoint };
-                    im.TransformPoints(worldPoint);
+                    var im = Transform.GetInverse();
+
+                    var screenPoint = e.Location.ToPointD();
+                    var worldPoint = im.Transform(screenPoint);
 
                     var t = Transform;
-                    t.Translate(-screenPoint.X, -screenPoint.Y, MatrixOrder.Append);
-                    t.Scale(scale, scale, MatrixOrder.Append);
-                    t.Translate(screenPoint.X, screenPoint.Y, MatrixOrder.Append);
+                    t.Translate(-screenPoint.X, -screenPoint.Y);
+                    t.Scale(scale, scale);
+                    t.Translate(screenPoint.X, screenPoint.Y);
                     Transform = t;
                 };
 
@@ -77,7 +76,7 @@ namespace Sidi.Treemapping
             mouseDelta.Move += (ms, me) =>
                 {
                     var t = Transform;
-                    t.Translate(me.Delta.X * PanScale, me.Delta.Y * PanScale, MatrixOrder.Append);
+                    t.Translate(me.Delta.X * PanScale, me.Delta.Y * PanScale);
                     Transform = t;
                 };
         }
@@ -107,7 +106,24 @@ namespace Sidi.Treemapping
 
             set
             {
-                setTransform(value);
+                var transform = value;
+
+                if (Limits != null)
+                {
+                    var cr = (RectangleD)this.control.ClientRectangle;
+                    var screenLimits = transform.Transform(Limits.Value);
+                    if (!screenLimits.Includes(cr))
+                    {
+                        screenLimits = new[] { screenLimits, cr }.GetEnvelope();
+                        var o = cr.Center - screenLimits.Center;
+                        transform.Translate(o.X, o.Y);
+                        var s = ((cr.Width / screenLimits.Width) + (cr.Height / screenLimits.Height)) * 0.5;
+                        s = 1.0 / s;
+                        transform.Scale(s, s);
+                    }
+                }
+
+                setTransform(transform);
                 control.Invalidate();
             }
         }
@@ -116,6 +132,17 @@ namespace Sidi.Treemapping
         {
             Transform = new Matrix();
         }
+
+        public RectangleD? Limits
+        {
+            get { return limits; }
+            set
+            {
+                limits = value;
+                Transform = Transform;
+            }
+        }
+        RectangleD? limits;
 
         private bool disposed = false;
             
