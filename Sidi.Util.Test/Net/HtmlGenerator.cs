@@ -48,12 +48,12 @@ namespace Sidi.Net
             page(Console.Out);
         }
 
-        [Test, ExpectedException(typeof(NullReferenceException))]
+        [Test]
         public void ExceptionHandling()
         {
             string name = null;
             var o = new StringWriter();
-            html(head(), body(name.Length))(o);
+            Assert.Throws<NullReferenceException>(() => html(head(), body(name.Length))(o));
         }
 
         [Test]
@@ -68,17 +68,20 @@ namespace Sidi.Net
             Assert.IsTrue(o.ToString().Contains("NullReferenceException"));
         }
 
-        [Test, ExpectedException(typeof(NullReferenceException))]
+        [Test]
         public void ExceptionWhileRendering()
         {
             var g = new HtmlGenerator();
             string name = null;
             var o = new StringWriter();
-            g.html(g.head(), g.body(
-                g.img(
-                    g.div(new Action<TextWriter>(x => x.WriteLine(name.Length)))
-                )
-                ))(o);
+            Assert.Throws<NullReferenceException>(() =>
+            {
+                g.html(g.head(), g.body(
+                    g.img(
+                        g.div(new Action<TextWriter>(x => x.WriteLine(name.Length)))
+                    )
+                    ))(o);
+            });
             Console.WriteLine(o.ToString());
         }
 
@@ -96,7 +99,7 @@ namespace Sidi.Net
         /// <summary>
         /// Generates attribute and tag for form HtmlGenerator.cs
         /// </summary>
-        [Test, Explicit("not really a test")]
+        [Test, Ignore("not really a test")]
         public void GenerateCode()
         {
             var web = new HtmlWeb();

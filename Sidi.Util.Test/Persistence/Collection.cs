@@ -583,7 +583,7 @@ namespace Sidi.Persistence
             Assert.AreEqual("(Name != \"Bert\")", Collection<Address>.SqlPredicate(f.Body));
         }
 
-        [Test, Explicit("todo")]
+        [Test, Ignore("todo")]
         public void QueryDateTime()
         {
             var x = DateTime.Now;

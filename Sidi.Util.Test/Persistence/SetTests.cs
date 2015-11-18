@@ -20,33 +20,38 @@ namespace Sidi.Persistence.Tests
 
             var numberCount = 100;
             var numbers = Enumerable.Range(0, numberCount);
-            
-            foreach (var i in numbers)
-            {
-                s.Add(i);
-            }
-            Assert.AreEqual(numberCount, s.Count);
 
-            foreach (var i in numbers)
+            using (var t = s.BeginTransaction())
             {
-                Assert.IsTrue(s.Contains(i));
-            }
-            
-            foreach (var i in numbers)
-            {
-                s.Remove(i);
-            }
-            Assert.AreEqual(0, s.Count);
+                foreach (var i in numbers)
+                {
+                    s.Add(i);
+                }
+                Assert.AreEqual(numberCount, s.Count);
 
-            foreach (var i in numbers)
-            {
-                s.Add(i);
+                foreach (var i in numbers)
+                {
+                    Assert.IsTrue(s.Contains(i));
+                }
+
+                foreach (var i in numbers)
+                {
+                    s.Remove(i);
+                }
+                Assert.AreEqual(0, s.Count);
+
+                foreach (var i in numbers)
+                {
+                    s.Add(i);
+                }
+                Assert.AreEqual(numberCount, s.Count);
+
+                s.Clear();
+
+                Assert.AreEqual(0, s.Count);
+
+                t.Commit();
             }
-            Assert.AreEqual(numberCount, s.Count);
-
-            s.Clear();
-
-            Assert.AreEqual(0, s.Count);
         }
     }
 }

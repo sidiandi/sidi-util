@@ -25,12 +25,10 @@ namespace Sidi.Extensions
             }
         }
 
-        [Test, ExpectedException(ExpectedException=typeof(ArgumentOutOfRangeException))]
+        [Test]
         public void InvalidRoot()
         {
-            using (var k = RegistryExtension.OpenKey(@"HKEY_LOCAL_MACHIN\SOFTWARE\Microsoft\Windows"))
-            {
-            }
+            Assert.Throws<ArgumentOutOfRangeException>(() => RegistryExtension.OpenKey(@"HKEY_LOCAL_MACHIN\SOFTWARE\Microsoft\Windows"));
         }
 
         [Test]

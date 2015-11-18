@@ -29,14 +29,14 @@ namespace Sidi.CommandLine.Test
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void UserInterface()
         {
             var p = ParserTest.ParserWithAllTestApps();
             p.Parse(new string[] { "gui" });
         }
 
-        [Test, Explicit("UI")]
+        [Test, Ignore("UI")]
         public void ActionControl()
         {
             var p = ParserTest.ParserWithAllTestApps();
@@ -45,7 +45,7 @@ namespace Sidi.CommandLine.Test
             c.ShowAndExecute();
         }
 
-        [Test, Explicit("UI")]
+        [Test, Ignore("UI")]
         public void Manual()
         {
             var ui = new ShowUserInterface(null);
@@ -53,7 +53,7 @@ namespace Sidi.CommandLine.Test
             p.Run(new []{"Manual"});
         }
 
-        [Test, Explicit("UI")]
+        [Test, Ignore("UI")]
         public void SubCommandUi()
         {
             var a = new Sidi.CommandLine.Test.ParserTest.TestAppWithStringList();

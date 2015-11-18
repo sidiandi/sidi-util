@@ -28,7 +28,7 @@ using Sidi.Test;
 
 namespace Sidi.Forms
 {
-    [TestFixture, Explicit("interactive")]
+    [TestFixture, Ignore("interactive")]
     public class ItemViewTest : TestBase
     {
         ItemView<string> itemView;
@@ -46,7 +46,7 @@ namespace Sidi.Forms
             itemView.ItemLayout = new ItemLayoutRows(32);
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ItemView()
         {
             Form f = Sidi.Forms.Util.AsForm(itemView);
@@ -61,7 +61,7 @@ namespace Sidi.Forms
 
         bool itemActivated = false;
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ItemsActivated()
         {
             itemActivated = false;
@@ -76,7 +76,7 @@ namespace Sidi.Forms
             itemActivated = true;
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ItemViewOneItem()
         {
             itemView.List.Clear();

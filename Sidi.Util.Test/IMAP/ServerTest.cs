@@ -27,7 +27,7 @@ namespace Sidi.Imap
     [TestFixture]
     public class ServerTest
     {
-        [Test, Explicit("server")]
+        [Test, Ignore("server")]
         public void Serve()
         {
             var server = new Sidi.Imap.Server();

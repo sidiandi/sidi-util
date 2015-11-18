@@ -17,6 +17,11 @@ namespace Sidi.Persistence
 
         Collection<Record> collection;
 
+        public System.Data.SQLite.SQLiteTransaction BeginTransaction()
+        {
+            return collection.BeginTransaction();
+        }
+
         class Record
         {
             public Record()

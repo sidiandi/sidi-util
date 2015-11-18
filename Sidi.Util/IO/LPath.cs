@@ -899,9 +899,10 @@ namespace Sidi.IO
                     }
                 }
             }
+
             if (Exists)
             {
-                throw new Exception("Cannot delete {0}".F(this));
+                throw new System.IO.IOException("Cannot delete {0}".F(this));
             }
         }
 

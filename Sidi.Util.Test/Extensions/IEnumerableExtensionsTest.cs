@@ -54,7 +54,7 @@ namespace Sidi.Extensions
                 .LogProgress(log.Info)
                 .Select(i =>
                     {
-                        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+                        Thread.Sleep(TimeSpan.FromSeconds(0.3));
                         return i.ToString();
                     })
                 .ToList();

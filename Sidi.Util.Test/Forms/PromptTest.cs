@@ -31,7 +31,7 @@ namespace Sidi.Forms
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Edit()
         {
             var text = "Hello, World";
@@ -39,7 +39,7 @@ namespace Sidi.Forms
             log.Info(result);
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Choose()
         {
             var lf = Process.GetProcesses()
@@ -51,7 +51,7 @@ namespace Sidi.Forms
             log.Info(selectedProcess);
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ChooseMany()
         {
             var lf = Process.GetProcesses()
@@ -63,7 +63,7 @@ namespace Sidi.Forms
             selectedProcess.ListFormat().RenderText();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ChooseManyEmptyList()
         {
             var lf = new string[] { };
@@ -71,7 +71,7 @@ namespace Sidi.Forms
             Assert.IsTrue(selected.Count == 0);
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Activate()
         {
             var lf = Process.GetProcesses()

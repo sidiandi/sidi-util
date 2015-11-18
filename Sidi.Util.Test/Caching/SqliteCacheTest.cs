@@ -218,10 +218,10 @@ namespace Sidi.Caching
         [Test]
         public void Performance()
         {
+            int count = 10;
             {
                 var cache = Cache.Local(MethodBase.GetCurrentMethod());
                 cache.Clear();
-                int count = 1000;
                 using (new LogScope(log.Info, "Caching {0} items (first time)", count))
                 {
                     for (int i = 0; i < count; ++i)
@@ -233,7 +233,6 @@ namespace Sidi.Caching
 
             {
                 var cache = Cache.Local(MethodBase.GetCurrentMethod());
-                int count = 1000;
                 using (new LogScope(log.Info, "Caching {0} items (second time)", count))
                 {
                     for (int i = 0; i < count; ++i)

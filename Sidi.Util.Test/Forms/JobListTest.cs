@@ -33,7 +33,7 @@ namespace Sidi.Forms
             j.Run();
         }
 
-        [Test, Explicit]
+        [Test, Ignore("ui")]
         public void Actions()
         {
             var j = new JobListView();

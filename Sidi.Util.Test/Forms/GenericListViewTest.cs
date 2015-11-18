@@ -28,7 +28,7 @@ namespace Sidi.Forms
     [TestFixture, RequiresSTA]
     public class GenericListViewTest
     {
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Show()
         {
             var v = new GenericListView();
@@ -38,7 +38,7 @@ namespace Sidi.Forms
             System.Windows.Forms.Application.Run(f);
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void DragDrop()
         {
             var v = new GenericListView();

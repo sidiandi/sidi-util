@@ -79,7 +79,7 @@ namespace Sidi.Util
             Assert.IsTrue(c.IsUpdateRequired);
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void TestSimple()
         {
             UpdateCheck c = new UpdateCheck(new Uri(TestFile("UpdateInfo.xml").StringRepresentation));
@@ -87,7 +87,7 @@ namespace Sidi.Util
             c.WaitCompleted();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void TestOpen()
         {
             Process p = new Process();

@@ -97,13 +97,13 @@ namespace Sidi.IO
             Assert.AreEqual(LPath.CreateRelative(), relChild.Root);
         }
 
-        [Test, ExpectedException(typeof(System.IO.IOException))]
+        [Test]
         public void NoOverwrite()
         {
             var op = new Operation() { Fast = false };
             op.Copy(sourceRoot, destRoot);
             Assert.IsTrue(op.IsTreeIdentical(sourceRoot, destRoot));
-            op.Copy(sourceRoot, destRoot);
+            Assert.Throws< System.IO.IOException>(() => op.Copy(sourceRoot, destRoot));
         }
 
         [Test]

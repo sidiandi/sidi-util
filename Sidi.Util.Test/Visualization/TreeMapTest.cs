@@ -33,7 +33,7 @@ namespace Sidi.Visualization
     [TestFixture]
     public class TreeMapTest : TestBase
     {
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void TestTreeDisplay()
         {
             var t = TreeMapTestData.GetTestTree();
@@ -41,7 +41,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void TestTreeWithColorDisplay()
         {
             var hsv = new HSLColor(Color.Red);

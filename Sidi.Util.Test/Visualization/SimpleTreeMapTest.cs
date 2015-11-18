@@ -32,10 +32,10 @@ using Sidi.Test;
 
 namespace Sidi.Visualization
 {
-    [TestFixture, Explicit("interactive")]
+    [TestFixture, Ignore("interactive")]
     public class SimpleTreeMapTest : TestBase
     {
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Simple()
         {
             var file = TestFile(@"mail\message-1-1456.eml");
@@ -52,7 +52,7 @@ namespace Sidi.Visualization
             st.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Simple2()
         {
             var files = TestFile("dir.txt").Read(StringExtensions.ReadLines);
@@ -62,7 +62,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Simple2ReverseOrder()
         {
             var files = TestFile("dir.txt").Read(StringExtensions.ReadLines);
@@ -72,7 +72,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void TypedVerySimple()
         {
             var files = TestFile("dir.txt").ReadAllLines().ToList();
@@ -81,7 +81,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Generic()
         {
             var files = TestFile("dir.txt").Read(StringExtensions.ReadLines)
@@ -97,7 +97,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ColorScale()
         {
             var files = TestFile("dir.txt").ReadAllLines().Select(x => new L.LPath(x)).ToList();
@@ -116,7 +116,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Empty()
         {
             var files = new string[] { };
@@ -126,7 +126,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ProcessTree()
         {
             var p = Process.GetProcesses().ToList();
@@ -141,7 +141,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("big")]
+        [Test, Ignore("big")]
         public void Big()
         {
             var items = Enumerable.Range(0, 100000).Select(x => x.ToString("D8"));
@@ -155,7 +155,7 @@ namespace Sidi.Visualization
             tm.RunFullScreen();
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Empty2()
         {
             var items = Enumerable.Range(0, 0).Select(x => x.ToString("D8"));

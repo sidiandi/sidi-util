@@ -53,7 +53,7 @@ namespace Sidi.Treemapping.Test
             return tree;
         }
 
-        [Test, Explicit("ui"), RequiresSTA]
+        [Test, Ignore("ui"), RequiresSTA]
         public void View()
         {
             var tree = CreateFileTree();

@@ -61,26 +61,25 @@ namespace Sidi.IO
             Assert.AreEqual(new LPath(@"C:\someDir"), p);
         }
 
-        [TestCase(@":", ExpectedException = typeof(ArgumentOutOfRangeException))]
-        [TestCase(@"asda:\", ExpectedException = typeof(ArgumentOutOfRangeException))]
-        [TestCase(@"_:", ExpectedException = typeof(ArgumentOutOfRangeException))]
+        [TestCase(@":")]
+        [TestCase(@"asda:\")]
+        [TestCase(@"_:")]
         public void CtorEx(string pathSpec)
         {
-            var p = new LPath(pathSpec);
-            log.Info(p.Prefix);
-            log.Info(p.Parts);
+            Assert.Throws<ArgumentOutOfRangeException>(() => new LPath(pathSpec));
         }
 
-        [Test, ExpectedException(typeof(System.ArgumentOutOfRangeException))]
+        [Test]
         public void Check()
         {
-            var ln = new LPath(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1)));
+           Assert.Throws<ArgumentOutOfRangeException>(() => 
+            new LPath(Enumerable.Range(0, 4000).Select(x => "0000000000").Join(new string(System.IO.Path.DirectorySeparatorChar, 1))));
         }
 
-        [Test, ExpectedException(ExpectedException = typeof(System.ArgumentOutOfRangeException))]
+        [Test]
         public void Check2()
         {
-            var ln = new LPath(new string('0', 256));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new LPath(new string('0', 256)));
         }
 
         [Test]
@@ -253,7 +252,7 @@ namespace Sidi.IO
             TestXmlSerialize(new ObjectGraph());
         }
 
-        [Test, Explicit("todo")]
+        [Test, Ignore("todo")]
         public void XmlSerializeNull()
         {
             TestXmlSerialize<LPath>(null);
@@ -297,11 +296,11 @@ namespace Sidi.IO
             Assert.AreEqual(new LPath(@"c"), s);
         }
 
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [Test]
         public void Sibling3()
         {
             var p = new Sidi.IO.LPath(@"");
-            var s = p.Sibling("c");
+            Assert.Throws<InvalidOperationException>(() => p.Sibling("c"));
         }
 
         [Test]
@@ -318,11 +317,11 @@ namespace Sidi.IO
             return new string('a', 512);
         }
 
-        [Test, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [Test]
         public void CatDirLong()
         {
             var p = TestFile("root");
-            p.CatDir(GetFileNameWhichIsTooLong());
+            Assert.Throws< ArgumentOutOfRangeException>(() => p.CatDir(GetFileNameWhichIsTooLong()));
         }
 
         [Test]
@@ -392,13 +391,13 @@ namespace Sidi.IO
             Assert.IsFalse(tf.Exists);
         }
 
-        [Test, ExpectedException]
+        [Test]
         public void EnsureNotExistsCannotDeleteDirectory()
         {
             var tf = NewTestFile("directory-to-delete");
             tf.EnsureNotExists();
             tf.EnsureDirectoryExists();
-            tf.EnsureFileNotExists();
+            Assert.Throws< System.IO.IOException>(() => tf.EnsureFileNotExists());
         }
 
         [Test]
@@ -466,15 +465,6 @@ namespace Sidi.IO
             Assert.AreEqual(p, LPath.Parse(@"C:/temp/somefile"));
             Assert.AreEqual(new LPath(@"a\b\c"), LPath.Parse("a/b/c"));
             Assert.AreEqual(new LPath(@"\\somehost.com\path1\path2"), LPath.Parse(@"file://somehost.com/path1/path2"));
-        }
-
-        [Test, RequiresSTA, Explicit]
-        public void ParseClipboard()
-        {
-            var paths = new PathList(new []{ new LPath(@"C:\temp\somefile") });
-            paths.WriteClipboard();
-            var p = LPath.Parse(":paste");
-            Assert.AreEqual(paths.First(), p);
         }
 
         [Test]

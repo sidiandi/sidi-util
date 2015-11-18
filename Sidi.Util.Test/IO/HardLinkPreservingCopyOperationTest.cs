@@ -25,7 +25,7 @@ namespace Sidi.IO
             }
         }
         
-        [Test, Explicit("requires second NTFS HDD")]
+        [Test, Ignore("requires second NTFS HDD")]
         public void Test()
         {
             var sourceDir = TestFile("copy-hardlink-test");

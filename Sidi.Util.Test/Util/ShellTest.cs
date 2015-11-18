@@ -10,7 +10,7 @@ namespace Sidi.Util
     [TestFixture]
     public class ShellTest
     {
-        [Test, Explicit("interacts with Desktop")]
+        [Test, Ignore("interacts with Desktop")]
         public void ActiveWindow()
         {
             var s = new Shell();
@@ -19,14 +19,14 @@ namespace Sidi.Util
             Console.WriteLine();
         }
 
-        [Test, Explicit("interacts with Desktop")]
+        [Test, Ignore("interacts with Desktop")]
         public void SelectedFiles()
         {
             var s = new Shell();
             Console.WriteLine(s.SelectedFiles.Join());
         }
 
-        [Test, Explicit("interacts with Desktop")]
+        [Test, Ignore("interacts with Desktop")]
         public void GetOpen()
         {
             var s = new Shell();

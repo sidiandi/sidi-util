@@ -38,7 +38,7 @@ namespace Sidi.IO
             Assert.IsFalse(d.Exists);
         }
 
-        [Test, ExpectedException(typeof(AggregateException))]
+        [Test]
         public void CopyFileCancel()
         {
             // create big file
@@ -65,11 +65,10 @@ namespace Sidi.IO
             Thread.Sleep(50);
             cts.Cancel();
 
-            copyTask.Wait();
-            Assert.IsTrue(copyTask.IsCanceled);
+            Assert.Throws<AggregateException>(() => copyTask.Wait());
         }
 
-        [Test, Explicit("reading raw disk. Requires elevation")]
+        [Test, Ignore("reading raw disk. Requires elevation")]
         public void ReadDisk()
         {
             var disk = new LPath(@"\\.\PhysicalDrive1");

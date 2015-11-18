@@ -254,13 +254,13 @@ namespace Sidi.CommandLine.Test
             Assert.IsTrue(app.Time == new DateTime(2008, 5, 11, 11, 12, 0));
         }
 
-        [Test, ExpectedException(ExpectedException = typeof(CommandLineException))]
+        [Test]
         public void NotUnique()
         {
             TestApp app = new TestApp();
             Parser parser = new Parser(app);
             // --t is not unique, since it could mean --Time or --Times
-            parser.Parse(new string[] { "--t", "2008-05-11 11:12:00" });
+            Assert.Throws< CommandLineException>(() => parser.Parse(new string[] { "--t", "2008-05-11 11:12:00" }));
         }
 
         [System.ComponentModel.Description("Test app that uses the Description attribute")]
@@ -609,7 +609,7 @@ namespace Sidi.CommandLine.Test
             Parser.Run(new PreferencesTestApplication(), new string[] { });
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void PasswordUi()
         {
             Parser.Run(new PreferencesTestApplication(), new string[] { "ui" });
@@ -653,12 +653,12 @@ namespace Sidi.CommandLine.Test
             Assert.AreEqual(arg, a.arg);
         }
 
-        [Test, ExpectedException(typeof(CommandLineException))]
+        [Test]
         public void Ambiguous3()
         {
             var a = new AmbiguousOption();
             var p = new Parser(a);
-            p.Parse(new string[] { "ru" });
+            Assert.Throws<CommandLineException>(() => p.Parse(new string[] { "ru" }));
         }
 
         [Test]
@@ -670,14 +670,14 @@ namespace Sidi.CommandLine.Test
             p.Parse(new string[] { "--ru", "1"});
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Serve()
         {
             var p = new Parser(new TestAppWithStringList());
             p.Parse(new string[] { "WebServer", "Run", "Browse" });
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void Serve2()
         {
             var p = new Parser(new TestAppWithStringList());
@@ -705,7 +705,7 @@ namespace Sidi.CommandLine.Test
             }
         }
 
-        [Test, Explicit("interactive")]
+        [Test, Ignore("interactive")]
         public void ExternalWebServer()
         {
             var p = new Parser(new TestAppWithStringList());

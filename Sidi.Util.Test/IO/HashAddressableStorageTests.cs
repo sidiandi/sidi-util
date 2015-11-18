@@ -88,7 +88,7 @@ namespace Sidi.IO.Tests
         
         public static void Performance(IHashAddressableStorage s)
         {
-            var keys = Enumerable.Range(0, 1000)
+            var keys = Enumerable.Range(0, 100)
                 .Select(x => ObjectHashProvider.GetDefault().Get(x))
                 .ToList();
 

@@ -159,7 +159,7 @@ namespace Sidi.Util
             lf.RenderText(Console.Out);
         }
 
-        [Test, Explicit]
+        [Test, Ignore("interactive")]
         public void Chart()
         {
             var data = TestFile(".").Info.GetFiles();
@@ -171,7 +171,7 @@ namespace Sidi.Util
                 .Chart().RunFullScreen();
         }
 
-        [Test, Explicit]
+        [Test, Ignore("interactive")]
         public void Bubbles()
         {
             var data = Process.GetProcesses();
@@ -183,7 +183,7 @@ namespace Sidi.Util
                 .Bubbles().RunFullScreen();
         }
 
-        [Test, Explicit]
+        [Test, Ignore("interactive")]
         public void ProcessChart()
         {
             var data = Process.GetProcesses();
@@ -194,7 +194,7 @@ namespace Sidi.Util
                 .Chart().RunFullScreen();
         }
 
-        [Test, Explicit]
+        [Test, Ignore("interactive")]
         public void AsHtml()
         {
             var data = Process.GetProcesses();
@@ -225,7 +225,7 @@ namespace Sidi.Util
             HtmlPage.Show(page);
         }
 
-        [Test, Explicit]
+        [Test, Ignore("interactive")]
         public void AsHtmlDetails()
         {
             var data = Process.GetProcesses();

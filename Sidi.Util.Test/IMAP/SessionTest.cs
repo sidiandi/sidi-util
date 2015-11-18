@@ -49,7 +49,7 @@ namespace Sidi.Imap
             Assert.AreEqual(1000, e.Count);
         }
 
-        [Test, Explicit("unstable")]
+        [Test, Ignore("unstable")]
         public void RetrieveDataItem()
         {
             var mailbox = new EmlMailbox(this.TestFile(@"mail"));
