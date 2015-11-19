@@ -217,12 +217,13 @@ namespace Sidi.Treemapping
         }
 
         /// <summary>
-        /// Squarify the count first nodes and returns the worst aspect ratio
+        /// Squarify the count first child nodes and returns the worst aspect ratio
         /// </summary>
-        /// <param name="nodes"></param>
-        /// <param name="bounds"></param>
+        /// <param name="childs"></param>
         /// <param name="count"></param>
-        /// <returns></returns>
+        /// <param name="bounds"></param>
+        /// <param name="remaining"></param>
+        /// <param name="worstAspectRatio"></param>
         static void Squarify(IList<TreeNode> childs, int count, RectangleD bounds, out RectangleD remaining, out double worstAspectRatio)
         {
             var size = childs.Sum(_ => _.Size);

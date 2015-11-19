@@ -26,7 +26,7 @@ using Sidi.Test;
 
 namespace Sidi.Forms
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(System.Threading.ApartmentState.STA)]
     public class PromptTest : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

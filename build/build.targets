@@ -19,16 +19,16 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	<PropertyGroup>
 		<SourceDir>$([System.IO.Directory]::GetParent($(MSBuildProjectDirectory)))</SourceDir>
 
-		<NugetPackagesDir>$(SourceDir)\..\Packages</NugetPackagesDir>
+		<NugetPackagesDir>$(SourceDir)\packages</NugetPackagesDir>
 		
-		<NUnitBin>$(NugetPackagesDir)\NUnit.Runners.2.6.4\tools</NUnitBin>
-		<NUnitConsole>$(NUnitBin)\nunit-console-x86.exe</NUnitConsole>
+		<NUnitBin>$(NugetPackagesDir)\NUnit.Console.3.0.0\tools</NUnitBin>
+		<NUnitConsole>$(NUnitBin)\nunit3-console.exe</NUnitConsole>
 		
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
 		<Git>git</Git>
   </PropertyGroup>
 
-  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.1.1\build\dotnet\GitVersionTask.targets" />
+  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.3.0\build\dotnet\GitVersionTask.targets" />
   <Import Project="C:\work\nugetPackSymbols.build\Release-AnyCPU\bin\Build\CreateNugetSymbolsPackage.targets" />
 
   <Target Name="GetVersion">
@@ -62,7 +62,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
-    <Exec Command="$(NUnitConsole) /xml=$(TestDir)\TestResult.xml /labels @(Targets, ' ')" />
+    <Exec Command="$(NUnitConsole) --labels=All @(Targets, ' ')" />
   </Target>
 
   <Target Name="Pack" DependsOnTargets="Build;Tag">

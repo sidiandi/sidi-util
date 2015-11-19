@@ -25,7 +25,7 @@ using Sidi.Extensions;
 
 namespace Sidi.Forms
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(System.Threading.ApartmentState.STA)]
     public class GenericListViewTest
     {
         [Test, Ignore("interactive")]

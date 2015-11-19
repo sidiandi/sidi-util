@@ -25,7 +25,7 @@ namespace Sidi.CommandLine
             Assert.IsTrue(StaticMethodValueParser.IsSuitable(mi));
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(System.Threading.ApartmentState.STA)]
         public void ParseExamples()
         {
             foreach (var vp in new Parser().AvailableValueParsers)

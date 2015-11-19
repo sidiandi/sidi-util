@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Sidi.Util
@@ -27,10 +28,11 @@ namespace Sidi.Util
             }
             return lastSerializer;
         }
+
         Type lastType;
         XmlSerializer lastSerializer;
 
-        public Hash Get(object x)
+        public Hash GetOld(object x)
         {
             if (x is MethodBase)
             {
@@ -46,21 +48,34 @@ namespace Sidi.Util
                     m.Seek(0, SeekOrigin.Begin);
                     var tr = new StreamReader(m);
 
-                    /*
-                    for (; ; )
-                    {
-                        var line = tr.ReadLine();
-                        if (line == null)
-                        {
-                            break;
-                        }
-                        Console.Out.WriteLine(line);
-                    }
-                    */
-
                     m.Seek(0, SeekOrigin.Begin);
                 }
                 return hashProvider.Get(m);
+            }
+        }
+
+        public Hash Get(object x)
+        {
+            if (x is MethodBase)
+            {
+                return Get(x.ToString());
+            }
+
+            using (var stream = hashProvider.GetStream())
+            {
+                if (x != null)
+                {
+                    using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                    {
+                        GetSerializer(x.GetType()).Serialize(writer, x);
+                    }
+
+                    using (var writer = XmlWriter.Create(Console.Out, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                    {
+                        GetSerializer(x.GetType()).Serialize(writer, x);
+                    }
+                }
+                return stream.GetHash();
             }
         }
     }

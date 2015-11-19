@@ -19,11 +19,13 @@ namespace Sidi.Util.Tests
         public void Get()
         {
             var hp = new XmlSerializerObjectHashProvider(HashProvider.GetDefault());
-            Assert.AreEqual(new Hash("dc57a758dfdebce53b4306ec3df857f8f5a0e971"), hp.Get(1));
-            Assert.AreEqual(new Hash("07d987af2de5c3001088a81e52b0dcd235c6e56b"), hp.Get("Hello"));
+            Assert.AreEqual(new Hash("3a57b1e6f78f5adbf6f23c0af317d84175e15972"), hp.Get(1));
+            Assert.AreEqual(new Hash("f94e81dff8a42c4877c093efd1533177999b7ddc"), hp.Get("Hello"));
             Assert.AreEqual(new Hash("da39a3ee5e6b4b0d3255bfef95601890afd80709"), hp.Get(null));
-            Assert.AreEqual(new Hash("3ad5f65764c24e22c0e942a2255659495cb0b1dd"), hp.Get(MethodBase.GetCurrentMethod()));
-            Assert.AreEqual(new Hash("f5fc7509647c44fd82fa40b6c94bfadc61fa6a92"), hp.Get(new FileVersion("a", 1, new DateTime(2015, 1, 1, 1, 1, 1))));
+            Assert.AreEqual(new Hash("ac164e379e469c897bd01f029a64ed79df8ef6ed"), hp.Get(MethodBase.GetCurrentMethod()));
+
+            var fv = new FileVersion("a", 1, new DateTime(2015, 1, 1, 1, 1, 1));
+            Assert.AreEqual(new Hash("53443472644d6cfc8c5352fb591ddfa53ef08257"), hp.Get(fv));
         }
     }
 }

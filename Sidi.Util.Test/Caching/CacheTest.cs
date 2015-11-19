@@ -228,7 +228,7 @@ namespace Sidi.Caching
         }
 
         [Test]
-        public void Dispose()
+        public void DisposeClosesAllFilehandles()
         {
             var dir = this.NewTestFile("dispose-cache");
             using (var cache = new Cache(dir))

@@ -53,7 +53,7 @@ namespace Sidi.Treemapping.Test
             return tree;
         }
 
-        [Test, Ignore("ui"), RequiresSTA]
+        [Test, Ignore("ui"), Apartment(System.Threading.ApartmentState.STA)]
         public void View()
         {
             var tree = CreateFileTree();

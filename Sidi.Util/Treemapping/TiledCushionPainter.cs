@@ -68,18 +68,14 @@ namespace Sidi.Treemapping
 
             foreach (var i in t)
             {
-                Bitmap b;
                 var bitmap = bitmaps[i];
                 {
                     var sr = i.ScreenRect.ToRectangleF();
                     g.DrawImage(bitmap, sr);
 
-                    // debug
-                    if (false)
-                    {
-                        g.DrawRectangle(Pens.Black, i.ScreenRect.ToRectangle());
-                        g.DrawString(i.ToString(), Control.DefaultFont, Brushes.Black, sr.Left, sr.Top);
-                    }
+                    // for debugging
+                    // g.DrawRectangle(Pens.Black, i.ScreenRect.ToRectangle());
+                    // g.DrawString(i.ToString(), Control.DefaultFont, Brushes.Black, sr.Left, sr.Top);
                 }
             }
         }

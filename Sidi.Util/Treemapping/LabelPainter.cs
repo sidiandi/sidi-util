@@ -228,7 +228,7 @@ namespace Sidi.Treemapping
         /// <summary>
         /// Draws a label in world rectangle rect
         /// </summary>
-        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="pa"></param>
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
@@ -236,11 +236,11 @@ namespace Sidi.Treemapping
         {
             return DrawLabel1(pa, text, rect);
         }
-        
+
         /// <summary>
         /// Draws a label in world rectangle rect
         /// </summary>
-        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="pa"></param>
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
@@ -307,7 +307,7 @@ namespace Sidi.Treemapping
         /// <summary>
         /// Draws a label in world rectangle rect
         /// </summary>
-        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="pa"></param>
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
@@ -349,7 +349,7 @@ namespace Sidi.Treemapping
         /// <summary>
         /// Draws a label in world rectangle rect
         /// </summary>
-        /// <param name="graphics">Assumes that graphics.Transform is identity</param>
+        /// <param name="pa"></param>
         /// <param name="text"></param>
         /// <param name="rect"></param>
         /// <returns></returns>
