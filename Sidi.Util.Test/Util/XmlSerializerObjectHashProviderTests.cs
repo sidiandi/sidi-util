@@ -8,12 +8,19 @@ using NUnit.Framework;
 using Sidi.Test;
 using System.Reflection;
 using Sidi.IO;
+using Sidi.Extensions;
+
 namespace Sidi.Util.Tests
 {
     [TestFixture()]
     public class XmlSerializerObjectHashProviderTests : TestBase
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        static void Print(Hash a, Hash b)
+        {
+            Console.WriteLine("            Assert.AreEqual(new Hash({0})", b.ToString().Quote());
+        }
 
         [Test()]
         public void Get()
@@ -25,7 +32,7 @@ namespace Sidi.Util.Tests
             Assert.AreEqual(new Hash("ac164e379e469c897bd01f029a64ed79df8ef6ed"), hp.Get(MethodBase.GetCurrentMethod()));
 
             var fv = new FileVersion("a", 1, new DateTime(2015, 1, 1, 1, 1, 1));
-            Assert.AreEqual(new Hash("53443472644d6cfc8c5352fb591ddfa53ef08257"), hp.Get(fv));
+            Assert.AreEqual(new Hash("3f5b2ecc1b46f80e204ff999dd33c384e5b36ce4"), hp.Get(fv));
         }
     }
 }

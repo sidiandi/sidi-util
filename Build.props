@@ -10,6 +10,10 @@
 		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
 
 	</PropertyGroup>
+	
+	<ItemGroup>
+		<TestTargets Include="Sidi.Util.Test.dll" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageProjects Include="Sidi.Util\Sidi.Util.csproj" >

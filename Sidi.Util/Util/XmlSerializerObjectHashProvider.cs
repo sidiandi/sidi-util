@@ -65,15 +65,22 @@ namespace Sidi.Util
             {
                 if (x != null)
                 {
-                    using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                    using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, Encoding = Encoding.UTF8 }))
                     {
-                        GetSerializer(x.GetType()).Serialize(writer, x);
+                        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                        ns.Add("", "");
+                        GetSerializer(x.GetType()).Serialize(writer, x, ns);
                     }
 
-                    using (var writer = XmlWriter.Create(Console.Out, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                    /*
+                    using (var writer = XmlWriter.Create(Console.Out, new XmlWriterSettings { OmitXmlDeclaration = true, Encoding = Encoding.UTF8 }))
                     {
-                        GetSerializer(x.GetType()).Serialize(writer, x);
+                        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                        ns.Add("", "");
+                        GetSerializer(x.GetType()).Serialize(writer, x, ns);
                     }
+                    */
+
                 }
                 return stream.GetHash();
             }
