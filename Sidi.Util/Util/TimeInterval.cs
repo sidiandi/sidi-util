@@ -6,25 +6,64 @@ using System.Text.RegularExpressions;
 
 namespace Sidi.Util
 {
+    /// <summary>
+    /// Time interval with begin time and end time
+    /// </summary>
+    /// The time interval includes the begin time, but does not include the end time.
     [Serializable]
     public class TimeInterval
     {
+        /// <summary>
+        /// Constructs a TimeInterval with specified begin and duration
+        /// </summary>
+        /// <param name="begin"></param>
+        /// <param name="duration"></param>
         public TimeInterval(DateTime begin, TimeSpan duration)
+            : this(begin, begin + duration)
         {
-            this.begin = begin;
-            this.end = begin + duration;
         }
 
+        /// <summary>
+        /// Constructs a TimeInterval with specified duration and end.
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="end"></param>
         public TimeInterval(TimeSpan duration, DateTime end)
+            : this(end - duration, end)
         {
-            this.end = end;
-            this.begin = end - duration;
         }
 
-        public TimeInterval(DateTime t0, DateTime t1)
+        /// <summary>
+        /// Constructs a begin closed, end open TimeInterval with specified begin and end
+        /// </summary>
+        /// <param name="begin"></param>
+        /// <param name="end"></param>
+        public TimeInterval(DateTime begin, DateTime end)
+            : this(begin, end, true, false)
         {
-            this.begin = t0;
-            this.end = t1;
+        }
+
+        public TimeInterval(DateTime begin, DateTime end, bool beginClosed, bool endClosed)
+        {
+            if (beginClosed && endClosed)
+            {
+                if (!(begin <= end))
+                {
+                    throw new ArgumentOutOfRangeException("end", end, "end must be greater or equal than begin");
+                }
+            }
+            else
+            {
+                if (!(begin < end))
+                {
+                    throw new ArgumentOutOfRangeException("end", end, "end must be greater than begin");
+                }
+            }
+
+            this.begin = begin;
+            this.end = end;
+            this.beginIncluded = beginClosed;
+            this.endIncluded = endClosed;
         }
 
         public static TimeInterval Parse(string timeIntervalText)
@@ -32,6 +71,9 @@ namespace Sidi.Util
             return new Sidi.CommandLine.Parser().ParseValue<TimeInterval>(timeIntervalText);
         }
 
+        /// <summary>
+        /// Time interval with maximum possible extent.
+        /// </summary>
         public static TimeInterval MaxValue
         {
             get
@@ -41,8 +83,14 @@ namespace Sidi.Util
         }
 
         DateTime begin;
-        DateTime end;
+        bool beginIncluded;
 
+        DateTime end;
+        bool endIncluded;
+
+        /// <summary>
+        /// Begin of the time interval
+        /// </summary>
         public DateTime Begin
         {
             get
@@ -51,6 +99,9 @@ namespace Sidi.Util
             }
         }
 
+        /// <summary>
+        /// End of the time interval. The end is not contained in the time interval.
+        /// </summary>
         public DateTime End
         {
             get
@@ -58,32 +109,120 @@ namespace Sidi.Util
                 return end;
             }
         }
+        
+        public bool BeginIncluded { get { return beginIncluded; } }
 
-        public bool Intersects(TimeInterval r)
-        {
-            return !(r.Begin >= End || r.End <= Begin);
-        }
+        public bool EndIncluded { get { return endIncluded; } }
 
-        public bool Includes(TimeInterval r)
+        /// <summary>
+        /// Returns a value indicating if the intersection of this and a specified TimeInterval is not empty.
+        /// </summary>
+        /// <param name="value">The value to check</param>
+        /// <returns>True if value intersects with this, false otherwise</returns>
+        public bool Intersects(TimeInterval value)
         {
-            return !(r.Begin >= End || r.End < Begin);
+            if (value.End < Begin || value.Begin > this.End)
+            {
+                return false;
+            }
+
+            if (value.End == Begin)
+            {
+                return value.endIncluded && beginIncluded;
+            }
+
+            if (value.Begin == End)
+            {
+                return value.beginIncluded && endIncluded;
+            }
+
+            return true;
         }
 
         /// <summary>
-        /// Test if r is a subset of this
+        /// Returns a value indicating if a specified TimeInterval is a subset of this
         /// </summary>
-        /// <param name="r"></param>
-        /// <returns>True if r is a subset of this, false otherwise</returns>
-        public bool Contains(TimeInterval r)
+        /// <param name="value">The value to check</param>
+        /// <returns>True if value is a subset of this, false otherwise</returns>
+        public bool Contains(TimeInterval value)
         {
-            return Begin <= r.Begin && r.End <= End;
+            return object.Equals(this, Envelope(this, value));
         }
 
-        public TimeInterval Intersect(TimeInterval r)
+        public static TimeInterval Envelope(params TimeInterval[] intervals)
         {
-            return new TimeInterval(
-                Begin > r.Begin ? Begin : r.Begin,
-                End < r.End ? End : r.End);
+            var x = intervals[0];
+            DateTime begin = x.Begin;
+            DateTime end = x.End;
+            bool beginClosed = x.beginIncluded;
+            bool endClosed = x.endIncluded;
+
+            for (int i = 1; i < intervals.Length; ++i)
+            {
+                x = intervals[i];
+                if (x.Begin < begin)
+                {
+                    begin = x.Begin;
+                    beginClosed = x.beginIncluded;
+                }
+                else if (x.Begin == begin)
+                {
+                    beginClosed = x.beginIncluded | beginClosed;
+                }
+
+                if (x.End > end)
+                {
+                    end = x.End;
+                    endClosed = x.endIncluded;
+                }
+                else if (x.End == end)
+                {
+                    endClosed = x.endIncluded | endClosed;
+                }
+            }
+
+            return new TimeInterval(begin, end, beginClosed, endClosed);
+        }
+
+        /// <summary>
+        /// Test if this time interval contains time
+        /// </summary>
+        /// Attention: the time interval does include its begin time, but not its end time
+        /// <param name="time">Time to be checked</param>
+        /// <returns>True if time is in the time interval, false otherwise</returns>
+        public bool Contains(DateTime time)
+        {
+            return Begin <= time && time < End;
+        }
+
+        public TimeInterval Intersect(TimeInterval x)
+        {
+            DateTime begin = Begin;
+            DateTime end = End;
+            bool beginClosed = this.beginIncluded;
+            bool endClosed = this.endIncluded;
+
+            if (x.Begin > begin)
+            {
+                begin = x.Begin;
+                beginClosed = x.beginIncluded;
+            }
+            else if (x.Begin == begin)
+            {
+                beginClosed = x.beginIncluded & beginClosed;
+            }
+
+            if (x.End < end)
+            {
+                end = x.End;
+                endClosed = x.endIncluded;
+            }
+            else if (x.End == end)
+            {
+                endClosed = x.endIncluded & endClosed;
+            }
+
+            return new TimeInterval(begin, end, beginClosed, endClosed);
         }
 
         public TimeSpan Duration
@@ -126,13 +265,22 @@ namespace Sidi.Util
 
         public override string ToString()
         {
-            return String.Format("[{0}, {1}[", Begin, End);
+            return String.Format("{0}{1}, {2}{3}", 
+                beginIncluded ? "[" : "]",
+                Begin, 
+                End,
+                endIncluded ? "]" : "["
+                );
         }
 
         public override bool Equals(object obj)
         {
             var r = obj as TimeInterval;
-            return r != null && Begin == r.Begin && End == r.End;
+            return r != null &&
+                Begin == r.Begin &&
+                End == r.End &&
+                beginIncluded == r.beginIncluded &&
+                endIncluded == r.endIncluded;
         }
 
         public override int GetHashCode()

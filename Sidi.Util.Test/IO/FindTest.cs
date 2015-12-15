@@ -47,19 +47,6 @@ namespace Sidi.IO
                 }
             }
 
-            [Test, Explicit]
-            public void Breadth()
-            {
-                var e = new Find()
-                {
-                    Root = _testTree
-                };
-
-                var d = e.Depth();
-                var b = e.Depth();
-                Assert.IsFalse(d.Except(b).Any());
-            }
-
             readonly LPath _testTree = Paths.BinDir;
 
             [Test]

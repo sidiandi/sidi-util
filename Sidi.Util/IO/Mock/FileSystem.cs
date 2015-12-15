@@ -184,6 +184,17 @@ namespace Sidi.IO.Mock
             e.Delete();
         }
 
+        public bool TryRemoveDirectory(LPath directoryName)
+        {
+            var e = GetElement(directoryName);
+            if (!e.IsDirectory || e.Childs.Any())
+            {
+                return false;
+            }
+            e.Delete();
+            return true;
+        }
+
         public LPath CurrentDirectory { get; set; }
 
         public IEnumerable<IFileSystemInfo> FindFile(LPath searchPath)

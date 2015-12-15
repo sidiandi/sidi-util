@@ -146,7 +146,7 @@
     <Compile Include="Util\StringExTest.cs" />
     <Compile Include="TokenizerUt.cs" />
     <Compile Include="UpdateCheckTest.cs" />
-    <Compile Include="Util\TimeIntervalTest.cs" />
+    <Compile Include="Util\TimeIntervalTests.cs" />
     <Compile Include="Util\XmlSerializerObjectHashProviderTests.cs" />
     <Compile Include="Visualization\SimpleTreeMapTest.cs" />
     <Compile Include="Visualization\TreeMapTest.cs" />

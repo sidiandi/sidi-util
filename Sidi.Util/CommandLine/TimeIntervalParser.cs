@@ -60,14 +60,22 @@ namespace Sidi.CommandLine
 
         public void BeforeParse(IList<string> args, Parser parser)
         {
-            if (args.First().StartsWith("["))
+            bool beginClosed = false;
+            bool endClosed = false;
+
+            var firstArg = args[0];
+            var start = firstArg.Substring(0, 1);
+            if (start.Equals("[") || firstArg.StartsWith("]"))
             {
+                beginClosed = start.Equals("[");
                 string text = String.Empty;
                 for (; ; )
                 {
                     var n = args.PopHead();
-                    if (n.EndsWith("["))
+                    var end = n.Substring(n.Length - 1, 1);
+                    if (end.Equals("[") || end.Equals("]"))
                     {
+                        endClosed = n.EndsWith("]");
                         text += " " + n.Substring(0, n.Length - 1);
                         break;
                     }
@@ -80,7 +88,9 @@ namespace Sidi.CommandLine
 
                 Value = new TimeInterval(
                     parser.ParseValue<DateTime>(p[1]),
-                    parser.ParseValue<DateTime>(p[2]));
+                    parser.ParseValue<DateTime>(p[2]),
+                    beginClosed, endClosed
+                    );
             }
         }
 

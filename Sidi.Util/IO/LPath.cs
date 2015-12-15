@@ -913,7 +913,6 @@ namespace Sidi.IO
         /// </summary>
         public void EnsureNotExists()
         {
-            // log.InfoFormat("EnsureNotExists({0})", this);
             var info = this.Info;
             
             if (!info.Exists)

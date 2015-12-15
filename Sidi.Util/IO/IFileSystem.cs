@@ -96,6 +96,14 @@ namespace Sidi.IO
         void RemoveDirectory(LPath directoryName);
 
         /// <summary>
+        /// Try to delete the directory.
+        /// </summary>
+        /// Postcondition: (!directoryName.Exists)
+        /// <param name="directoryName">Path to the directory.</param>
+        /// <returns>true, if directoryName does exist, false otherwise</returns>
+        bool TryRemoveDirectory(LPath directoryName);
+
+        /// <summary>
         /// Returns the current directory of the process. Use wisely.
         /// </summary>
         /// <returns>Current directory.</returns>

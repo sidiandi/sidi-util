@@ -87,6 +87,11 @@ namespace Sidi.IO.Windows
             NativeMethods.RemoveDirectory(GetLongPathApiParameter(directory)).CheckApiCall(directory);
         }
 
+        public bool TryRemoveDirectory(LPath directory)
+        {
+            return NativeMethods.RemoveDirectory(GetLongPathApiParameter(directory));
+        }
+
         const string longPrefix = @"\\?\";
         const string longUncPrefix = @"\\?\UNC\";
         public const string DirectorySeparator = @"\";
@@ -497,5 +502,6 @@ namespace Sidi.IO.Windows
                 }
             }
         }
+
     }
 }
