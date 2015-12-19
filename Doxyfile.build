@@ -1,0 +1,5 @@
+# only use this file during msbuild run
+
+@INCLUDE = Doxyfile
+
+HTML_OUTPUT            = $(OUTPUT_DIRECTORY)

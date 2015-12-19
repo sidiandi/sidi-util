@@ -31,10 +31,21 @@ using Sidi.Parse;
 using System.Collections;
 using System.Threading;
 
+/// <summary>
+/// Enhances and replaces the functionality of System.IO
+/// </summary>
+/// This namespace offers LPath, a value class for a file system path. LPath works on the file system abstraction
+/// IFileSystem which allows you to mock file system operations for testing.
+/// 
+/// The two implementations of IFileSystem are Sidi.IO.Mock.FileSystem and Sidi.IO.Windows.FileSystem.
 namespace Sidi.IO
 {
     /// <summary>
-    /// Absolute or relative file system path.
+    /// Value class for an absolute or relative file system path
+    /// </summary>
+    /// 
+    /// LPath supports path lengths as long as allowed by the underlying IFileSystem implementation.
+    ///
     /// A file system path has following grammar
     ///
     /// Path = Prefix [*(Name PathSeparator) Name]
@@ -43,7 +54,6 @@ namespace Sidi.IO
     /// Unc = "\\?\UNC\" Host PathSeparator Share PathSeparator
     /// Drive = [A-Z] ":\"
     /// 
-    /// </summary>
     [Serializable]
     public class LPath : IXmlSerializable, IComparable, IEquatable<LPath>, ISerializable
     {
@@ -62,12 +72,16 @@ namespace Sidi.IO
             this.fileSystem = fileSystem;
             Initialize(CheckPrefix(prefix), parts);
         }
-        
+
         public LPath(string path)
+            : this(Sidi.IO.FileSystem.Current, path)
+        {
+        }
+        public LPath(IFileSystem fileSystem, string path)
         {
             try
             {
-                this.fileSystem = Sidi.IO.FileSystem.Current;
+                this.fileSystem = fileSystem;
                 var text = new Sidi.Parse.Text(path);
                 var t = text.Copy();
                 var ast = PathParser.Path()(t);
@@ -312,11 +326,11 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// Appends a number (.02) to the file name so that the returned path points to a file 
+        /// Appends a number to the file name so that the returned path points to a file 
         /// in the same directory that does not exist yet
-        /// Example: C:\temp\myimage.jpg => C:\temp\myimage.1.jpg
         /// </summary>
-        /// <returns></returns>
+        /// Example: `C:\\temp\\myimage.jpg` => `C:\\temp\\myimage.1.jpg`
+        /// <returns>Unique path</returns>
         public LPath UniqueFileName()
         {
             if (!Exists)
@@ -370,7 +384,7 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// Root of the path, e.g. C:\ or \\server\share\
+        /// Root of the path, e.g. C:\\ or \\\\server\\share\\
         /// </summary>
         public LPath Root
         {
@@ -992,10 +1006,10 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// returns the extension of the file name without the . 
-        /// returns null if no extension exists
-        /// example: c:\image.jpg => jpg
+        /// Returns the extension of the file name without the dot (.)
         /// </summary>
+        /// Returns null if no extension exists
+        /// Example: c:\\image.jpg => jpg
         public string ExtensionWithoutDot
         {
             get
@@ -1172,11 +1186,12 @@ namespace Sidi.IO
         }
 
         /// <summary>
-        /// Converts an absolute path into a relative path by converting its prefix into file names
-        /// Example: C:\temp => local\C\temp
-        /// Example: \\server\share\somfile => unc\server\share\somefile
+        /// Converts an absolute path into a relative path
         /// </summary>
-        /// <returns></returns>
+        /// Converts an absolute path into a relative path by converting its prefix into file names
+        /// Example: C:\\temp => local\\C\\temp
+        /// Example: \\\\server\\share\\somfile => unc\\server\\share\\somefile
+        /// <returns>Relative path</returns>
         public LPath ToRelative()
         {
             if (prefix is LocalDrivePrefix)

@@ -9,6 +9,14 @@ using System.IO;
 
 namespace Sidi.IO.Mock
 {
+    /// <summary>
+    /// Mock file system
+    /// </summary>
+    /// This implementation of IFileSystem uses a temporary ContentDirectory to store all generated files. 
+    /// The ContentDirectory will be deleted on disposal of this instance.
+    /// 
+    /// Usage example:
+    /// \snippet Sidi.Util.Test\IO\Mock\FileSystemTest.cs Usage
     public class FileSystem : IFileSystem, IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -33,6 +41,10 @@ namespace Sidi.IO.Mock
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deletes the ContentDirectory
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -49,9 +61,14 @@ namespace Sidi.IO.Mock
             }
         }
 
+        /// <summary>
+        /// Creates a new virtual drive root
+        /// </summary>
+        /// Can create local drives (X:\\) and network shares (\\\\server\\share)
+        /// <param name="root">Path of a file system  object in the drive root to be created.</param>
         public void CreateRoot(LPath root)
         {
-            roots[root.Prefix] = new FileSystemInfo(this, root.Root, true);
+            roots[root.Prefix] = new FileSystemInfo(this, new LPath(this, root.Root), true);
         }
 
         public void Move(LPath existingPath, LPath newPath)
@@ -97,7 +114,7 @@ namespace Sidi.IO.Mock
             var i = TryGetElement(path);
             if (i == null)
             {
-                i = new FileSystemInfo(this, path, false);
+                i = new FileSystemInfo(this, new LPath(this, path), false);
             }
             return i;
         }

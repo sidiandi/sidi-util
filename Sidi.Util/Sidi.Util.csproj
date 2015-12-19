@@ -23,8 +23,8 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -35,16 +35,16 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.98.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.98.1\lib\net45\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.99.0\lib\net45\System.Data.SQLite.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.98.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.98.1\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.99.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.98.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.98.1\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.99.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
@@ -61,8 +61,10 @@
     <Compile Include="Caching\LruCache.cs" />
     <Compile Include="Caching\LruCacheBackground.cs" />
     <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Caching\Namespace.cs" />
     <Compile Include="Collections\DefaultValueDictionary.cs" />
     <Compile Include="Collections\EnumList.cs" />
+    <Compile Include="Collections\Namespace.cs" />
     <Compile Include="Collections\SelectList.cs" />
     <Compile Include="CommandLine\Action.cs" />
     <Compile Include="CommandLine\ActionDialog.cs">
@@ -79,6 +81,7 @@
     <Compile Include="CommandLine\LogOptions.cs" />
     <Compile Include="CommandLine\LPathParser.cs" />
     <Compile Include="CommandLine\Manual.cs" />
+    <Compile Include="CommandLine\Namespace.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
     <Compile Include="CommandLine\Parameter.cs" />
     <Compile Include="CommandLine\PathListParser.cs" />
@@ -96,13 +99,14 @@
     <Compile Include="CommandLine\ValueParserAttribute.cs" />
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppender.cs" />
-    <Compile Include="Extensions\AssemblyExtensions.cs" />
+    <Compile Include="ComponentModel\Namespace.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="Extensions\MethodBaseExtensions.cs" />
+    <Compile Include="Extensions\Namespace.cs" />
     <Compile Include="Extensions\RegistryExtension.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
@@ -126,6 +130,7 @@
     <Compile Include="Forms\JobListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\Namespace.cs" />
     <Compile Include="Forms\NativeMethods.cs" />
     <Compile Include="Forms\PanZoomController.cs" />
     <Compile Include="Forms\Prompt.cs" />
@@ -139,6 +144,7 @@
     <Compile Include="IMAP\ArgParser.cs" />
     <Compile Include="IMAP\EmlDirectory.cs" />
     <Compile Include="IMAP\IMailbox.cs" />
+    <Compile Include="IMAP\Namespace.cs" />
     <Compile Include="IMAP\Rfc822Message.cs" />
     <Compile Include="IMAP\Session.cs" />
     <Compile Include="IMAP\Server.cs" />
@@ -146,6 +152,8 @@
     <Compile Include="IO\CopyStream.cs" />
     <Compile Include="IO\HybridHashAddressableStorage.cs" />
     <Compile Include="IO\LPathSurrogate.cs" />
+    <Compile Include="IO\Mock\Namespace.cs" />
+    <Compile Include="IO\Namespace.cs" />
     <Compile Include="IO\ReadForwardStream.cs" />
     <Compile Include="IO\SQLiteHashAddressableStorage.cs" />
     <Compile Include="IO\HashAddressableStorage.cs" />
@@ -173,7 +181,9 @@
     <Compile Include="IO\Operation.cs" />
     <Compile Include="IO\Prefix.cs" />
     <Compile Include="Net\HtmlPage.cs" />
+    <Compile Include="Net\Namespace.cs" />
     <Compile Include="Parse\Ast.cs" />
+    <Compile Include="Parse\Namespace.cs" />
     <Compile Include="Parse\Parser.cs" />
     <Compile Include="Parse\Text.cs" />
     <Compile Include="IO\Paths.cs" />
@@ -193,8 +203,12 @@
     <Compile Include="Net\HtmlCodeWriter.cs" />
     <Compile Include="Net\HtmlGenerator.cs" />
     <Compile Include="Net\WebServer.cs" />
+    <Compile Include="Persistence\Namespace.cs" />
     <Compile Include="Persistence\Set.cs" />
     <Compile Include="Persistence\SharedConnection.cs" />
+    <Compile Include="Net\Pop3\Namespace.cs" />
+    <Compile Include="Test\Namespace.cs" />
+    <Compile Include="Treemapping\Namespace.cs" />
     <Compile Include="Treemapping\ColorScale.cs" />
     <Compile Include="Treemapping\CushionPainter.cs" />
     <Compile Include="Treemapping\LabelPainter.cs" />
@@ -286,18 +300,19 @@
     <Compile Include="Persistence\Attributes.cs" />
     <Compile Include="Persistence\Collection.cs" />
     <Compile Include="Persistence\Dictionary.cs" />
-    <Compile Include="Pop3\Server.cs" />
+    <Compile Include="Net\Pop3\Server.cs" />
     <Compile Include="Util\ListFormat.cs" />
     <Compile Include="Extensions\ListFormatHtmlExtension.cs" />
     <Compile Include="Util\LogScope.cs" />
     <Compile Include="Util\MetricPrefix.cs" />
+    <Compile Include="Util\Namespace.cs" />
     <Compile Include="Util\OnDispose.cs" />
     <Compile Include="Util\ProcessEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Progress.cs" />
     <Compile Include="Util\ProtobufObjectHashProvider.cs" />
     <Compile Include="Util\RandomEx.cs" />
-    <Compile Include="Pop3\Session.cs" />
+    <Compile Include="Net\Pop3\Session.cs" />
     <Compile Include="Util\RegexIgnoreCase.cs" />
     <Compile Include="Util\RegistrySerializer.cs" />
     <Compile Include="Util\SerializeHelpers.cs" />
@@ -327,6 +342,7 @@
     <Compile Include="Visualization\DistinctColor.cs" />
     <Compile Include="Visualization\FileSystemTree.cs" />
     <Compile Include="Visualization\Layout.cs" />
+    <Compile Include="Visualization\Namespace.cs" />
     <Compile Include="Visualization\Tile.cs" />
     <Compile Include="Visualization\Tiles.cs" />
     <Compile Include="Visualization\TreeEventArgs.cs" />
@@ -419,10 +435,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\GitVersionTask.3.3.0\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.3.0\build\dotnet\GitVersionTask.targets'))" />
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets'))" />
   </Target>
   <Import Project="..\packages\GitVersionTask.3.3.0\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.3.0\build\dotnet\GitVersionTask.targets')" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

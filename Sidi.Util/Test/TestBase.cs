@@ -33,6 +33,12 @@ using System.Xml.Serialization;
 
 namespace Sidi.Test
 {
+    /// <summary>
+    /// Base class for Nunit test fixtures
+    /// </summary>
+    /// - Implements the Dispose pattern
+    /// - Enables log4net logger
+    /// - Access test files
     public class TestBase : IDisposable
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

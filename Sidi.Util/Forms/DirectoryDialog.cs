@@ -155,7 +155,7 @@ namespace Sidi.Forms {
 		}
 		///<summary>Gets or sets the title of the dialog.</summary>
 		///<value>A String representing the title of the dialog.</value>
-		///<exceptions cref="ArgumentNullException">The specified value is null (VB.NET: Nothing)</exceptions>
+		///<exception cref="ArgumentNullException">The specified value is null (VB.NET: Nothing)</exception>
 		public string Title
         {
 			get

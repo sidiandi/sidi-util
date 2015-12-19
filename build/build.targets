@@ -65,6 +65,17 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <Exec Command="$(NUnitConsole) --out=$(BuildDir)\test-out.txt --labels=All $(OutDir)\%(TestTargets.Identity)" />
   </Target>
 
+  <Target Name="Doc" >
+    <PropertyGroup>
+		<DocDir>$(BuildDir)\doc</DocDir>
+	</PropertyGroup>
+	<MakeDir Directories="$(DocDir)" />
+	<Exec 
+		Command="set OUTPUT_DIRECTORY=$(DocDir) &amp; doxygen Doxyfile.build" 
+		WorkingDirectory="$(SourceDir)"
+	/>
+  </Target>
+
   <Target Name="Pack" DependsOnTargets="Build;Tag">
     <PropertyGroup>
 		<PackageDir>$(BuildDir)\package</PackageDir>

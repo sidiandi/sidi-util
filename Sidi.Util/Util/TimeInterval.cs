@@ -4,18 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+/// <summary>
+/// Utility classes for making programming with the .NET framework easier
+/// </summary>
 namespace Sidi.Util
 {
     /// <summary>
     /// Time interval with begin time and end time
     /// </summary>
-    /// The time interval includes the begin time, but does not include the end time.
+    /// This class can represent open and closed time intervals with its properties BeginIncluded and EndIncluded.
     [Serializable]
     public class TimeInterval
     {
         /// <summary>
         /// Constructs a TimeInterval with specified begin and duration
         /// </summary>
+        /// If duration is zero, an interval with begin and end included will be constructed.
+        /// Otherwise an interval with begin included and end not excluded will be constructed.
         /// <param name="begin"></param>
         /// <param name="duration"></param>
         public TimeInterval(DateTime begin, TimeSpan duration)
@@ -26,6 +31,8 @@ namespace Sidi.Util
         /// <summary>
         /// Constructs a TimeInterval with specified duration and end.
         /// </summary>
+        /// If duration is zero, an interval with begin and end included will be constructed.
+        /// Otherwise an interval with begin included and end not excluded will be constructed.
         /// <param name="duration"></param>
         /// <param name="end"></param>
         public TimeInterval(TimeSpan duration, DateTime end)
@@ -34,15 +41,25 @@ namespace Sidi.Util
         }
 
         /// <summary>
-        /// Constructs a begin closed, end open TimeInterval with specified begin and end
+        /// Constructs a TimeInterval with specified begin and end
         /// </summary>
+        /// If duration is zero, an interval with begin and end included will be constructed.
+        /// Otherwise an interval with begin included and end not excluded will be constructed.
         /// <param name="begin"></param>
         /// <param name="end"></param>
         public TimeInterval(DateTime begin, DateTime end)
-            : this(begin, end, true, false)
+            : this(begin, end, true, begin.Equals(end))
         {
         }
 
+        /// <summary>
+        /// Constructs a TimeInterval with specified begin and end and specified specified inclusion of begin and end.
+        /// </summary>
+        /// <param name="begin">Begin time</param>
+        /// <param name="end">End time</param>
+        /// <param name="beginClosed">Indicates if begin is included.</param>
+        /// <param name="endClosed">Indicates if end is included.</param>
+        /// <exception cref="System.ArgumentException">Thrown when end is not greater than begin.</exception>
         public TimeInterval(DateTime begin, DateTime end, bool beginClosed, bool endClosed)
         {
             if (beginClosed && endClosed)
@@ -66,9 +83,17 @@ namespace Sidi.Util
             this.endIncluded = endClosed;
         }
 
+        /// <summary>
+        /// Parses a text as a TimeInterval
+        /// </summary>
+        /// Can parse the string returned by ToString.
+        /// 
+        /// <example></example>
+        /// <param name="timeIntervalText">Text to parse, e.g. </param>
+        /// <returns></returns>
         public static TimeInterval Parse(string timeIntervalText)
         {
-            return new Sidi.CommandLine.Parser().ParseValue<TimeInterval>(timeIntervalText);
+            return TimeIntervalParser.Parse(timeIntervalText);
         }
 
         /// <summary>
@@ -146,20 +171,32 @@ namespace Sidi.Util
         /// <returns>True if value is a subset of this, false otherwise</returns>
         public bool Contains(TimeInterval value)
         {
-            return object.Equals(this, Envelope(this, value));
+            return object.Equals(this, GetEnvelope(new[] { this, value }));
         }
 
-        public static TimeInterval Envelope(params TimeInterval[] intervals)
+        /// <summary>
+        /// Return the maximum extent of the specified intervals
+        /// </summary>
+        /// <exception cref="System.ArgumentOutOfRangeException">Throws when the enumerable contains no elements</exception>
+        /// <param name="intervals"></param>
+        /// <returns>The minimum time interval which contains all the specified time intervals</returns>
+        public static TimeInterval GetEnvelope(IEnumerable<TimeInterval> intervals)
         {
-            var x = intervals[0];
+            var e = intervals.GetEnumerator();
+            if (!e.MoveNext())
+            {
+                throw new ArgumentOutOfRangeException("intervals", intervals, "At least one element required in the enumerable");
+            }
+
+            var x = e.Current;
             DateTime begin = x.Begin;
             DateTime end = x.End;
             bool beginClosed = x.beginIncluded;
             bool endClosed = x.endIncluded;
 
-            for (int i = 1; i < intervals.Length; ++i)
+            for (; e.MoveNext();)
             {
-                x = intervals[i];
+                x = e.Current;
                 if (x.Begin < begin)
                 {
                     begin = x.Begin;
@@ -195,6 +232,12 @@ namespace Sidi.Util
             return Begin <= time && time < End;
         }
 
+        /// <summary>
+        /// Returns the intersection of this with the given time interval.
+        /// </summary>
+        /// <exception cref="System.ArgumentOutOfRangeException" >Throws when intervals do not intersect</exception>
+        /// <param name="x">Time interval to intersect</param>
+        /// <returns>Intersection time interval</returns>
         public TimeInterval Intersect(TimeInterval x)
         {
             DateTime begin = Begin;
@@ -225,6 +268,9 @@ namespace Sidi.Util
             return new TimeInterval(begin, end, beginClosed, endClosed);
         }
 
+        /// <summary>
+        /// The duration of the time interval
+        /// </summary>
         public TimeSpan Duration
         {
             get
@@ -255,6 +301,9 @@ namespace Sidi.Util
             }
         }
 
+        /// <summary>
+        /// Center of the time interval
+        /// </summary>
         public DateTime Center
         {
             get
@@ -285,14 +334,32 @@ namespace Sidi.Util
 
         public override int GetHashCode()
         {
-            return Begin.GetHashCode() * 251 + End.GetHashCode();
+            var hc = 0;
+            var m = 23;
+            hc += m * Begin.GetHashCode();
+            hc += m * End.GetHashCode();
+            hc += m * BeginIncluded.GetHashCode();
+            hc += m * EndIncluded.GetHashCode();
+            return hc;
         }
 
+        /// <summary>
+        /// Returns the year of the given time as time interval
+        /// </summary>
+        /// <param name="time">Time for which to return the year</param>
+        /// <returns>The year time interval</returns>
         public static TimeInterval Year(DateTime time)
         {
             return new TimeInterval(new DateTime(time.Year, 1, 1), new DateTime(time.Year + 1, 1, 1));
         }
 
+        /// <summary>
+        /// Returns a time interval with a length of 1 year, starting with the specified start month
+        /// </summary>
+        /// Can be used to obtain tax or financial years with a begin other than January 1st.
+        /// <param name="time">Time for which to return the year</param>
+        /// <param name="startMonth">Start month of the year interval (1=January)</param>
+        /// <returns>The year time interval</returns>
         public static TimeInterval Year(DateTime time, int startMonth)
         {
             var d = time.Month < startMonth ? -1 : 0;
@@ -301,12 +368,20 @@ namespace Sidi.Util
                 new DateTime(time.Year + d + 1, startMonth, 1));
         }
 
+        /// <summary>
+        /// Returns the month of the given time as time interval
+        /// </summary>
+        /// <param name="time">Time for which to return the month</param>
+        /// <returns>The month time interval</returns>
         public static TimeInterval Month(DateTime time)
         {
             var b = new DateTime(time.Year, time.Month, 1);
             return new TimeInterval(b, b.AddMonths(1));
         }
 
+        /// <summary>
+        /// Returns today as time interval
+        /// </summary>
         public static TimeInterval Today
         {
             get
@@ -315,6 +390,11 @@ namespace Sidi.Util
             }
         }
 
+        /// <summary>
+        /// Returns the day of the given time as time interval
+        /// </summary>
+        /// <param name="time">Time for which to return the day</param>
+        /// <returns>Day time interval</returns>
         public static TimeInterval Day(DateTime time)
         {
             return new TimeInterval(time.Date, time.Date.AddDays(1));

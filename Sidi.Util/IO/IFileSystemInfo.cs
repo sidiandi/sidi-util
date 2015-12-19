@@ -6,7 +6,7 @@ namespace Sidi.IO
     /// Set and get attributes of a file system element (file or directory)
     /// </summary>
     /// Most properties are identical to the properties of System.IO.FileInfo and System.IO.DirectoryInfo
-    public interface IFileSystemInfo
+    public interface IFileSystemInfo : IEquatable<IFileSystemInfo>, IComparable<IFileSystemInfo>
     {
         System.IO.FileAttributes Attributes { get; set; }
         DateTime CreationTime { get; }

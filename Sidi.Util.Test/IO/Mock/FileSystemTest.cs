@@ -18,6 +18,31 @@ namespace Sidi.IO.Mock
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [Test]
+        public void UseMockFileSystem()
+        {
+            //! [Usage]
+            using (var mockFs = new Sidi.IO.Mock.FileSystem())
+            {
+                mockFs.CreateRoot(new LPath(@"C:\"));
+
+                var path = new LPath(mockFs, @"C:\temp\hello.txt");
+                path.EnsureParentDirectoryExists();
+
+                // write file
+                var data = "hello, world";
+                path.WriteAllText(data);
+
+                // read file
+                Assert.AreEqual(data, path.ReadAllText());
+
+                // delete file
+                path.EnsureFileNotExists();
+                Assert.IsFalse(path.Exists);
+            }
+            //! [Usage]
+        }
+
+        [Test]
         public void UseMock()
         {
             using (var fs = new FileSystem())

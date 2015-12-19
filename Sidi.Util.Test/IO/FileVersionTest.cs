@@ -34,5 +34,16 @@ namespace Sidi.IO
             Assert.That(d0, Is.Not.EqualTo(d1));
             log.Info(d1);
         }
+
+        [Test]
+        public void Serialize()
+        {
+            var f0 = TestFile("hello");
+            f0.WriteAllText("hello");
+
+            var v0 = FileVersion.Get(f0);
+            TestBase.TestSerialize(v0);
+            TestBase.TestXmlSerialize(v0);
+        }
     }
 }

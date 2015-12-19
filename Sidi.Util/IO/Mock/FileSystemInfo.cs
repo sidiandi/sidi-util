@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sidi.IO.Mock
 {
-    class FileSystemInfo : IFileSystemInfo
+    internal class FileSystemInfo : IFileSystemInfo
     {
         public readonly Dictionary<string, FileSystemInfo> Childs = new Dictionary<string, FileSystemInfo>();
         private LPath path;
@@ -222,6 +222,21 @@ namespace Sidi.IO.Mock
 
         public void Refresh()
         {
+        }
+
+        public bool Equals(IFileSystemInfo other)
+        {
+            var r = other as FileSystemInfo;
+            if (r == null)
+            {
+                return false;
+            }
+            return object.Equals(this.FullName, r.FullName);
+        }
+
+        public int CompareTo(IFileSystemInfo other)
+        {
+            return FullName.CompareTo(other.FullName);
         }
     }
 }

@@ -27,6 +27,9 @@ using System.Linq.Expressions;
 
 namespace Sidi.Extensions
 {
+    /// <summary>
+    /// Extension methods to ease display of data
+    /// </summary>
     public static class DumpExtensions
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -59,6 +62,13 @@ namespace Sidi.Extensions
             }
         }
 
+        /// <summary>
+        /// Creates a ListFormat instance for the IEnumerable
+        /// </summary>
+        /// Use the generated ListFormat instance to display the IEnumerable in tabular form.
+        /// <typeparam name="T">Item type</typeparam>
+        /// <param name="e">enumerable of items</param>
+        /// <returns></returns>
         public static ListFormat<T> ListFormat<T>(this IEnumerable<T> e)
         {
             return new ListFormat<T>(e);

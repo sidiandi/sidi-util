@@ -489,8 +489,8 @@ namespace Sidi.CommandLine
 
         /// <summary>
         /// Registry key for LoadPreferences and StorePreferences. 
-        /// Default is HKEY_CURRENT_USER\Software\[your company]\[your product]\[profile]
         /// </summary>
+        /// Default: HKEY_CURRENT_USER\\Software\\[your company]\\[your product]\\[profile]
         public string PreferencesKey
         {
             get

@@ -30,7 +30,7 @@ namespace Sidi.IO.Windows
     /// Same methods and properties as System.IO.FileSystemInfo, but can handle long paths
     /// </summary>
     [Serializable]
-    public class FileSystemInfo : IEquatable<FileSystemInfo>, IComparable, Sidi.IO.IFileSystemInfo
+    internal class FileSystemInfo : IFileSystemInfo
     {
         #region FileSystemInfo methods
         
@@ -495,6 +495,21 @@ namespace Sidi.IO.Windows
             {
                 throw new ArgumentException("obj is not of type IFileSystemInfo", ex);
             }
+        }
+
+        public bool Equals(IFileSystemInfo other)
+        {
+            var r = other as FileSystemInfo;
+            if (r == null)
+            {
+                return false;
+            }
+            return object.Equals(this.FullName, r.FullName);
+        }
+
+        public int CompareTo(IFileSystemInfo other)
+        {
+            return FullName.CompareTo(other.FullName);
         }
     }
 }
