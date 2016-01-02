@@ -68,13 +68,13 @@ namespace Sidi.IO
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode)
+        public static System.IO.Stream Open(LPath path, System.IO.FileMode fileMode)
         {
             return path.FileSystem.Open(path, fileMode);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static System.IO.FileStream Open(
+        public static System.IO.Stream Open(
             LPath fileName, 
             System.IO.FileMode fileMode, 
             System.IO.FileAccess fileAccess,
@@ -88,7 +88,7 @@ namespace Sidi.IO
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static System.IO.FileStream OpenWrite(LPath path)
+        public static System.IO.Stream OpenWrite(LPath path)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace Sidi.IO
             }
         }
 
-        public static System.IO.FileStream OpenRead(LPath path)
+        public static System.IO.Stream OpenRead(LPath path)
         {
             return Open(path,
                 System.IO.FileMode.Open,

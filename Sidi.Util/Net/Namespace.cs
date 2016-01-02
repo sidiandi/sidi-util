@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// Utilities for internet and HTML
-/// </summary>
+//! Utilities for internet and HTML
 namespace Sidi.Net
 {
 }

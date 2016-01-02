@@ -29,12 +29,12 @@ namespace Sidi.IO
         /// <summary>
         /// Open a file.
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="path"></param>
         /// <param name="fileMode"></param>
+        /// <param name="fileAccess"></param>
+        /// <param name="shareMode"></param>
         /// <returns></returns>
-        System.IO.FileStream Open(LPath fileName, System.IO.FileMode fileMode);
-
-        System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare shareMode);
+        System.IO.Stream Open(LPath path, System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare shareMode);
 
         /// <summary>
         /// Delete a file.

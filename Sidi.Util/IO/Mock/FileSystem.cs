@@ -119,14 +119,9 @@ namespace Sidi.IO.Mock
             return i;
         }
 
-        public System.IO.FileStream Open(LPath fileName, System.IO.FileMode fileMode)
-        {
-            return Open(fileName, fileMode, FileAccess.ReadWrite, System.IO.FileShare.None);
-        }
-
         public IFileSystem RealFs = new Sidi.IO.Windows.FileSystem();
 
-        public System.IO.FileStream Open(LPath path, System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare shareMode)
+        public System.IO.Stream Open(LPath path, System.IO.FileMode fileMode, System.IO.FileAccess fileAccess, System.IO.FileShare shareMode)
         {
             var e = CreateFile(path);
             return RealFs.Open(e.Content, fileMode, fileAccess, shareMode);

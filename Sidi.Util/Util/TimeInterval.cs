@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-/// <summary>
-/// Utility classes for making programming with the .NET framework easier
-/// </summary>
 namespace Sidi.Util
 {
     /// <summary>
@@ -17,34 +14,12 @@ namespace Sidi.Util
     public class TimeInterval
     {
         /// <summary>
-        /// Constructs a TimeInterval with specified begin and duration
-        /// </summary>
-        /// If duration is zero, an interval with begin and end included will be constructed.
-        /// Otherwise an interval with begin included and end not excluded will be constructed.
-        /// <param name="begin"></param>
-        /// <param name="duration"></param>
-        public TimeInterval(DateTime begin, TimeSpan duration)
-            : this(begin, begin + duration)
-        {
-        }
-
-        /// <summary>
-        /// Constructs a TimeInterval with specified duration and end.
-        /// </summary>
-        /// If duration is zero, an interval with begin and end included will be constructed.
-        /// Otherwise an interval with begin included and end not excluded will be constructed.
-        /// <param name="duration"></param>
-        /// <param name="end"></param>
-        public TimeInterval(TimeSpan duration, DateTime end)
-            : this(end - duration, end)
-        {
-        }
-
-        /// <summary>
         /// Constructs a TimeInterval with specified begin and end
         /// </summary>
         /// If duration is zero, an interval with begin and end included will be constructed.
         /// Otherwise an interval with begin included and end not excluded will be constructed.
+        /// 
+        /// \snippet Sidi.Util.Test\Util\TimeIntervalTests.cs TimeIntervalTestCtor
         /// <param name="begin"></param>
         /// <param name="end"></param>
         public TimeInterval(DateTime begin, DateTime end)
@@ -84,6 +59,30 @@ namespace Sidi.Util
         }
 
         /// <summary>
+        /// Constructs a TimeInterval with specified begin and duration
+        /// </summary>
+        /// If duration is zero, an interval with begin and end included will be constructed.
+        /// Otherwise an interval with begin included and end not excluded will be constructed.
+        /// <param name="begin"></param>
+        /// <param name="duration"></param>
+        public TimeInterval(DateTime begin, TimeSpan duration)
+            : this(begin, begin + duration)
+        {
+        }
+
+        /// <summary>
+        /// Constructs a TimeInterval with specified duration and end.
+        /// </summary>
+        /// If duration is zero, an interval with begin and end included will be constructed.
+        /// Otherwise an interval with begin included and end not excluded will be constructed.
+        /// <param name="duration"></param>
+        /// <param name="end"></param>
+        public TimeInterval(TimeSpan duration, DateTime end)
+            : this(end - duration, end)
+        {
+        }
+
+        /// <summary>
         /// Parses a text as a TimeInterval
         /// </summary>
         /// Can parse the string returned by ToString.
@@ -93,7 +92,7 @@ namespace Sidi.Util
         /// <returns></returns>
         public static TimeInterval Parse(string timeIntervalText)
         {
-            return TimeIntervalParser.Parse(timeIntervalText);
+            return Sidi.CommandLine.TimeIntervalParser.Parse(timeIntervalText);
         }
 
         /// <summary>
@@ -125,7 +124,7 @@ namespace Sidi.Util
         }
 
         /// <summary>
-        /// End of the time interval. The end is not contained in the time interval.
+        /// End of the time interval.
         /// </summary>
         public DateTime End
         {
@@ -134,9 +133,15 @@ namespace Sidi.Util
                 return end;
             }
         }
-        
+
+        /// <summary>
+        /// Indicates if Begin is included in the time interval.
+        /// </summary>
         public bool BeginIncluded { get { return beginIncluded; } }
 
+        /// <summary>
+        /// Indicates if End is included in the time interval
+        /// </summary>
         public bool EndIncluded { get { return endIncluded; } }
 
         /// <summary>
@@ -229,7 +234,9 @@ namespace Sidi.Util
         /// <returns>True if time is in the time interval, false otherwise</returns>
         public bool Contains(DateTime time)
         {
-            return Begin <= time && time < End;
+            return
+                (BeginIncluded ? (Begin <= time) : (Begin < time)) &&
+                (EndIncluded ? (time <= End) : (time < End));
         }
 
         /// <summary>

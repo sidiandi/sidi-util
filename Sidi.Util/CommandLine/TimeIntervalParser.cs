@@ -17,6 +17,14 @@ namespace Sidi.CommandLine
     [Example("(begin 2013-03-01 end 2013-04-10)")]
     public class TimeIntervalParser : ValueContainer<TimeInterval>, CommandLineHandler2
     {
+        public static TimeInterval Parse(string value)
+        {
+            var tip = new TimeIntervalParser();
+            var p = new Parser(tip);
+            p.Parse(Tokenizer.ToArray(value));
+            return tip.Value;
+        }
+
         public TimeIntervalParser()
         {
             Value = TimeInterval.MaxValue;

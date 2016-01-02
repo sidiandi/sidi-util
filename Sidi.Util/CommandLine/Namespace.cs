@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// Attribute-based command line argument parser
-/// </summary>
+//! Attribute-based command line argument parser
 namespace Sidi.CommandLine
 {
 }

@@ -324,7 +324,6 @@
     <Compile Include="Util\Taggable.cs" />
     <Compile Include="Util\TileGeometry.cs" />
     <Compile Include="Util\TimeInterval.cs" />
-    <Compile Include="Util\TimeIntervalParser.cs" />
     <Compile Include="Util\Tokenizer.cs" />
     <Compile Include="Util\UnixTime.cs" />
     <Compile Include="Util\UpdateCheck.cs" />

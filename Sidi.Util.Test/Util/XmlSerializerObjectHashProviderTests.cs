@@ -32,7 +32,7 @@ namespace Sidi.Util.Tests
             Assert.AreEqual(new Hash("ac164e379e469c897bd01f029a64ed79df8ef6ed"), hp.Get(MethodBase.GetCurrentMethod()));
 
             var fv = new FileVersion("a", 1, new DateTime(2015, 1, 1, 1, 1, 1));
-            Assert.AreEqual(new Hash("3f5b2ecc1b46f80e204ff999dd33c384e5b36ce4"), hp.Get(fv));
+            Assert.AreEqual(new Hash("b5494ce71e865e3e0809233aac1b132f9f427818"), hp.Get(fv));
         }
     }
 }

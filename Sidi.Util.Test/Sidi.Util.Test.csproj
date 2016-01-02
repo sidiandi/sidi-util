@@ -72,7 +72,6 @@
     <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppenderTest.cs" />
     <Compile Include="Extensions\DumpExtensionsTest.cs" />
     <Compile Include="Extensions\IEnumerableExtensionsTest.cs" />
-    <Compile Include="Extensions\Namespace.cs" />
     <Compile Include="Extensions\RegistryExtensionTest.cs" />
     <Compile Include="Extensions\TypeExtensionsTest.cs" />
     <Compile Include="Forms\GenericListViewTest.cs" />
@@ -104,7 +103,6 @@
     <Compile Include="IO\LPathExtensionsTests.cs" />
     <Compile Include="IO\LPathTests.cs" />
     <Compile Include="IO\Mock\FileSystemTest.cs" />
-    <Compile Include="IO\Namespace.cs" />
     <Compile Include="IO\NamespaceCompatibilityTest.cs" />
     <Compile Include="IO\OperationTest.cs" />
     <Compile Include="IO\LPathTest.cs" />

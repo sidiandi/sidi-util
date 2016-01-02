@@ -275,69 +275,8 @@ namespace Sidi.IO.Windows
             }
         }
 
-        /// <summary>
-        /// Opens a file
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="fileMode"></param>
-        /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public System.IO.FileStream Open(LPath fileName, System.IO.FileMode fileMode)
-        {
-            var desiredAccess = System.IO.FileAccess.ReadWrite;
-            var shareMode = System.IO.FileShare.None;
-            var lpSecurityAttributes = IntPtr.Zero;
-            var creationDisposition = System.IO.FileMode.Open;
-            var flagsAndAttributes = System.IO.FileAttributes.Normal;
-            var hTemplateFile = IntPtr.Zero;
-
-            switch (fileMode)
-            {
-                case System.IO.FileMode.Create:
-                    desiredAccess = System.IO.FileAccess.Write;
-                    creationDisposition = System.IO.FileMode.Create;
-                    break;
-                case System.IO.FileMode.Open:
-                    desiredAccess = System.IO.FileAccess.Read;
-                    creationDisposition = System.IO.FileMode.Open;
-                    break;
-                default:
-                    throw new NotImplementedException(fileMode.ToString());
-            }
-
-            if (fileName.Prefix.Equals(@"\\.\"))
-            {
-                shareMode = System.IO.FileShare.Write;
-                desiredAccess = System.IO.FileAccess.Read;
-            }
-
-            SafeFileHandle h;
-            try
-            {
-                h = NativeMethods.CreateFile(
-                    GetLongPathApiParameter(fileName),
-                    desiredAccess,
-                    shareMode,
-                    lpSecurityAttributes,
-                    creationDisposition,
-                    flagsAndAttributes,
-                    hTemplateFile);
-
-                if (h.IsInvalid)
-                {
-                    throw new Win32Exception();
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                throw new System.IO.IOException(String.Format("Cannot open file: {0}", fileName), ex);
-            }
-
-            return new System.IO.FileStream(h, desiredAccess);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public System.IO.FileStream Open(
+        public System.IO.Stream Open(
             LPath path,
             System.IO.FileMode fileMode,
             System.IO.FileAccess fileAccess,

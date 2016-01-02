@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// Extensions for classes of the System namespace
-/// </summary>
-namespace Sidi.Extensions
+//! Utility classes for making programming with the .NET framework easier
+namespace Sidi.Util
 {
 }

@@ -31,13 +31,6 @@ using Sidi.Parse;
 using System.Collections;
 using System.Threading;
 
-/// <summary>
-/// Enhances and replaces the functionality of System.IO
-/// </summary>
-/// This namespace offers LPath, a value class for a file system path. LPath works on the file system abstraction
-/// IFileSystem which allows you to mock file system operations for testing.
-/// 
-/// The two implementations of IFileSystem are Sidi.IO.Mock.FileSystem and Sidi.IO.Windows.FileSystem.
 namespace Sidi.IO
 {
     /// <summary>

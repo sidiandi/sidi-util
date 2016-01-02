@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// [IMAP](https://tools.ietf.org/html/rfc3501) Server
-/// </summary>
+//! [IMAP](https://tools.ietf.org/html/rfc3501) Server
 namespace Sidi.Imap
 {
 }

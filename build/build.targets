@@ -21,7 +21,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
 		<NugetPackagesDir>$(SourceDir)\packages</NugetPackagesDir>
 		
-		<NUnitBin>$(NugetPackagesDir)\NUnit.Console.3.0.0\tools</NUnitBin>
+		<NUnitBin>$(NugetPackagesDir)\NUnit.Console.3.0.1\tools</NUnitBin>
 		<NUnitConsole>$(NUnitBin)\nunit3-console.exe</NUnitConsole>
 		
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
@@ -65,15 +65,22 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <Exec Command="$(NUnitConsole) --out=$(BuildDir)\test-out.txt --labels=All $(OutDir)\%(TestTargets.Identity)" />
   </Target>
 
-  <Target Name="Doc" >
+  <Target Name="Doc" DependsOnTargets="GetVersion" >
     <PropertyGroup>
 		<DocDir>$(BuildDir)\doc</DocDir>
 	</PropertyGroup>
 	<MakeDir Directories="$(DocDir)" />
 	<Exec 
-		Command="set OUTPUT_DIRECTORY=$(DocDir) &amp; doxygen Doxyfile.build" 
+		Command="
+			set OUTPUT_DIRECTORY=$(DocDir) &amp; 
+			set VERSION=$(GfvNuGetVersion) &amp; 
+			doxygen Doxyfile.build" 
 		WorkingDirectory="$(SourceDir)"
 	/>
+  </Target>
+
+  <Target Name="ShowDoc" DependsOnTargets="Doc" >
+	<Exec Command="explorer $(DocDir)\index.html" />
   </Target>
 
   <Target Name="Pack" DependsOnTargets="Build;Tag">

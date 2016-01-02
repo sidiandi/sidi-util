@@ -15,10 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// Create [cushion tree map](http://www.win.tue.nl/~vanwijk/ctm.pdf) visualizations
-/// </summary>
-/// For details about cushion tree maps, see 
+//! Create [cushion tree map](http://www.win.tue.nl/~vanwijk/ctm.pdf) visualizations
 namespace Sidi.Treemapping
 {
 }

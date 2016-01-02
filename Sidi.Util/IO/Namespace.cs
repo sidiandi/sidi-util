@@ -15,9 +15,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// Extensions for classes of the System namespace
-/// </summary>
-namespace Sidi.Extensions
+/*! Enhances and replaces the functionality of System.IO
+
+This namespace offers LPath, a value class for a file system path. LPath works on the file system abstraction
+IFileSystem which allows you to mock file system operations for testing.
+
+    The two implementations of IFileSystem are Sidi.IO.Mock.FileSystem and Sidi.IO.Windows.FileSystem.
+*/
+namespace Sidi.IO
 {
 }

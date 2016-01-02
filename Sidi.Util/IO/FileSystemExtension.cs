@@ -21,5 +21,19 @@ namespace Sidi.IO
             }
             return fs;
         }
+
+        public static System.IO.Stream Open(this IFileSystem fileSystem, LPath fileName, System.IO.FileMode fileMode)
+        {
+            var desiredAccess = System.IO.FileAccess.ReadWrite;
+            var shareMode = System.IO.FileShare.None;
+
+            if (fileName.Prefix.Equals(@"\\.\"))
+            {
+                shareMode = System.IO.FileShare.Write;
+                desiredAccess = System.IO.FileAccess.Read;
+            }
+
+            return fileSystem.Open(fileName, fileMode, desiredAccess, shareMode);
+        }
     }
 }

@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with sidi-util. If not, see <http://www.gnu.org/licenses/>.
 
-/// <summary>
-/// Utilities for unit testing
-/// </summary>
+//! Utilities for unit testing
 namespace Sidi.Test
 {
 }
