@@ -34,8 +34,20 @@ namespace Sidi.Extensions
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        static System.Security.Cryptography.MD5CryptoServiceProvider serviceProvider = new System.Security.Cryptography.MD5CryptoServiceProvider();
-        
+        static System.Security.Cryptography.MD5CryptoServiceProvider md5ServiceProvider
+        {
+            get
+            {
+                if (s_md5ServiceProvider == null)
+                {
+                    s_md5ServiceProvider = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                }
+                return s_md5ServiceProvider;
+            }
+        }
+        static System.Security.Cryptography.MD5CryptoServiceProvider s_md5ServiceProvider;
+
+        [Obsolete("MD5 should not be used anymore. Use Shorten() instead")]
         public static string ShortenMd5(this string text, int maxLength)
         {
             if (text.Length <= maxLength)
@@ -43,7 +55,7 @@ namespace Sidi.Extensions
                 return text;
             }
 
-            var digest = serviceProvider.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(text)).HexString();
+            var digest = md5ServiceProvider.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(text)).HexString();
 
             var truncatedTextLength = maxLength-digest.Length;
 
@@ -53,6 +65,40 @@ namespace Sidi.Extensions
             }
 
             return text.Substring(0, truncatedTextLength) + digest;
+        }
+
+        static System.Security.Cryptography.SHA1CryptoServiceProvider sha1
+        {
+            get
+            {
+                if (s_sha1 == null)
+                {
+                    s_sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+                }
+                return s_sha1;
+            }
+        }
+        static System.Security.Cryptography.SHA1CryptoServiceProvider s_sha1;
+
+        /// <summary>
+        /// Shortens a string to maxLength or less. Tries to maintain uniqueness by replacing last characters by a SHA1 digest of the complete string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="maxLength"></param>
+        /// <returns></returns>
+        public static string Shorten(this string text, int maxLength)
+        {
+            if (text.Length <= maxLength)
+            {
+                return text;
+            }
+
+            var digest = sha1.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(text)).HexString();
+
+            var truncatedTextLength = Math.Max(maxLength - digest.Length, 0);
+            var hashLength = maxLength - truncatedTextLength;
+
+            return text.Substring(0, truncatedTextLength) + digest.Substring(0, hashLength);
         }
 
         public static string Unquote(this string text)

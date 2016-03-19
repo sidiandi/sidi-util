@@ -88,5 +88,15 @@ namespace Sidi.Util
             Assert.AreEqual("cf09b5cb769d068e70d248ac7e013ac9", "012345678901234567890123456789012".ShortenMd5(32));
             Assert.AreEqual("0123456789012345677387bcdc5554d1269d2198c14204b480", "012345678901234567890123456789012012345678901234567890123456789012".ShortenMd5(50));
         }
+
+        [Test]
+        public void Shorten()
+        {
+            Assert.AreEqual(String.Empty, String.Empty.Shorten(32));
+            Assert.AreEqual("hello", "hello".Shorten(32));
+            Assert.AreEqual("01234567890123456789012345678901", "01234567890123456789012345678901".Shorten(32));
+            Assert.AreEqual("8ceb248e295234b117739b601034cdf3", "012345678901234567890123456789012".Shorten(32));
+            Assert.AreEqual("01234567898f54ba8ed475b21a3f16eb492b7e04a15fad8a42", "012345678901234567890123456789012012345678901234567890123456789012".Shorten(50));
+        }
     }
 }

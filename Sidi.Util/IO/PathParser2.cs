@@ -261,7 +261,7 @@ namespace Sidi.IO
                 })
                 .Join(String.Empty);
 
-            return valid.ShortenMd5(LPath.MaxFilenameLength);
+            return valid.Shorten(LPath.MaxFilenameLength);
         }
     }
 }
