@@ -28,7 +28,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 		<Git>git</Git>
   </PropertyGroup>
 
-  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.4.1\build\dotnet\GitVersionTask.targets" />
+  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets" />
   <Import Project="C:\work\nugetPackSymbols.build\Release-AnyCPU\bin\Build\CreateNugetSymbolsPackage.targets" />
 
   <Target Name="GetVersion">
