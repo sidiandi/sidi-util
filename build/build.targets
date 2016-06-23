@@ -21,7 +21,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
 		<NugetPackagesDir>$(SourceDir)\packages</NugetPackagesDir>
 		
-		<NUnitBin>$(NugetPackagesDir)\NUnit.Console.3.0.1\tools</NUnitBin>
+		<NUnitBin>$(NugetPackagesDir)\NUnit.Console.3.2.1\tools</NUnitBin>
 		<NUnitConsole>$(NUnitBin)\nunit3-console.exe</NUnitConsole>
 		
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
