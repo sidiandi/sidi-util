@@ -24,9 +24,10 @@ namespace Sidi.Treemapping.Test
             var sw = new Stopwatch();
             sw.Start();
             int loopCounter = 0;
+            var layout = tree.Squarify(RectangleD.FromLTRB(0, 0, size.Width, size.Height));
             for (; sw.Elapsed < runTime; ++loopCounter)
             {
-                using(var bm = cp.Render(tree, tree.Rectangle, size))
+                using(var bm = cp.Render(layout, layout.Data.Rectangle, size))
                 {
                     Assert.AreEqual(size, bm.Size);
                 }

@@ -32,9 +32,9 @@ namespace Sidi.Treemapping
             return WorldToScreen.GetInverse().Transform(clientPoint.ToPointD());
         }
 
-        public TreeNode GetNode(Point clientLocation)
+        public ITree<TreeLayout> GetNode(Point clientLocation)
         {
-            return this.Tree.GetNodeAt(GetWorldPoint(clientLocation));
+            return Layout.GetNodeAt(GetWorldPoint(clientLocation));
         }
 
         public TreeNode Tree
@@ -55,12 +55,19 @@ namespace Sidi.Treemapping
 
         void UpdateLayout()
         {
-            Tree.Rectangle = this.ClientRectangle;
-            Tree.Squarify();
+            Layout = Tree.Squarify(this.ClientRectangle);
+
+            foreach (var i in Layout.GetLeafs())
+            {
+                i.Data.Color = i.Data.Tag.Color;
+            }
+
             this.cushionPainter.Clear();
-            this.zoomPanController.Limits = Tree.Rectangle;
+            this.zoomPanController.Limits = Layout.Data.Rectangle;
             Invalidate();
         }
+
+        public ITree<TreeLayout> Layout { get; private set; }
 
         public System.Windows.Media.Matrix WorldToScreen
         {
@@ -99,22 +106,22 @@ namespace Sidi.Treemapping
                 PaintEventArgs = e,
                 WorldToScreen = WorldToScreen,
                 ScreenToWorld = screenToWorld,
-                Tree = this.Tree,
+                Tree = this.Layout,
                 ScreenRect = this.ClientRectangle,
             };
 
             cushionPainter.Paint(tpe);
             labelPainter.Paint(tpe);
-            // PaintWireFrame(e, Transform, Tree);
+            // PaintWireFrame(tpe);
         }
 
-        void PaintWireFrame(PaintEventArgs e, System.Windows.Media.Matrix transform, TreeNode tree)
+        void PaintWireFrame(TreePaintArgs tpe)
         {
-            var pen = Pens.Black;
-            foreach (var i in Tree.GetLeafs())
+            var pen = Pens.Red;
+            foreach (var i in Layout.GetLeafs())
             {
-                var r = transform.Transform(i.Rectangle);
-                e.Graphics.DrawRectangle(pen, (float)r.Left, (float)r.Top, (float)r.Width, (float)r.Height);
+                var r = tpe.WorldToScreen.Transform(i.Data.Rectangle);
+                tpe.PaintEventArgs.Graphics.DrawRectangle(pen, (float)r.Left, (float)r.Top, (float)r.Width, (float)r.Height);
             }
         }
     }

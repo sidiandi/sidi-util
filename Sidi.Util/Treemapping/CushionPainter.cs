@@ -23,7 +23,7 @@ namespace Sidi.Treemapping
         }
 
         public System.Drawing.Bitmap Render(
-            TreeNode tree,
+            ITree<TreeLayout> tree,
             RectangleD renderArea,
             System.Drawing.Size bitmapSize)
         {
@@ -56,7 +56,7 @@ namespace Sidi.Treemapping
         }
 
         public void Render(
-            TreeNode tree,
+            ITree<TreeLayout> tree,
             RectangleD renderArea,
             Matrix transform,
             double h,
@@ -64,7 +64,7 @@ namespace Sidi.Treemapping
             RectangleD s,
             BitmapData pixels)
         {
-            if (!renderArea.Intersects(tree.Rectangle))
+            if (!renderArea.Intersects(tree.Data.Rectangle))
             {
                 return;
             }
@@ -74,8 +74,8 @@ namespace Sidi.Treemapping
                 var s0 = s[d, Bound.Min];
                 var s1 = s[d, Bound.Max];
                 AddRidge(
-                    tree.Rectangle[d, Bound.Min],
-                    tree.Rectangle[d, Bound.Max], h,
+                    tree.Data.Rectangle[d, Bound.Min],
+                    tree.Data.Rectangle[d, Bound.Max], h,
                     ref s0,
                     ref s1);
 
@@ -83,14 +83,14 @@ namespace Sidi.Treemapping
                 s[d, Bound.Max] = s1;
             }
 
-            var treeBoundsBitmap = transform.Transform(tree.Rectangle);
-            if (tree.IsLeaf || treeBoundsBitmap.PixelsCovered <= MinimalCushionSizeInPixels)
+            var treeBoundsBitmap = transform.Transform(tree.Data.Rectangle);
+            if (tree.IsLeaf() || treeBoundsBitmap.PixelsCovered <= MinimalCushionSizeInPixels)
             {
-                RenderCushion(pixels, tree.Rectangle, treeBoundsBitmap, s, tree.GetFirstLeaf().Color.ToArray());
+                RenderCushion(pixels, tree.Data.Rectangle, treeBoundsBitmap, s, tree.GetFirstLeaf().Data.Color.ToArray());
             }
             else
             {
-                foreach (var i in tree.Nodes)
+                foreach (var i in tree.Children)
                 {
                     Render(
                         i,

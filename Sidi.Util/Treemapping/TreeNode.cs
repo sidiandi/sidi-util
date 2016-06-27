@@ -19,21 +19,9 @@ namespace Sidi.Treemapping
 
         public double Size { get; set; }
 
-        public RectangleD Rectangle { get; set; }
-
         public Color Color { get; set; }
 
         public string Text { get; set; }
-
-        /// <summary>
-        /// Returns the direct child node that contains point or null
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public TreeNode GetNodeAt(System.Windows.Point point)
-        {
-            return Nodes.FirstOrDefault(n => n.Rectangle.Contains(point));
-        }
 
         //
         // Summary:
@@ -47,29 +35,47 @@ namespace Sidi.Treemapping
         {
             get
             {
-                return m_Parent;
+                return parent;
             }
 
             set
             {
                 if (Parent != null)
                 {
-                    Parent.Nodes.Remove(this);
+                    Parent.MutableNodes.Remove(this);
                 }
 
-                m_Parent = value;
+                parent = value;
 
                 if (Parent != null)
                 {
-                    Parent.Nodes.Add(this);
+                    Parent.MutableNodes.Add(this);
                 }
             }
         }
 
-        TreeNode m_Parent;
+        TreeNode parent;
 
-        public IList<TreeNode> Nodes { get { if (m_Nodes == null) { m_Nodes = new List<TreeNode>(); } return m_Nodes; } }
-        IList<TreeNode> m_Nodes;
+        public IReadOnlyList<TreeNode> Nodes
+        {
+            get
+            {
+                return (IReadOnlyList < TreeNode> ) MutableNodes;
+            }
+        }
+
+        IList<TreeNode> MutableNodes
+        {
+            get
+            {
+                if (nodes == null)
+                {
+                    nodes = new List<TreeNode>();
+                }
+                return nodes;
+            }
+        }
+        IList<TreeNode> nodes;
 
         string ToStringDescriptiveText
         {
@@ -85,7 +91,7 @@ namespace Sidi.Treemapping
                 }
                 else
                 {
-                    return base.ToString();
+                    return "[no name]";
                 }
             }
         }
@@ -94,7 +100,7 @@ namespace Sidi.Treemapping
 
         public override string ToString()
         {
-            return String.Format("{0}, s={1}, c={2}, b={3}", ToStringDescriptiveText, Size, Color, Rectangle);
+            return String.Format("{0}, s={1}, c={2}", ToStringDescriptiveText, Size, Color);
         }
     }
 }

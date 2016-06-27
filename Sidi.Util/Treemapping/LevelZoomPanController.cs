@@ -58,7 +58,7 @@ namespace Sidi.Treemapping
         public void LevelDown(System.Drawing.Point clientPoint)
         {
             var w = view.GetWorldPoint(clientPoint);
-            var c = view.Tree.GetNodeAt(w);
+            var c = view.Layout.GetNodeAt(w).Data.Tag;
             if (c != null)
             {
                 view.Tree = c;

@@ -219,6 +219,8 @@
     <Compile Include="Treemapping\RectangleDExtensions.cs" />
     <Compile Include="Treemapping\RectangleFExtensions.cs" />
     <Compile Include="Treemapping\TiledCushionPainter.cs" />
+    <Compile Include="Treemapping\Tree.cs" />
+    <Compile Include="Treemapping\TreeLayout.cs" />
     <Compile Include="Treemapping\TreeNode.cs" />
     <Compile Include="Treemapping\TreePaintArgs.cs" />
     <Compile Include="Treemapping\View.cs">

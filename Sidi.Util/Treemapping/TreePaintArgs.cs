@@ -13,7 +13,7 @@ namespace Sidi.Treemapping
         public PaintEventArgs PaintEventArgs;
         public System.Windows.Media.Matrix WorldToScreen;
         public System.Windows.Media.Matrix ScreenToWorld;
-        public TreeNode Tree;
+        public ITree<TreeLayout> Tree;
         public RectangleD ScreenRect;
 
         public TreePaintArgs Clone()

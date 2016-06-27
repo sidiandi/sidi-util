@@ -100,7 +100,7 @@ namespace Sidi.Treemapping
         public void Paint(TreePaintArgs pa)
         {
             var g = pa.PaintEventArgs.Graphics;
-            double maxArea = pa.Tree.Rectangle.Area;
+            double maxArea = pa.Tree.Data.Rectangle.Area;
             alphaF = 220.0 / (Math.Log10(maxArea) - Math.Log10(MinArea));
             areaScale = pa.WorldToScreen.Transform(RectangleD.FromLTRB(0, 0, 1, 1)).Area;
 
@@ -122,16 +122,16 @@ namespace Sidi.Treemapping
 
         void PaintRecursiveFocusPoint(TreePaintArgs pa, int level)
         {
-            bool drawLabel = !pa.Tree.Rectangle.Contains(worldFocusPoint) || pa.Tree.IsLeaf;
+            bool drawLabel = !pa.Tree.Data.Rectangle.Contains(worldFocusPoint) || pa.Tree.IsLeaf();
 
             if (!drawLabel)
             {
                 // determine if there is enough area to draw a label in at least 75% of all childs
                 double totalArea = 0;
                 double drawableArea = 0;
-                foreach (var c in pa.Tree.Nodes)
+                foreach (var c in pa.Tree.Children)
                 {
-                    var a = c.Rectangle.Area * areaScale;
+                    var a = c.Data.Rectangle.Area * areaScale;
                     if (a >= MinArea)
                     {
                         drawableArea += a;
@@ -144,12 +144,12 @@ namespace Sidi.Treemapping
 
             if (drawLabel)
             {
-                var text = Text(pa.Tree);
-                DrawLabel(pa, text, pa.Tree.Rectangle);
+                var text = Text(pa.Tree.Data.Tag);
+                DrawLabel(pa, text, pa.Tree.Data.Rectangle);
             }
             else
             {
-                foreach (var c in pa.Tree.Nodes)
+                foreach (var c in pa.Tree.Children)
                 {
                     var newPa = pa.Clone();
                     newPa.Tree = c;
@@ -169,7 +169,7 @@ namespace Sidi.Treemapping
         bool PaintRecursive(TreePaintArgs pa, int level)
         {
             var g = pa.PaintEventArgs.Graphics;
-            var treeRectScreen = pa.WorldToScreen.Transform(pa.Tree.Rectangle);
+            var treeRectScreen = pa.WorldToScreen.Transform(pa.Tree.Data.Rectangle);
 
             if (!treeRectScreen.Intersects(pa.PaintEventArgs.ClipRectangle))
             {
@@ -182,7 +182,7 @@ namespace Sidi.Treemapping
 
             if (levelVisible)
             {
-                var text = Text(pa.Tree);
+                var text = Text(pa.Tree.Data.Tag);
                 var textSize = g.MeasureString(text, Font);
                 var scale = Math.Min(treeRectScreen.Width / Math.Max(1.0f, textSize.Width), treeRectScreen.Height / Math.Max(1.0f, textSize.Height));
                 if ((scale * textSize.Height * 8) < treeRectScreen.Height)
@@ -212,7 +212,7 @@ namespace Sidi.Treemapping
                 }
             }
 
-            foreach (var c in pa.Tree.Nodes)
+            foreach (var c in pa.Tree.Children)
             {
                 PaintRecursive(new TreePaintArgs
                 {

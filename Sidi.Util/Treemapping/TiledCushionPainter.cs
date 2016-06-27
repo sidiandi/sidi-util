@@ -30,7 +30,7 @@ namespace Sidi.Treemapping
             return cushionPainter.Render(Tree, i.WorldRect, tiles.Size);
         }
 
-        TreeNode Tree
+        ITree<TreeLayout> Tree
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Sidi.Treemapping
                 m_tree = value;
             }
         }
-        TreeNode m_tree;
+        ITree<TreeLayout> m_tree;
 
         public void Clear()
         {

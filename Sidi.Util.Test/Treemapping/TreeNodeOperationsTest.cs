@@ -29,12 +29,6 @@ namespace Sidi.Treemapping.Test
 
             Assert.AreEqual(leafs.Sum(_ => (double)_), tree.Size);
 
-            // calculate bounds
-            tree.Rectangle = RectangleD.FromLTRB(0, 0, 1, 1);
-            tree.Squarify();
-
-            Assert.AreEqual(tree.Rectangle.Area, tree.GetLeafs().Sum(_ => _.Rectangle.Area), 1e-9);
-
             return tree;
         }
 
@@ -65,7 +59,7 @@ namespace Sidi.Treemapping.Test
                 var n = v.GetNode(e.Location);
                 if (n != null)
                 {
-                    var file = (IFileSystemInfo)n.Tag;
+                    var file = (IFileSystemInfo)n.Data.Tag;
                     Process.Start(file.FullName);
                 }
             };

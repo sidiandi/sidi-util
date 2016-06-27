@@ -127,6 +127,8 @@
     <Compile Include="Treemapping\TreeMap.cs" />
     <Compile Include="Treemapping\TreeNode.cs" />
     <Compile Include="Treemapping\TreeNodeOperationsTest.cs" />
+    <Compile Include="Treemapping\TreeNodeOperationsTests.cs" />
+    <Compile Include="Treemapping\ViewTests.cs" />
     <Compile Include="Util\Base32Test.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
     <Compile Include="Util\ByteArrayExtensionsTest.cs" />
