@@ -13,6 +13,9 @@ namespace Sidi.Treemapping
     {
         public View()
         {
+            GetColor = _ => Color.White;
+            GetSize = _ => 1.0;
+
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.UserPaint, true);
@@ -23,8 +26,7 @@ namespace Sidi.Treemapping
             zoomPanController = new ZoomPanController(this, () => WorldToScreen, t => this.WorldToScreen = t);
             labelPainterController = new LabelPainterController(this, labelPainter);
 
-            Tree = new TreeNode(null) { Size = 1.0 };
-            Size = new Size(100, 100);
+            Tree = new Tree<object>();
         }
 
         public System.Windows.Point GetWorldPoint(Point clientPoint)
@@ -37,7 +39,24 @@ namespace Sidi.Treemapping
             return Layout.GetNodeAt(GetWorldPoint(clientLocation));
         }
 
-        public TreeNode Tree
+        public Func<ITree, Color> GetColor
+        {
+            get; set;
+        }
+
+        public Func<ITree, string> GetLabel
+        {
+            get;
+            set;
+        }
+
+        public Func<ITree, double> GetSize
+        {
+            get;
+            set;
+        }
+
+        public ITree Tree
         {
             get
             {
@@ -51,17 +70,14 @@ namespace Sidi.Treemapping
             }
 
         }
-        TreeNode m_Tree;
+        ITree m_Tree;
+
 
         void UpdateLayout()
         {
-            Layout = Tree.Squarify(this.ClientRectangle);
-
-            foreach (var i in Layout.GetLeafs())
-            {
-                i.Data.Color = i.Data.Tag.Color;
-            }
-
+            var layout = TreeLayoutExtensions.CreateLayoutTree(this.Tree, GetColor, GetSize);
+            layout.Squarify(this.ClientRectangle);
+            Layout = layout;
             this.cushionPainter.Clear();
             this.zoomPanController.Limits = Layout.Data.Rectangle;
             Invalidate();

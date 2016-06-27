@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Sidi.Treemapping;
+using Sidi.Treemapping.Tests;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace Sidi.Treemapping.Test
         [Test()]
         public void RenderTest()
         {
-            var tree = new TreeNodeOperationsTest().CreateTree();
+            ITree tree = ViewTests.CreateTestTree();
             var cp = new CushionPainter();
 
             var runTime = TimeSpan.FromSeconds(3);
@@ -24,7 +25,8 @@ namespace Sidi.Treemapping.Test
             var sw = new Stopwatch();
             sw.Start();
             int loopCounter = 0;
-            var layout = tree.Squarify(RectangleD.FromLTRB(0, 0, size.Width, size.Height));
+            var layout = TreeLayoutExtensions.CreateLayoutTree(tree, _ => ((TreeLayout)_.Data).Color, _ => ((TreeLayout)_.Data).Size);
+            layout.Squarify(RectangleD.FromLTRB(0, 0, size.Width, size.Height));
             for (; sw.Elapsed < runTime; ++loopCounter)
             {
                 using(var bm = cp.Render(layout, layout.Data.Rectangle, size))

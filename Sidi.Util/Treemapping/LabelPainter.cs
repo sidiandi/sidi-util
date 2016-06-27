@@ -47,7 +47,7 @@ namespace Sidi.Treemapping
             MinArea = 1000;
             MinFontSize = 5;
             LeafsOnly = false;
-            Text = t => t == null ? String.Empty : t.Tag.SafeToString();
+            Text = t => t == null ? String.Empty : t.Data.SafeToString();
 
             StringFormat = new StringFormat()
             {
@@ -160,7 +160,7 @@ namespace Sidi.Treemapping
         public Font Font { set; get; }
         public float MinFontSize { set; get; }
         public bool LeafsOnly { get; set; }
-        public Func<TreeNode, string> Text { set; get; }
+        public Func<ITree, string> Text { set; get; }
 
         double alphaF;
 

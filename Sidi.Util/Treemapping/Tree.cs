@@ -9,9 +9,18 @@ using Sidi.Extensions;
 
 namespace Sidi.Treemapping
 {
-    public interface ITree<T>
+    public interface ITree
     {
-        T Data { get; set; }
+        object Data { get; }
+
+        IEnumerable<ITree> Children { get; }
+
+        ITree Parent { get; }
+    }
+
+    public interface ITree<T> : ITree
+    {
+        T Data { get; }
 
         IEnumerable<ITree<T>> Children { get; }
 
@@ -76,7 +85,15 @@ namespace Sidi.Treemapping
 
     public class Tree<T> : ITree<T>
     {
-        public IEnumerable<ITree<T>> Children
+        IEnumerable<ITree<T>> ITree<T>.Children
+        {
+            get
+            {
+                return children;
+            }
+        }
+
+        public IList<Tree<T>> Children
         {
             get
             {
@@ -110,15 +127,17 @@ namespace Sidi.Treemapping
 
             set
             {
-                if (parent == null)
-                {
-                }
-                else
+                if (parent != null)
                 {
                     parent.children.Remove(this);
                 }
+
                 parent = value;
-                parent.children.Add(this);
+
+                if (parent != null)
+                {
+                    parent.children.Add(this);
+                }
             }
         }
 
@@ -127,6 +146,30 @@ namespace Sidi.Treemapping
             get
             {
                 return ((ITree<T>)Parent).Parent;
+            }
+        }
+
+        object ITree.Data
+        {
+            get
+            {
+                return data;
+            }
+        }
+
+        IEnumerable<ITree> ITree.Children
+        {
+            get
+            {
+                return children;
+            }
+        }
+
+        ITree ITree.Parent
+        {
+            get
+            {
+                return parent;
             }
         }
 

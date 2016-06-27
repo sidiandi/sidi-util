@@ -208,6 +208,7 @@
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Net\Pop3\Namespace.cs" />
     <Compile Include="Test\Namespace.cs" />
+    <Compile Include="Treemapping\ITreemapData.cs" />
     <Compile Include="Treemapping\Namespace.cs" />
     <Compile Include="Treemapping\ColorScale.cs" />
     <Compile Include="Treemapping\CushionPainter.cs" />

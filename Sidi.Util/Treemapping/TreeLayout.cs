@@ -17,8 +17,9 @@ namespace Sidi.Treemapping
         {
         }
 
-        public TreeNode Tag;
+        public ITree Tag;
         public RectangleD Rectangle;
+        public double Size;
         public Color Color;
     }
 
@@ -38,80 +39,12 @@ namespace Sidi.Treemapping
             }
         }
 
-        static ITree<TreeLayout> Columns(this TreeNode tree, RectangleD bounds)
+        public static void Squarify(this ITree<TreeLayout> tree, RectangleD bounds)
         {
-            double s = 0;
-            double sizeInv = 1.0 / tree.Size * bounds.Width;
-            double p0 = s * sizeInv + bounds.Left;
-
-            var layout = new Tree<TreeLayout>
-            {
-                Data = new TreeLayout
-                {
-                    Rectangle = bounds,
-                    Tag = tree
-                }
-            };
-
-            foreach (var n in tree.Nodes)
-            {
-                s += n.Size;
-                double p1 = s * sizeInv + bounds.Left;
-                new Tree<TreeLayout>
-                {
-                    Data = new TreeLayout
-                    {
-                        Rectangle = RectangleF.FromLTRB((float)p0, (float)bounds.Top, (float)p1, (float)bounds.Bottom),
-                        Tag = n
-                    },
-                    Parent = layout,
-                };
-                p0 = p1;
-            }
-
-            return layout;
-        }
-
-        static ITree<TreeLayout> Rows(this TreeNode tree, RectangleD bounds)
-        {
-            double s = 0;
-            double sizeInv = 1.0 / tree.Size * bounds.Height;
-            double p0 = s * sizeInv + bounds.Top;
-
-            var layout = new Tree<TreeLayout>
-            {
-                Data = new TreeLayout
-                {
-                    Rectangle = bounds,
-                    Tag = tree
-                }
-            };
-
-            foreach (var n in tree.Nodes)
-            {
-                s += n.Size;
-                double p1 = s * sizeInv + bounds.Top;
-
-                new Tree<TreeLayout>
-                {
-                    Data = new TreeLayout
-                    {
-                        Rectangle = RectangleD.FromLTRB(bounds.Left, p0, bounds.Right, p1),
-                        Tag = n
-                    },
-                    Parent = layout,
-                };
-                p0 = p1;
-            }
-
-            return layout;
-        }
-
-        public static Tree<TreeLayout> Squarify(this TreeNode tree, RectangleD bounds)
-        {
-            var rectangles = tree.Nodes
+            tree.Data.Rectangle = bounds;
+            var rectangles = tree.Children
+                .Select(_ => _.Data)
                 .OrderByDescending(x => x.Size)
-                .Select(n => new TreeLayout { Tag = n })
                 .ToArray();
 
             RectangleD remaining = bounds;
@@ -139,20 +72,10 @@ namespace Sidi.Treemapping
                 offset += count;
             }
 
-            var layout = new Tree<TreeLayout>
+            foreach (var i in tree.Children)
             {
-                Data = new TreeLayout
-                {
-                    Rectangle = bounds,
-                    Tag = tree,
-                }
-            };
-
-            foreach (var i in rectangles)
-            {
-                i.Tag.Squarify(i.Rectangle).Parent = layout;
+                i.Squarify(i.Data.Rectangle);
             }
-            return layout;
         }
 
         /// <summary>
@@ -169,7 +92,7 @@ namespace Sidi.Treemapping
             double size = 0;
             for (int i = offset; i < childs.Length; ++i)
             {
-                size += childs[i].Tag.Size;
+                size += childs[i].Size;
             }
 
             var isRow = bounds.Width < bounds.Height;
@@ -177,7 +100,7 @@ namespace Sidi.Treemapping
             double rowSize = 0;
             for (int i = offset; i < offset + count; ++i)
             {
-                rowSize += childs[i].Tag.Size;
+                rowSize += childs[i].Size;
             }
             var rowWidth = isRow ? bounds.Width : bounds.Height;
             var availableRowHeight = isRow ? bounds.Height : bounds.Width;
@@ -188,7 +111,7 @@ namespace Sidi.Treemapping
             double s = 0;
             for (int i = offset; i < offset + count; ++i)
             {
-                var s1 = s + childs[i].Tag.Size;
+                var s1 = s + childs[i].Size;
                 if (isRow)
                 {
                     childs[i].Rectangle = RectangleD.FromLTRB(
@@ -225,6 +148,38 @@ namespace Sidi.Treemapping
                         bounds.Right,
                         bounds.Bottom);
             }
+        }
+
+        public static ITree<TreeLayout> CreateLayoutTree(ITree tree, Func<ITree, Color> GetColor, Func<ITree, double> GetSize)
+        {
+            return CreateLayoutTree(null, tree, GetColor, GetSize);
+        }
+
+        static Tree<TreeLayout> CreateLayoutTree(Tree<TreeLayout> parent, ITree tree, Func<ITree, Color> GetColor, Func<ITree, double> GetSize)
+        {
+            var lt = new Tree<TreeLayout>
+            {
+                Data = new TreeLayout(),
+                Parent = parent
+            };
+
+            double size = 0;
+            if (!tree.Children.Any())
+            {
+                lt.Data.Color = GetColor(tree);
+                size = GetSize(tree);
+            }
+            else
+            {
+                foreach (var c in tree.Children)
+                {
+                    var cl = CreateLayoutTree(lt, c, GetColor, GetSize);
+                    size += cl.Data.Size;
+                }
+            }
+            lt.Data.Size = size;
+
+            return lt;
         }
     }
 }
