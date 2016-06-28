@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
-    public class CushionPainter
+    internal class CushionPainter
     {
         double h = 0.75f;
         double f = 0.75f;
@@ -23,7 +23,7 @@ namespace Sidi.Treemapping
         }
 
         public System.Drawing.Bitmap Render(
-            ITree<TreeLayout> tree,
+            ITree<Layout> tree,
             RectangleD renderArea,
             System.Drawing.Size bitmapSize)
         {
@@ -56,7 +56,7 @@ namespace Sidi.Treemapping
         }
 
         public void Render(
-            ITree<TreeLayout> tree,
+            ITree<Layout> tree,
             RectangleD renderArea,
             Matrix transform,
             double h,

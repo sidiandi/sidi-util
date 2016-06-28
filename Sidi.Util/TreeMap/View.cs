@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public class View : Control
     {
@@ -34,7 +34,7 @@ namespace Sidi.Treemapping
             return WorldToScreen.GetInverse().Transform(clientPoint.ToPointD());
         }
 
-        public ITree<TreeLayout> GetNode(Point clientLocation)
+        ITree<Layout> GetNode(Point clientLocation)
         {
             return Layout.GetNodeAt(GetWorldPoint(clientLocation));
         }
@@ -46,8 +46,15 @@ namespace Sidi.Treemapping
 
         public Func<ITree, string> GetLabel
         {
-            get;
-            set;
+            get
+            {
+                return labelPainter.Text;
+            }
+
+            set
+            {
+                labelPainter.Text = value;
+            }
         }
 
         public Func<ITree, double> GetSize
@@ -83,7 +90,7 @@ namespace Sidi.Treemapping
             Invalidate();
         }
 
-        public ITree<TreeLayout> Layout { get; private set; }
+        internal ITree<Layout> Layout { get; set; }
 
         public System.Windows.Media.Matrix WorldToScreen
         {

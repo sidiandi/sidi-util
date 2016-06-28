@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
-    public class TreePaintArgs
+    internal class TreePaintArgs
     {
         public PaintEventArgs PaintEventArgs;
         public System.Windows.Media.Matrix WorldToScreen;
         public System.Windows.Media.Matrix ScreenToWorld;
-        public ITree<TreeLayout> Tree;
+        public ITree<Layout> Tree;
         public RectangleD ScreenRect;
 
         public TreePaintArgs Clone()

@@ -123,8 +123,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Test\TestBaseTest.cs" />
-    <Compile Include="Treemapping\CushionPainterTests.cs" />
-    <Compile Include="Treemapping\ViewTests.cs" />
+    <Compile Include="TreeMap\CushionPainterTests.cs" />
+    <Compile Include="TreeMap\TreeLayoutExtensionsTests.cs" />
+    <Compile Include="TreeMap\ViewTests.cs" />
     <Compile Include="Util\Base32Test.cs" />
     <Compile Include="Util\BinaryPrefix.cs" />
     <Compile Include="Util\ByteArrayExtensionsTest.cs" />

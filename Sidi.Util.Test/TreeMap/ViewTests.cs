@@ -1,34 +1,36 @@
 ﻿using NUnit.Framework;
 using Sidi.IO;
-using Sidi.Treemapping;
+using Sidi.Test;
+using Sidi.TreeMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Environment;
 
-namespace Sidi.Treemapping.Tests
+namespace Sidi.TreeMap.Tests
 {
     [TestFixture, Apartment(System.Threading.ApartmentState.STA)]
-    public class ViewTests
+    public class ViewTests : TestBase
     {
         internal static ITree CreateTestTree()
         {
             var random = new Random(0);
-            var root = new Tree<TreeLayout>();
+            var root = new Tree<Layout>();
             AddRandomChilds(random, root, 3);
             return root;
         }
 
-        static void AddRandomChilds(Random random, Tree<TreeLayout> parent, int level)
+        static void AddRandomChilds(Random random, Tree<Layout> parent, int level)
         {
             var iEnd = random.Next(5, 10);
             for (int i = 0; i < iEnd; ++i)
             {
-                new Tree<TreeLayout>
+                new Tree<Layout>
                 {
                     Parent = parent,
-                    Data = new TreeLayout
+                    Data = new Layout
                     {
                     }
                 };
@@ -56,6 +58,22 @@ namespace Sidi.Treemapping.Tests
             var view = new View
             {
                 Tree = CreateTestTree()
+            };
+
+            Sidi.Forms.Util.RunFullScreen(view);
+        }
+
+        [Test]
+        public void FileTree()
+        {
+            var files = FileSystemTree.Create(TestFile(".").Parent.Parent.Parent);
+            var colorScale = ColorScale.Distinct(files.GetLeafs(), _ => _.Data.Extension);
+            var view = new View
+            {
+                Tree = files,
+                GetSize = _ => ((IFileSystemInfo)_.Data).Length,
+                GetLabel = _ => ((IFileSystemInfo)_.Data).Name,
+                GetColor = _ => colorScale((ITree<IFileSystemInfo>)_)
             };
 
             Sidi.Forms.Util.RunFullScreen(view);

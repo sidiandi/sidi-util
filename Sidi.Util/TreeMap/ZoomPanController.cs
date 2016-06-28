@@ -24,7 +24,7 @@ using System.Drawing;
 using Sidi.Forms;
 using System.Windows.Media;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public class ZoomPanController : IDisposable
     {
@@ -60,42 +60,57 @@ namespace Sidi.Treemapping
                     }
                     else if (e.Button == MouseButtons.Left)
                     {
-                        StartPan();
+                        StartPan(e.Location);
                     }
                 };
 
             control.MouseUp += (s, e) =>
                 {
-                    StopPan();
+                    StopPan(e.Location);
                 };
+
+            control.MouseMove += Control_MouseMove;
         }
 
-        void StartPan()
+        Control control;
+        Func<Matrix> getTransform;
+        Action<Matrix> setTransform;
+
+        bool panning = false;
+        Point panStartLocation;
+        Matrix panStartTransform;
+
+        private void Control_MouseMove(object sender, MouseEventArgs e)
         {
-            mouseDelta = new MouseDelta();
-            mouseDelta.Move += (ms, me) =>
-                {
-                    var t = Transform;
-                    t.Translate(me.Delta.X * PanScale, me.Delta.Y * PanScale);
-                    Transform = t;
-                };
+            if (panning)
+            {
+                var delta = e.Location.Sub(panStartLocation);
+                var t = panStartTransform;
+                t.Translate(delta.Width, delta.Height);
+                Transform = t;
+            }
+        }
+
+        void StartPan(Point panStartLocation)
+        {
+            panning = true;
+            panStartTransform = Transform;
+            this.panStartLocation = panStartLocation;
         }
 
         float PanScale { set; get; }
 
-        void StopPan()
+        void StopPan(Point panStopLocation)
         {
-            if (mouseDelta != null)
+            if (panning)
             {
-                mouseDelta.Dispose();
-                mouseDelta = null;
+                var delta = panStopLocation.Sub(panStartLocation);
+                var t = panStartTransform;
+                t.Translate(delta.Width, delta.Height);
+                Transform = t;
+                panning = false;
             }
         }
-
-        MouseDelta mouseDelta;
-        Control control;
-        Func<Matrix> getTransform;
-        Action<Matrix> setTransform;
 
         Matrix Transform
         {
@@ -138,8 +153,8 @@ namespace Sidi.Treemapping
             get { return limits; }
             set
             {
-                limits = value;
-                Transform = Transform;
+                // limits = value;
+                // Transform = Transform;
             }
         }
         RectangleD? limits;
@@ -159,10 +174,7 @@ namespace Sidi.Treemapping
           {
             if (disposing)
             {
-                if (mouseDelta != null)
-                {
-                    mouseDelta.Dispose();
-                }
+                control.MouseMove -= Control_MouseMove;
             }
             // Free your own state (unmanaged objects).
             // Set large fields to null.

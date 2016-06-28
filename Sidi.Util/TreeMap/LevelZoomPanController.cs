@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public class LevelZoomPanController : IDisposable
     {
@@ -58,7 +58,7 @@ namespace Sidi.Treemapping
         public void LevelDown(System.Drawing.Point clientPoint)
         {
             var w = view.GetWorldPoint(clientPoint);
-            var c = view.Layout.GetNodeAt(w).Data.Tag;
+            var c = view.Layout.GetNodeAt(w).Data.Tree;
             if (c != null)
             {
                 view.Tree = c;

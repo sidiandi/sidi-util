@@ -7,25 +7,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
-    public class TreeLayout
+    internal class Layout
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public TreeLayout()
+        public Layout()
         {
         }
 
-        public ITree Tag;
+        public ITree Tree;
         public RectangleD Rectangle;
         public double Size;
         public Color Color;
     }
 
-    public static class TreeLayoutExtensions
+    internal static class TreeLayoutExtensions
     {
-        public static ITree<TreeLayout> GetNodeAt(this ITree<TreeLayout> tree, System.Windows.Point point)
+        public static ITree<Layout> GetNodeAt(this ITree<Layout> tree, System.Windows.Point point)
         {
             if (tree.Data.Rectangle.Contains(point))
             {
@@ -39,7 +39,7 @@ namespace Sidi.Treemapping
             }
         }
 
-        public static void Squarify(this ITree<TreeLayout> tree, RectangleD bounds)
+        public static void Squarify(this ITree<Layout> tree, RectangleD bounds)
         {
             tree.Data.Rectangle = bounds;
             var rectangles = tree.Children
@@ -87,7 +87,7 @@ namespace Sidi.Treemapping
         /// <param name="bounds"></param>
         /// <param name="remaining"></param>
         /// <param name="worstAspectRatio"></param>
-        static void Squarify(TreeLayout[] childs, int offset, int count, RectangleD bounds, out RectangleD remaining, out double worstAspectRatio)
+        static void Squarify(Layout[] childs, int offset, int count, RectangleD bounds, out RectangleD remaining, out double worstAspectRatio)
         {
             double size = 0;
             for (int i = offset; i < childs.Length; ++i)
@@ -102,10 +102,11 @@ namespace Sidi.Treemapping
             {
                 rowSize += childs[i].Size;
             }
+
             var rowWidth = isRow ? bounds.Width : bounds.Height;
             var availableRowHeight = isRow ? bounds.Height : bounds.Width;
-            var rowHeight = (availableRowHeight * rowSize / size);
-            var columnPerSize = rowWidth / rowSize;
+            var rowHeight = size == 0 ? 0 : (availableRowHeight * rowSize / size);
+            var columnPerSize = rowSize == 0 ? 0 : (rowWidth / rowSize);
 
             worstAspectRatio = 1.0;
             double s = 0;
@@ -150,16 +151,19 @@ namespace Sidi.Treemapping
             }
         }
 
-        public static ITree<TreeLayout> CreateLayoutTree(ITree tree, Func<ITree, Color> GetColor, Func<ITree, double> GetSize)
+        public static ITree<Layout> CreateLayoutTree(ITree tree, Func<ITree, Color> GetColor, Func<ITree, double> GetSize)
         {
             return CreateLayoutTree(null, tree, GetColor, GetSize);
         }
 
-        static Tree<TreeLayout> CreateLayoutTree(Tree<TreeLayout> parent, ITree tree, Func<ITree, Color> GetColor, Func<ITree, double> GetSize)
+        static Tree<Layout> CreateLayoutTree(Tree<Layout> parent, ITree tree, Func<ITree, Color> GetColor, Func<ITree, double> GetSize)
         {
-            var lt = new Tree<TreeLayout>
+            var lt = new Tree<Layout>
             {
-                Data = new TreeLayout(),
+                Data = new Layout
+                {
+                    Tree = tree
+                },
                 Parent = parent
             };
 

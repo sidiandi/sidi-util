@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     /// <summary>
     /// Interpolates a scalar to a color

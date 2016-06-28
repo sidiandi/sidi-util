@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public static class RectangleFExtensions
     {

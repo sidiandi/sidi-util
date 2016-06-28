@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public static class RectangleDExtensions
     {

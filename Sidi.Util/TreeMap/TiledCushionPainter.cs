@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
-    public class TiledCushionPainter
+    internal class TiledCushionPainter
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -30,7 +30,7 @@ namespace Sidi.Treemapping
             return cushionPainter.Render(Tree, i.WorldRect, tiles.Size);
         }
 
-        ITree<TreeLayout> Tree
+        ITree<Layout> Tree
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Sidi.Treemapping
                 m_tree = value;
             }
         }
-        ITree<TreeLayout> m_tree;
+        ITree<Layout> m_tree;
 
         public void Clear()
         {

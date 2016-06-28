@@ -23,7 +23,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Globalization;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public enum Dimension
     {
@@ -199,6 +199,10 @@ namespace Sidi.Treemapping
 
         public static RectangleD FromLTRB(double l, double t, double r, double b)
         {
+            if (Double.IsNaN(l) || Double.IsNaN(t) || double.IsNaN(r) || double.IsNaN(b))
+            {
+                throw new ArgumentOutOfRangeException("NaN");
+            }
             return new RectangleD { P0 = new Point(l, t), P1 = new Point(r, b) };
         }
 

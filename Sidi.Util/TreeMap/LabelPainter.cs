@@ -24,7 +24,7 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using Sidi.Extensions;
 
-namespace Sidi.Treemapping
+namespace Sidi.TreeMap
 {
     public enum InteractionMode
     {
@@ -33,7 +33,7 @@ namespace Sidi.Treemapping
         Max
     };
 
-    public class LabelPainter
+    internal class LabelPainter
     {
         public InteractionMode InteractMode { set; get; }
 
@@ -144,7 +144,7 @@ namespace Sidi.Treemapping
 
             if (drawLabel)
             {
-                var text = Text(pa.Tree.Data.Tag);
+                var text = Text(pa.Tree.Data.Tree);
                 DrawLabel(pa, text, pa.Tree.Data.Rectangle);
             }
             else
@@ -182,33 +182,36 @@ namespace Sidi.Treemapping
 
             if (levelVisible)
             {
-                var text = Text(pa.Tree.Data.Tag);
-                var textSize = g.MeasureString(text, Font);
-                var scale = Math.Min(treeRectScreen.Width / Math.Max(1.0f, textSize.Width), treeRectScreen.Height / Math.Max(1.0f, textSize.Height));
-                if ((scale * textSize.Height * 8) < treeRectScreen.Height)
+                var text = Text(pa.Tree.Data.Tree);
+                if (!String.IsNullOrEmpty(text))
                 {
-                    scale *= 2;
-                }
+                    var textSize = g.MeasureString(text, Font);
+                    var scale = Math.Min(treeRectScreen.Width / Math.Max(1.0f, textSize.Width), treeRectScreen.Height / Math.Max(1.0f, textSize.Height));
+                    if ((scale * textSize.Height * 8) < treeRectScreen.Height)
+                    {
+                        scale *= 2;
+                    }
 
-                byte a = Util.ClipByte(level * 32 + 128);
+                    byte a = Util.ClipByte(level * 32 + 128);
 
-                float fontSize = Math.Max(Font.Size * (float)scale, 1.0f);
+                    float fontSize = Math.Max(Font.Size * (float)scale, 1.0f);
 
-                if (fontSize < MinFontSize)
-                {
-                    return false;
-                }
+                    if (fontSize < MinFontSize)
+                    {
+                        return false;
+                    }
 
-                using (var white = new SolidBrush(Color.FromArgb(a, Color.White)))
-                using (var font = new Font(FontFamily.GenericSansSerif, fontSize))
-                {
-                    g.DrawString(
-                        text,
-                        font,
-                        white,
-                        treeRectScreen.ToRectangle(),
-                        StringFormat
-                        );
+                    using (var white = new SolidBrush(Color.FromArgb(a, Color.White)))
+                    using (var font = new Font(FontFamily.GenericSansSerif, fontSize))
+                    {
+                        g.DrawString(
+                            text,
+                            font,
+                            white,
+                            treeRectScreen.ToRectangle(),
+                            StringFormat
+                            );
+                    }
                 }
             }
 
@@ -313,6 +316,11 @@ namespace Sidi.Treemapping
         /// <returns></returns>
         public bool DrawLabel1(TreePaintArgs pa, string text, RectangleD rect)
         {
+            if (String.IsNullOrEmpty(text))
+            {
+                return true;
+            }
+
             var graphics = pa.PaintEventArgs.Graphics;
             rect = pa.WorldToScreen.Transform(rect);
 
