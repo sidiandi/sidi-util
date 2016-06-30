@@ -21,7 +21,7 @@ namespace Sidi.TreeMap.Tests
             var layout = TreeLayoutExtensions.CreateLayoutTree(tree, _ => Color.White, _ => ((IFileSystemInfo)_.Data).Length);
             var rect = RectangleD.FromLTRB(0, 0, 1, 1);
             layout.Squarify(rect);
-            Assert.AreEqual(rect.Area, layout.GetLeafs().Sum(_ => _.Data.Rectangle.Area));
+            Assert.AreEqual(rect.Area, layout.GetLeafs().Sum(_ => _.Data.Rectangle.Area), 1e-4);
         }
     }
 }

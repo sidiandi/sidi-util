@@ -28,6 +28,8 @@ namespace Sidi.TreeMap
 {
     public class ZoomPanController : IDisposable
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public ZoomPanController(Control control, Func<Matrix> getTransform, Action<Matrix> setTransform)
         {
             this.control = control;
@@ -49,7 +51,7 @@ namespace Sidi.TreeMap
                     t.Translate(-screenPoint.X, -screenPoint.Y);
                     t.Scale(scale, scale);
                     t.Translate(screenPoint.X, screenPoint.Y);
-                    Transform = t;
+                    Transform = EnforceLimits(t);
                 };
 
             control.MouseDown += (s, e) =>
@@ -87,6 +89,7 @@ namespace Sidi.TreeMap
                 var delta = e.Location.Sub(panStartLocation);
                 var t = panStartTransform;
                 t.Translate(delta.Width, delta.Height);
+                t = EnforceLimitsSoft(t);
                 Transform = t;
             }
         }
@@ -100,6 +103,64 @@ namespace Sidi.TreeMap
 
         float PanScale { set; get; }
 
+        static double f(double x)
+        {
+            var s = 0.01;
+            return x - ((Math.Sqrt(Math.Abs(x) * s + 1.0) - 1.0) / s * Math.Sign(x));
+        }
+
+        static double t(double a0, double a1, double b0, double b1)
+        {
+            if ((a1 - a0) > (b1 - b0))
+            {
+                // screen is bigger than object
+                return (a0 + a1) / 2 - (b0 + b1) / 2;
+            }
+            else
+            {
+                if (a0 < b0)
+                {
+                    return a0 - b0;
+                }
+                if (b1 < a1)
+                {
+                    return a1 - b1;
+                }
+                return 0;
+            }
+        }
+
+        Matrix EnforceLimitsSoft(Matrix m)
+        {
+            var d = GetEnforceLimitsTranslation(m);
+            m.Translate(f(d.X), f(d.Y));
+            return m;
+        }
+
+        System.Windows.Point GetEnforceLimitsTranslation(Matrix m)
+        {
+            if (Limits != null)
+            {
+                var screen = (RectangleD)this.control.ClientRectangle;
+                var limits = m.Transform(Limits.Value);
+
+                return new System.Windows.Point(
+                    t(screen.Left, screen.Right, limits.Left, limits.Right),
+                    t(screen.Top, screen.Bottom, limits.Top, limits.Bottom));
+            }
+            else
+            {
+                return new System.Windows.Point(0, 0);
+            }
+        }
+
+        Matrix EnforceLimits(Matrix m)
+        {
+            var d = GetEnforceLimitsTranslation(m);
+            m.Translate(d.X, d.Y);
+            return m;
+        }
+
         void StopPan(Point panStopLocation)
         {
             if (panning)
@@ -107,6 +168,7 @@ namespace Sidi.TreeMap
                 var delta = panStopLocation.Sub(panStartLocation);
                 var t = panStartTransform;
                 t.Translate(delta.Width, delta.Height);
+                t = EnforceLimits(t);
                 Transform = t;
                 panning = false;
             }
@@ -122,22 +184,6 @@ namespace Sidi.TreeMap
             set
             {
                 var transform = value;
-
-                if (Limits != null)
-                {
-                    var cr = (RectangleD)this.control.ClientRectangle;
-                    var screenLimits = transform.Transform(Limits.Value);
-                    if (!screenLimits.Includes(cr))
-                    {
-                        screenLimits = new[] { screenLimits, cr }.GetEnvelope();
-                        var o = cr.Center - screenLimits.Center;
-                        transform.Translate(o.X, o.Y);
-                        var s = ((cr.Width / screenLimits.Width) + (cr.Height / screenLimits.Height)) * 0.5;
-                        s = 1.0 / s;
-                        transform.Scale(s, s);
-                    }
-                }
-
                 setTransform(transform);
                 control.Invalidate();
             }
@@ -153,8 +199,8 @@ namespace Sidi.TreeMap
             get { return limits; }
             set
             {
-                // limits = value;
-                // Transform = Transform;
+                limits = value;
+                Transform = Transform;
             }
         }
         RectangleD? limits;

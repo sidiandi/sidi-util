@@ -29,6 +29,44 @@ namespace Sidi.TreeMap
             Tree = new Tree<object>();
         }
 
+        public class Adapter<T>
+        {
+            View view;
+
+            public Adapter(View view)
+            {
+                this.view = view;
+            }
+
+            public Func<ITree<T>, Color> GetColor
+            {
+                set
+                {
+                    view.GetColor = _ => value((ITree<T>)_);
+                }
+            }
+
+            public Func<ITree<T>, string> GetLabel
+            {
+                set
+                {
+                    view.GetLabel = _ => value((ITree<T>)_);
+                }
+            }
+            public Func<ITree<T>, double> GetSize
+            {
+                set
+                {
+                    view.GetSize = _ => value((ITree<T>)_);
+                }
+            }
+        }
+
+        public Adapter<T> GetAdapter<T>(ITree<T> typedTree)
+        {
+            return new Adapter<T>(this);
+        }
+
         public System.Windows.Point GetWorldPoint(Point clientPoint)
         {
             return WorldToScreen.GetInverse().Transform(clientPoint.ToPointD());

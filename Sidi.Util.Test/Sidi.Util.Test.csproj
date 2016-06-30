@@ -124,6 +124,7 @@
     <Compile Include="RegistrySerializerTest.cs" />
     <Compile Include="Test\TestBaseTest.cs" />
     <Compile Include="TreeMap\CushionPainterTests.cs" />
+    <Compile Include="TreeMap\ITreeExtensionsTests.cs" />
     <Compile Include="TreeMap\TreeLayoutExtensionsTests.cs" />
     <Compile Include="TreeMap\ViewTests.cs" />
     <Compile Include="Util\Base32Test.cs" />
