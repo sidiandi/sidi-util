@@ -2,8 +2,10 @@
 using Sidi.IO;
 using Sidi.Test;
 using Sidi.TreeMap;
+using Sidi.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,13 +72,37 @@ namespace Sidi.TreeMap.Tests
             var colorScale = ColorScale.Distinct(files.GetLeafs(), _ => _.Data.Extension);
             var view = new View
             {
-                Tree = files,
-                GetSize = _ => ((IFileSystemInfo)_.Data).Length,
-                GetLabel = _ => ((IFileSystemInfo)_.Data).Name,
-                GetColor = _ => colorScale((ITree<IFileSystemInfo>)_)
+                Tree = files
             };
 
-            Sidi.Forms.Util.RunFullScreen(view);
+            using (var a = view.GetAdapter(files))
+            {
+                a.GetSize = _ => _.Data.Length;
+                a.GetLabel = _ => _.Data.Name;
+                a.GetColor = _ => colorScale(_);
+                a.GetToolTipText = _ =>
+                {
+                    if (_.Data == null)
+                    {
+                        return null;
+                    }
+                    return String.Format(
+                        BinaryPrefix.Instance,
+                        "{0}\r\nSize:{1}\r\nLast modified: {2}", 
+                        _.Data.FullName,
+                        _.Data.Length, 
+                        _.Data.LastWriteTime);
+                };
+
+                a.Activate += A_Activate;
+
+                Sidi.Forms.Util.RunFullScreen(view);
+            }
+        }
+
+        private void A_Activate(object sender, TreeEventArgs<IFileSystemInfo> e)
+        {
+            Process.Start(e.Tree.Data.FullName);
         }
     }
 }

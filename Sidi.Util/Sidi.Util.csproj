@@ -35,16 +35,16 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.101.0\lib\net45\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.102.0\lib\net45\System.Data.SQLite.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.101.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.102.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.101.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.102.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
@@ -100,6 +100,20 @@
     <Compile Include="CommandLine\WebServer.cs" />
     <Compile Include="ComponentModel\BackgroundWorkerReportProgressAppender.cs" />
     <Compile Include="ComponentModel\Namespace.cs" />
+    <Compile Include="CredentialManagement\BaseCredentialsPrompt.cs" />
+    <Compile Include="CredentialManagement\Credential.cs" />
+    <Compile Include="CredentialManagement\CredentialProvider.cs" />
+    <Compile Include="CredentialManagement\CredentialSet.cs" />
+    <Compile Include="CredentialManagement\CredentialType.cs" />
+    <Compile Include="CredentialManagement\DialogResult.cs" />
+    <Compile Include="CredentialManagement\GlobalSuppressions.cs" />
+    <Compile Include="CredentialManagement\ICredentialProvider.cs" />
+    <Compile Include="CredentialManagement\ICredentialsPrompt.cs" />
+    <Compile Include="CredentialManagement\NativeMethods.cs" />
+    <Compile Include="CredentialManagement\PersistanceType.cs" />
+    <Compile Include="CredentialManagement\SecureStringHelper.cs" />
+    <Compile Include="CredentialManagement\VistaPrompt.cs" />
+    <Compile Include="CredentialManagement\XPPrompt.cs" />
     <Compile Include="Extensions\DumpExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
@@ -208,6 +222,7 @@
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Net\Pop3\Namespace.cs" />
     <Compile Include="Test\Namespace.cs" />
+    <Compile Include="TreeMap\Adapter.cs" />
     <Compile Include="TreeMap\FileSystemTree.cs" />
     <Compile Include="TreeMap\ITree.cs" />
     <Compile Include="TreeMap\ITreemapData.cs" />
@@ -225,9 +240,7 @@
     <Compile Include="TreeMap\Tree.cs" />
     <Compile Include="TreeMap\TreeLayout.cs" />
     <Compile Include="TreeMap\TreePaintArgs.cs" />
-    <Compile Include="TreeMap\View.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="TreeMap\View.cs" />
     <Compile Include="TreeMap\Util.cs" />
     <Compile Include="TreeMap\ZoomPanController.cs" />
     <Compile Include="Util\AsyncCalculation.cs" />
@@ -292,6 +305,7 @@
     <Compile Include="Collections\IntSet.cs" />
     <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="IO\PathExtensions.cs" />
     <Compile Include="IO\SearchPath.cs" />
     <Compile Include="Util\IObjectHashProvider.cs" />
@@ -430,6 +444,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="CredentialManagement\CredentialManagement.csproj" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\build\Common.targets" />
   <Import Project="..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets')" />
@@ -438,9 +455,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets'))" />
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.102.0\build\net45\System.Data.SQLite.Core.targets'))" />
   </Target>
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net45\System.Data.SQLite.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

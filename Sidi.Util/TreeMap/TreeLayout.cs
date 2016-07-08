@@ -29,9 +29,15 @@ namespace Sidi.TreeMap
         {
             if (tree.Data.Rectangle.Contains(point))
             {
-                return tree.Children
-                    .Concat(new[] { tree })
-                    .First(_ => _.Data.Rectangle.Contains(point));
+                var child = tree.Children.FirstOrDefault(_ => _.Data.Rectangle.Contains(point));
+                if (child == null)
+                {
+                    return tree;
+                }
+                else
+                {
+                    return child.GetNodeAt(point);
+                }
             }
             else
             {

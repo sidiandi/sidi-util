@@ -9,12 +9,24 @@ using System.Windows.Forms;
 
 namespace Sidi.TreeMap
 {
+    public class TreeEventArgs : EventArgs
+    {
+        public TreeEventArgs(ITree tree)
+        {
+            this.Tree = tree;
+        }
+
+        public ITree Tree { get; private set; }
+    }
+
     public class View : Control
     {
         public View()
         {
             GetColor = _ => Color.White;
             GetSize = _ => 1.0;
+            GetLabel = _ => _.Data.ToString();
+            GetToolTipText = _ => null;
 
             SetStyle(ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
@@ -26,41 +38,65 @@ namespace Sidi.TreeMap
             zoomPanController = new ZoomPanController(this, () => WorldToScreen, t => this.WorldToScreen = t);
             labelPainterController = new LabelPainterController(this, labelPainter);
 
+            this.MouseDoubleClick += View_MouseDoubleClick;
+            this.MouseHover += View_MouseHover;
+            this.MouseMove += View_MouseMove;
+
             Tree = new Tree<object>();
+
+            InitialiseToolTips();
         }
 
-        public class Adapter<T>
+        private void View_MouseMove(object sender, MouseEventArgs e)
         {
-            View view;
-
-            public Adapter(View view)
+            var tree = GetTree(e.Location);
+            if (tree != null)
             {
-                this.view = view;
-            }
-
-            public Func<ITree<T>, Color> GetColor
-            {
-                set
+                var text = GetToolTipText(tree);
+                if (!String.IsNullOrEmpty(text))
                 {
-                    view.GetColor = _ => value((ITree<T>)_);
+                    toolTip1.SetToolTip(this, text);
+                    return;
                 }
             }
 
-            public Func<ITree<T>, string> GetLabel
+            toolTip1.Hide(this);
+        }
+
+        private void View_MouseHover(object sender, EventArgs e)
+        {
+        }
+
+        ToolTip toolTip1;
+        bool recursionBreak = false;
+
+        private void InitialiseToolTips()
+        {
+            toolTip1 = new ToolTip
             {
-                set
-                {
-                    view.GetLabel = _ => value((ITree<T>)_);
-                }
-            }
-            public Func<ITree<T>, double> GetSize
+            };
+        }
+
+        private void View_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (Activate != null)
             {
-                set
-                {
-                    view.GetSize = _ => value((ITree<T>)_);
-                }
+                Activate(this, GetTreeEventArgs(e.Location));
             }
         }
+
+        TreeEventArgs GetTreeEventArgs(Point p)
+        {
+            return new TreeEventArgs(GetTree(p));
+        }
+
+        public ITree GetTree(Point p)
+        {
+            var layout = GetNode(p);
+            return layout.Data.Tree;
+        }
+
+        public event EventHandler<TreeEventArgs> Activate;
 
         public Adapter<T> GetAdapter<T>(ITree<T> typedTree)
         {
@@ -101,6 +137,11 @@ namespace Sidi.TreeMap
             set;
         }
 
+        public Func<ITree, string> GetToolTipText
+        {
+            set; get;
+        }
+
         public ITree Tree
         {
             get
@@ -116,7 +157,6 @@ namespace Sidi.TreeMap
 
         }
         ITree m_Tree;
-
 
         void UpdateLayout()
         {
