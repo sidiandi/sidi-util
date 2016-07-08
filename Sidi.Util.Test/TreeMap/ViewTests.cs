@@ -54,7 +54,7 @@ namespace Sidi.TreeMap.Tests
             }
         }
 
-        [Test]
+        [Test, Explicit]
         public void ViewTest()
         {
             var view = new View
@@ -65,7 +65,7 @@ namespace Sidi.TreeMap.Tests
             Sidi.Forms.Util.RunFullScreen(view);
         }
 
-        [Test]
+        [Test, Explicit]
         public void FileTree()
         {
             var files = FileSystemTree.Create(TestFile(".").Parent.Parent.Parent);

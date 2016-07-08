@@ -98,10 +98,7 @@ namespace Sidi.IO
             var p = TestFile("dir.txt");
             var info = p.Info;
             var infoSerialized = TestSerialization(info);
-            p.WriteAllText("changed");
-            var newInfo = p.Info;
-            Assert.AreNotEqual(infoSerialized.LastWriteTimeUtc, newInfo.LastWriteTimeUtc);
-            Assert.AreNotEqual(infoSerialized, newInfo);
+            Assert.AreEqual(info.FullName, infoSerialized.FullName);
         }
 
         [Test]
