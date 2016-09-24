@@ -9,7 +9,11 @@
 		
 		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
 
-	</PropertyGroup>
+    <!-- versions of nuget packages required during build -->
+    <GitVersionTask>GitVersionTask.3.6.3</GitVersionTask>
+    <NUnitConsoleRunner>NUnit.ConsoleRunner.3.4.1</NUnitConsoleRunner>
+    
+  </PropertyGroup>
 	
 	<ItemGroup>
 		<TestTargets Include="Sidi.Util.Test.dll" />

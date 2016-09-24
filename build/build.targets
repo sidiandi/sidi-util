@@ -21,15 +21,14 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
 		<NugetPackagesDir>$(SourceDir)\packages</NugetPackagesDir>
 		
-		<NUnitBin>$(NugetPackagesDir)\NUnit.ConsoleRunner.3.4.1\tools</NUnitBin>
+		<NUnitBin>$(NugetPackagesDir)\$(NUnitConsoleRunner)\tools</NUnitBin>
 		<NUnitConsole>$(NUnitBin)\nunit3-console.exe</NUnitConsole>
 		
 		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
 		<Git>git</Git>
   </PropertyGroup>
 
-  <Import Project="$(NugetPackagesDir)\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets" />
-  <Import Project="C:\work\nugetPackSymbols.build\Release-AnyCPU\bin\Build\CreateNugetSymbolsPackage.targets" />
+  <Import Project="$(NugetPackagesDir)\$(GitVersionTask)\build\dotnet\GitVersionTask.targets" />
 
   <Target Name="GetVersion">
 		<GetVersion SolutionDirectory="$(SolutionDir)">
@@ -93,11 +92,6 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	<ItemGroup>
 		<PackageFiles Include="$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg" />
 	</ItemGroup>
-	<CreateNugetSymbolsPackage
-		Package = "%(PackageFiles.Identity)"
-		BinDir = "$(OutDir)"
-		NugetExePath = "$(Nuget)"
-		/>
   </Target>
 
   <Target Name="Tag" DependsOnTargets="GetVersion">
