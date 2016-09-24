@@ -10,6 +10,7 @@ set SourceDir=%~dp0.
 call :file_name_from_path DirName %SourceDir%
 set BuildDir=%USERPROFILE%\build\%DirName%
 mkdir %BuildDir%
+%SourceDir%\.nuget\nuget.exe restore %SourceDir%\sidi-util.sln
 %msbuild% %SourceDir%\build\Build.proj /t:StartWrapper /p:BuildTarget=%Target%
 goto :eof
 
