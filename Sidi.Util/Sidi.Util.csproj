@@ -335,6 +335,7 @@
     <Compile Include="Util\SerializeHelpers.cs" />
     <Compile Include="Util\ShellAccess.cs" />
     <Compile Include="Util\Stats.cs" />
+    <Compile Include="Util\StopwatchLog.cs" />
     <Compile Include="Util\StringEx.cs" />
     <Compile Include="Net\TcpClientEx.cs" />
     <Compile Include="Test\TestBase.cs" />

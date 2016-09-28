@@ -7,44 +7,25 @@ using System.Diagnostics;
 
 namespace Sidi.Util
 {
-    public class LogScope : IDisposable
+    /// <summary>
+    /// Adds a nested diagnostic context to log4net for its lifetime
+    /// </summary>
+    public class LogScope : StopwatchLog
     {
         public LogScope(Action<object> logger, string text, params object[] parameters)
+            : base(logger, text, parameters)
         {
-            this.logger = logger;
-            this.stopwatch = Stopwatch.StartNew();
-
-            this.contextString = String.Format(text, parameters);
-            context = log4net.ThreadContext.Stacks["NDC"].Push(contextString);
-            logger(String.Format("begin {0}", contextString));
+            context = log4net.ThreadContext.Stacks["NDC"].Push(ContextString);
         }
 
         IDisposable context;
 
-        private bool disposed = false;
-            
-        //Implement IDisposable.
-        public void Dispose()
-        {
-          Dispose(true);
-          GC.SuppressFinalize(this);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
-          if (!disposed)
-          {
             if (disposing)
             {
-                stopwatch.Stop();
-                var msg = String.Format(CultureInfo.InvariantCulture, "completed in {0:F3}s: {1}", stopwatch.Elapsed.TotalSeconds, contextString);
-                logger(msg);
                 context.Dispose();
             }
-            // Free your own state (unmanaged objects).
-            // Set large fields to null.
-            disposed = true;
-          }
         }
 
         // Use C# destructor syntax for finalization code.
@@ -53,10 +34,5 @@ namespace Sidi.Util
           // Simply call Dispose(false).
           Dispose(false);
         }    
-    
-
-        Action<object> logger;
-        string contextString;
-        Stopwatch stopwatch;
     }
 }

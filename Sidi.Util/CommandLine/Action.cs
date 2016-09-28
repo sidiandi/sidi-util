@@ -153,7 +153,7 @@ namespace Sidi.CommandLine
                     })
                 .ToArray();
 
-            using (new LogScope(log.Info, "Action {0}({1})", Name, parameterValues.Join(", ")))
+            using (new StopwatchLog(log.Debug, "{0}({1})", Name, parameterValues.Join(", ")))
             {
                 if (execute)
                 {
