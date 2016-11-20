@@ -26,7 +26,6 @@ namespace Sidi.Util
         }
 
         public string ContextString { get; private set; }
-        IDisposable context;
 
         private bool disposed = false;
 

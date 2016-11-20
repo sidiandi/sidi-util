@@ -68,7 +68,6 @@ namespace Sidi.TreeMap
         }
 
         ToolTip toolTip1;
-        bool recursionBreak = false;
 
         private void InitialiseToolTips()
         {
@@ -168,7 +167,7 @@ namespace Sidi.TreeMap
             Invalidate();
         }
 
-        internal ITree<Layout> Layout { get; set; }
+        new internal ITree<Layout> Layout { get; set; }
 
         public System.Windows.Media.Matrix WorldToScreen
         {

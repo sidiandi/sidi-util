@@ -20,7 +20,7 @@ namespace Sidi.Util
 
         IDisposable context;
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {

@@ -21,11 +21,11 @@ namespace Sidi.TreeMap
 
     public interface ITree<T> : ITree
     {
-        T Data { get; }
+        new T Data { get; }
 
-        IEnumerable<ITree<T>> Children { get; }
+        new IEnumerable<ITree<T>> Children { get; }
 
-        ITree<T> Parent { get; }
+        new ITree<T> Parent { get; }
     }
 
     public static class ITreeExtensions

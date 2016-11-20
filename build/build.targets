@@ -111,6 +111,9 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).symbols.nupkg" />
   </Target>
 
+  <Target Name="Release" DependsOnTargets="Push">
+  </Target>
+
   <!-- This target puts the build.log file into the build directory -->
   <Target Name="StartWrapper" >
 	<MakeDir Directories="$(BuildDir)"/>

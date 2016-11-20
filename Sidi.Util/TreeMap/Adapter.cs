@@ -20,7 +20,7 @@ namespace Sidi.TreeMap
     }
 
     /// <summary>
-    /// Adapts a generic treemap view to an ITree<T>
+    /// Adapts a generic treemap view to an ITree&lt;T&gt;
     /// Obtain via View.GetAdapter
     /// </summary>
     /// <typeparam name="T"></typeparam>
