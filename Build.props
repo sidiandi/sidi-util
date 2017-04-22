@@ -10,8 +10,8 @@
 		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
 
     <!-- versions of nuget packages required during build -->
-    <GitVersionTask>GitVersionTask.3.6.4</GitVersionTask>
-    <NUnitConsoleRunner>NUnit.ConsoleRunner.3.5.0</NUnitConsoleRunner>
+    <GitVersionTask>GitVersionTask.3.6.5</GitVersionTask>
+    <NUnitConsoleRunner>NUnit.ConsoleRunner.3.6.1</NUnitConsoleRunner>
     
   </PropertyGroup>
 	
