@@ -11,7 +11,7 @@
 
     <!-- versions of nuget packages required during build -->
     <GitVersionTask>GitVersionTask.3.6.5</GitVersionTask>
-    <NUnitConsoleRunner>NUnit.ConsoleRunner.3.6.1</NUnitConsoleRunner>
+    <NUnitConsoleRunner>NUnit.ConsoleRunner.3.7.0</NUnitConsoleRunner>
     
   </PropertyGroup>
 	
