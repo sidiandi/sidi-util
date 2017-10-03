@@ -16,110 +16,92 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<SourceDir>$([System.IO.Directory]::GetParent($(MSBuildProjectDirectory)))</SourceDir>
+  <PropertyGroup>
+    <SourceDir>$([System.IO.Directory]::GetParent($(MSBuildProjectDirectory)))</SourceDir>
 
-		<NugetPackagesDir>$(SourceDir)\packages</NugetPackagesDir>
-		
-		<NUnitBin>$(NugetPackagesDir)\$(NUnitConsoleRunner)\tools</NUnitBin>
-		<NUnitConsole>$(NUnitBin)\nunit3-console.exe</NUnitConsole>
-		
-		<Nuget>$(SourceDir)\.nuget\NuGet.exe</Nuget>
-		<Git>git</Git>
+    <NugetPackagesDir>$(SourceDir)\packages</NugetPackagesDir>
+    
+    <NUnitBin>$(NugetPackagesDir)\$(NUnitConsoleRunner)\tools</NUnitBin>
+    <NUnitConsole>$(NUnitBin)\nunit3-console.exe</NUnitConsole>
+    
+    <Nuget>NuGet.exe</Nuget>
+    <Git>git</Git>
   </PropertyGroup>
 
   <Import Project="$(NugetPackagesDir)\$(GitVersionTask)\build\dotnet\GitVersionTask.targets" />
 
   <Target Name="GetVersion">
-		<GetVersion SolutionDirectory="$(SolutionDir)">
-		  <Output TaskParameter="Major" PropertyName="GfvMajor" />
-		  <Output TaskParameter="Minor" PropertyName="GfvMinor" />
-		  <Output TaskParameter="Patch" PropertyName="GfvPatch" />
-		  <Output TaskParameter="BuildMetaData" PropertyName="GfvBuildMetaData" />
-		  <Output TaskParameter="FullBuildMetaData" PropertyName="GfvFullBuildMetaData" />
-		  <Output TaskParameter="BranchName" PropertyName="GfvBranchName" />
-		  <Output TaskParameter="Sha" PropertyName="GfvSha" />
-		  <Output TaskParameter="MajorMinorPatch" PropertyName="GfvMajorMinorPatch" />
-		  <Output TaskParameter="SemVer" PropertyName="GfvSemVer" />
-		  <Output TaskParameter="LegacySemVer" PropertyName="GfvLegacySemVer" />
-		  <Output TaskParameter="LegacySemVerPadded" PropertyName="GfvLegacySemVerPadded" />
-		  <Output TaskParameter="FullSemVer" PropertyName="GfvFullSemVer" />
-		  <Output TaskParameter="AssemblySemVer" PropertyName="GfvAssemblySemVer" />
-		  <Output TaskParameter="NuGetVersion" PropertyName="GfvNuGetVersion" />
-		  <Output TaskParameter="PreReleaseTag" PropertyName="GfvPreReleaseTag" />
-		  <Output TaskParameter="PreReleaseTagWithDash" PropertyName="GfvPreReleaseTagWithDash" />
-		  <Output TaskParameter="InformationalVersion" PropertyName="GfvInformationalVersion" />
-		</GetVersion>
-		<Message Text="$(GfvSemVer)" />
-		<Message Text="$(GfvNuGetVersion)" />
-	</Target>
+    <GetVersion SolutionDirectory="$(SolutionDir)">
+      <Output TaskParameter="Major" PropertyName="GfvMajor" />
+      <Output TaskParameter="Minor" PropertyName="GfvMinor" />
+      <Output TaskParameter="Patch" PropertyName="GfvPatch" />
+      <Output TaskParameter="BuildMetaData" PropertyName="GfvBuildMetaData" />
+      <Output TaskParameter="FullBuildMetaData" PropertyName="GfvFullBuildMetaData" />
+      <Output TaskParameter="BranchName" PropertyName="GfvBranchName" />
+      <Output TaskParameter="Sha" PropertyName="GfvSha" />
+      <Output TaskParameter="MajorMinorPatch" PropertyName="GfvMajorMinorPatch" />
+      <Output TaskParameter="SemVer" PropertyName="GfvSemVer" />
+      <Output TaskParameter="LegacySemVer" PropertyName="GfvLegacySemVer" />
+      <Output TaskParameter="LegacySemVerPadded" PropertyName="GfvLegacySemVerPadded" />
+      <Output TaskParameter="FullSemVer" PropertyName="GfvFullSemVer" />
+      <Output TaskParameter="AssemblySemVer" PropertyName="GfvAssemblySemVer" />
+      <Output TaskParameter="NuGetVersion" PropertyName="GfvNuGetVersion" />
+      <Output TaskParameter="PreReleaseTag" PropertyName="GfvPreReleaseTag" />
+      <Output TaskParameter="PreReleaseTagWithDash" PropertyName="GfvPreReleaseTagWithDash" />
+      <Output TaskParameter="InformationalVersion" PropertyName="GfvInformationalVersion" />
+    </GetVersion>
+    <Message Text="$(GfvSemVer)" />
+    <Message Text="$(GfvNuGetVersion)" />
+  </Target>
 
-	<Target Name="Build" DependsOnTargets="GetVersion" >
+  <Target Name="Build" DependsOnTargets="GetVersion" >
     <MSBuild Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=Any CPU;BuildDir=$(BuildDir)">
-		<Output ItemName="Targets" TaskParameter="TargetOutputs"/>
+    <Output ItemName="Targets" TaskParameter="TargetOutputs"/>
     </MSBuild>
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
-    <Exec Command="$(NUnitConsole) --out=$(BuildDir)\test-out.txt --labels=All $(OutDir)\%(TestTargets.Identity)" />
+    <Exec Command="&quot;$(NUnitConsole)&quot; --out=&quot;$(BuildDir)\test-out.txt&quot; --labels=All @(TestTargets -> '&quot;$(OutDir)\%(Identity)&quot;', '')" />
   </Target>
 
   <Target Name="Doc" DependsOnTargets="GetVersion" >
     <PropertyGroup>
-		<DocDir>$(BuildDir)\doc</DocDir>
-	</PropertyGroup>
-	<MakeDir Directories="$(DocDir)" />
-	<Exec 
-		Command="
-			set OUTPUT_DIRECTORY=$(DocDir) &amp; 
-			set VERSION=$(GfvNuGetVersion) &amp; 
-			doxygen Doxyfile.build" 
-		WorkingDirectory="$(SourceDir)"
-	/>
+    <DocDir>$(BuildDir)\doc</DocDir>
+  </PropertyGroup>
+  <MakeDir Directories="$(DocDir)" />
+  <Exec 
+    Command="
+      set OUTPUT_DIRECTORY=$(DocDir) &amp; 
+      set VERSION=$(GfvNuGetVersion) &amp; 
+      doxygen Doxyfile.build" 
+    WorkingDirectory="$(SourceDir)"
+  />
   </Target>
 
   <Target Name="ShowDoc" DependsOnTargets="Doc" >
-	<Exec Command="explorer $(DocDir)\index.html" />
+  <Exec Command="explorer $(DocDir)\index.html" />
   </Target>
 
   <Target Name="Pack" DependsOnTargets="Build;Tag">
     <PropertyGroup>
-		<PackageDir>$(BuildDir)\package</PackageDir>
-	</PropertyGroup>
-	<RemoveDir Directories="$(PackageDir)"/>
-	<MakeDir Directories="$(PackageDir)" />
-	<Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) pack $(SourceDir)\%(PackageProjects.Identity) -OutputDirectory $(PackageDir) -Version $(GfvNuGetVersion) -Verbosity detailed" />
-	<ItemGroup>
-		<PackageFiles Include="$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg" />
-	</ItemGroup>
+    <PackageDir>$(BuildDir)\package</PackageDir>
+  </PropertyGroup>
+  <RemoveDir Directories="$(PackageDir)"/>
+  <MakeDir Directories="$(PackageDir)" />
+  <Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; pack &quot;$(SourceDir)\%(PackageProjects.Identity)&quot; -OutputDirectory &quot;$(PackageDir)&quot; -Version $(GfvNuGetVersion) -Verbosity detailed" />
+  <ItemGroup>
+    <PackageFiles Include="$(PackageDir)\sidi-util.$(GfvNuGetVersion).nupkg" />
+  </ItemGroup>
   </Target>
 
   <Target Name="Tag" DependsOnTargets="GetVersion">
-	<Exec WorkingDirectory="$(SourceDir)" Command="$(Git) tag --force v$(GfvSemVer)" />
-  </Target>
-
-  <Target Name="PushLocal" DependsOnTargets="Pack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(PackageFiles.Identity)" />
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source $(NugetLocalFeed) %(PackageFiles.RootDir)%(PackageFiles.Directory)%(PackageFiles.Filename).symbols.nupkg" />
+  <Exec WorkingDirectory="$(SourceDir)" Command="$(Git) tag --force v$(GfvSemVer)" />
   </Target>
 
   <Target Name="Push" DependsOnTargets="Test;Pack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push -Source https://www.nuget.org/api/v2/package %(PackageFiles.Identity)" />
-  </Target>
-
-  <Target Name="TestPush" DependsOnTargets="Build">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="$(Nuget) push $(OutDir)\%(Package.Identity).$(GfvNuGetVersion).symbols.nupkg" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; push -Source https://www.nuget.org/api/v2/package &quot;%(PackageFiles.Identity)&quot;" />
   </Target>
 
   <Target Name="Release" DependsOnTargets="Push">
   </Target>
-
-  <!-- This target puts the build.log file into the build directory -->
-  <Target Name="StartWrapper" >
-	<MakeDir Directories="$(BuildDir)"/>
-    <Exec
-		Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:$(BuildTarget) &quot;/fileLoggerParameters:LogFile=$(BuildDir)\build.log;Verbosity=diagnostic;Encoding=UTF-8&quot;"
-		/>
-  </Target>
-
 </Project>

@@ -1,17 +1,18 @@
-rem %1 : build target. Default: Release
+@echo off
+
+rem script to start the build pipeline
+rem usage: build [Target]
+rem Target: build target. Default: Release. See build/build.targets for available targets
 
 set Target=%1
 if "%Target%" == "" (
 	set Target=Release
 )
 
-set msbuild="%ProgramFiles(x86)%\MSBuild\14.0\Bin\msbuild.exe"
+set msbuild="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"
 set SourceDir=%~dp0.
 call :file_name_from_path DirName %SourceDir%
-set BuildDir=%USERPROFILE%\build\%DirName%
-mkdir %BuildDir%
-%SourceDir%\.nuget\nuget.exe restore %SourceDir%\sidi-util.sln
-%msbuild% %SourceDir%\build\Build.proj /t:StartWrapper /p:BuildTarget=%Target%
+%msbuild% "%SourceDir%\build\Bootstrap.proj" /p:BuildTarget=%Target% || exit /b 1
 goto :eof
 
 :file_name_from_path <resultVar> <pathVar>
