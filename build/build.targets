@@ -99,7 +99,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   </Target>
 
   <Target Name="Push" DependsOnTargets="Test;Pack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; push -Source https://www.nuget.org/api/v2/package &quot;%(PackageFiles.Identity)&quot;" />
+    <Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; push -Source https://www.nuget.org/api/v2/package -ApiKey $(NugetApiKey) &quot;%(PackageFiles.Identity)&quot;" />
   </Target>
 
   <Target Name="Release" DependsOnTargets="Push">
