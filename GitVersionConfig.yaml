@@ -1,4 +1,10 @@
-# assembly-versioning-scheme: MajorMinorPatchMetadata | MajorMinorPatch | MajorMinor | Major
+next-version: 12.4.0
+branches:
+  master:
+    increment: Patch
+ignore:
+  sha: []
+ Major
 # tag-prefix: '[vV|version-] # regex to match git tag prefix
 # next-version: 1.0.0
 # mode: ContinuousDeployment
