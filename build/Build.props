@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--Copyright (c) 2014, Andreas Grimme (http://andreas-grimme.gmxhome.de/) -->
 <Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<CompanyName>Andreas Grimme</CompanyName>
-        <ProductName>sidi-util</ProductName>
-		<Configuration>Release</Configuration>
-		<Platform>AnyCPU</Platform>
-		
-		<NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
+  <PropertyGroup>
+    <CompanyName>Andreas Grimme</CompanyName>
+    <ProductName>sidi-util</ProductName>
+    <Configuration>Release</Configuration>
+    <Platform>AnyCPU</Platform>
+    
+    <NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
 
     <!-- versions of nuget packages required during build -->
     <GitVersionTask>GitVersionTask.3.6.5</GitVersionTask>
     <NUnitConsoleRunner>NUnit.ConsoleRunner.3.7.0</NUnitConsoleRunner>
-    
   </PropertyGroup>
-	
-	<ItemGroup>
-		<TestTargets Include="Sidi.Util.Test.dll" />
-	</ItemGroup>
+  
+  <ItemGroup>
+    <TestTargets Include="Sidi.Util.Test.dll" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageProjects Include="Sidi.Util\Sidi.Util.csproj" >
-			<PackageName>sidi-util</PackageName>
-		</PackageProjects>
-	</ItemGroup>
-</Project>
+  <ItemGroup>
+    <PackageProjects Include="Sidi.Util\Sidi.Util.csproj" >
+      <PackageName>sidi-util</PackageName>
+    </PackageProjects>
+  </ItemGroup>
+
+  </Project>
