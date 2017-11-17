@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07C0FD19-D688-4FDC-92A6-AD445879EE02}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,11 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util", "Sidi.Util\Sidi.Util.csproj", "{D85CDD84-8F56-4763-99CD-8D86E2DB76C9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMAP-test", "IMAP-test\IMAP-test.csproj", "{FDA69690-DE87-41F7-AB0D-D3A492D98912}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0A40EC6D-7CD7-43EA-B06F-6F6886042170}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util.Test", "Sidi.Util.Test\Sidi.Util.Test.csproj", "{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}"
 EndProject
@@ -81,5 +76,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {91D3EFA2-16BC-418A-BB8F-6A955DE2A830}
 	EndGlobalSection
 EndGlobal

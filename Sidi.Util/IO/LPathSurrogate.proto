@@ -1,0 +1,13 @@
+// [START declaration]
+syntax = "proto3";
+package sidi_util;
+
+// [START csharp_declaration]
+option csharp_namespace = "Sidi.IO";
+// [END csharp_declaration]
+
+// [START messages]
+message LPathSurrogate {
+  string Value = 1;
+}
+// [END messages]
