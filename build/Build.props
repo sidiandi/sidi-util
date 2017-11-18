@@ -23,5 +23,6 @@
   <Import Project="$(SECRET_PROPS)" Condition="Exists('$(SECRET_PROPS)') and $(GITHUB_TOKEN) == ''" />
   
   <Target Name="Release" DependsOnTargets="Test;Push;Tag" />
+
   
 </Project>
