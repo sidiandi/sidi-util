@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMAP-test", "IMAP-test\IMAP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util.Test", "Sidi.Util.Test\Sidi.Util.Test.csproj", "{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "np", "np\np.csproj", "{111FA37D-D960-468B-84A8-BE8604732407}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,18 @@ Global
 		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Release|Mixed Platforms.Build.0 = Release|x86
 		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Release|x86.ActiveCfg = Release|x86
 		{7E48D3A3-065C-4C60-B82D-9790E6FB2AB5}.Release|x86.Build.0 = Release|x86
+		{111FA37D-D960-468B-84A8-BE8604732407}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Debug|x86.Build.0 = Debug|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Release|x86.ActiveCfg = Release|Any CPU
+		{111FA37D-D960-468B-84A8-BE8604732407}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

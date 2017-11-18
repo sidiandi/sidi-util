@@ -767,7 +767,12 @@ found:
         
         public static object ParseValueBuiltIn(string stringRepresentation, Type type)
         {
-            var parse = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
+            if (type.Equals(typeof(System.String)))
+            {
+                return stringRepresentation;
+            }
+
+            var parse = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null);
             if (parse != null)
             {
                 return parse.Invoke(null, new object[] { stringRepresentation });

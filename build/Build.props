@@ -1,27 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--Copyright (c) 2014, Andreas Grimme (http://andreas-grimme.gmxhome.de/) -->
-<Project DefaultTargets="Release" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <CompanyName>Andreas Grimme</CompanyName>
+    <CompanyName>sidiandi</CompanyName>
     <ProductName>sidi-util</ProductName>
-    <Configuration>Release</Configuration>
-    <Platform>AnyCPU</Platform>
-    
-    <NugetLocalFeed>$(USERPROFILE)\Dropbox\nuget</NugetLocalFeed>
-
-    <!-- versions of nuget packages required during build -->
-    <GitVersionTask>GitVersionTask.3.6.5</GitVersionTask>
-    <NUnitConsoleRunner>NUnit.ConsoleRunner.3.7.0</NUnitConsoleRunner>
   </PropertyGroup>
   
   <ItemGroup>
-    <TestTargets Include="Sidi.Util.Test.dll" />
+    <Package Include="Sidi.Util" />
   </ItemGroup>
+  
+  <PropertyGroup>
+    <GITHUB_REPO>sidi-util</GITHUB_REPO>
+  </PropertyGroup>
 
-  <ItemGroup>
-    <PackageProjects Include="Sidi.Util\Sidi.Util.csproj" >
-      <PackageName>sidi-util</PackageName>
-    </PackageProjects>
-  </ItemGroup>
+  <!-- define secret project properties in a private .props file. See build/api_key_example.props for an example -->
+  <PropertyGroup Condition="$(SECRET_PROPS) == ''">
+    <SECRET_PROPS>$(HOMEPATH)\Documents\$(ProductName)-secrets.props</SECRET_PROPS>
+  </PropertyGroup>
 
-  </Project>
+  <!-- Only import the secret props file if it exists and if the secrets are not available as environment variables. -->
+  <Import Project="$(SECRET_PROPS)" Condition="Exists('$(SECRET_PROPS)') and $(GITHUB_TOKEN) == ''" />
+  
+</Project>
