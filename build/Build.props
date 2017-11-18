@@ -22,4 +22,6 @@
   <!-- Only import the secret props file if it exists and if the secrets are not available as environment variables. -->
   <Import Project="$(SECRET_PROPS)" Condition="Exists('$(SECRET_PROPS)') and $(GITHUB_TOKEN) == ''" />
   
+  <Target Name="Release" DependsOnTargets="Test;Push;Tag" />
+  
 </Project>

@@ -147,10 +147,6 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
     />
   </Target>
   
-  <Target Name="Release" DependsOnTargets="Test;Setup;Tag;PublishAsGithubRelease" />
-  
-  <Target Name="PreRelease" DependsOnTargets="Test;Setup;Tag;PublishOnDropbox" />
-  
   <Target Name="Clean" >
     <RemoveDir Directories="$(BuildDir)" />
   </Target>

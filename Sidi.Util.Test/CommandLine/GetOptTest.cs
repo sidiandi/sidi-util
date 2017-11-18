@@ -26,6 +26,15 @@ namespace Sidi.CommandLine.Test
     [Usage("Module to test GetOpt")]
     public class HelloWorld : Sidi.CommandLine.IArgumentHandler
     {
+        [Usage("Add two numbers and print result")]
+        public void Add(double a, double b)
+        {
+            AddResult = a + b;
+            Console.WriteLine(AddResult);
+        }
+
+        public double AddResult;
+
         [Usage(@"Say hello to someone.
 
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
@@ -116,7 +125,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
             var m = new HelloWorld();
             var options = GetOpt.GetOptions(new object[] { m });
             options.ListFormat().AllPublic().RenderText();
-            Assert.AreEqual(3, options.Count());
+            Assert.AreEqual(4, options.Count());
         }
 
         [Test]
