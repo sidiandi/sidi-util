@@ -117,7 +117,7 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	<MakeDir Directories="$(PackageDir)" />
 	<Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; pack &quot;$(SourceDir)\%(Package.Identity)\%(Package.Identity).csproj&quot; -OutputDirectory &quot;$(PackageDir)&quot; -Version $(GfvNuGetVersion)" />
 	<ItemGroup>
-		<PackageFiles Include="$(PackageDir)\%(Package.Identity).$(GfvNuGetVersion).nupkg" />
+		<PackageFiles Include="$(PackageDir)\$(ProductName).$(GfvNuGetVersion).nupkg" />
 	</ItemGroup>
   </Target>
 
