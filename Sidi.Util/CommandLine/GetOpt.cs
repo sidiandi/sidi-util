@@ -73,9 +73,17 @@ namespace Sidi.CommandLine
         {
             var o = new GetOpt();
             o.modules.Add(module);
-            o.modules.Add(new Logging(o));
-            o.modules.Add(new GetOptInternal.ShowHelp(o));
+            o.AddDefaultModules();
             return o.Run(args);
+        }
+
+        /// <summary>
+        /// Adds default modules for logging and help
+        /// </summary>
+        public void AddDefaultModules()
+        {
+            modules.Add(new Logging(this));
+            modules.Add(new GetOptInternal.ShowHelp(this));
         }
 
         static IEnumerable<GetOptOption> GetOptions(object module)
@@ -106,10 +114,64 @@ namespace Sidi.CommandLine
             }
         }
 
-        internal static bool HandleLongOption(Args args, IEnumerable<GetOptOption> options)
+        internal static bool IsAbbreviationFor(string abbreviation, string candidate)
         {
-            var a = args.Current;
-            var prefix = "--";
+            return IsAbbreviationFor(abbreviation, candidate, 0, 0);
+        }
+
+        static bool IsAbbreviationFor(string a, string b, int ia, int ib)
+        {
+            if (ia == a.Length)
+            {
+                return true;
+            }
+
+            if (Char.ToLower(a[ia]) == Char.ToLower(b[ib]))
+            {
+                for (int i = ib + 1; i <= b.Length; ++i)
+                {
+                    if (IsAbbreviationFor(a, b, ia + 1, i))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else
+            { 
+                return false;
+            }
+        }
+
+        static GetOptOption FindLongOption(string name, IEnumerable<GetOptOption> options)
+        {
+            // exact match?
+            var o = options.FirstOrDefault(_ => _.LongOption.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (o != null) return o;
+
+            var abbreviationMatches = options.Where(_ => IsAbbreviationFor(name, _.LongOption)).ToList();
+
+            if (abbreviationMatches.Count() == 1)
+            {
+                return abbreviationMatches.First();
+            }
+
+            if (abbreviationMatches.Count() == 0)
+            {
+                throw new CommandLineException(String.Format("parameter {0} is unknown", name));
+            }
+
+            throw new CommandLineException(String.Format("parameter {0} is not unique. Could be {1}", name, abbreviationMatches.Join(", ")));
+        }
+
+        internal static bool HandleLongOption(Args args, IEnumerable<GetOptOption> options, string prefix)
+        {
+            if (!args.HasNext)
+            {
+                return false;
+            }
+
+            var a = args.Next;
             if (!a.StartsWith(prefix))
             {
                 return false;
@@ -122,7 +184,7 @@ namespace Sidi.CommandLine
                 args.InlineParameter = p[1];
             }
 
-            var option = options.FirstOrDefault(_ => _.LongOption.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var option = FindLongOption(name, options);
 
             if (option == null)
             {
@@ -135,11 +197,16 @@ namespace Sidi.CommandLine
             return true;
         }
 
-        internal static bool HandleOption(Args args, IEnumerable<GetOptOption> options)
+        internal static bool HandleOption(Args args, IEnumerable<GetOptOption> options, string prefix)
         {
-            var a = args.Current;
-            var prefix = "-";
-            if (!a.StartsWith(prefix))
+            if (!args.HasNext)
+            {
+                return false;
+            }
+
+            var a = args.Next;
+
+            if (!a.StartsWith(prefix) || a.Length == 1)
             {
                 return false;
             }
@@ -155,13 +222,13 @@ namespace Sidi.CommandLine
 
             if (option == null)
             {
-                throw new CommandLineException(String.Format("unknown option: {0}", a));
+                throw new CommandLineException(String.Format("unknown option: {0}", args.Current));
             }
 
             // Multiple options may follow a hyphen delimiter in a single token if the options do not take arguments. Thus, ‘-abc’ is equivalent to ‘-a -b -c’. 
             if (!GetParameterTypes(option).Any() && args.InlineParameter != null)
             {
-                args.args[args.i] = prefix + args.InlineParameter;
+                args.args[args.i+1] = prefix + args.InlineParameter;
                 args.InlineParameter = null;
             }
             else
@@ -178,12 +245,14 @@ namespace Sidi.CommandLine
             public Args(string[] args)
             {
                 this.args = args;
-                this.i = 0;
+                this.i = -1;
             }
             public readonly string[] args;
             public int i;
 
             public string Current { get { return args[i]; } }
+
+            public string Next { get { return args[i+1]; } }
 
             object IEnumerator.Current => args[i];
 
@@ -191,7 +260,7 @@ namespace Sidi.CommandLine
             {
             }
 
-            public bool HasNext => i < args.Length;
+            public bool HasNext => i < args.Length-1;
 
             public string InlineParameter { get; set; }
 
@@ -210,33 +279,7 @@ namespace Sidi.CommandLine
 
             public void Reset()
             {
-                i = 0;
-            }
-        }
-
-        static IEnumerable<string> GetParameters(Args args)
-        {
-            if (args.InlineParameter != null)
-            {
-                yield return args.InlineParameter;
-                args.InlineParameter = null;
-            }
-            for (;args.HasNext;)
-            {
-                if (!args.Current.StartsWith("-") || args.Current.Equals("-"))
-                {
-                    var a = args.Current;
-                    args.MoveNext();
-                    yield return a;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            for (; ; )
-            {
-                yield return null;
+                i = -1;
             }
         }
 
@@ -254,12 +297,34 @@ namespace Sidi.CommandLine
             return Parser.ParseValueBuiltIn(value, type);
         }
 
+        internal static string GetParameter(Args args)
+        {
+            if (args.InlineParameter != null)
+            {
+                var p = args.InlineParameter;
+                args.InlineParameter = null;
+                return p;
+            }
+
+            return args.MoveNext() ? args.Current : null;
+        }
+
+        internal static object[] GetParameterValues(Args args, ParameterInfo[] parameter)
+        {
+            return parameter.Select(pi => ParseParameter(GetParameter(args), pi)).ToArray();
+        }
+
+        internal static object[] GetParameterValues(Args args, Type[] parameter)
+        {
+            return parameter.Select(pi => ParseParameter(GetParameter(args), pi)).ToArray();
+        }
+
         static internal void Invoke(GetOptOption option, Args args)
         {
             var method = option.memberInfo as MethodInfo;
             if (method != null)
             {
-                var p = GetParameters(args).Zip(method.GetParameters(), ParseParameter).ToArray();
+                var p = GetParameterValues(args, method.GetParameters());
                 log.DebugFormat("invoke option {0} with arguments {1}", option, p.Join(", "));
                 method.Invoke(option.instance, p);
             }
@@ -275,7 +340,7 @@ namespace Sidi.CommandLine
                 }
                 else
                 {
-                    p = GetParameters(args).Zip(new[] { property.PropertyType }, ParseParameter).First();
+                    p = GetParameterValues(args, new[] { property.PropertyType })[0];
                 }
                 log.DebugFormat("invoke option {0} with argument {1}", option, p);
                 property.SetValue(option.instance, p);
@@ -342,6 +407,31 @@ namespace Sidi.CommandLine
 
         public object MainModule { get { return modules.First(); } }
 
+        static bool HandleTwoDashes(Args args, IList<string> argList, string longOptionPrefix)
+        {
+            if (!args.HasNext || !args.Next.Equals(longOptionPrefix))
+            {
+                return false;
+            }
+
+            args.MoveNext();
+
+            for (; args.MoveNext();)
+            {
+                argList.Add(args.Current);
+            }
+            return true;
+        }
+
+        static bool HandleNormalArgument(Args args, IList<string> argList)
+        {
+            if (!args.HasNext) return false;
+
+            args.MoveNext();
+            argList.Add(args.Current);
+            return true;
+        }
+
         public int Run(string[] argsArray)
         {
             try
@@ -351,10 +441,10 @@ namespace Sidi.CommandLine
 
                 for (; args.HasNext;)
                 {
-                    if (HandleLongOption(args, Options)) continue;
-                    if (HandleOption(args, Options)) continue;
-                    argList.Add(args.Current);
-                    args.MoveNext();
+                    if (HandleTwoDashes(args, argList, longOptionPrefix)) continue;
+                    if (HandleLongOption(args, Options, longOptionPrefix)) continue;
+                    if (HandleOption(args, Options, shortOptionPrefix)) continue;
+                    if (HandleNormalArgument(args, argList)) continue;
                 }
 
                 var argumentHandler = MainModule as Sidi.CommandLine.IArgumentHandler;
