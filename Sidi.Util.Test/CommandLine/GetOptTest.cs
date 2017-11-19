@@ -26,6 +26,15 @@ namespace Sidi.CommandLine.Test
     [Usage("Module to test GetOpt")]
     public class HelloWorld : Sidi.CommandLine.IArgumentHandler
     {
+        [Usage("option")]
+        public bool f { get; set; }
+
+        [Usage("option")]
+        public bool e { get; set; }
+
+        [Usage("option")]
+        public bool d { get; set; }
+
         [Usage("Add two numbers and print result")]
         public void Add(double a, double b)
         {
@@ -166,6 +175,15 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         {
             var m = new HelloWorld();
             GetOpt.Run(m, new[] { "-v", "Bert" });
+            Assert.IsTrue(m.args.SequenceEqual(new[] { "Bert" }));
+        }
+
+        [Test]
+        public void HandleOption3()
+        {
+            var m = new HelloWorld();
+            GetOpt.Run(m, new[] { "-def", "Bert" });
+            Assert.IsTrue(m.d & m.e & m.f);
             Assert.IsTrue(m.args.SequenceEqual(new[] { "Bert" }));
         }
 

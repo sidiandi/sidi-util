@@ -121,9 +121,14 @@ namespace Sidi.CommandLine
 
         static bool IsAbbreviationFor(string a, string b, int ia, int ib)
         {
-            if (ia == a.Length)
+            if (ia >= a.Length)
             {
                 return true;
+            }
+
+            if (ib >= b.Length)
+            {
+                return false;
             }
 
             if (Char.ToLower(a[ia]) == Char.ToLower(b[ib]))
@@ -197,6 +202,45 @@ namespace Sidi.CommandLine
             return true;
         }
 
+        internal static void HandleInlineOption(Args args, IEnumerable<GetOptOption> options)
+        {
+            if (args.InlineParameter == null)
+            {
+                throw new ArgumentOutOfRangeException("args");
+            }
+
+            var a = args.InlineParameter;
+            args.InlineParameter = null;
+
+            var name = a.Substring(0, 1);
+            args.InlineParameter = a.Substring(1);
+            if (String.IsNullOrEmpty(args.InlineParameter))
+            {
+                args.InlineParameter = null;
+            }
+
+            var option = options.FirstOrDefault(_ => string.Equals(_.ShortOption, name, StringComparison.InvariantCultureIgnoreCase));
+
+            if (option == null)
+            {
+                throw new CommandLineException(String.Format("unknown option: {0}", args.Current));
+            }
+
+            Invoke(option, args);
+
+            if (args.InlineParameter != null)
+            {
+                if (GetParameterTypes(option).Any())
+                {
+                    throw new CommandLineException("inline parameter not consumed.");
+                }
+                else
+                {
+                    HandleInlineOption(args, options);
+                }
+            }
+        }
+
         internal static bool HandleOption(Args args, IEnumerable<GetOptOption> options, string prefix)
         {
             if (!args.HasNext)
@@ -225,18 +269,23 @@ namespace Sidi.CommandLine
                 throw new CommandLineException(String.Format("unknown option: {0}", args.Current));
             }
 
-            // Multiple options may follow a hyphen delimiter in a single token if the options do not take arguments. Thus, ‘-abc’ is equivalent to ‘-a -b -c’. 
-            if (!GetParameterTypes(option).Any() && args.InlineParameter != null)
-            {
-                args.args[args.i+1] = prefix + args.InlineParameter;
-                args.InlineParameter = null;
-            }
-            else
-            {
-                args.MoveNext();
-            }
+            args.MoveNext();
 
             Invoke(option, args);
+
+            if (args.InlineParameter != null)
+            {
+                if (GetParameterTypes(option).Any())
+                {
+                    throw new CommandLineException("inline parameter not consumed.");
+                }
+                else
+                {
+                    HandleInlineOption(args, options);
+                    return true;
+                }
+            }
+
             return true;
         }
 
