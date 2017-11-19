@@ -125,6 +125,7 @@ namespace Sidi.np
             }
         }
 
+        [Usage("")]
         public void ProcessArguments(string[] args)
         {
             OpenStdinInNotepad();

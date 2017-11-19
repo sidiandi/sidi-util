@@ -1,5 +1,6 @@
 ﻿using Sidi.Extensions;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,24 +23,36 @@ namespace Sidi.CommandLine.GetOptInternal
             System.Environment.Exit(0);
         }
 
-        public void PrintHelp2Column(TextWriter w)
+        static string GetIArgumentHandlerUsage(GetOpt o)
         {
-            w.WriteLine("Usage: {0} [OPTION]", o.modules.First().GetType().Name);
-            w.WriteLine(Usage.Get(o.modules.First().GetType()));
-            w.WriteLine();
-
-            foreach (var option in o.Options)
+            if (o.MainModule is IArgumentHandler)
             {
-                PrintColumns(w, new[] { 40, 40 }, new[] { Syntax(o, option), option.usage });
+                var processArguments = o.MainModule.GetType().GetMethod("ProcessArguments", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string[]) }, null);
+                var u = processArguments.GetCustomAttribute<Usage>();
+                if (u == null)
+                {
+                    return "[argument]...";
+                }
+                return u.Description;
             }
+            else
+            {
+                return String.Empty;
+            }
+        }
+
+        static string GetExeName()
+        {
+            return Process.GetCurrentProcess().ProcessName;
         }
 
         public void PrintHelp(TextWriter w)
         {
-            w.WriteLine("Usage: {0} [OPTION]", o.modules.First().GetType().Name);
-            w.WriteLine(Usage.Get(o.modules.First().GetType()));
+            w.WriteLine("Usage: {0} [option]... {1}", GetExeName(), GetIArgumentHandlerUsage(this.o));
+            w.WriteLine(Usage.Get(o.MainModule.GetType()));
             w.WriteLine();
 
+            w.WriteLine("Options:");
             foreach (var option in o.Options)
             {
                 w.WriteLine("{0} : {1}", Syntax(o, option), option.usage);

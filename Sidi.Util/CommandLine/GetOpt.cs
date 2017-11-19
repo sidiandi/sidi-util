@@ -91,6 +91,7 @@ namespace Sidi.CommandLine
             return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Select(m => GetOptOption.Create(module, m))
                 .Where(_ => _ != null)
+                .Where(_ => !_.memberInfo.Name.Equals("ProcessArguments"))
                 .ToList();
         }
         internal static IEnumerable<GetOptOption> GetOptions(IEnumerable<object> modules)
@@ -499,7 +500,6 @@ namespace Sidi.CommandLine
                 var argumentHandler = MainModule as Sidi.CommandLine.IArgumentHandler;
                 if (argumentHandler == null)
                 {
-                    throw new CommandLineException("{0} must implement IArgumentHandler to handle command line arguments.");
                 }
                 else
                 {

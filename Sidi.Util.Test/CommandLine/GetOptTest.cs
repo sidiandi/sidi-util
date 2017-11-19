@@ -23,7 +23,7 @@ namespace Sidi.CommandLine.Test
         public double AddResult;
     }
 
-    [Usage("Module to test GetOpt")]
+    [Usage("Module to test GetOpt. Greets names")]
     public class HelloWorld : Sidi.CommandLine.IArgumentHandler
     {
         [Usage("option")]
@@ -69,6 +69,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
         public string[] args;
 
+        [Usage("[name]...")]
         public void ProcessArguments(string[] args)
         {
             this.args = args;
