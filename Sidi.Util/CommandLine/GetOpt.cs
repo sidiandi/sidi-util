@@ -12,6 +12,9 @@ using log4net.Layout;
 using log4net.Appender;
 using log4net.Core;
 using Sidi.Extensions;
+using System.IO;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Sidi.CommandLine
 {
@@ -42,7 +45,7 @@ namespace Sidi.CommandLine
             var ca = new ConsoleAppender
             {
                 Target = "Console.Out",
-                Name ="getopt",
+                Name = "getopt",
                 Layout = pattern,
                 Threshold = Level.All
             };
@@ -144,7 +147,7 @@ namespace Sidi.CommandLine
                 return false;
             }
             else
-            { 
+            {
                 return false;
             }
         }
@@ -302,7 +305,7 @@ namespace Sidi.CommandLine
 
             public string Current { get { return args[i]; } }
 
-            public string Next { get { return args[i+1]; } }
+            public string Next { get { return args[i + 1]; } }
 
             object IEnumerator.Current => args[i];
 
@@ -310,7 +313,7 @@ namespace Sidi.CommandLine
             {
             }
 
-            public bool HasNext => i < args.Length-1;
+            public bool HasNext => i < args.Length - 1;
 
             public string InlineParameter { get; set; }
 
@@ -511,14 +514,52 @@ namespace Sidi.CommandLine
             }
             catch (Sidi.CommandLine.CommandLineException cle)
             {
-                Console.WriteLine(cle.Message);
-                new GetOptInternal.ShowHelp(this).PrintHelp(Console.Out);
+                using (var message = new StringWriter())
+                {
+                    message.WriteLine(cle.Message);
+                    new GetOptInternal.ShowHelp(this).PrintHelp(message);
+                    ShowMessage(message);
+                }
                 return -1;
             }
             catch (Exception ex)
             {
                 log.Error(ex);
                 return -1;
+            }
+        }
+
+        static bool IsConsole()
+        {
+            try
+            {
+                var t = Console.Title;
+                return true;
+            }
+            catch (System.IO.IOException)
+            {
+                return false;
+            }
+        }
+
+        public void ShowMessage(object message)
+        {
+            var text = message.ToString();
+            if (!IsConsole())
+            {
+                MessageBox.Show(text, this.ProgramName);
+            }
+            else
+            {
+                Console.Out.WriteLine(text);
+            }
+        }
+
+        public string ProgramName
+        {
+            get
+            {
+                return Process.GetCurrentProcess().ProcessName;
             }
         }
     }

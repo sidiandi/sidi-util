@@ -19,7 +19,11 @@ namespace Sidi.CommandLine.GetOptInternal
         [Usage("Show this message and exit.")]
         public void Help()
         {
-            PrintHelp(Console.Out);
+            using (var w = new StringWriter())
+            {
+                PrintHelp(w);
+                o.ShowMessage(w);
+            }
             System.Environment.Exit(0);
         }
 
@@ -41,14 +45,9 @@ namespace Sidi.CommandLine.GetOptInternal
             }
         }
 
-        static string GetExeName()
-        {
-            return Process.GetCurrentProcess().ProcessName;
-        }
-
         public void PrintHelp(TextWriter w)
         {
-            w.WriteLine("Usage: {0} [option]... {1}", GetExeName(), GetIArgumentHandlerUsage(this.o));
+            w.WriteLine("Usage: {0} [option]... {1}", o.ProgramName, GetIArgumentHandlerUsage(this.o));
             w.WriteLine(Usage.Get(o.MainModule.GetType()));
             w.WriteLine();
 
@@ -180,13 +179,17 @@ print:
         internal void PrintVersion(TextWriter w)
         {
             var mainModule = o.MainModule;
-            w.WriteLine("{0} {1}", mainModule.GetType().Name, mainModule.GetType().Assembly.GetName().Version);
+            w.WriteLine("{0} {1}", this.o.ProgramName, mainModule.GetType().Assembly.GetName().Version);
         }
 
         [Usage("Show version information and exit.")]
         public void Version()
         {
-            PrintVersion(Console.Out);
+            using (var w = new StringWriter())
+            {
+                PrintVersion(w);
+                this.o.ShowMessage(w);
+            }
             System.Environment.Exit(0);
         }
     }

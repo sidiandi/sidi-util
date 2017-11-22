@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.Util.Test", "Sidi.Util
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "np", "np\np.csproj", "{111FA37D-D960-468B-84A8-BE8604732407}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetOptNoConsoleTest", "GetOptNoConsoleTest\GetOptNoConsoleTest.csproj", "{59F0E363-7ABE-4524-B27E-20FC18204628}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,18 @@ Global
 		{111FA37D-D960-468B-84A8-BE8604732407}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{111FA37D-D960-468B-84A8-BE8604732407}.Release|x86.ActiveCfg = Release|Any CPU
 		{111FA37D-D960-468B-84A8-BE8604732407}.Release|x86.Build.0 = Release|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Debug|x86.Build.0 = Debug|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Release|x86.ActiveCfg = Release|Any CPU
+		{59F0E363-7ABE-4524-B27E-20FC18204628}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
