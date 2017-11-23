@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace Sidi.CommandLine.GetOptInternal
 {
-    internal class GetOptOption
+    internal class Option
     {
-        static public GetOptOption Create(object instance, MemberInfo memberInfo)
+        static public Option Create(object instance, MemberInfo memberInfo)
         {
             var usage = Sidi.CommandLine.Usage.Get(memberInfo);
             if (usage == null)
             {
                 return null;
             }
-            return new GetOptOption(instance, memberInfo, usage);
+            return new Option(instance, memberInfo, usage);
         }
 
-        GetOptOption(object instance, MemberInfo memberInfo, string usage)
+        Option(object instance, MemberInfo memberInfo, string usage)
         {
             this.instance = instance;
             this.memberInfo = memberInfo;
@@ -61,15 +61,15 @@ namespace Sidi.CommandLine.GetOptInternal
             return "--" + LongOption;
         }
 
-        public static IEnumerable<GetOptOption> Get(object module)
+        public static IEnumerable<Option> Get(object module)
         {
             return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Select(m => GetOptOption.Create(module, m))
+                .Select(m => Option.Create(module, m))
                 .Where(_ => _ != null)
                 .Where(_ => !_.memberInfo.Name.Equals("ProcessArguments"))
                 .ToList();
         }
-        public static IEnumerable<GetOptOption> Get(IEnumerable<object> modules)
+        public static IEnumerable<Option> Get(IEnumerable<object> modules)
         {
             var options = modules.SelectMany(Get).ToList();
             return options;

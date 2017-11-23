@@ -25,7 +25,7 @@ namespace Sidi.CommandLine.GetOptInternal
         {
             this.instance = instance;
             this.memberInfo = memberInfo;
-            this.LongOption = GetOptOption.CSharpIdentifierToLongOption(memberInfo.Name);
+            this.LongOption = Option.CSharpIdentifierToLongOption(memberInfo.Name);
             this.usage = Usage.Get(ModuleType);
         }
 

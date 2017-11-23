@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections;
 using log4net.Repository.Hierarchy;
 using log4net;
 using log4net.Layout;
@@ -15,6 +14,7 @@ using Sidi.Extensions;
 using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Option = Sidi.CommandLine.GetOptInternal.Option;
 
 namespace Sidi.CommandLine
 {
@@ -22,7 +22,7 @@ namespace Sidi.CommandLine
     /// Implements the GNU Program Argument Syntax Conventions
     /// https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html#Argument-Syntax
     /// </summary>
-    public class GetOpt
+    public partial class GetOpt
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -89,7 +89,7 @@ namespace Sidi.CommandLine
             modules.Add(new GetOptInternal.ShowHelp(this));
         }
 
-        static void AddShortOptions(IEnumerable<GetOptOption> options)
+        internal static void AddShortOptions(IEnumerable<GetOptInternal.Option> options)
         {
             var used = new HashSet<string>();
             foreach (var i in options)
@@ -151,7 +151,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        static GetOptOption FindLongOption(string name, IEnumerable<GetOptOption> options)
+        static GetOptInternal.Option FindLongOption(string name, IEnumerable<GetOptInternal.Option> options)
         {
             // exact match?
             var o = options.FirstOrDefault(_ => _.LongOption.Equals(name, StringComparison.InvariantCultureIgnoreCase));
@@ -172,7 +172,7 @@ namespace Sidi.CommandLine
             throw new CommandLineException(String.Format("parameter {0} is not unique. Could be {1}", name, abbreviationMatches.Join(", ")));
         }
 
-        internal static bool HandleLongOption(Args args, IEnumerable<GetOptOption> options, string prefix)
+        internal static bool HandleLongOption(Args args, IEnumerable<GetOptInternal.Option> options, string prefix)
         {
             if (!args.HasNext)
             {
@@ -205,7 +205,7 @@ namespace Sidi.CommandLine
             return true;
         }
 
-        internal static void HandleInlineOption(Args args, IEnumerable<GetOptOption> options)
+        internal static void HandleInlineOption(Args args, IEnumerable<GetOptInternal.Option> options)
         {
             if (args.InlineParameter == null)
             {
@@ -244,7 +244,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        internal static bool HandleOption(Args args, IEnumerable<GetOptOption> options, string prefix)
+        internal static bool HandleOption(Args args, IEnumerable<GetOptInternal.Option> options, string prefix)
         {
             if (!args.HasNext)
             {
@@ -365,49 +365,6 @@ namespace Sidi.CommandLine
             throw new CommandLineException(String.Format("command {0} is not unique. Could be {1}", name, abbreviationMatches.Join(", ")));
         }
 
-        internal class Args : IEnumerator<string>
-        {
-            public Args(string[] args)
-            {
-                this.args = args;
-                this.i = -1;
-            }
-            public readonly string[] args;
-            public int i;
-
-            public string Current { get { return args[i]; } }
-
-            public string Next { get { return args[i + 1]; } }
-
-            object IEnumerator.Current => args[i];
-
-            public void Dispose()
-            {
-            }
-
-            public bool HasNext => i < args.Length - 1;
-
-            public string InlineParameter { get; set; }
-
-            public bool MoveNext()
-            {
-                if (HasNext)
-                {
-                    ++i;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            public void Reset()
-            {
-                i = -1;
-            }
-        }
-
         internal static object ParseParameter(string value, ParameterInfo parameter)
         {
             if (value == null && parameter.IsOptional)
@@ -444,7 +401,7 @@ namespace Sidi.CommandLine
             return parameter.Select(pi => ParseParameter(GetParameter(args), pi)).ToArray();
         }
 
-        static internal void Invoke(GetOptOption option, Args args)
+        static internal void Invoke(GetOptInternal.Option option, Args args)
         {
             var method = option.memberInfo as MethodInfo;
             if (method != null)
@@ -472,13 +429,13 @@ namespace Sidi.CommandLine
             }
         }
 
-        static internal IEnumerable<ParameterInfo> GetNamedParameters(GetOptOption option)
+        static internal IEnumerable<ParameterInfo> GetNamedParameters(GetOptInternal.Option option)
         {
             var method = option.memberInfo as MethodInfo;
             return method == null ? Enumerable.Empty<ParameterInfo>() : method.GetParameters();
         }
 
-        internal static Type[] GetParameterTypes(GetOptOption option)
+        internal static Type[] GetParameterTypes(GetOptInternal.Option option)
         {
             var p = GetParameterTypesInternal(option);
             if (p.Length == 1 && p[0].Equals(typeof(Boolean)))
@@ -491,7 +448,7 @@ namespace Sidi.CommandLine
             }
         }
 
-        static Type[] GetParameterTypesInternal(GetOptOption option)
+        static Type[] GetParameterTypesInternal(GetOptInternal.Option option)
         {
             var method = option.memberInfo as MethodInfo;
             if (method != null)
@@ -518,19 +475,19 @@ namespace Sidi.CommandLine
         public readonly string shortOptionPrefix = "-";
         public readonly string longOptionPrefix = "--";
 
-        internal IEnumerable<GetOptOption> Options
+        internal IEnumerable<GetOptInternal.Option> Options
         {
             get
             {
                 if (_options == null)
                 {
-                    _options = GetOptOption.Get(modules);
+                    _options = GetOptInternal.Option.Get(modules);
                     AddShortOptions(_options);
                 }
                 return _options;
             }
         }
-        IEnumerable<GetOptOption> _options;
+        IEnumerable<GetOptInternal.Option> _options;
 
         internal IEnumerable<Command> Commands
         {
@@ -630,6 +587,15 @@ namespace Sidi.CommandLine
             {
                 log.Error(ex);
                 return -1;
+            }
+        }
+
+        static string ToString(Action<TextWriter> printer)
+        {
+            using (var w = new StringWriter())
+            {
+                printer(w);
+                return w.ToString();
             }
         }
 

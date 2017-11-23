@@ -166,9 +166,9 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         public void HandleLongOption()
         {
             var m = new HelloWorld();
-            var options = GetOptInternal.GetOptOption.Get(new[] { m });
+            var options = GetOptInternal.Option.Get(new[] { m });
 
-            var args = new GetOpt.Args(new[] { "--cordially", "--say-hello=Andreas" });
+            var args = new GetOptInternal.Args(new[] { "--cordially", "--say-hello=Andreas" });
             Assert.IsTrue(GetOpt.HandleLongOption(args, options, longOptionPrefix));
             Assert.AreEqual(0, args.i);
 
@@ -184,9 +184,10 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         public void HandleOption()
         {
             var m = new HelloWorld();
-            var options = GetOptInternal.GetOptOption.Get(new object[] { m });
+            var options = GetOptInternal.Option.Get(new object[] { m });
+            GetOpt.AddShortOptions(options);
 
-            var args = new GetOpt.Args(new[] { "-c", "-sAndreas" , "-w1.1.2018"});
+            var args = new GetOptInternal.Args(new[] { "-c", "-sAndreas" , "-w1.1.2018"});
             Assert.IsTrue(GetOpt.HandleOption(args, options, shortOptionPrefix));
             Assert.AreEqual(0, args.i);
 
@@ -293,7 +294,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
             var g = new GetOpt();
             g.modules.Add(m);
             g.AddDefaultModules();
-            g.Run(new[] { "-vvvv", "add", "1", "2", "3" });
+            g.Run(new[] { "-vvvv", "add", "1", "2", "3", "--" });
             Assert.AreEqual(6.0, m.Add.Result);
         }
     }

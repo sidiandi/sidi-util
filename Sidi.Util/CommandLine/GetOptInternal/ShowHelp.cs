@@ -78,7 +78,7 @@ namespace Sidi.CommandLine.GetOptInternal
             }
         }
 
-        static string Syntax(GetOpt o, GetOptOption option)
+        static string Syntax(GetOpt o, Option option)
         {
             if (GetOpt.GetNamedParameters(option).Count() > 1)
             {
@@ -129,7 +129,7 @@ namespace Sidi.CommandLine.GetOptInternal
             return NotEmpty(command.ShortOption, command.LongOption).Join(" | ");
         }
 
-        static string SyntaxForMethodsWithMultipleParameters(GetOpt o, GetOptOption option)
+        static string SyntaxForMethodsWithMultipleParameters(GetOpt o, Option option)
         {
             using (var w = new StringWriter())
             {

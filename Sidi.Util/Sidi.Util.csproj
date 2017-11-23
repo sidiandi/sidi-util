@@ -44,13 +44,14 @@
     <Compile Include="CommandLine\ActionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="CommandLine\GetOptInternal\Args.cs" />
     <Compile Include="CommandLine\ComplexValueParser.cs" />
     <Compile Include="CommandLine\DateTimeParser.cs" />
     <Compile Include="CommandLine\GetOpt.cs" />
     <Compile Include="CommandLine\GetOptInternal\Command.cs" />
     <Compile Include="CommandLine\GetOptInternal\Logging.cs" />
-    <Compile Include="CommandLine\GetOptInternal\GetOptUsage.cs" />
-    <Compile Include="CommandLine\GetOptInternal\GetOptOption.cs" />
+    <Compile Include="CommandLine\GetOptInternal\ShowHelp.cs" />
+    <Compile Include="CommandLine\GetOptInternal\Option.cs" />
     <Compile Include="CommandLine\ItemSource.cs" />
     <Compile Include="CommandLine\ArrayValueParser.cs" />
     <Compile Include="CommandLine\Attributes.cs" />

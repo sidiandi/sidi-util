@@ -14,8 +14,8 @@ namespace Sidi.CommandLine.GetOptInternal.Test
         [Test]
         public void CSharpIdentifierToLongOption()
         {
-            Assert.AreEqual("say-hello", GetOptOption.CSharpIdentifierToLongOption("SayHello"));
-            Assert.AreEqual("get-wlan", GetOptOption.CSharpIdentifierToLongOption("GetWLAN"));
+            Assert.AreEqual("say-hello", Sidi.CommandLine.GetOptInternal.Option.CSharpIdentifierToLongOption("SayHello"));
+            Assert.AreEqual("get-wlan", Sidi.CommandLine.GetOptInternal.Option.CSharpIdentifierToLongOption("GetWLAN"));
         }
     }
 }
