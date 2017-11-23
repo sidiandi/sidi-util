@@ -2,6 +2,7 @@ using Sidi.CommandLine;
 using Sidi.IO;
 using System;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Sidi.np
 {
@@ -13,10 +14,19 @@ namespace Sidi.np
 
         public static object Process { get; private set; }
 
+        [STAThread]
         public static int Main(string[] args)
         {
             return GetOpt.Run(new np(), args);
         }
+
+        public np()
+        {
+            Clipboard = new ClipboardCommand(this);
+        }
+
+        [SubCommand]
+        ClipboardCommand Clipboard;
 
         [Usage("Write received input to stdout.")]
         public bool Passthrough { get; set; }
@@ -51,6 +61,21 @@ namespace Sidi.np
             return 0;
         }
 
+        public void OpenInNotepad(string text)
+        {
+            var textFile = Paths.GetLocalApplicationDataDirectory(this.GetType())
+                .CatDir(LPath.GetValidFilename(DateTime.UtcNow.ToString("o")) + ".txt");
+
+            log.InfoFormat("write to file {0}", textFile);
+
+            using (var w = textFile.WriteText())
+            {
+                w.Write(text);
+            }
+
+            OpenInNotepad(textFile);
+        }
+
         static LPath GetNotepadPlusPlusExe()
         {
             return Paths.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
@@ -62,7 +87,7 @@ namespace Sidi.np
             return Paths.GetFolderPath(Environment.SpecialFolder.System).CatDir(@"notepad.exe");
         }
 
-        static void OpenInNotepad(LPath textFile)
+        public static void OpenInNotepad(LPath textFile)
         {
             var notepadExe = GetNotepadPlusPlusExe();
             if (notepadExe.IsFile)
@@ -79,7 +104,7 @@ namespace Sidi.np
             }
         }
 
-        static void OpenNotepad()
+        public static void OpenNotepad()
         {
             var notepadExe = GetNotepadPlusPlusExe();
             if (notepadExe.IsFile)
@@ -129,6 +154,22 @@ namespace Sidi.np
         public void ProcessArguments(string[] args)
         {
             OpenStdinInNotepad();
+        }
+    }
+
+    [Usage("show clipboard content in notepad")]
+    class ClipboardCommand : IArgumentHandler
+    {
+        public ClipboardCommand(np p)
+        {
+            this.p = p;
+        }
+
+        np p;
+
+        public void ProcessArguments(string[] args)
+        {
+            p.OpenInNotepad(Clipboard.GetText());
         }
     }
 }

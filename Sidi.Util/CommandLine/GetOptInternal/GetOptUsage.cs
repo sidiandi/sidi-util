@@ -1,5 +1,6 @@
 ﻿using Sidi.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -47,14 +48,33 @@ namespace Sidi.CommandLine.GetOptInternal
 
         public void PrintHelp(TextWriter w)
         {
-            w.WriteLine("Usage: {0} [option]... {1}", o.ProgramName, GetIArgumentHandlerUsage(this.o));
+            w.WriteLine("Usage: " + NotEmpty
+            (
+                o.ProgramName,
+                "[option]...",
+                this.o.Commands.Any() ? "<command> " : null,
+                GetIArgumentHandlerUsage(this.o)
+            ).Join(" "));
             w.WriteLine(Usage.Get(o.MainModule.GetType()));
-            w.WriteLine();
 
-            w.WriteLine("Options:");
-            foreach (var option in o.Options)
+            if (o.Options.Any())
             {
-                w.WriteLine("{0} : {1}", Syntax(o, option), option.usage);
+                w.WriteLine();
+                w.WriteLine("Options:");
+                foreach (var option in o.Options)
+                {
+                    w.WriteLine("{0} : {1}", Syntax(o, option), option.usage);
+                }
+            }
+
+            if (o.Commands.Any())
+            {
+                w.WriteLine();
+                w.WriteLine("Commands:");
+                foreach (var command in o.Commands)
+                {
+                    w.WriteLine("{0} : {1}", Syntax(o, command), command.usage);
+                }
             }
         }
 
@@ -68,9 +88,11 @@ namespace Sidi.CommandLine.GetOptInternal
             using (var w = new StringWriter())
             {
                 bool needSep = false;
+                const string sep = " | ";
+
                 if (option.ShortOption != null)
                 {
-                    if (needSep) { w.Write(", "); }
+                    if (needSep) { w.Write(sep); }
                     w.Write(o.shortOptionPrefix);
                     w.Write(option.ShortOption);
                     var p = GetOpt.GetParameterTypes(option);
@@ -82,7 +104,7 @@ namespace Sidi.CommandLine.GetOptInternal
                 }
                 if (option.LongOption != null)
                 {
-                    if (needSep) { w.Write(", "); }
+                    if (needSep) { w.Write(sep); }
                     w.Write(o.longOptionPrefix);
                     w.Write(option.LongOption);
                     var p = GetOpt.GetParameterTypes(option);
@@ -95,6 +117,16 @@ namespace Sidi.CommandLine.GetOptInternal
                 }
                 return w.ToString();
             }
+        }
+
+        static IEnumerable<string> NotEmpty(params string[] p)
+        {
+            return p.Where(_ => !String.IsNullOrEmpty(_));
+        }
+
+        static string Syntax(GetOpt o, Command command)
+        {
+            return NotEmpty(command.ShortOption, command.LongOption).Join(" | ");
         }
 
         static string SyntaxForMethodsWithMultipleParameters(GetOpt o, GetOptOption option)

@@ -89,25 +89,24 @@ namespace Sidi.CommandLine
             modules.Add(new GetOptInternal.ShowHelp(this));
         }
 
-        static IEnumerable<GetOptOption> GetOptions(object module)
-        {
-            return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Select(m => GetOptOption.Create(module, m))
-                .Where(_ => _ != null)
-                .Where(_ => !_.memberInfo.Name.Equals("ProcessArguments"))
-                .ToList();
-        }
-        internal static IEnumerable<GetOptOption> GetOptions(IEnumerable<object> modules)
-        {
-            var options = modules.SelectMany(GetOptions).ToList();
-            AddShortOptions(options);
-            return options;
-        }
-
         static void AddShortOptions(IEnumerable<GetOptOption> options)
         {
             var used = new HashSet<string>();
             foreach (var i in options)
+            {
+                var shortName = i.LongOption.Substring(0, 1).ToLower();
+                if (!used.Contains(shortName))
+                {
+                    i.ShortOption = shortName;
+                    used.Add(shortName);
+                }
+            }
+        }
+
+        static void AddShort(IEnumerable<Command> commands)
+        {
+            var used = new HashSet<string>();
+            foreach (var i in commands)
             {
                 var shortName = i.LongOption.Substring(0, 1).ToLower();
                 if (!used.Contains(shortName))
@@ -293,6 +292,79 @@ namespace Sidi.CommandLine
             return true;
         }
 
+        internal static bool HandleCommand(Args args, IEnumerable<Command> commands, string prefix)
+        {
+            if (!commands.Any())
+            {
+                return false;
+            }
+
+            if (!args.HasNext)
+            {
+                return false;
+            }
+
+            var a = args.Next;
+
+            if (!a.StartsWith(prefix))
+            {
+                return false;
+            }
+
+            var name = a.Substring(prefix.Length);
+
+            var command = FindCommand(name, commands);
+
+            if (command == null)
+            {
+                throw new CommandLineException(String.Format("unknown command: {0}", args.Current));
+            }
+
+            args.MoveNext();
+
+            Invoke(command, args);
+
+            return true;
+        }
+
+        private static void Invoke(Command command, Args args)
+        {
+            log.InfoFormat("command {0}", command);
+            object commandModule = null;
+            if (command.memberInfo is FieldInfo)
+            {
+                var field = (FieldInfo)command.memberInfo;
+                commandModule = field.GetValue(command.instance);
+            }
+
+            var getOpt = new GetOpt();
+            getOpt.modules.Add(commandModule);
+            getOpt.AddDefaultModules();
+            getOpt.ProgramName = getOpt.ProgramName + " " + command.LongOption;
+            getOpt.RunCommand(args);
+        }
+
+        private static Command FindCommand(string name, IEnumerable<Command> commands)
+        {
+            // exact match?
+            var o = commands.FirstOrDefault(_ => _.LongOption.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (o != null) return o;
+
+            var abbreviationMatches = commands.Where(_ => IsAbbreviationFor(name, _.LongOption)).ToList();
+
+            if (abbreviationMatches.Count() == 1)
+            {
+                return abbreviationMatches.First();
+            }
+
+            if (abbreviationMatches.Count() == 0)
+            {
+                throw new CommandLineException(String.Format("command {0} is unknown", name));
+            }
+
+            throw new CommandLineException(String.Format("command {0} is not unique. Could be {1}", name, abbreviationMatches.Join(", ")));
+        }
+
         internal class Args : IEnumerator<string>
         {
             public Args(string[] args)
@@ -442,7 +514,7 @@ namespace Sidi.CommandLine
             throw new ArgumentOutOfRangeException("option");
         }
 
-        IEnumerable<GetOptOption> _options;
+        public readonly string commandPrefix = String.Empty;
         public readonly string shortOptionPrefix = "-";
         public readonly string longOptionPrefix = "--";
 
@@ -452,11 +524,27 @@ namespace Sidi.CommandLine
             {
                 if (_options == null)
                 {
-                    _options = GetOptions(modules);
+                    _options = GetOptOption.Get(modules);
+                    AddShortOptions(_options);
                 }
                 return _options;
             }
         }
+        IEnumerable<GetOptOption> _options;
+
+        internal IEnumerable<Command> Commands
+        {
+            get
+            {
+                if (_commands == null)
+                {
+                    _commands = Command.Get(modules);
+                    AddShort(_commands);
+                }
+                return _commands;
+            }
+        }
+        IEnumerable<Command> _commands;
 
         public object MainModule { get { return modules.First(); } }
 
@@ -475,6 +563,17 @@ namespace Sidi.CommandLine
             }
             return true;
         }
+        static bool HandleTwoDashesAsCommandEnd(Args args, IList<string> argList, string longOptionPrefix)
+        {
+            if (!args.HasNext || !args.Next.Equals(longOptionPrefix))
+            {
+                return false;
+            }
+
+            args.MoveNext();
+
+            return true;
+        }
 
         static bool HandleNormalArgument(Args args, IList<string> argList)
         {
@@ -487,9 +586,13 @@ namespace Sidi.CommandLine
 
         public int Run(string[] argsArray)
         {
+            return Run(new Args(argsArray));
+        }
+
+        internal int Run(Args args)
+        {
             try
             {
-                var args = new Args(argsArray);
                 var argList = new List<string>();
 
                 for (; args.HasNext;)
@@ -497,6 +600,7 @@ namespace Sidi.CommandLine
                     if (HandleTwoDashes(args, argList, longOptionPrefix)) continue;
                     if (HandleLongOption(args, Options, longOptionPrefix)) continue;
                     if (HandleOption(args, Options, shortOptionPrefix)) continue;
+                    if (HandleCommand(args, Commands, commandPrefix)) continue;
                     if (HandleNormalArgument(args, argList)) continue;
                 }
 
@@ -506,7 +610,7 @@ namespace Sidi.CommandLine
                 }
                 else
                 {
-                    log.InfoFormat("Handling arguments: {0}", argList.Join(", "));
+                    log.InfoFormat("arguments: {0}", argList.Join(", "));
                     argumentHandler.ProcessArguments(argList.ToArray());
                 }
 
@@ -526,6 +630,58 @@ namespace Sidi.CommandLine
             {
                 log.Error(ex);
                 return -1;
+            }
+        }
+
+        internal void RunCommand(Args args)
+        {
+            try
+            {
+                var argList = new List<string>();
+                bool commandDidNotConsumeAll = false;
+
+                for (; args.HasNext;)
+                {
+                    if (HandleTwoDashesAsCommandEnd(args, argList, longOptionPrefix))
+                    {
+                        commandDidNotConsumeAll = true;
+                        break;
+                    };
+                    if (HandleLongOption(args, Options, longOptionPrefix)) continue;
+                    if (HandleOption(args, Options, shortOptionPrefix)) continue;
+                    if (HandleCommand(args, Commands, commandPrefix)) continue;
+                    if (HandleNormalArgument(args, argList)) continue;
+                }
+
+                var argumentHandler = MainModule as Sidi.CommandLine.IArgumentHandler;
+                if (argumentHandler == null)
+                {
+                }
+                else
+                {
+                    log.InfoFormat("arguments: {0}", argList.Join(", "));
+                    argumentHandler.ProcessArguments(argList.ToArray());
+                }
+
+                if (!commandDidNotConsumeAll)
+                {
+                    Environment.Exit(0);
+                }
+            }
+            catch (Sidi.CommandLine.CommandLineException cle)
+            {
+                using (var message = new StringWriter())
+                {
+                    message.WriteLine(cle.Message);
+                    new GetOptInternal.ShowHelp(this).PrintHelp(message);
+                    ShowMessage(message);
+                }
+                Environment.Exit(-1);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                Environment.Exit(1);
             }
         }
 
@@ -559,8 +715,18 @@ namespace Sidi.CommandLine
         {
             get
             {
-                return Process.GetCurrentProcess().ProcessName;
+                if (_ProgramName == null)
+                {
+                    return Process.GetCurrentProcess().ProcessName;
+                }
+                return _ProgramName;
+            }
+
+            set
+            {
+                _ProgramName = value;
             }
         }
+        string _ProgramName;
     }
 }

@@ -10,17 +10,46 @@ using System.Threading.Tasks;
 
 namespace Sidi.CommandLine.Test
 {
+    [Usage("Add numbers")]
+    public class Add : IArgumentHandler
+    {
+        public void ProcessArguments(string[] args)
+        {
+            Result = args.Select(Double.Parse).Sum();
+        }
+
+        public double Result;
+    }
+
+    [Usage("Subtract numbers")]
+    public class Subtract : IArgumentHandler
+    {
+        public void ProcessArguments(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [Usage("Multiply numbers")]
+    public class Multiply : IArgumentHandler
+    {
+        public void ProcessArguments(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [Usage("Calculate")]
     public class Calculator
     {
-        [Usage("Add two numbers and print result")]
-        public void Add(double a, double b)
-        {
-            AddResult = a + b;
-            Console.WriteLine(AddResult);
-        }
+        [SubCommand]
+        public Add Add = new Add();
 
-        public double AddResult;
+        [SubCommand]
+        public Subtract Subtract = new Subtract();
+
+        [SubCommand]
+        public Multiply Multiply = new Multiply();
     }
 
     [Usage("Module to test GetOpt. Greets names")]
@@ -52,9 +81,6 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         {
             this.name = name;
         }
-
-        [SubCommand]
-        Calculator Calculator;
 
         public string name;
 
@@ -140,7 +166,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         public void HandleLongOption()
         {
             var m = new HelloWorld();
-            var options = GetOpt.GetOptions(new[] { m });
+            var options = GetOptInternal.GetOptOption.Get(new[] { m });
 
             var args = new GetOpt.Args(new[] { "--cordially", "--say-hello=Andreas" });
             Assert.IsTrue(GetOpt.HandleLongOption(args, options, longOptionPrefix));
@@ -158,7 +184,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         public void HandleOption()
         {
             var m = new HelloWorld();
-            var options = GetOpt.GetOptions(new object[] { m });
+            var options = GetOptInternal.GetOptOption.Get(new object[] { m });
 
             var args = new GetOpt.Args(new[] { "-c", "-sAndreas" , "-w1.1.2018"});
             Assert.IsTrue(GetOpt.HandleOption(args, options, shortOptionPrefix));
@@ -248,6 +274,27 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
             Assert.IsTrue(GetOpt.IsAbbreviationFor("sh", "say-hello"));
             Assert.IsTrue(GetOpt.IsAbbreviationFor("s", "say-hello"));
             Assert.IsFalse(GetOpt.IsAbbreviationFor("o", "say-hello"));
+        }
+
+        [Test]
+        public void CommandHelp()
+        {
+            var m = new Calculator();
+            var g = new GetOpt();
+            g.modules.Add(m);
+            g.AddDefaultModules();
+            new GetOptInternal.ShowHelp(g).PrintHelp(Console.Out);
+        }
+
+        [Test]
+        public void CommandExecute()
+        {
+            var m = new Calculator();
+            var g = new GetOpt();
+            g.modules.Add(m);
+            g.AddDefaultModules();
+            g.Run(new[] { "-vvvv", "add", "1", "2", "3" });
+            Assert.AreEqual(6.0, m.Add.Result);
         }
     }
 }

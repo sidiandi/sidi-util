@@ -47,6 +47,7 @@
     <Compile Include="CommandLine\ComplexValueParser.cs" />
     <Compile Include="CommandLine\DateTimeParser.cs" />
     <Compile Include="CommandLine\GetOpt.cs" />
+    <Compile Include="CommandLine\GetOptInternal\Command.cs" />
     <Compile Include="CommandLine\GetOptInternal\Logging.cs" />
     <Compile Include="CommandLine\GetOptInternal\GetOptUsage.cs" />
     <Compile Include="CommandLine\GetOptInternal\GetOptOption.cs" />

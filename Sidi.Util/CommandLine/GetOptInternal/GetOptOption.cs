@@ -60,5 +60,19 @@ namespace Sidi.CommandLine.GetOptInternal
         {
             return "--" + LongOption;
         }
+
+        public static IEnumerable<GetOptOption> Get(object module)
+        {
+            return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Select(m => GetOptOption.Create(module, m))
+                .Where(_ => _ != null)
+                .Where(_ => !_.memberInfo.Name.Equals("ProcessArguments"))
+                .ToList();
+        }
+        public static IEnumerable<GetOptOption> Get(IEnumerable<object> modules)
+        {
+            var options = modules.SelectMany(Get).ToList();
+            return options;
+        }
     }
 }
