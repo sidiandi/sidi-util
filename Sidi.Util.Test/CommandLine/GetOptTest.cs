@@ -43,7 +43,7 @@ namespace Sidi.CommandLine.Test
     public class Calculator
     {
         [SubCommand]
-        public Add Add = new Add();
+        internal Add Add; // unassigned fields with subcommand attribute will automatically created on demand.
 
         [SubCommand]
         public Subtract Subtract = new Subtract();

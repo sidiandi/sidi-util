@@ -327,6 +327,17 @@ namespace Sidi.CommandLine
             return true;
         }
 
+        static object ProvideValue(object instance, FieldInfo field)
+        { 
+            var v = field.GetValue(instance);
+            if (v == null)
+            {
+                v = Activator.CreateInstance(field.FieldType);
+                field.SetValue(instance, v);
+            }
+            return v;
+        }
+
         private static void Invoke(Command command, Args args)
         {
             log.InfoFormat("command {0}", command);
@@ -334,7 +345,7 @@ namespace Sidi.CommandLine
             if (command.memberInfo is FieldInfo)
             {
                 var field = (FieldInfo)command.memberInfo;
-                commandModule = field.GetValue(command.instance);
+                commandModule = ProvideValue(command.instance, field);
             }
 
             var getOpt = new GetOpt();
