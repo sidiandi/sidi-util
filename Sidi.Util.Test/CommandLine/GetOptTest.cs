@@ -11,45 +11,60 @@ using System.Threading.Tasks;
 namespace Sidi.CommandLine.Test
 {
     [Usage("Add numbers")]
-    public class Add : IArgumentHandler
+    public class Add
     {
-        public void ProcessArguments(string[] args)
+        public void Main(double[] args)
         {
-            Result = args.Select(Double.Parse).Sum();
+            Result = args.Sum();
         }
 
         public double Result;
     }
 
     [Usage("Subtract numbers")]
-    public class Subtract : IArgumentHandler
+    public class Subtract
     {
-        public void ProcessArguments(string[] args)
+        public void Main(double[] args)
         {
-            throw new NotImplementedException();
+            Result = args[0] - args.Skip(1).Sum();
         }
+        public double Result;
     }
 
     [Usage("Multiply numbers")]
-    public class Multiply : IArgumentHandler
+    public class Multiply
     {
-        public void ProcessArguments(string[] args)
+        public void Main(double[] args)
         {
-            throw new NotImplementedException();
+            Result = args.Aggregate(1.0, (a, d) => a * d);
         }
+        public double Result;
     }
 
-    [Usage("Calculate")]
+    [Usage("Demonstrates the different ways to create a subcommand")]
     public class Calculator
     {
+        // unassigned fields with subcommand attribute will automatically created on demand.
         [SubCommand]
-        internal Add Add; // unassigned fields with subcommand attribute will automatically created on demand.
+        internal Add Add;
+
+        // Lazy initialization of a property
+        [SubCommand]
+        public Subtract Subtract
+        {
+            get
+            {
+                if (_Subtract == null)
+                {
+                    _Subtract = new Subtract();
+                }
+                return _Subtract;
+            }
+        }
+        Subtract _Subtract;
 
         [SubCommand]
-        public Subtract Subtract = new Subtract();
-
-        [SubCommand]
-        public Multiply Multiply = new Multiply();
+        public Lazy<Multiply> Multiply = new Lazy<Multiply>();
     }
 
     [Usage("Module to test GetOpt. Greets names")]
@@ -288,14 +303,18 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         }
 
         [Test]
-        public void CommandExecute()
+        public void SubCommandExecute()
         {
             var m = new Calculator();
             var g = new GetOpt();
             g.modules.Add(m);
             g.AddDefaultModules();
-            g.Run(new[] { "-vvvv", "add", "1", "2", "3", "--" });
+            Assert.AreEqual(0, g.Run(new[] { "-vvvv", "add", "1", "2", "3", "--" }));
             Assert.AreEqual(6.0, m.Add.Result);
+            Assert.AreEqual(0, g.Run(new[] { "-vvvv", "sub", "1", "2", "3", "--" }));
+            Assert.AreEqual(-4.0, m.Subtract.Result);
+            Assert.AreEqual(0, g.Run(new[] { "-vvvv", "mul", "1", "2", "3", "--" }));
+            Assert.AreEqual(6.0, m.Multiply.Value.Result);
         }
     }
 }

@@ -33,22 +33,72 @@ namespace Sidi.CommandLine.GetOptInternal
         {
             get
             {
+                Type t = null;
                 if (memberInfo is FieldInfo)
                 {
-                    return ((FieldInfo)memberInfo).FieldType;
+                    t = ((FieldInfo)memberInfo).FieldType;
                 }
 
                 if (memberInfo is PropertyInfo)
                 {
-                    return ((PropertyInfo)memberInfo).PropertyType;
+                    t = ((PropertyInfo)memberInfo).PropertyType;
                 }
+
+                t = HandleLazy(t);
+
+                if (t != null) return t;
 
                 throw new ArgumentOutOfRangeException();
             }
         }
 
+        Type HandleLazy(Type moduleType)
+        {
+            if (moduleType.IsGenericType && moduleType.Name.StartsWith("Lazy"))
+            {
+                return moduleType.GetGenericArguments()[0];
+            }
+
+            return moduleType;
+        }
+
+        public object GetModule()
+        {
+            object module = null;
+            if (memberInfo is FieldInfo)
+            {
+                var field = (FieldInfo)memberInfo;
+                module = GetOpt.ProvideValue(instance, field);
+            }
+            else if (memberInfo is PropertyInfo)
+            {
+                var property = (PropertyInfo)memberInfo;
+                module = GetOpt.ProvideValue(instance, property);
+            }
+
+            module = HandleLazyValue(module);
+
+            if (module != null) return module;
+
+            throw new ArgumentOutOfRangeException("command.memberInfo", memberInfo, "Cannot handle this memberInfo");
+        }
+
+        static object HandleLazyValue(object x)
+        {
+            if (x == null) return null;
+
+            var moduleType = x.GetType();
+
+            if (moduleType.IsGenericType && moduleType.Name.StartsWith("Lazy"))
+            {
+                return moduleType.GetProperty("Value").GetValue(x);
+            }
+
+            return x;
+        }
+
         public readonly object instance;
-        public readonly MemberInfo memberInfo;
+        readonly MemberInfo memberInfo;
         public readonly string usage;
 
         public string LongOption { get; set; }

@@ -327,7 +327,7 @@ namespace Sidi.CommandLine
             return true;
         }
 
-        static object ProvideValue(object instance, FieldInfo field)
+        internal static object ProvideValue(object instance, FieldInfo field)
         { 
             var v = field.GetValue(instance);
             if (v == null)
@@ -338,16 +338,21 @@ namespace Sidi.CommandLine
             return v;
         }
 
+        internal static object ProvideValue(object instance, PropertyInfo property)
+        {
+            var v = property.GetValue(instance, new object[] { });
+            if (v == null)
+            {
+                v = Activator.CreateInstance(property.PropertyType);
+                property.SetValue(instance, v, new object[] { });
+            }
+            return v;
+        }
+
         private static void Invoke(Command command, Args args)
         {
             log.InfoFormat("command {0}", command);
-            object commandModule = null;
-            if (command.memberInfo is FieldInfo)
-            {
-                var field = (FieldInfo)command.memberInfo;
-                commandModule = ProvideValue(command.instance, field);
-            }
-
+            var commandModule = command.GetModule();
             var getOpt = new GetOpt();
             getOpt.modules.Add(commandModule);
             getOpt.AddDefaultModules();
@@ -376,13 +381,48 @@ namespace Sidi.CommandLine
             throw new CommandLineException(String.Format("command {0} is not unique. Could be {1}", name, abbreviationMatches.Join(", ")));
         }
 
-        internal static object ParseParameter(string value, ParameterInfo parameter)
+        internal static object ParseParameter(Args args, ParameterInfo parameter)
         {
-            if (value == null && parameter.IsOptional)
+            if (parameter.IsOptional)
             {
-                return null;
+                var value = GetParameter(args);
+                if (value == null)
+                {
+                    return null;
+                }
+                return ParseParameter(value, parameter.ParameterType);
             }
-            return ParseParameter(value, parameter.ParameterType);
+
+            return ParseParameter(args, parameter.ParameterType);
+        }
+
+        internal static object ParseParameter(Args args, Type type)
+        {
+            if (type.IsArray)
+            {
+                var p = new List<object>();
+                for (; ;)
+                {
+                    var element = ParseParameter(args, type.GetElementType());
+                    if (element == null)
+                    {
+                        break;
+                    }
+                    p.Add(element);
+                }
+                var a = Array.CreateInstance(type.GetElementType(), p.Count);
+                for (int i=0; i<p.Count;++i)
+                {
+                    a.SetValue(p[i], i);
+                }
+                return a;
+            }
+            else
+            {
+                var value = GetParameter(args);
+                if (value == null) return null;
+                return Parser.ParseValueBuiltIn(value, type);
+            }
         }
 
         internal static object ParseParameter(string value, Type type)
@@ -404,12 +444,12 @@ namespace Sidi.CommandLine
 
         internal static object[] GetParameterValues(Args args, ParameterInfo[] parameter)
         {
-            return parameter.Select(pi => ParseParameter(GetParameter(args), pi)).ToArray();
+            return parameter.Select(pi => ParseParameter(args, pi)).ToArray();
         }
 
         internal static object[] GetParameterValues(Args args, Type[] parameter)
         {
-            return parameter.Select(pi => ParseParameter(GetParameter(args), pi)).ToArray();
+            return parameter.Select(pi => ParseParameter(args, pi)).ToArray();
         }
 
         static internal void Invoke(GetOptInternal.Option option, Args args)
@@ -557,6 +597,40 @@ namespace Sidi.CommandLine
             return Run(new Args(argsArray));
         }
 
+        class MethodArgumentHandler : IArgumentHandler
+        {
+            private readonly object instance;
+            private readonly MethodInfo method;
+
+            public MethodArgumentHandler(object instance, MethodInfo method)
+            {
+                this.instance = instance;
+                this.method = method;
+            }
+
+            public void ProcessArguments(string[] args)
+            {
+                var p = GetParameterValues(new Args(args), method.GetParameters());
+                log.DebugFormat("invoke argument handler {0} with arguments {1}", method, p.Join(", "));
+                method.Invoke(instance, p);
+            }
+        }
+
+        IArgumentHandler GetArgumentHandler()
+        {
+            var argumentHandler = MainModule as IArgumentHandler;
+            if (argumentHandler != null) return argumentHandler;
+
+            // look for "Main" method to handle arguments
+            var main = MainModule.GetType().GetMethod("Main", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (main != null)
+            {
+                return new MethodArgumentHandler(MainModule, main);
+            }
+
+            throw new CommandLineException("Cannot process normal arguments.");
+        }
+
         internal int Run(Args args)
         {
             try
@@ -572,12 +646,9 @@ namespace Sidi.CommandLine
                     if (HandleNormalArgument(args, argList)) continue;
                 }
 
-                var argumentHandler = MainModule as Sidi.CommandLine.IArgumentHandler;
-                if (argumentHandler == null)
+                if (argList.Any())
                 {
-                }
-                else
-                {
+                    var argumentHandler = GetArgumentHandler();
                     log.InfoFormat("arguments: {0}", argList.Join(", "));
                     argumentHandler.ProcessArguments(argList.ToArray());
                 }
@@ -630,12 +701,9 @@ namespace Sidi.CommandLine
                     if (HandleNormalArgument(args, argList)) continue;
                 }
 
-                var argumentHandler = MainModule as Sidi.CommandLine.IArgumentHandler;
-                if (argumentHandler == null)
+                if (argList.Any())
                 {
-                }
-                else
-                {
+                    var argumentHandler = GetArgumentHandler();
                     log.InfoFormat("arguments: {0}", argList.Join(", "));
                     argumentHandler.ProcessArguments(argList.ToArray());
                 }
