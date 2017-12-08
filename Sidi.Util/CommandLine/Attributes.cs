@@ -23,6 +23,10 @@ using System.Reflection;
 
 namespace Sidi.CommandLine
 {
+    /// <summary>
+    /// Properties, fields, or methods with this attribute will become command line options.
+    /// Use on classes to provide usage information for programs and sub commands.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
     public class Usage : System.Attribute
     {
@@ -52,6 +56,14 @@ namespace Sidi.CommandLine
 
             return null;
         }
+    }
+
+    /// <summary>
+    /// The method with this attribute will be used to handle normal arguments, i.e. arguments which are not options
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ArgumentHandler : System.Attribute
+    {
     }
 
     /// <summary>

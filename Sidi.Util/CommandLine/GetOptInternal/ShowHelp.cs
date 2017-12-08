@@ -30,19 +30,14 @@ namespace Sidi.CommandLine.GetOptInternal
 
         static string GetIArgumentHandlerUsage(GetOpt o)
         {
-            if (o.MainModule is IArgumentHandler)
+            var u = o.GetArgumentHandler();
+            if (u == null)
             {
-                var processArguments = o.MainModule.GetType().GetMethod("ProcessArguments", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string[]) }, null);
-                var u = processArguments.GetCustomAttribute<Usage>();
-                if (u == null)
-                {
-                    return "[argument]...";
-                }
-                return u.Description;
+                return String.Empty;
             }
             else
             {
-                return String.Empty;
+                return u.Usage;
             }
         }
 
@@ -73,7 +68,7 @@ namespace Sidi.CommandLine.GetOptInternal
                 w.WriteLine("Commands:");
                 foreach (var command in o.Commands)
                 {
-                    w.WriteLine("{0} : {1}", Syntax(o, command), command.usage);
+                    w.WriteLine("{0} : {1}", Syntax(o, command), command.Usage);
                 }
             }
         }
@@ -166,9 +161,21 @@ namespace Sidi.CommandLine.GetOptInternal
             return String.Format("<{0}>", type.Name);
         }
 
+        internal static string ArgumentSyntax(MethodInfo method)
+        {
+            return method.GetParameters().Select(Syntax).Join(" ");
+        }
+
         static string Syntax(ParameterInfo parameterInfo)
         {
-            return String.Format("<{0}: {1}>", parameterInfo.Name, parameterInfo.ParameterType.Name);
+            if (parameterInfo.ParameterType.IsArray)
+            {
+                return String.Format("<{0}: {1}>...", parameterInfo.Name, parameterInfo.ParameterType.GetElementType().Name);
+            }
+            else
+            {
+                return String.Format("<{0}: {1}>", parameterInfo.Name, parameterInfo.ParameterType.Name);
+            }
         }
 
         static void PrintColumns(TextWriter w, int[] width, string[] text)

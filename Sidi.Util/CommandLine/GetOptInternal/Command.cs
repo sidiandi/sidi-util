@@ -11,6 +11,8 @@ namespace Sidi.CommandLine.GetOptInternal
 {
     internal class Command
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static public Command Create(object instance, MemberInfo memberInfo)
         {
             var attribute = memberInfo.GetCustomAttribute<Sidi.CommandLine.SubCommandAttribute>();
@@ -26,7 +28,7 @@ namespace Sidi.CommandLine.GetOptInternal
             this.instance = instance;
             this.memberInfo = memberInfo;
             this.LongOption = Option.CSharpIdentifierToLongOption(memberInfo.Name);
-            this.usage = Usage.Get(ModuleType);
+            this.usage = Sidi.CommandLine.Usage.Get(ModuleType);
         }
 
         Type ModuleType
@@ -62,7 +64,18 @@ namespace Sidi.CommandLine.GetOptInternal
             return moduleType;
         }
 
-        public object GetModule()
+        internal void Invoke(Args args)
+        {
+            log.InfoFormat("command {0}", this);
+            var commandModule = GetModule();
+            var getOpt = new GetOpt();
+            getOpt.modules.Add(commandModule);
+            getOpt.AddDefaultModules();
+            getOpt.ProgramName = getOpt.ProgramName + " " + LongOption;
+            getOpt.RunCommand(args);
+        }
+
+        object GetModule()
         {
             object module = null;
             if (memberInfo is FieldInfo)
@@ -97,9 +110,11 @@ namespace Sidi.CommandLine.GetOptInternal
             return x;
         }
 
-        public readonly object instance;
+        readonly object instance;
         readonly MemberInfo memberInfo;
-        public readonly string usage;
+        readonly string usage;
+
+        public string Usage { get { return usage;  } }
 
         public string LongOption { get; set; }
 
@@ -110,7 +125,7 @@ namespace Sidi.CommandLine.GetOptInternal
             return LongOption;
         }
 
-        public static IEnumerable<Command> Get(object module)
+        static IEnumerable<Command> Get(object module)
         {
             return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Select(m => Command.Create(module, m))

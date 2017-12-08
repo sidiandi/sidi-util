@@ -322,7 +322,7 @@ namespace Sidi.CommandLine
 
             args.MoveNext();
 
-            Invoke(command, args);
+            command.Invoke(args);
 
             return true;
         }
@@ -347,17 +347,6 @@ namespace Sidi.CommandLine
                 property.SetValue(instance, v, new object[] { });
             }
             return v;
-        }
-
-        private static void Invoke(Command command, Args args)
-        {
-            log.InfoFormat("command {0}", command);
-            var commandModule = command.GetModule();
-            var getOpt = new GetOpt();
-            getOpt.modules.Add(commandModule);
-            getOpt.AddDefaultModules();
-            getOpt.ProgramName = getOpt.ProgramName + " " + command.LongOption;
-            getOpt.RunCommand(args);
         }
 
         private static Command FindCommand(string name, IEnumerable<Command> commands)
@@ -597,10 +586,18 @@ namespace Sidi.CommandLine
             return Run(new Args(argsArray));
         }
 
-        class MethodArgumentHandler : IArgumentHandler
+        class MethodArgumentHandler : IArgumentHandlerWithUsage
         {
             private readonly object instance;
             private readonly MethodInfo method;
+
+            public string Usage
+            {
+                get
+                {
+                    return GetOptInternal.ShowHelp.ArgumentSyntax(method);
+                }
+            }
 
             public MethodArgumentHandler(object instance, MethodInfo method)
             {
@@ -614,21 +611,75 @@ namespace Sidi.CommandLine
                 log.DebugFormat("invoke argument handler {0} with arguments {1}", method, p.Join(", "));
                 method.Invoke(instance, p);
             }
+
+            internal static IArgumentHandlerWithUsage Create(object mainModule)
+            {
+                var method = mainModule.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                    .FirstOrDefault(_ => _.GetCustomAttribute<ArgumentHandler>() != null);
+
+                if (method == null) return null;
+
+                return new MethodArgumentHandler(mainModule, method);
+            }
         }
 
-        IArgumentHandler GetArgumentHandler()
+        internal interface IArgumentHandlerWithUsage : IArgumentHandler
         {
-            var argumentHandler = MainModule as IArgumentHandler;
-            if (argumentHandler != null) return argumentHandler;
+              string Usage { get; }
+        }
 
-            // look for "Main" method to handle arguments
-            var main = MainModule.GetType().GetMethod("Main", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (main != null)
+        class ArgumentHandlerWrapper : IArgumentHandlerWithUsage
+        {
+            private readonly IArgumentHandler actualHandler;
+
+            public ArgumentHandlerWrapper(IArgumentHandler actualHandler)
             {
-                return new MethodArgumentHandler(MainModule, main);
+                this.actualHandler = actualHandler;
             }
 
-            throw new CommandLineException("Cannot process normal arguments.");
+            public string Usage
+            {
+                get
+                {
+                    var processArguments = actualHandler.GetType().GetMethod("ProcessArguments", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string[]) }, null);
+                    var u = processArguments.GetCustomAttribute<Usage>();
+                    if (u == null)
+                    {
+                        return "[argument]...";
+                    }
+                    return u.Description;
+                }
+            }
+
+            public void ProcessArguments(string[] args)
+            {
+                actualHandler.ProcessArguments(args);
+            }
+        }
+
+        class EmptyArgumentHandler : IArgumentHandlerWithUsage
+        {
+            public string Usage => String.Empty;
+
+            public void ProcessArguments(string[] args)
+            {
+                foreach (var i in args)
+                {
+                    log.WarnFormat("Argument {0} is ignored.", i);
+                }
+            }
+        }
+
+        internal IArgumentHandlerWithUsage GetArgumentHandler()
+        {
+            var argumentHandler = MainModule as IArgumentHandler;
+            if (argumentHandler != null) return new ArgumentHandlerWrapper(argumentHandler);
+
+            // look for method with ArgumentHandler attribute to handle arguments
+            var argumentHandlerWithUsage = MethodArgumentHandler.Create(MainModule);
+            if (argumentHandlerWithUsage != null) return argumentHandlerWithUsage;
+
+            return new EmptyArgumentHandler();
         }
 
         internal int Run(Args args)

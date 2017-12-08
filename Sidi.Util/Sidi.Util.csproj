@@ -52,6 +52,7 @@
     <Compile Include="CommandLine\GetOptInternal\Logging.cs" />
     <Compile Include="CommandLine\GetOptInternal\ShowHelp.cs" />
     <Compile Include="CommandLine\GetOptInternal\Option.cs" />
+    <Compile Include="CommandLine\IArgumentHandler.cs" />
     <Compile Include="CommandLine\ItemSource.cs" />
     <Compile Include="CommandLine\ArrayValueParser.cs" />
     <Compile Include="CommandLine\Attributes.cs" />
@@ -200,7 +201,6 @@
     <Compile Include="Persistence\Set.cs" />
     <Compile Include="Persistence\SharedConnection.cs" />
     <Compile Include="Net\Pop3\Namespace.cs" />
-    <Compile Include="Sidi\CommandLine\IArgumentHandler.cs" />
     <Compile Include="Test\Namespace.cs" />
     <Compile Include="TreeMap\Adapter.cs" />
     <Compile Include="TreeMap\FileSystemTree.cs" />
