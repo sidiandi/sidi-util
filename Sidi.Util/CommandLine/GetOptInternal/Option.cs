@@ -13,12 +13,47 @@ namespace Sidi.CommandLine.GetOptInternal
     {
         static public Option Create(object instance, MemberInfo memberInfo)
         {
+            if (instance == null)
+            {
+                throw new ArgumentNullException(nameof(instance));
+            }
+
+            if (memberInfo == null)
+            {
+                throw new ArgumentNullException(nameof(memberInfo));
+            }
+
             var usage = Sidi.CommandLine.Usage.Get(memberInfo);
             if (usage == null)
             {
                 return null;
             }
+
+            if (IsStatic(memberInfo))
+            {
+                throw new CommandLineException("[Usage] attribute cannot be applied to static members.");
+            }
+
             return new Option(instance, memberInfo, usage);
+        }
+
+        static bool IsStatic(MemberInfo m)
+        {
+            if (m is FieldInfo)
+            {
+                var f = (FieldInfo)m;
+                return f.IsStatic;
+            }
+            if (m is PropertyInfo)
+            {
+                return true;
+            }
+            if (m is MethodInfo)
+            {
+                var method = (MethodInfo)m;
+                return method.IsStatic;
+            }
+            throw new ArgumentOutOfRangeException("m", m, "Cannot handle this type");
         }
 
         Option(object instance, MemberInfo memberInfo, string usage)
@@ -63,7 +98,7 @@ namespace Sidi.CommandLine.GetOptInternal
 
         public static IEnumerable<Option> Get(object module)
         {
-            return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            return module.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
                 .Select(m => Option.Create(module, m))
                 .Where(_ => _ != null)
                 .Where(_ => !_.memberInfo.Name.Equals("ProcessArguments"))
