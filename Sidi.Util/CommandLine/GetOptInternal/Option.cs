@@ -46,7 +46,7 @@ namespace Sidi.CommandLine.GetOptInternal
             }
             if (m is PropertyInfo)
             {
-                return true;
+                return false;
             }
             if (m is MethodInfo)
             {

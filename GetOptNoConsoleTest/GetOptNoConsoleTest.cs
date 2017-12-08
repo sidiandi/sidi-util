@@ -9,7 +9,7 @@ namespace Sidi.np
 
     [Usage("Does nothing")]
     [TestFixture]
-    public class np : IArgumentHandler
+    public class np
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -18,7 +18,8 @@ namespace Sidi.np
             return GetOpt.Run(new np(), args);
         }
 
-        public void ProcessArguments(string[] args)
+        [ArgumentHandler]
+        public void ProcessArguments(string[] file)
         {
         }
 

@@ -13,9 +13,10 @@ namespace Sidi.CommandLine.Test
     [Usage("Add numbers")]
     public class Add
     {
-        public void Main(double[] args)
+        [ArgumentHandler]
+        void Main(double[] operand)
         {
-            Result = args.Sum();
+            Result = operand.Sum();
         }
 
         public double Result;
@@ -24,9 +25,10 @@ namespace Sidi.CommandLine.Test
     [Usage("Subtract numbers")]
     public class Subtract
     {
-        public void Main(double[] args)
+        [ArgumentHandler]
+        void Main(double[] operand)
         {
-            Result = args[0] - args.Skip(1).Sum();
+            Result = operand[0] - operand.Skip(1).Sum();
         }
         public double Result;
     }
@@ -34,9 +36,10 @@ namespace Sidi.CommandLine.Test
     [Usage("Multiply numbers")]
     public class Multiply
     {
-        public void Main(double[] args)
+        [ArgumentHandler]
+        void Main(double[] operand)
         {
-            Result = args.Aggregate(1.0, (a, d) => a * d);
+            Result = operand.Aggregate(1.0, (a, d) => a * d);
         }
         public double Result;
     }
@@ -68,7 +71,7 @@ namespace Sidi.CommandLine.Test
     }
 
     [Usage("Module to test GetOpt. Greets names")]
-    public class HelloWorld : Sidi.CommandLine.IArgumentHandler
+    public class HelloWorld
     {
         [Usage("option")]
         public bool f { get; set; }
@@ -110,7 +113,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
         public string[] args;
 
-        [Usage("[name]...")]
+        [ArgumentHandler]
         public void ProcessArguments(string[] args)
         {
             this.args = args;
@@ -315,6 +318,21 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
             Assert.AreEqual(-4.0, m.Subtract.Result);
             Assert.AreEqual(0, g.Run(new[] { "-vvvv", "mul", "1", "2", "3", "--" }));
             Assert.AreEqual(6.0, m.Multiply.Value.Result);
+        }
+
+        class WrongUse
+        {
+            [Usage("putting usage on static members is not allowed and will throw when used with GetOpt.")]
+            static bool flag;
+        }
+
+        [Test]
+        public void UsageOnStaticFieldsThrows()
+        {
+            Assert.Throws<CommandLineException>(() =>
+            {
+                GetOpt.Run(new WrongUse(), new[] { "-f" });
+            });
         }
     }
 }
